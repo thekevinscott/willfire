@@ -43,6 +43,11 @@ def gh_paginate(path):
         while j < len(s) and s[j] in " \n\r\t":
             j += 1
         i = j
+    # unwrap envelope objects like {"total_count": N, "workflows": [...]}
+    if items and isinstance(items[0], dict):
+        for key in ("workflows", "workflow_runs", "jobs"):
+            if key in items[0]:
+                return [x for page in items for x in page[key]]
     return items
 
 
