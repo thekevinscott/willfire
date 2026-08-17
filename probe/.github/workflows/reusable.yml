@@ -1,0 +1,14 @@
+name: reusable
+on: workflow_call
+jobs:
+  inner-one:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo inner one
+  inner-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        x: [a, b]
+    steps:
+      - run: echo "${{ matrix.x }}"

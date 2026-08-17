@@ -1,0 +1,9 @@
+name: types
+on:
+  pull_request:
+    types: [labeled]
+jobs:
+  on-label:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo labeled

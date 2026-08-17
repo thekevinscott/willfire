@@ -1,0 +1,12 @@
+name: combined
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "src/**"
+jobs:
+  main-and-src:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo main + src

@@ -1,0 +1,29 @@
+name: job-if
+on: pull_request
+jobs:
+  never:
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo never
+  push-only:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo push only
+  pr-only:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo pr only
+  dependent:
+    needs: [never]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo dependent
+  dependent-always:
+    needs: [never]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo dependent always

@@ -1,0 +1,11 @@
+name: paths-ignore
+on:
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+jobs:
+  non-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo non-docs change

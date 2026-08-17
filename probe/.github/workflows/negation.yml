@@ -1,0 +1,11 @@
+name: negation
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "!src/vendor/**"
+jobs:
+  non-vendor-src:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo non-vendor src change

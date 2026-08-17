@@ -1,0 +1,17 @@
+name: multi
+on: [pull_request]
+jobs:
+  alpha:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo alpha
+  beta:
+    name: beta job
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo beta
+  gamma:
+    needs: [alpha, beta]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo gamma

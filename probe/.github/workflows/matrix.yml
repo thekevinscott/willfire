@@ -1,0 +1,16 @@
+name: matrix
+on: pull_request
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ver: ["1.0", "2.0"]
+        mode: [fast, slow]
+        exclude:
+          - ver: "2.0"
+            mode: slow
+        include:
+          - ver: "3.0"
+    steps:
+      - run: echo "${{ matrix.ver }} ${{ matrix.mode }}"

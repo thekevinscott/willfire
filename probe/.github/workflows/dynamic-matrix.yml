@@ -1,0 +1,18 @@
+name: dynamic-matrix
+on: pull_request
+jobs:
+  gen:
+    runs-on: ubuntu-latest
+    outputs:
+      items: ${{ steps.set.outputs.items }}
+    steps:
+      - id: set
+        run: echo 'items=["p","q"]' >> "$GITHUB_OUTPUT"
+  use:
+    needs: gen
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        item: ${{ fromJSON(needs.gen.outputs.items) }}
+    steps:
+      - run: echo "${{ matrix.item }}"

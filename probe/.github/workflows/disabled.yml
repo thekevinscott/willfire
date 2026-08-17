@@ -1,0 +1,7 @@
+name: disabled
+on: pull_request
+jobs:
+  should-not-run:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo this workflow gets disabled via API

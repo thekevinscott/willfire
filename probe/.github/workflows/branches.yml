@@ -1,0 +1,10 @@
+name: branches
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  into-main:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo PR into main
