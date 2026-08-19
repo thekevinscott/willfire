@@ -37,7 +37,12 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     permissions:
       contents: write
-      id-token: write
+      # id-token: write is deliberately absent for the first publish:
+      # with OIDC env present, npm attempts the trusted-publishing
+      # exchange, which fails for a never-published package and
+      # clobbers NODE_AUTH_TOKEN auth. Restore `id-token: write` here
+      # after willrun exists on the registry and the trusted publisher
+      # is registered.
 
   # PyPI upload runs in the caller's workflow context (see
   # pypi/warehouse#11096). The `if:` gate skips this job for non-PyPI
