@@ -1,6 +1,8 @@
 # putitoutthere release configuration.
 #
-# One published artifact: the `willrun` npm package (library + CLI).
+# One published artifact: the `willfire` npm package (library + CLI).
+# ("willrun" is unregistrable on npm: `will-run` exists, and npm blocks
+# punctuation-variant names.)
 # Single-package repo, so tags stay on the v1.2.3-style timeline rather
 # than the default `{name}-v{version}`.
 
@@ -8,8 +10,8 @@
 version = 1
 
 [[package]]
-name  = "willrun"
-npm   = "willrun"
+name  = "willfire"
+npm   = "willfire"
 kind  = "npm"
 path  = "."
 globs = [

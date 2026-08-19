@@ -402,7 +402,7 @@ function parseArgs(argv: string[]): { repo: string; pr: number; json: boolean } 
   return { repo, pr: Number(pr), json: argv.includes("--json") };
 }
 
-const isMain = /predict\.(ts|js)$|\/willrun$/.test(process.argv[1] ?? "");
+const isMain = /predict\.(ts|js)$|\/willfire$/.test(process.argv[1] ?? "");
 if (isMain) {
   const args = parseArgs(process.argv.slice(2));
   const { entries, skip } = await predict(makeOctokit(), args.repo, args.pr);

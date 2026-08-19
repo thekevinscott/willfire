@@ -1,23 +1,23 @@
-# willrun
+# willfire
 
 Predicts the set of CI check entries GitHub Actions will create for a pull
 request — before (or without) the runs happening.
 
 GitHub's dispatch decision is server-side and unpublished: no API tells you
 which workflows will fire for a PR after branch/path/type filters, or which
-job entries they expand into. willrun evaluates the workflow files statically
+job entries they expand into. willfire evaluates the workflow files statically
 against the PR's base branch, changed files, and head commit message.
 
 ## Install
 
 ```sh
-pnpm add willrun
+pnpm add willfire
 ```
 
 ## Library
 
 ```ts
-import { predict } from "willrun";
+import { predict } from "willfire";
 import { getOctokit } from "@actions/github"; // or new Octokit({ auth: token })
 
 const { entries, skip } = await predict(getOctokit(token), "owner/repo", 123);
@@ -30,7 +30,7 @@ Auth is any token with `contents: read`, `actions: read`, and
 ## CLI
 
 ```sh
-GH_TOKEN=... willrun --repo owner/repo --pr 123 [--json]
+GH_TOKEN=... willfire --repo owner/repo --pr 123 [--json]
 ```
 
 ## What it handles

@@ -23,7 +23,7 @@ on:
         description: >
           Packages to release manually, bypassing change detection.
           Comma-separated list of name[@<bump|version>] entries, e.g.
-          "willrun@minor" or "willrun@1.2.0". Leave empty to fall back
+          "willfire@minor" or "willfire@1.2.0". Leave empty to fall back
           to automatic change detection (same as a push).
         required: false
         default: ''

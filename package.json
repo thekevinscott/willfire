@@ -1,5 +1,5 @@
 {
-  "name": "willrun",
+  "name": "willfire",
   "version": "0.1.0",
   "description": "Predict the set of CI check entries GitHub Actions will create for a pull request",
   "license": "MIT",
@@ -25,7 +25,7 @@
     }
   },
   "bin": {
-    "willrun": "dist/predict.js"
+    "willfire": "dist/predict.js"
   },
   "files": [
     "dist"
