@@ -1,0 +1,23 @@
+# putitoutthere release configuration.
+#
+# One published artifact: the `willrun` npm package (library + CLI).
+# Single-package repo, so tags stay on the v1.2.3-style timeline rather
+# than the default `{name}-v{version}`.
+
+[putitoutthere]
+version = 1
+
+[[package]]
+name  = "willrun"
+npm   = "willrun"
+kind  = "npm"
+path  = "."
+globs = [
+  "src/**",
+  "package.json",
+  "pnpm-lock.yaml",
+  "tsconfig.json",
+  "tsconfig.build.json",
+]
+tag_format    = "v{version}"
+first_version = "0.1.0"

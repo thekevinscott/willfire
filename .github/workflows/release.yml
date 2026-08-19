@@ -1,0 +1,64 @@
+name: Release
+
+# putitoutthere's reusable workflow; config lives in `putitoutthere.toml`
+# at the repo root.
+#
+# Auth: the `NPM_TOKEN` secret is the first-publish bootstrap only —
+# Trusted Publishing on npm binds to an already-published package, so
+# the very first publish has no OIDC path. Once `willrun` exists on the
+# registry: register the trusted publisher (repo thekevinscott/willrun,
+# workflow release.yml, environment release), then DELETE the NPM_TOKEN
+# secret; the OIDC exchange takes over.
+#
+# Filename matters: npm's trust policy matches the caller workflow
+# filename. Renaming this file requires re-registering the trusted
+# publisher.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      release_packages:
+        description: >
+          Packages to release manually, bypassing change detection.
+          Comma-separated list of name[@<bump|version>] entries, e.g.
+          "willrun@minor" or "willrun@1.2.0". Leave empty to fall back
+          to automatic change detection (same as a push).
+        required: false
+        default: ''
+
+jobs:
+  release:
+    uses: thekevinscott/putitoutthere/.github/workflows/release.yml@v0
+    with:
+      release_packages: ${{ inputs.release_packages || '' }}
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    permissions:
+      contents: write
+      id-token: write
+
+  # PyPI upload runs in the caller's workflow context (see
+  # pypi/warehouse#11096). The `if:` gate skips this job for non-PyPI
+  # repos — pasted verbatim per putitoutthere's README regardless of
+  # what the repo publishes.
+  pypi-publish:
+    needs: release
+    if: needs.release.outputs.has_pypi == 'true'
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: '*-sdist'
+          path: dist/
+          merge-multiple: true
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: '*-wheel-*'
+          path: dist/
+          merge-multiple: true
+      - uses: pypa/gh-action-pypi-publish@release/v1
