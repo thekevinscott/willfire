@@ -5,8 +5,8 @@ name: Release
 #
 # Auth: the `NPM_TOKEN` secret is the first-publish bootstrap only —
 # Trusted Publishing on npm binds to an already-published package, so
-# the very first publish has no OIDC path. Once `willrun` exists on the
-# registry: register the trusted publisher (repo thekevinscott/willrun,
+# the very first publish has no OIDC path. `willfire` is published:
+# register the trusted publisher (repo thekevinscott/willfire,
 # workflow release.yml, environment release), then DELETE the NPM_TOKEN
 # secret; the OIDC exchange takes over.
 #

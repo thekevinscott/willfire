@@ -6,7 +6,7 @@
   "author": "Kevin Scott <me@thekevinscott.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thekevinscott/willrun.git"
+    "url": "git+https://github.com/thekevinscott/willfire.git"
   },
   "keywords": [
     "github-actions",
