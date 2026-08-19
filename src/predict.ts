@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // Predict the set of CI check entries GitHub Actions will create for a PR.
 //
 // Usage: pnpm predict --repo owner/name --pr N [--json]
@@ -401,7 +402,7 @@ function parseArgs(argv: string[]): { repo: string; pr: number; json: boolean } 
   return { repo, pr: Number(pr), json: argv.includes("--json") };
 }
 
-const isMain = process.argv[1]?.endsWith("predict.ts");
+const isMain = /predict\.(ts|js)$|\/willrun$/.test(process.argv[1] ?? "");
 if (isMain) {
   const args = parseArgs(process.argv.slice(2));
   const { entries, skip } = await predict(makeOctokit(), args.repo, args.pr);
