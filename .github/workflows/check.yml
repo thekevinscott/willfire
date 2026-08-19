@@ -1,0 +1,8 @@
+name: putitoutthere check
+
+on:
+  pull_request: {}
+
+jobs:
+  putitoutthere-check:
+    uses: thekevinscott/putitoutthere/.github/workflows/check.yml@v0
