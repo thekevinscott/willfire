@@ -58,6 +58,11 @@ export interface WorkflowEntry extends EntryBase {
  * These can be genuinely undecidable statically — dynamic matrix, a reusable
  * workflow we cannot read, unresolvable `if`, or `needs` on any of those — so
  * `"unknown"` lives here and only here.
+ *
+ * `"no-dispatch"` is the mirror image, and lives on {@link WorkflowEntry} and
+ * only there. It is a verdict about whether the run happens at all, which is
+ * settled before any job is looked at — so by the time there is a job entry to
+ * label, the answer is already yes.
  */
 export interface JobEntry extends EntryBase {
   job: JobName;
@@ -71,7 +76,7 @@ export interface JobEntry extends EntryBase {
    * interpolates something we cannot evaluate ahead of the run.
    */
   checkName: string | null;
-  status: "run" | "skipped" | "unknown" | "no-dispatch";
+  status: "run" | "skipped" | "unknown";
 }
 
 export type Entry = WorkflowEntry | JobEntry;
