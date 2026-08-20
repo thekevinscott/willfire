@@ -71,9 +71,25 @@ entries, matching how they appear in the checks UI.
 Things that cannot be known statically — e.g. a matrix computed at runtime
 from another job's output — are reported as `unknown` rather than guessed.
 
+## Development
+
+```sh
+pnpm install
+pnpm typecheck        # tsc over src/, tests included
+pnpm test             # vitest, once
+pnpm test:coverage    # the 100% floor CI enforces
+```
+
+Unit tests are colocated with their source (`foo.ts` ↔ `foo.test.ts`) at 100%
+coverage, per the
+[testing-conventions](https://github.com/thekevinscott/testing-conventions)
+standard. `.github/workflows/conventions.yml` enforces that in CI;
+`testing-conventions.toml` holds the thresholds.
+
 ## Verification
 
-Predictions are verified against real GitHub behavior, not just the docs:
+The unit suite fixes the behavior. What fixes the *expectations* is the probe:
+predictions are verified against real GitHub behavior, not just the docs.
 [willrun-probe](https://github.com/thekevinbot/willrun-probe) holds one
 workflow per dispatch rule, and probe PRs exercise each complication
 (docs-only diffs, negation edges, `[skip ci]`, a 301-file diff, PRs into

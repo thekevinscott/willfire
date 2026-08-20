@@ -1,0 +1,26 @@
+name: Testing Conventions
+
+# Runs the upstream testing-conventions gates over this repo, pinned to the
+# rolling `v0` tag (the same convention as check.yml).
+#
+# There is no config file: every gate takes its default, which for TypeScript is
+# a 100% floor on all four coverage metrics and nothing exempt.
+#
+# `mutation` and `e2e-verify` are left out — mutation needs Stryker in this
+# package's own deps, and there is no e2e attestation to keep fresh.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  conventions:
+    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
+    with:
+      languages: '["typescript"]'
+      source: src
+      gates: '["colocated-test", "unit-lint", "unit-coverage", "integration-lint", "packaging"]'
