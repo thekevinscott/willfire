@@ -6,9 +6,9 @@ name: test
 # locally with `pnpm typecheck` and `pnpm test:coverage`.
 #
 # The suites are not a set of opinions about how GitHub *should* behave: every
-# expectation in `src/names.test.ts` and every workflow-level verdict in
-# `src/predict.test.ts` was read back off a live dispatch on
-# thekevinbot/willrun-probe. See `probe/README.md`.
+# expectation in `tests/integration/names.test.ts` and every workflow-level
+# verdict in `src/predict.test.ts` was read back off a live dispatch on
+# thekevinbot/willrun-probe. See `tests/fixtures/willrun-probe/README.md`.
 
 on:
   pull_request: {}

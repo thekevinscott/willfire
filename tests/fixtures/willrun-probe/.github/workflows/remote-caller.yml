@@ -1,0 +1,39 @@
+name: remote-caller
+# The caller half of the remote-reusable probe: every job here reaches
+# `remote-reusable.yml` by the full `owner/repo/path@ref` form rather than `./`,
+# once per kind of ref GitHub accepts.
+#
+# Scoped to `src/remote.txt` so it stays out of the other probe PRs'
+# predictions — PRs 1-8 pin dispatch and check-name rules that predate it.
+on:
+  pull_request:
+    paths:
+      - src/remote.txt
+jobs:
+  call-remote-tag:
+    uses: thekevinbot/willrun-probe/.github/workflows/remote-reusable.yml@remote-v0
+
+  call-remote-named:
+    name: Remote Caller
+    uses: thekevinbot/willrun-probe/.github/workflows/remote-reusable.yml@remote-v0
+
+  call-remote-matrix:
+    strategy:
+      matrix:
+        v: [a, b]
+    uses: thekevinbot/willrun-probe/.github/workflows/remote-reusable.yml@remote-v0
+    with:
+      tag: ${{ matrix.v }}
+
+  # `main` carries renamed jobs, so this one's check names say the branch ref
+  # was resolved rather than the tag.
+  call-remote-branch:
+    uses: thekevinbot/willrun-probe/.github/workflows/remote-reusable.yml@main
+
+  # The same commit `remote-v0` points at, spelled as a SHA.
+  call-remote-sha:
+    uses: thekevinbot/willrun-probe/.github/workflows/remote-reusable.yml@085aa5927d7ac296cc6e740713ef5b1a7e20d6b7
+
+  call-remote-skipped:
+    if: false
+    uses: thekevinbot/willrun-probe/.github/workflows/remote-reusable.yml@remote-v0

@@ -1,0 +1,13 @@
+name: remote-bad
+# A remote reusable call that cannot resolve. Kept in its own file because an
+# unresolvable `uses:` fails the whole run at startup, which would take
+# `remote-caller.yml`'s real answers down with it.
+#
+# Scoped to its own path for the same reason `remote-caller.yml` is.
+on:
+  pull_request:
+    paths:
+      - src/remote-bad.txt
+jobs:
+  call-missing:
+    uses: thekevinbot/willrun-probe/.github/workflows/does-not-exist.yml@remote-v0

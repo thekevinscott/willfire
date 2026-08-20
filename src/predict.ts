@@ -7,8 +7,9 @@
 //
 // Faithful port of predict.py, which was verified entry-for-entry against
 // live dispatches on thekevinbot/willrun-probe (PRs 1-7). Check-name
-// resolution was verified the same way on probe PR 8; the rules it turned up
-// are pinned in src/names.test.ts.
+// resolution was verified the same way on probe PR 8, and cross-repo reusable
+// workflow calls on probe PR 9; the rules they turned up are pinned in
+// src/names.test.ts.
 
 import { Octokit } from "@octokit/rest";
 import { parse as parseYaml } from "yaml";
@@ -53,8 +54,8 @@ export interface WorkflowEntry extends EntryBase {
 /**
  * A verdict about one job entry inside a workflow that does dispatch.
  *
- * These can be genuinely undecidable statically — dynamic matrix, non-local
- * reusable workflow, unresolvable `if`, or `needs` on any of those — so
+ * These can be genuinely undecidable statically — dynamic matrix, a reusable
+ * workflow we cannot read, unresolvable `if`, or `needs` on any of those — so
  * `"unknown"` lives here and only here.
  */
 export interface JobEntry extends EntryBase {
@@ -65,8 +66,8 @@ export interface JobEntry extends EntryBase {
    * `<caller> / <callee>` prefixing for reusable workflows.
    *
    * null when there is no single statically-knowable name: a matrix computed
-   * at runtime, a non-local reusable workflow, or a `name:` that interpolates
-   * something we cannot evaluate ahead of the run.
+   * at runtime, a reusable workflow we could not fetch, or a `name:` that
+   * interpolates something we cannot evaluate ahead of the run.
    */
   checkName: string | null;
   status: "run" | "skipped" | "unknown" | "no-dispatch";
@@ -190,8 +191,8 @@ function getPrTrigger(wf: Workflow): Record<string, any> | typeof MISSING {
 
 // A predicate: does this workflow produce a run for the PR? Every workflow-level
 // verdict is decidable, so there is no third answer to express. Only job
-// expansion can be genuinely undecidable (dynamic matrix, non-local reusable
-// workflow, unresolvable `if`), and that is a per-entry status.
+// expansion can be genuinely undecidable (dynamic matrix, an unreadable
+// reusable workflow, unresolvable `if`), and that is a per-entry status.
 function workflowDispatches(
   wf: Workflow,
   ctx: Ctx,
@@ -451,13 +452,76 @@ export interface ExpandedJob {
  * GitHub allows a reusable-workflow call chain four levels deep. Past that the
  * run itself fails, so anything deeper is not a name we could predict anyway.
  * Probe-verified to three levels: `call-nested / Mid Call / inner`.
+ *
+ * A cross-repo hop costs the same one level as a local one, so a chain that
+ * mixes the two is counted the same way.
  */
 const MAX_REUSABLE_DEPTH = 4;
+
+/**
+ * Which repo and ref a workflow file is read from.
+ *
+ * Expansion carries one of these rather than a bare path because `uses:` can
+ * cross repositories. A local `uses: ./...` keeps the current source, so a
+ * relative call inside a workflow that was itself reached by
+ * `owner/repo/path@ref` resolves against *that* repo at *that* ref — probe
+ * verified, see `src/names.test.ts`.
+ */
+export interface WorkflowSource {
+  owner: string;
+  repo: string;
+  /** Tag, branch, or SHA — whatever `@` was pinned to. */
+  ref: string;
+}
+
+/** Read one workflow file, or null if it is not reachable. Must not throw. */
+export type FetchWorkflow = (
+  path: string,
+  source: WorkflowSource,
+) => Promise<string | null>;
+
+/** A `uses:` that named a workflow file we know how to go and get. */
+export interface UsesTarget {
+  /** Path inside the target repo, e.g. `.github/workflows/x.yml`. */
+  path: string;
+  /** null for a local `./` call: the caller's own repo and ref. */
+  source: WorkflowSource | null;
+}
+
+/**
+ * Split a job-level `uses:` into the file it names and the repo it lives in.
+ *
+ * Two spellings are legal:
+ *
+ *   `./.github/workflows/x.yml`              -> the caller's repo, same commit
+ *   `owner/repo/.github/workflows/x.yml@ref` -> another repo, at `ref`
+ *
+ * The ref is taken from the last `@` so a branch containing a slash
+ * (`@feature/foo`) survives. Returns null for anything else — including a
+ * reference built from an expression, which we cannot evaluate and so must not
+ * guess a fetch target for.
+ */
+export function parseUses(uses: string): UsesTarget | null {
+  if (EXPRESSION_RE.test(uses)) return null;
+  if (uses.startsWith("./")) {
+    const path = uses.slice(2);
+    return path === "" ? null : { path, source: null };
+  }
+  const at = uses.lastIndexOf("@");
+  if (at <= 0) return null;
+  const ref = uses.slice(at + 1);
+  if (ref === "") return null;
+  const [owner, repo, ...rest] = uses.slice(0, at).split("/");
+  const path = rest.join("/");
+  if (!owner || !repo || path === "") return null;
+  return { path, source: { owner, repo, ref } };
+}
 
 async function expandJobs(
   wf: Workflow,
   ctx: Ctx,
-  fetchFile: (path: string) => Promise<string | null>,
+  fetchWorkflow: FetchWorkflow,
+  source: WorkflowSource,
   depth = 0,
   prefix = "",
   prefixResolved = true,
@@ -504,7 +568,9 @@ async function expandJobs(
     if ("uses" in job) {
       // Reusable workflow call. The calling job produces no check of its own;
       // each called job becomes `<calling job name> / <called job name>`, and
-      // a matrix on the *caller* multiplies the whole callee set.
+      // a matrix on the *caller* multiplies the whole callee set. A cross-repo
+      // call names its checks exactly the same way a local one does — probe
+      // PR #9, `call-remote-tag / r-inner` alongside `call-plain / inner`.
       const uses: string = job.uses;
       if (combos == null) {
         entries.push({
@@ -519,13 +585,17 @@ async function expandJobs(
       // Resolve the called workflow once, not once per matrix combination.
       let subWf: Workflow | null = null;
       let failure: string | null = null;
-      const m = uses.match(/^\.\/(.+)$/);
+      // Where the callee's own `./` calls will resolve. A remote `uses:` moves
+      // this to the callee's repo and pinned ref; a local one leaves it alone.
+      let subSource: WorkflowSource = source;
+      const target = parseUses(uses);
       if (depth + 1 > MAX_REUSABLE_DEPTH) {
         failure = `reusable workflow nested deeper than ${MAX_REUSABLE_DEPTH} levels`;
-      } else if (!m) {
-        failure = `non-local reusable: ${uses}`;
+      } else if (target == null) {
+        failure = `unresolvable reusable reference: ${uses}`;
       } else {
-        const content = await fetchFile(m[1]);
+        subSource = target.source ?? source;
+        const content = await fetchWorkflow(target.path, subSource);
         if (content == null) {
           failure = `cannot fetch ${uses}`;
         } else {
@@ -554,7 +624,8 @@ async function expandJobs(
           ...(await expandJobs(
             subWf,
             ctx,
-            fetchFile,
+            fetchWorkflow,
+            subSource,
             depth + 1,
             `${baseName} / `,
             nameResolved,
@@ -595,9 +666,10 @@ async function expandJobs(
 export function expandWorkflowJobs(
   wf: Workflow,
   ctx: Ctx,
-  fetchFile: (path: string) => Promise<string | null>,
+  fetchWorkflow: FetchWorkflow,
+  source: WorkflowSource,
 ): Promise<ExpandedJob[]> {
-  return expandJobs(wf, ctx, fetchFile);
+  return expandJobs(wf, ctx, fetchWorkflow, source);
 }
 
 // ------------------------------------------------------------------- pipeline
@@ -638,18 +710,34 @@ export async function predict(
     return finalizePrediction([], "head commit message contains a skip instruction");
   }
 
-  const fetchFile = async (path: string): Promise<string | null> => {
+  /** The PR's own repo at the head commit — where expansion starts. */
+  const headSource: WorkflowSource = { owner, repo: name, ref: headSha };
+
+  // One callee is commonly reached from several callers — a fleet repo calls
+  // the same `testing-conventions@v0` from eight workflows — so remember what
+  // each `owner/repo/path@ref` resolved to, misses included.
+  const cache = new Map<string, string | null>();
+  const fetchWorkflow: FetchWorkflow = async (path, src) => {
+    const key = `${src.owner}/${src.repo}/${path}@${src.ref}`;
+    const hit = cache.get(key);
+    if (hit !== undefined) return hit;
+    let content: string | null;
     try {
       const { data } = await octokit.rest.repos.getContent({
-        ...base,
+        owner: src.owner,
+        repo: src.repo,
         path,
-        ref: headSha,
+        ref: src.ref,
         mediaType: { format: "raw" },
       });
-      return data as unknown as string;
+      content = data as unknown as string;
     } catch {
-      return null;
+      // Private, deleted, bad ref, rate limit, network: all one answer here.
+      // The caller turns it into an `unknown` entry rather than throwing.
+      content = null;
     }
+    cache.set(key, content);
+    return content;
   };
 
   const workflows = await octokit.paginate(octokit.rest.actions.listRepoWorkflows, {
@@ -670,7 +758,7 @@ export async function predict(
       });
       continue;
     }
-    const content = await fetchFile(path);
+    const content = await fetchWorkflow(path, headSource);
     if (content == null) {
       // The Actions API keeps listing a workflow as `active` after its file is
       // deleted. There is no file at head, so there is nothing to dispatch —
@@ -703,7 +791,7 @@ export async function predict(
       entries.push({ workflow: path, job: "*", status: "no-dispatch", reason });
       continue;
     }
-    for (const j of await expandJobs(wf, ctx, fetchFile)) {
+    for (const j of await expandJobs(wf, ctx, fetchWorkflow, headSource)) {
       entries.push({
         workflow: path,
         job: jobName(j.job),

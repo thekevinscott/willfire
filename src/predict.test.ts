@@ -9,8 +9,9 @@
 //
 // The expectations are not opinions about how GitHub *ought* to behave. The
 // workflow-level verdicts were settled in #7 against live dispatches on
-// thekevinbot/willrun-probe, and the probe workflows under `probe/` are the
-// record. Changing one of these assertions means claiming GitHub changed.
+// thekevinbot/willrun-probe, and the probe workflows under
+// `tests/fixtures/willrun-probe/` are the record. Changing one of these
+// assertions means claiming GitHub changed.
 
 import type { Octokit } from "@octokit/rest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -19,6 +20,7 @@ import {
   expandMatrix,
   expandWorkflowJobs,
   makeOctokit,
+  parseUses,
   matchFilters,
   patternToRegex,
   predict,
@@ -755,12 +757,16 @@ describe("job expansion", () => {
       });
     });
 
-    it("cannot see inside a workflow from another repo", async () => {
+    // A cross-repo callee is fetched like any other (#13); this stand-in has no
+    // content for it, so the case under test is the fetch failing rather than
+    // the address being cross-repo. The resolvable path is pinned against live
+    // dispatches in tests/integration/names.test.ts.
+    it("reports a cross-repo reusable it cannot fetch", async () => {
       const uses = "octo/repo/.github/workflows/x.yml@v1";
       expect(await only(caller(uses))).toMatchObject({
         job: "call",
         status: "unknown",
-        reason: `non-local reusable: ${uses}`,
+        reason: `cannot fetch ${uses}`,
       });
     });
 
@@ -985,12 +991,17 @@ describe("the CLI entrypoint", () => {
 // dispatches; this covers the wrapper itself — that it forwards to the job
 // expansion and hands back the entries unchanged.
 describe("expandWorkflowJobs", () => {
+  // Where expansion starts from. Nothing here calls out to another workflow, so
+  // the source is only carried, never followed.
+  const SOURCE = { owner: "o", repo: "r", ref: "main" };
+
   it("expands a parsed workflow into its job entries", async () => {
     const wf = { on: { pull_request: null }, jobs: { build: { "runs-on": "ubuntu-latest" } } };
     const entries = await expandWorkflowJobs(
       wf as never,
       { action: "opened", baseRef: "main", files: ["src/app.txt"] },
       async () => null,
+      SOURCE,
     );
     expect(entries).toEqual([
       { job: "build", checkName: "build", status: "run", reason: "" },
@@ -1002,6 +1013,7 @@ describe("expandWorkflowJobs", () => {
       { on: { pull_request: null }, jobs } as never,
       { action: "opened", baseRef: "main", files: ["src/app.txt"] },
       async () => null,
+      SOURCE,
     );
 
   it("renders an object-valued matrix entry as its comma-joined values", async () => {
@@ -1035,5 +1047,73 @@ describe("expandWorkflowJobs", () => {
       m: { "runs-on": "ubuntu-latest", if: false, name: "sk ${{ github.event_name }}" },
     });
     expect(entries.map((e) => e.checkName)).toEqual(["sk ${{ github.event_name }}"]);
+  });
+});
+
+// Cross-repo `uses:` (#13). The resolvable path — which ref GitHub actually
+// reads, and how a `./` inside a remote callee resolves — is pinned against live
+// dispatches in tests/integration/names.test.ts. What is left for the unit tier
+// is the address parser and the two failure shapes around it.
+describe("cross-repo reusable references", () => {
+  it("parses both spellings and takes the ref from the last @", () => {
+    expect(parseUses("./.github/workflows/x.yml")).toEqual({
+      path: ".github/workflows/x.yml",
+      source: null,
+    });
+    expect(parseUses("o/r/.github/workflows/x.yml@v1")).toEqual({
+      path: ".github/workflows/x.yml",
+      source: { owner: "o", repo: "r", ref: "v1" },
+    });
+    // A branch name may contain a slash, so the ref is everything after the
+    // last `@` rather than the next path segment.
+    expect(parseUses("o/r/w.yml@feature/foo")).toEqual({
+      path: "w.yml",
+      source: { owner: "o", repo: "r", ref: "feature/foo" },
+    });
+  });
+
+  it.each([
+    ["${{ env.CALLEE }}/.github/workflows/x.yml@v1", "built from an expression"],
+    ["./", "a local path with nothing after it"],
+    ["not-a-reference", "no @ at all"],
+    ["owner/repo@v1", "no path between the repo and the ref"],
+    ["owner/repo/x.yml@", "an empty ref"],
+    ["@v1", "an empty address"],
+  ])("rejects %j — %s", (uses) => {
+    expect(parseUses(uses)).toBeNull();
+  });
+
+  it("reports a uses: it cannot turn into a fetch target", async () => {
+    const body = "on: pull_request\njobs:\n  call:\n    uses: not-a-reference\n";
+    const { entries } = await predict(
+      fakeOctokit({ contents: { [WF]: body } }),
+      "o/r",
+      1,
+    );
+    expect(entries).toContainEqual(
+      expect.objectContaining({
+        job: "call",
+        status: "unknown",
+        reason: "unresolvable reusable reference: not-a-reference",
+      }),
+    );
+  });
+
+  it("fetches a callee named twice only once", async () => {
+    const body =
+      "on: pull_request\njobs:\n" +
+      "  a:\n    uses: ./.github/workflows/sub.yml\n" +
+      "  b:\n    uses: ./.github/workflows/sub.yml\n";
+    const octokit = fakeOctokit({
+      contents: {
+        [WF]: body,
+        [SUB]: "on:\n  workflow_call:\njobs:\n  inner:\n    name: Inner\n",
+      },
+    });
+    const spy = vi.spyOn(octokit.rest.repos, "getContent");
+    const { entries } = await predict(octokit, "o/r", 1);
+    expect(entries.map((e) => e.job)).toEqual(["a / Inner", "b / Inner"]);
+    const subFetches = spy.mock.calls.filter((c) => c[0]?.path === SUB);
+    expect(subFetches).toHaveLength(1);
   });
 });
