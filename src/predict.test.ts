@@ -15,7 +15,6 @@
 
 import type { Octokit } from "@octokit/rest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { stringify as stringifyYaml } from "yaml";
 import {
   evalIf,
   expandMatrix,
@@ -995,19 +994,30 @@ describe("caller inputs reaching a called workflow", () => {
   const SOURCE = { owner: "o", repo: "r", ref: "main" };
   const CTX = { action: "opened", baseRef: "main", files: ["src/app.txt"] };
 
+  /**
+   * A called workflow, as the text `fetchWorkflow` hands back. JSON is valid
+   * YAML, so serializing the document is enough — and it keeps this suite from
+   * importing `yaml`, which a unit test has no business reaching for.
+   */
+  const calleeDoc = (doc: Record<string, unknown>) => JSON.stringify(doc);
+
   const call = async (
     withBlock: unknown,
     cond: string,
     calleeOn: unknown = { workflow_call: { inputs: { x: { type: "string" } } } },
+    onKey = "on",
   ) => {
-    const callee = { on: calleeOn, jobs: { inner: { "runs-on": "ubuntu-latest", if: cond } } };
     const entries = await expandWorkflowJobs(
       {
         on: { pull_request: null },
         jobs: { c: { uses: "./.github/workflows/callee.yml", with: withBlock } },
       } as never,
       CTX,
-      async () => stringifyYaml(callee),
+      async () =>
+        calleeDoc({
+          ...(calleeOn === undefined ? {} : { [onKey]: calleeOn }),
+          jobs: { inner: { "runs-on": "ubuntu-latest", if: cond } },
+        }),
       SOURCE,
     );
     return entries[0];
@@ -1061,20 +1071,10 @@ describe("caller inputs reaching a called workflow", () => {
   });
 
   it("reads the inputs block under a YAML 1.1 `on` parsed as true", async () => {
-    const callee = {
-      true: { workflow_call: { inputs: { x: { type: "string", default: "d" } } } },
-      jobs: { inner: { "runs-on": "ubuntu-latest", if: "inputs.x == 'd'" } },
-    };
-    const entries = await expandWorkflowJobs(
-      {
-        on: { pull_request: null },
-        jobs: { c: { uses: "./.github/workflows/callee.yml", with: {} } },
-      } as never,
-      CTX,
-      async () => stringifyYaml(callee),
-      SOURCE,
-    );
-    expect(entries[0].status).toBe("run");
+    // A YAML 1.1 parser reads the `on:` key as boolean true. Expansion has to
+    // find the inputs under either spelling.
+    const on = { workflow_call: { inputs: { x: { type: "string", default: "d" } } } };
+    expect((await call({}, "inputs.x == 'd'", on, "true")).status).toBe("run");
   });
 
   it.each([
@@ -1100,7 +1100,7 @@ describe("caller inputs reaching a called workflow", () => {
       } as never,
       CTX,
       async () =>
-        stringifyYaml({
+        calleeDoc({
           on: { workflow_call: { inputs: { x: { type: "string" } } } },
           jobs: { inner: { "runs-on": "ubuntu-latest" } },
         }),
