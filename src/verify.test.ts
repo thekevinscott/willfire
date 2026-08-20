@@ -65,18 +65,22 @@ interface Invocation {
   runs?: RunFixture[];
 }
 
+// #9 made the comparison key the resolved check name rather than the job id, so
+// `checkName` defaults to the job id here and is passed explicitly only when a
+// case is about the two diverging — or about the name being unresolvable.
 const entry = (
   workflow: string,
   job: string,
   status: JobEntry["status"],
-): JobEntry => ({ workflow, job: jobName(job), status, reason: "because" });
+  checkName: string | null = job,
+): JobEntry => ({ workflow, job: jobName(job), checkName, status, reason: "because" });
 
 // `jobName` refuses the workflow-level sentinel at the type level — that is what
 // #11 bought — so the other variant needs its own constructor.
 const wfEntry = (
   workflow: string,
   status: WorkflowEntry["status"],
-): WorkflowEntry => ({ workflow, job: "*", status, reason: "because" });
+): WorkflowEntry => ({ workflow, job: "*", checkName: null, status, reason: "because" });
 
 describe("verify", () => {
   const argv = process.argv;
@@ -217,6 +221,30 @@ describe("verify", () => {
   it("does not compare a dispatching workflow-level entry as a job", async () => {
     const code = await invoke({ predicted: [wfEntry("w.yml", "run")], runs: [] });
     expect(out).toEqual(["PASS"]);
+    expect(code).toBe(0);
+  });
+
+  it("reports an entry whose check name could not be resolved, and judges nothing", async () => {
+    // #9 made the comparison key the resolved name, so an entry without one has
+    // nothing to compare against. It is reported and its workflow is marked
+    // unknown, which also stops the real checks in that workflow reading as
+    // OVER — under-reporting beats a false failure.
+    const code = await invoke({
+      predicted: [entry("w.yml", "a", "run", null)],
+      runs: [
+        {
+          id: 1,
+          path: "w.yml",
+          status: "completed",
+          jobs: [{ name: "a (18)", conclusion: "success" }],
+        },
+      ],
+    });
+    expect(out).toEqual([
+      "  ?   w.yml :: a (18) :: actual run, workflow had unknown prediction",
+      "  ?   w.yml :: a :: name unresolved: because",
+      "PASS",
+    ]);
     expect(code).toBe(0);
   });
 

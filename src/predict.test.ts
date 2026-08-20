@@ -313,7 +313,13 @@ describe("workflow-level verdicts", () => {
       1,
     );
     expect(entries).toEqual([
-      { workflow: WF, job: "*", status: "no-dispatch", reason: "no workflow file at head" },
+      {
+        workflow: WF,
+        job: "*",
+        checkName: null,
+        status: "no-dispatch",
+        reason: "no workflow file at head",
+      },
     ]);
   });
 
@@ -395,7 +401,13 @@ describe("predict", () => {
     });
     const { entries } = await predict(octokit, "o/r", 1);
     expect(entries).toEqual([
-      { workflow: WF, job: "*", status: "no-dispatch", reason: "workflow state: disabled_manually" },
+      {
+        workflow: WF,
+        job: "*",
+        checkName: null,
+        status: "no-dispatch",
+        reason: "workflow state: disabled_manually",
+      },
     ]);
   });
 
@@ -403,7 +415,7 @@ describe("predict", () => {
     const octokit = fakeOctokit({
       workflows: [{ path: "dynamic/pages/pages-build-deployment", state: "active" }],
     });
-    expect(await predict(octokit, "o/r", 1)).toEqual({ entries: [], skip: null });
+    expect(await predict(octokit, "o/r", 1)).toEqual({ entries: [], checkNames: [], skip: null });
   });
 
   it.each([
@@ -415,6 +427,7 @@ describe("predict", () => {
   ])("suppresses everything on a %s head commit", async (_label, message) => {
     expect(await run("on: pull_request\njobs:\n  a: {}\n", { message })).toEqual({
       entries: [],
+      checkNames: [],
       skip: "head commit message contains a skip instruction",
     });
   });
@@ -423,18 +436,20 @@ describe("predict", () => {
     const message = "feat: thing\n\nskip-checks: true\n";
     expect(await run("on: pull_request\njobs:\n  a: {}\n", { message })).toEqual({
       entries: [],
+      checkNames: [],
       skip: "head commit message contains a skip instruction",
     });
   });
 
   it("keeps a workflow with no jobs as a run with no entries", async () => {
-    expect(await run("on: pull_request\n")).toEqual({ entries: [], skip: null });
+    expect(await run("on: pull_request\n")).toEqual({ entries: [], checkNames: [], skip: null });
   });
 
   it("carries the workflow reason onto jobs that have none of their own", async () => {
     expect(await only("on: pull_request\njobs:\n  a: {}\n")).toEqual({
       workflow: WF,
       job: "a",
+      checkName: "a",
       status: "run",
       reason: "trigger matched",
     });
@@ -540,17 +555,58 @@ describe("job expansion", () => {
       expect(entries.map((e) => e.job)).toEqual(["build linux", "build mac"]);
     });
 
-    it("renders an unset matrix key as the empty string", async () => {
+    it("leaves an unset matrix key in place rather than guessing at it", async () => {
+      // #9 stopped rendering an unevaluable expression as the empty string. It
+      // survives into the name verbatim and nulls `checkName` instead: a wrong
+      // name reads as a MISS against a check that really ran, whereas an absent
+      // one is something verify.ts can report as unresolved and move on.
       const wf =
         "on: pull_request\njobs:\n  a:\n    name: build ${{ matrix.nope }}\n    strategy:\n      matrix:\n        os: [linux]\n";
-      const { entries } = await run(wf);
-      expect(entries.map((e) => e.job)).toEqual(["build "]);
+      expect(await only(wf)).toMatchObject({
+        job: "build ${{ matrix.nope }}",
+        checkName: null,
+      });
     });
 
-    it("leaves a non-matrix expression in the name untouched", async () => {
+    it("evaluates github.event_name, the one expression this can decide", async () => {
+      // predict() only ever answers for a pull_request dispatch, so this
+      // expression is knowable and the name stays resolved.
       const wf =
         "on: pull_request\njobs:\n  a:\n    name: on ${{ github.event_name }}\n";
-      expect(await only(wf)).toMatchObject({ job: "on ${{ github.event_name }}" });
+      expect(await only(wf)).toMatchObject({
+        job: "on pull_request",
+        checkName: "on pull_request",
+      });
+    });
+
+    it("renders a null matrix value as nothing and a list value as a joined run", async () => {
+      // The parenthetical is built from the raw YAML value, whatever shape it
+      // has. A null renders as the empty string rather than "null", and a list
+      // flattens the same way an object does.
+      const wf =
+        "on: pull_request\njobs:\n  a:\n    strategy:\n      matrix:\n        v: [~, [1, 2]]\n";
+      const { entries } = await run(wf);
+      expect(entries.map((e) => e.job)).toEqual(["a ()", "a (1, 2)"]);
+    });
+
+    it("omits the parenthetical when a combination has no keys to show", async () => {
+      // An empty `include:` entry with no axes to attach to becomes a
+      // combination of its own with nothing in it. One check, bare job id.
+      const wf =
+        "on: pull_request\njobs:\n  a:\n    strategy:\n      matrix:\n        include:\n          - {}\n";
+      expect(await only(wf)).toMatchObject({ job: "a", checkName: "a" });
+    });
+
+    it("cannot resolve a matrix expression on a job that has no matrix", async () => {
+      // `${{ matrix.* }}` outside a matrix is nothing we can substitute, so the
+      // name stays unresolved rather than collapsing to an empty parenthetical.
+      const wf =
+        "on: pull_request\njobs:\n  a:\n    name: build ${{ matrix.os }}\n";
+      expect(await only(wf)).toMatchObject({
+        job: "build ${{ matrix.os }}",
+        checkName: null,
+        status: "run",
+      });
     });
 
     it("reports a dynamic matrix as unknown", async () => {
@@ -586,7 +642,7 @@ describe("job expansion", () => {
       expect(entries.map((e) => e.job)).toEqual(["Called / inner"]);
     });
 
-    it("stops at one level of nesting", async () => {
+    it("follows a nested call and keeps prefixing", async () => {
       const body = caller("./.github/workflows/sub.yml");
       const { entries } = await run(body, {
         contents: {
@@ -598,11 +654,104 @@ describe("job expansion", () => {
       expect(entries).toEqual([
         {
           workflow: WF,
-          job: "call / mid",
-          status: "unknown",
-          reason: "nested reusable workflow",
+          job: "call / mid / deep",
+          checkName: "call / mid / deep",
+          status: "run",
+          reason: "trigger matched",
         },
       ]);
+    });
+
+    it("gives up past the four-level call chain GitHub allows", async () => {
+      // Not a self-imposed budget: a fifth level fails the run outright, so
+      // there is no check name to predict. Level five is the first `uses:` we
+      // decline to follow, and the entry stops at the caller that made it.
+      const body = caller("./.github/workflows/n1.yml");
+      const link = (next: string) =>
+        `on:\n  workflow_call:\njobs:\n  j:\n    uses: ./.github/workflows/${next}\n`;
+      const { entries } = await run(body, {
+        contents: {
+          [WF]: body,
+          ".github/workflows/n1.yml": link("n2.yml"),
+          ".github/workflows/n2.yml": link("n3.yml"),
+          ".github/workflows/n3.yml": link("n4.yml"),
+          ".github/workflows/n4.yml": link("n5.yml"),
+          ".github/workflows/n5.yml": "on:\n  workflow_call:\njobs:\n  leaf: {}\n",
+        },
+      });
+      expect(entries).toEqual([
+        {
+          workflow: WF,
+          job: "call / j / j / j / j",
+          checkName: null,
+          status: "unknown",
+          reason: "reusable workflow nested deeper than 4 levels",
+        },
+      ]);
+    });
+
+    it("reports a dynamic matrix on the calling job as unknown", async () => {
+      // The caller's matrix multiplies the whole callee set, so an unknown
+      // multiplier makes the entire subtree unpredictable: one unknown entry
+      // for the calling job, and the callee is never fetched at all.
+      const body = caller(
+        "./.github/workflows/sub.yml",
+        "    strategy:\n      matrix: ${{ fromJSON(needs.x.outputs.m) }}\n",
+      );
+      const entry = await only(body, {
+        contents: { [WF]: body, [SUB]: "on:\n  workflow_call:\n" },
+      });
+      expect(entry).toMatchObject({
+        job: "call",
+        checkName: null,
+        status: "unknown",
+        reason: "dynamic matrix on reusable workflow call",
+      });
+    });
+
+    it("reports a callee that does not parse as unknown", async () => {
+      const body = caller("./.github/workflows/sub.yml");
+      const entry = await only(body, {
+        contents: { [WF]: body, [SUB]: "jobs:\n  a: [unclosed\n" },
+      });
+      expect(entry).toMatchObject({ job: "call", checkName: null, status: "unknown" });
+      expect(entry.reason).toMatch(
+        /^YAML parse error in \.\/\.github\/workflows\/sub\.yml: /,
+      );
+    });
+
+    it("reports a callee that parses to nothing as unresolvable", async () => {
+      // An empty file is not a fetch failure and not a parse error: it parses
+      // cleanly to null. There is still no workflow to expand, so the call has
+      // to land somewhere rather than fall through as a resolved zero-job set.
+      const body = caller("./.github/workflows/sub.yml");
+      expect(await only(body, { contents: { [WF]: body, [SUB]: "" } })).toMatchObject({
+        job: "call",
+        checkName: null,
+        status: "unknown",
+        reason: "cannot resolve ./.github/workflows/sub.yml",
+      });
+    });
+
+    it("nulls the name of a skipped job inside an unresolvable caller", async () => {
+      // A skipped job's own name is always resolved — nothing about it is
+      // evaluated. The prefix is what is missing here, and an unresolved prefix
+      // has to poison the whole subtree, skipped entries included.
+      const body = caller(
+        "./.github/workflows/sub.yml",
+        "    name: ${{ inputs.flavour }}\n",
+      );
+      const entry = await only(body, {
+        contents: {
+          [WF]: body,
+          [SUB]: "on:\n  workflow_call:\njobs:\n  inner:\n    if: false\n",
+        },
+      });
+      expect(entry).toMatchObject({
+        job: "${{ inputs.flavour }} / inner",
+        checkName: null,
+        status: "skipped",
+      });
     });
 
     it("cannot see inside a workflow from another repo", async () => {
@@ -802,11 +951,21 @@ describe("the CLI entrypoint", () => {
     ]);
   });
 
+  it("says so in the line rather than printing a name it could not resolve", async () => {
+    await invoke(["--repo", "o/r", "--pr", "1"], {
+      contents: { [WF]: "on: pull_request\njobs:\n  a:\n    name: on ${{ inputs.x }}\n" },
+    });
+    expect(out).toEqual([`${WF} :: on \${{ inputs.x }} (name unresolved) :: run`]);
+  });
+
   it("emits JSON under --json", async () => {
     await invoke(["--repo", "o/r", "--pr", "1", "--json"], { contents: { [WF]: WORKFLOW } });
     expect(JSON.parse(out.join("\n"))).toEqual({
       skip: null,
-      entries: [{ workflow: WF, job: "a", status: "run", reason: "trigger matched" }],
+      checkNames: ["a"],
+      entries: [
+        { workflow: WF, job: "a", checkName: "a", status: "run", reason: "trigger matched" },
+      ],
     });
   });
 

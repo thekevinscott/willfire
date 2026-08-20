@@ -14,9 +14,16 @@ coverage = { lines = 100, branches = 100, functions = 100, statements = 100 }
 # something in it.
 build_command = "pnpm build"
 
-# There are no `[[typescript.exempt]]` entries, and that is the point: both runtime
+# There is exactly one exemption, and it is not a coverage waiver. Both runtime
 # modules carry a colocated test and both are fully covered. `verify.ts` is a
 # top-level script — importing it runs it — which reads as untestable, but its test
 # stands up argv, `process.exit` and a stubbed `predict()` and drives the whole
 # script. Reach for an exemption only when a technique genuinely runs out; a waiver
-# here would have hidden a hundred lines of comparison logic.
+# there would have hidden a hundred lines of comparison logic.
+#
+# Exempt paths are relative to the scanned root, i.e. to `src/`.
+
+[[typescript.exempt]]
+path = "names.test.ts"
+rules = ["unmocked-collaborator"]
+reason = "second unit-test file for predict.ts, named for the behaviour it pins rather than the module: `./predict.js` is its unit under test, not a collaborator, and `yaml` only builds the parsed workflow the unit takes as an argument. The rule pairs a test with a source file of the same name and there is no src/names.ts to pair with. Splitting predict.ts is tracked in #6 and #8; when name resolution moves to its own module the file gets renamed alongside it and this goes away."

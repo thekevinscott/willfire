@@ -6,8 +6,7 @@
 // same YAML; the expected names are the `name` field of the jobs the run
 // actually created. Nothing here is inferred from the docs alone.
 
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 import { parse as parseYaml } from "yaml";
 import { expandWorkflowJobs } from "./predict.js";
 
@@ -195,49 +194,39 @@ const OBSERVED_NAMES = [
 ].sort();
 
 test("names.yml resolves to exactly the checks GitHub created", async () => {
-  assert.deepEqual(await nameSet(NAMES_YML), OBSERVED_NAMES);
+  expect(await nameSet(NAMES_YML)).toEqual(OBSERVED_NAMES);
 });
 
 test("name: overrides the job id", async () => {
-  assert.deepEqual(
-    await nameSet(`
+  expect(await nameSet(`
 jobs:
   a: { runs-on: ubuntu-latest }
   b: { name: Custom Name, runs-on: ubuntu-latest }
-`),
-    ["Custom Name", "a"],
-  );
+`)).toEqual(["Custom Name", "a"]);
 });
 
 test("a literal name: still takes the matrix parenthetical", async () => {
-  assert.deepEqual(
-    await nameSet(`
+  expect(await nameSet(`
 jobs:
   j:
     name: Static Label
     strategy: { matrix: { a: [x, y] } }
-`),
-    ["Static Label (x)", "Static Label (y)"],
-  );
+`)).toEqual(["Static Label (x)", "Static Label (y)"]);
 });
 
 test("any expression in name: suppresses the parenthetical", async () => {
   // Even one that never reads the matrix, and even when that leaves both
   // combinations sharing a single name.
-  assert.deepEqual(
-    await nameSet(`
+  expect(await nameSet(`
 jobs:
   j:
     name: ev \${{ github.event_name }}
     strategy: { matrix: { a: [x, y] } }
-`),
-    ["ev pull_request", "ev pull_request"],
-  );
+`)).toEqual(["ev pull_request", "ev pull_request"]);
 });
 
 test("include keys merged into an existing combination stay out of the name", async () => {
-  assert.deepEqual(
-    await nameSet(`
+  expect(await nameSet(`
 jobs:
   j:
     strategy:
@@ -245,14 +234,11 @@ jobs:
         a: [x, y]
         include:
           - { a: x, extra: e1 }
-`),
-    ["j (x)", "j (y)"],
-  );
+`)).toEqual(["j (x)", "j (y)"]);
 });
 
 test("an include that creates a combination shows all of its keys", async () => {
-  assert.deepEqual(
-    await nameSet(`
+  expect(await nameSet(`
 jobs:
   j:
     strategy:
@@ -260,86 +246,68 @@ jobs:
         a: [x]
         include:
           - { a: z, extra: e2 }
-`),
-    ["j (x)", "j (z, e2)"],
-  );
+`)).toEqual(["j (x)", "j (z, e2)"]);
 });
 
 test("object matrix values flatten to their own values", async () => {
-  assert.deepEqual(
-    await nameSet(`
+  expect(await nameSet(`
 jobs:
   j:
     strategy:
       matrix:
         cfg:
           - { os: linux, arch: x64 }
-`),
-    ["j (linux, x64)"],
-  );
+`)).toEqual(["j (linux, x64)"]);
 });
 
 test("a name: we cannot evaluate resolves to null, not a guess", async () => {
-  assert.deepEqual(
-    await jobs(`
+  expect(await jobs(`
 jobs:
   j:
     name: build \${{ inputs.flavour }}
     runs-on: ubuntu-latest
-`),
-    [{ job: "build ${{ inputs.flavour }}", checkName: null, status: "run" }],
-  );
+`)).toEqual([{ job: "build ${{ inputs.flavour }}", checkName: null, status: "run" }]);
 });
 
 test("a skipped job collapses to one check with no parenthetical", async () => {
-  assert.deepEqual(
-    await jobs(`
+  expect(await jobs(`
 jobs:
   j:
     if: false
     strategy: { matrix: { a: [x, y] } }
-`),
-    [{ job: "j", checkName: "j", status: "skipped" }],
-  );
+`)).toEqual([{ job: "j", checkName: "j", status: "skipped" }]);
 });
 
 test("a skipped reusable call keeps its literal name and calls nothing", async () => {
-  assert.deepEqual(
-    await nameSet(`
+  expect(await nameSet(`
 jobs:
   j:
     name: Skipped Caller
     if: false
     uses: ./.github/workflows/sub.yml
-`),
-    ["Skipped Caller"],
-  );
+`)).toEqual(["Skipped Caller"]);
 });
 
 test("a skipped job's name: is not interpolated at all", async () => {
   // GitHub never sets a skipped job up, so the expression text survives into
   // the check name verbatim — even one we could have evaluated.
-  assert.deepEqual(
-    await jobs(`
+  expect(await jobs(`
 jobs:
   j:
     name: sk \${{ github.event_name }}
     if: false
     runs-on: ubuntu-latest
-`),
-    [
+`)).toEqual([
       {
         job: "sk ${{ github.event_name }}",
         checkName: "sk ${{ github.event_name }}",
         status: "skipped",
       },
-    ],
-  );
+    ]);
 });
 
 test("a dynamic matrix is one unknown entry, not a workflow-wide verdict", async () => {
-  assert.deepEqual(
-    await jobs(`
+  expect(await jobs(`
 jobs:
   fine: { runs-on: ubuntu-latest }
   gen: { runs-on: ubuntu-latest }
@@ -348,13 +316,11 @@ jobs:
     strategy:
       matrix:
         item: \${{ fromJSON(needs.gen.outputs.items) }}
-`),
-    [
+`)).toEqual([
       { job: "fine", checkName: "fine", status: "run" },
       { job: "gen", checkName: "gen", status: "run" },
       { job: "use", checkName: null, status: "unknown" },
-    ],
-  );
+    ]);
 });
 
 // ------------------------------------------------------- reusable workflows
@@ -452,12 +418,11 @@ const OBSERVED_CALLER = [
 ].sort();
 
 test("names-caller.yml resolves to exactly the checks GitHub created", async () => {
-  assert.deepEqual(await nameSet(CALLER, SUB_FILES), OBSERVED_CALLER);
+  expect(await nameSet(CALLER, SUB_FILES)).toEqual(OBSERVED_CALLER);
 });
 
 test("an unresolvable caller name nulls the whole callee subtree", async () => {
-  assert.deepEqual(
-    await jobs(
+  expect(await jobs(
       `
 jobs:
   call:
@@ -465,8 +430,7 @@ jobs:
     uses: ./.github/workflows/names-reusable.yml
 `,
       SUB_FILES,
-    ),
-    [
+    )).toEqual([
       { job: "call ${{ inputs.flavour }} / inner", checkName: null, status: "run" },
       { job: "call ${{ inputs.flavour }} / Inner Label", checkName: null, status: "run" },
       {
@@ -479,17 +443,13 @@ jobs:
         checkName: null,
         status: "run",
       },
-    ],
-  );
+    ]);
 });
 
 test("a non-local reusable call is one unknown entry", async () => {
-  assert.deepEqual(
-    await jobs(`
+  expect(await jobs(`
 jobs:
   call:
     uses: some/other/.github/workflows/x.yml@v1
-`),
-    [{ job: "call", checkName: null, status: "unknown" }],
-  );
+`)).toEqual([{ job: "call", checkName: null, status: "unknown" }]);
 });
