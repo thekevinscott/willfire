@@ -1,0 +1,39 @@
+name: remote-reusable
+# The callee half of the remote-reusable probe. Never called by `./` — only by
+# the full `thekevinbot/willrun-probe/.github/workflows/remote-reusable.yml@ref`
+# form, which is what `remote-caller.yml` exercises.
+#
+# This file exists at two refs that differ on purpose:
+#
+#   tag `remote-v0`  -> the job below is `r-inner`
+#   branch `main`    -> the same job is `r-inner-at-main`
+#
+# so a single dispatch reports which ref GitHub resolved instead of leaving it
+# to be assumed. See probe/README.md.
+on:
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: false
+        default: ""
+jobs:
+  r-inner-at-main:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "r-inner ${{ inputs.tag }}"
+  r-named:
+    name: Remote Label
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo r-named
+  r-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        z: ["1", "2"]
+    steps:
+      - run: echo "${{ matrix.z }}"
+  r-call-local:
+    name: Remote Local Call
+    uses: ./.github/workflows/remote-inner.yml

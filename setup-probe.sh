@@ -22,6 +22,26 @@ git push origin dev
 # --- disable disabled.yml via API ---
 gh api -X PUT "repos/$REPO/actions/workflows/disabled.yml/disable"
 
+# --- tag remote-v0, whose content differs from main on purpose ---
+# The cross-repo probe needs the callee to exist at two refs that disagree, so
+# a name observed in a check says which ref GitHub read. `probe/` mirrors main;
+# the tag is main's files with the two jobs renamed back. See probe/README.md.
+git checkout -b tmp-v0 main
+sed -i 's/^  r-inner-at-main:$/  r-inner:/' .github/workflows/remote-reusable.yml
+sed -i 's/^  deep-at-main:$/  deep-at-v0:/' .github/workflows/remote-inner.yml
+git commit -am "seed: remote-reusable callee, the version tag remote-v0 pins"
+git tag remote-v0
+git push origin remote-v0
+git checkout main
+git branch -D tmp-v0
+
+# remote-caller.yml pins that same commit by SHA as well as by tag, so that the
+# two spellings can be compared. Point it at the tag this run just created.
+sed -i "s#remote-reusable.yml@[0-9a-f]\{40\}#remote-reusable.yml@$(git rev-parse remote-v0^{commit})#" \
+  .github/workflows/remote-caller.yml
+git commit -am "seed: point the SHA-pinned call at this repo's remote-v0"
+git push origin main
+
 mkpr() {  # mkpr <branch> <base> <title>
   local branch=$1 base=$2 title=$3
   gh pr create --repo "$REPO" --head "$branch" --base "$base" \
@@ -88,6 +108,17 @@ echo namecheck >> src/app.txt
 git commit -am "pr8: src change for the check-name probes"
 git push origin pr8-names
 mkpr pr8-names main "pr8: check-name resolution probes"
+
+# PR9: touch both cross-repo probe paths. `remote-caller.yml` and
+# `remote-bad.yml` are scoped to a file each so they stay out of PRs 1-8's
+# predictions; this is the PR that makes them fire. The expected names live in
+# willfire's src/names.test.ts.
+git checkout -b pr9-remote main
+echo "remote probe change" >> src/remote.txt
+echo "remote bad probe change" >> src/remote-bad.txt
+git commit -am "pr9: touch both remote-probe paths"
+git push origin pr9-remote
+mkpr pr9-remote main "pr9: remote reusable workflow probes"
 
 git checkout main
 echo "done"

@@ -43,7 +43,9 @@ single name is knowable ahead of the run:
 
 - a matrix computed at runtime (`fromJSON` of another job's output), reported
   as one `unknown` entry for that job and nothing else;
-- a non-local reusable workflow, whose callee jobs we do not fetch;
+- a reusable workflow we cannot read — private, deleted, a ref that does not
+  exist, a `uses:` built from an expression, or one nested past GitHub's
+  four-level limit;
 - a `name:` interpolating something we cannot evaluate statically.
 
 Duplicate names in `checkNames` are not possible (it is a set), but duplicate
@@ -64,9 +66,11 @@ GH_TOKEN=... willfire --repo owner/repo --pr 123 [--json]
 Path filters (`paths`, `paths-ignore`, order-sensitive `!` negation), branch
 filters, event `types`, combined filters, `[skip ci]` and friends, disabled
 workflows, multi-job workflows, static matrix expansion (including
-`exclude`/`include`), `needs` skip-propagation, job-level `if`, and local
-reusable workflows. Jobs whose `if` is false are predicted as `skipped`
-entries, matching how they appear in the checks UI.
+`exclude`/`include`), `needs` skip-propagation, job-level `if`, and reusable
+workflows — both the local `./.github/workflows/x.yml` form and the cross-repo
+`owner/repo/.github/workflows/x.yml@ref` form, whose callee is fetched from its
+own repo at the pinned tag, branch, or SHA. Jobs whose `if` is false are
+predicted as `skipped` entries, matching how they appear in the checks UI.
 
 Things that cannot be known statically — e.g. a matrix computed at runtime
 from another job's output — are reported as `unknown` rather than guessed.
@@ -96,10 +100,10 @@ workflow per dispatch rule, and probe PRs exercise each complication
 non-default branches). The `verify` script diffs predictions against the
 check entries GitHub actually created. All probe PRs currently pass exactly.
 
-Check-name resolution is verified the same way, on probe PR #8. `pnpm test`
-replays those probe workflows through the resolver and asserts the exact job
-names the live run produced. Several of the rules it pins are ones the docs do
-not state:
+Check-name resolution is verified the same way, on probe PRs #8 and #9.
+`pnpm test` replays those probe workflows through the resolver and asserts the
+exact job names the live run produced. Several of the rules it pins are ones
+the docs do not state:
 
 - a `name:` containing *any* `${{ }}` expression suppresses the matrix
   parenthetical, even an expression that never reads the matrix — a literal
@@ -110,9 +114,17 @@ not state:
 - object matrix values flatten to their own values, so `{os: linux, arch: x64}`
   renders as `(linux, x64)`;
 - a skipped job is never set up, so its matrix does not expand and its `name:`
-  is not interpolated: one check, expression text and all.
+  is not interpolated: one check, expression text and all;
+- a cross-repo `uses:` names the same `<caller> / <callee>` checks a local one
+  does, at whichever tag, branch, or SHA the `@ref` pinned — and a relative
+  `uses: ./...` *inside* that callee resolves against the callee's repo and
+  ref, not the caller's. Probe PR #9 settles the second one: the caller's copy
+  of the callee's file was present at head, under a different job name, and
+  GitHub did not use it.
 
 Scope notes: validated on `opened` pull_request events; `synchronize`/`labeled`
-live events, cross-repo reusable workflows, `branches-ignore`, and diffs far
-beyond 301 files are not yet probe-verified. Reusable-workflow name prefixing
-is probe-verified to three levels; deeper nesting is inferred.
+live events, `branches-ignore`, and diffs far beyond 301 files are not yet
+probe-verified. Reusable-workflow name prefixing is probe-verified to three
+levels; deeper nesting is inferred. The cross-repo probe calls back into the
+probe repo itself by full `owner/repo@ref` reference, so it pins ref
+resolution but not the owner/repo half of the address.

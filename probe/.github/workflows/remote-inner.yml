@@ -1,0 +1,18 @@
+name: remote-inner
+# Reached only through `remote-reusable.yml`'s `uses: ./...`. Like its caller it
+# exists at two differing refs:
+#
+#   tag `remote-v0`  -> the job below is `deep-at-v0`
+#   branch `main`    -> the same job is `deep-at-main`
+#
+# A relative `uses:` inside a workflow that was itself reached by
+# `owner/repo/...@ref` has two candidate refs to resolve against — the caller's
+# commit or the callee's pinned ref — and the job name observed under
+# `call-remote-tag / Remote Local Call / ...` says which one GitHub picked.
+on:
+  workflow_call: {}
+jobs:
+  deep-at-main:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo deep
