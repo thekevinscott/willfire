@@ -33,6 +33,7 @@ import {
   type WorkflowEntry,
   type WorkflowReader,
 } from "./predict.js";
+import type { Scope } from "./expr.js";
 
 // Compile-time only, checked by `tsc --noEmit` over this file rather than at
 // run time. `expandJobs` is the sole producer of job entries, so the status a
@@ -1032,6 +1033,45 @@ describe("expandMatrix", () => {
 
   it("gives up on an axis that is not a list", () => {
     expect(expandMatrix({ matrix: { os: "${{ x }}" } })).toBeNull();
+    expect(expandMatrix({ matrix: { os: 3 } })).toBeNull();
+  });
+
+  it("expands an axis written as an expression over known outputs", () => {
+    // The fleet shape: the axis is the values another job computed, and they
+    // are knowable exactly when the scope carries that job's outputs.
+    const strategy = { matrix: { language: "${{ fromJSON(needs.d.outputs.langs) }}" } };
+    const scope = { needs: { d: { outputs: { langs: '["typescript","rust"]' } } } };
+    expect(expandMatrix(strategy, scope)).toEqual([
+      { language: "typescript" },
+      { language: "rust" },
+    ]);
+  });
+
+  it("expands such an axis to nothing when the output is an empty array", () => {
+    const strategy = { matrix: { language: "${{ fromJSON(needs.d.outputs.langs) }}" } };
+    expect(expandMatrix(strategy, { needs: { d: { outputs: { langs: "[]" } } } })).toEqual([]);
+  });
+
+  it("multiplies a dynamic axis against a static one", () => {
+    const strategy = {
+      matrix: { language: "${{ fromJSON(needs.d.outputs.langs) }}", os: ["linux"] },
+    };
+    const scope = { needs: { d: { outputs: { langs: '["ts"]' } } } };
+    expect(expandMatrix(strategy, scope)).toEqual([{ language: "ts", os: "linux" }]);
+  });
+
+  it("gives up on an axis expression the scope cannot settle", () => {
+    const strategy = { matrix: { language: "${{ fromJSON(needs.d.outputs.langs) }}" } };
+    expect(expandMatrix(strategy)).toBeNull();
+    expect(expandMatrix(strategy, { needs: { other: { outputs: {} } } })).toBeNull();
+  });
+
+  it("gives up on an axis expression that is not an array", () => {
+    // A scalar cannot be an axis, and neither can an object. Treating either
+    // as one combination would invent a check name.
+    const scope = { needs: { d: { outputs: { s: '"ts"', o: "{}" } } } };
+    expect(expandMatrix({ matrix: { l: "${{ fromJSON(needs.d.outputs.s) }}" } }, scope)).toBeNull();
+    expect(expandMatrix({ matrix: { l: "${{ fromJSON(needs.d.outputs.o) }}" } }, scope)).toBeNull();
   });
 
   it("takes the cartesian product of the axes", () => {
@@ -1138,6 +1178,99 @@ describe("a job whose matrix expands to nothing", () => {
     // The callee is still read once — resolution happens before the matrix is
     // walked — but nothing it declares becomes a check.
     expect(fetched).toEqual([".github/workflows/callee.yml"]);
+  });
+});
+
+// The fleet shape, end to end: a `detect` job writes JSON to `$GITHUB_OUTPUT`,
+// and the jobs downstream of it take both their `if:` and their matrix from
+// what it wrote. Nothing here works out what `detect` writes — the outputs are
+// handed in, which is the whole point of the seam.
+describe("a matrix taken from another job's outputs", () => {
+  const SOURCE = { owner: "o", repo: "r", ref: SHA, sha: SHA };
+  const CTX = { action: "opened", baseRef: "main", files: ["src/app.txt"] };
+  const NO_FETCH = async () => null;
+
+  /** The fleet's `unit-coverage`, reduced to the two lines that matter. */
+  const WORKFLOW = {
+    on: { pull_request: null },
+    jobs: {
+      detect: { "runs-on": "ubuntu-latest", name: "Detect" },
+      "unit-coverage": {
+        "runs-on": "ubuntu-latest",
+        name: "Unit-test coverage (${{ matrix.language }})",
+        needs: "detect",
+        if: "${{ needs.detect.outputs.langs != '[]' }}",
+        strategy: { matrix: { language: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+      },
+    },
+  };
+
+  const expand = (scope?: Scope) =>
+    expandWorkflowJobs(WORKFLOW as never, CTX, readerOf(NO_FETCH), SOURCE, scope);
+
+  it("names one check per value the output carries", async () => {
+    const entries = await expand({ needs: { detect: { outputs: { langs: '["typescript"]' } } } });
+    expect(entries).toEqual([
+      { job: "Detect", checkName: "Detect", status: "run", reason: "" },
+      {
+        job: "Unit-test coverage (typescript)",
+        checkName: "Unit-test coverage (typescript)",
+        status: "run",
+        reason: "if: \"${{ needs.detect.outputs.langs != '[]' }}\"",
+      },
+    ]);
+  });
+
+  it("collapses to the uninterpolated name when the output is empty", async () => {
+    // The guard decides `skipped` first, and a skipped job never expands its
+    // matrix or interpolates its `name:` — so GitHub creates one check called
+    // exactly what the YAML says, expression text and all.
+    const entries = await expand({ needs: { detect: { outputs: { langs: "[]" } } } });
+    expect(entries.map((e) => e.checkName)).toEqual([
+      "Detect",
+      "Unit-test coverage (${{ matrix.language }})",
+    ]);
+    expect(entries[1].status).toBe("skipped");
+  });
+
+  it("stays one unknown entry when the outputs are not supplied", async () => {
+    const entries = await expand();
+    expect(entries[1]).toEqual({
+      job: "unit-coverage",
+      checkName: null,
+      status: "unknown",
+      reason: "dynamic matrix",
+    });
+  });
+
+  it("does not carry the outputs into a called workflow", async () => {
+    // `needs` is workflow-scoped: a callee's `needs.detect` is the callee's own
+    // job, not the caller's. Inheriting the map would answer for the wrong one.
+    const entries = await expandWorkflowJobs(
+      {
+        on: { pull_request: null },
+        jobs: { call: { uses: "./.github/workflows/callee.yml" } },
+      } as never,
+      CTX,
+      readerOf(async () =>
+        JSON.stringify({
+          jobs: {
+            inner: { "runs-on": "ubuntu-latest", if: "needs.detect.outputs.langs != '[]'" },
+          },
+        }),
+      ),
+      SOURCE,
+      { needs: { detect: { outputs: { langs: '["typescript"]' } } } },
+    );
+    // The name is still resolvable — it is the guard that is not.
+    expect(entries).toEqual([
+      {
+        job: "call / inner",
+        checkName: "call / inner",
+        status: "unknown",
+        reason: "if: \"needs.detect.outputs.langs != '[]'\"",
+      },
+    ]);
   });
 });
 

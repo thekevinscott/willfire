@@ -54,8 +54,9 @@ workflows all applied. That is the unit required status checks key on, so it
 is the one worth comparing against. On a `JobEntry` it is `null` only where no
 single name is knowable ahead of the run:
 
-- a matrix computed at runtime (`fromJSON` of another job's output), reported
-  as one `unknown` entry for that job and nothing else;
+- a matrix computed at runtime (`fromJSON` of another job's output) whose
+  outputs were not supplied, reported as one `unknown` entry for that job and
+  nothing else — see "Supplying job outputs" below;
 - a reusable workflow we cannot read — private, deleted, a ref that does not
   exist, a `uses:` built from an expression, or one nested past GitHub's
   four-level limit;
@@ -100,8 +101,44 @@ workflows — both the local `./.github/workflows/x.yml` form and the cross-repo
 commit and the callee then read at that commit. Jobs whose `if` is false are
 predicted as `skipped` entries, matching how they appear in the checks UI.
 
-Things that cannot be known statically — e.g. a matrix computed at runtime
-from another job's output — are reported as `unknown` rather than guessed.
+Things that cannot be known statically are reported as `unknown` rather than
+guessed.
+
+## Supplying job outputs
+
+A matrix built from another job's output is the common way a workflow decides
+its own check names:
+
+```yaml
+strategy:
+  matrix:
+    language: ${{ fromJSON(needs.detect.outputs.coverage_languages) }}
+```
+
+Given those outputs, willfire expands it. `expandWorkflowJobs` takes a `scope`
+whose `needs` maps a job id to its outputs:
+
+```ts
+await expandWorkflowJobs(wf, ctx, fetchWorkflow, source, {
+  needs: { detect: { outputs: { coverage_languages: '["typescript"]' } } },
+});
+```
+
+Values are raw strings — what a step wrote to `$GITHUB_OUTPUT`, and what the
+runner substitutes. Parsing them here would break the guards written against
+them: `!= '[]'` compares a string to a string, and an array on the left makes
+it unknown. `fromJSON` is the only thing that turns one into a structure.
+
+`outputs` must be the job's *complete* output set, because a key absent from it
+reads as the empty string — the same answer the runner gives for an output no
+step wrote. A job you know nothing about belongs left out entirely; every
+lookup against it then stays unknown.
+
+`needs` is workflow-scoped and is not inherited across a reusable-workflow
+call: a callee's `needs.detect` is the callee's own job.
+
+Nothing in willfire works out what those outputs are. `predict` supplies none,
+so a dynamic matrix stays `unknown` there.
 
 ## Development
 
