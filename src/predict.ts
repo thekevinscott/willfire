@@ -13,7 +13,7 @@
 
 import { Octokit } from "@octokit/rest";
 import { parse as parseYaml } from "yaml";
-import { evaluate, UNKNOWN, type Scope, type Val } from "./expr.js";
+import { evaluate, evaluateValue, UNKNOWN, type Scope, type Val } from "./expr.js";
 
 interface EntryBase {
   workflow: string;
@@ -302,18 +302,39 @@ interface DetailedCombo {
  */
 type DetailedCombos = Array<DetailedCombo | null> | null;
 
-function expandMatrixDetailed(strategy: any): DetailedCombos {
+/**
+ * The values of one matrix axis, or null when they cannot be known.
+ *
+ * A plain list is itself. An axis written as an expression —
+ * `language: ${{ fromJSON(needs.detect.outputs.coverage_languages) }}` — is
+ * the values another job computed, and is knowable exactly when the scope
+ * carries that job's outputs. Anything else stays null, which is what makes
+ * the whole job `unknown` rather than a guess at how many checks it creates.
+ */
+function axisValues(v: unknown, scope: Scope): unknown[] | null {
+  if (Array.isArray(v)) return v;
+  if (typeof v !== "string") return null;
+  const val = evaluateValue(v, scope);
+  if (val.kind !== "json" || !Array.isArray(val.v)) return null;
+  return val.v;
+}
+
+function expandMatrixDetailed(strategy: any, scope: Scope = {}): DetailedCombos {
   const matrix = strategy?.matrix;
   if (matrix == null) return [null];
-  if (typeof matrix === "string") return null; // ${{ fromJSON(...) }}
+  // `matrix: ${{ ... }}` — the whole matrix as one expression, rather than the
+  // per-axis form below. It yields include-style entries, not axes, so it is a
+  // separate expansion and is not modelled.
+  if (typeof matrix === "string") return null;
   const include: any[] = matrix.include ?? [];
   const exclude: any[] = matrix.exclude ?? [];
   if (typeof include === "string" || typeof exclude === "string") return null;
   const axes: Record<string, any[]> = {};
   for (const [k, v] of Object.entries(matrix)) {
     if (k === "include" || k === "exclude") continue;
-    if (!Array.isArray(v)) return null;
-    axes[k] = v;
+    const vals = axisValues(v, scope);
+    if (vals == null) return null;
+    axes[k] = vals;
   }
   const axisKeys = Object.keys(axes);
   let combos: DetailedCombo[] = [{ values: {}, displayKeys: axisKeys }];
@@ -354,8 +375,8 @@ function expandMatrixDetailed(strategy: any): DetailedCombos {
 }
 
 /** Return list of matrix combination dicts, or null if dynamic. */
-export function expandMatrix(strategy: any): Combo[] | null {
-  const detailed = expandMatrixDetailed(strategy);
+export function expandMatrix(strategy: any, scope: Scope = {}): Combo[] | null {
+  const detailed = expandMatrixDetailed(strategy, scope);
   return detailed == null ? null : detailed.map((c) => (c == null ? null : c.values));
 }
 
@@ -479,18 +500,29 @@ function skippedDisplayName(jobId: string, job: Workflow): DisplayName {
 const PR_GITHUB_CONTEXT: Record<string, string> = { event_name: "pull_request" };
 
 /**
+ * A scope with the fixed pull-request facts filled in.
+ *
+ * Every `${{ }}` this module evaluates — a job `if:`, a matrix axis — is
+ * evaluated for the same event, so they all get the same `github.*`. Anything
+ * the caller states wins; there is nothing here worth overriding, but a scope
+ * that silently ignored what it was handed would be the wrong shape.
+ */
+const prScope = (scope: Scope): Scope => ({
+  ...scope,
+  github: { ...PR_GITHUB_CONTEXT, ...scope.github },
+});
+
+/**
  * Return run|skipped|unknown for a job-level `if:`.
  *
- * `scope` carries the inputs the calling workflow passed down. Without it a
- * reusable workflow's guards are all unknown, because every one of them is
- * written against `inputs.*`.
+ * `scope` carries the inputs the calling workflow passed down, and any job
+ * outputs the caller knows. Without it a reusable workflow's guards are all
+ * unknown, because every one of them is written against `inputs.*` or
+ * `needs.*`.
  */
 export function evalIf(cond: any, scope: Scope = {}): "run" | "skipped" | "unknown" {
   if (cond == null) return "run";
-  const verdict = evaluate(String(cond), {
-    inputs: scope.inputs,
-    github: { ...PR_GITHUB_CONTEXT, ...scope.github },
-  });
+  const verdict = evaluate(String(cond), prScope(scope));
   if (verdict === null) return "unknown";
   return verdict ? "run" : "skipped";
 }
@@ -720,7 +752,7 @@ async function expandJobs(
       continue;
     }
 
-    const combos = expandMatrixDetailed(job.strategy);
+    const combos = expandMatrixDetailed(job.strategy, prScope(scope));
 
     if ("uses" in job) {
       // Reusable workflow call. The calling job produces no check of its own;
@@ -838,14 +870,20 @@ async function expandJobs(
  * Expand one already-parsed workflow into its job entries. Exported so check
  * names can be tested against recorded GitHub behaviour without a network
  * round-trip; `predict` is the API you want.
+ *
+ * `scope` seeds what this workflow's own `${{ }}` resolve against — notably
+ * `needs`, the outputs of jobs that have not run. Nothing here works out what
+ * those are; a caller that knows hands them in, and a caller that does not
+ * leaves them out and gets `unknown` where they would have been used.
  */
 export function expandWorkflowJobs(
   wf: Workflow,
   ctx: Ctx,
   reader: WorkflowReader,
   source: WorkflowSource,
+  scope: Scope = {},
 ): Promise<ExpandedJob[]> {
-  return expandJobs(wf, ctx, reader, source);
+  return expandJobs(wf, ctx, reader, source, 0, "", true, scope);
 }
 
 // ------------------------------------------------------------------- pipeline
