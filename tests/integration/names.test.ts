@@ -7,9 +7,25 @@
 // expected names are the `name` field of the jobs the run actually created.
 // Nothing here is inferred from the docs alone.
 
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
 import { parse as parseYaml } from "yaml";
 import { expandWorkflowJobs, parseUses, type WorkflowSource } from "../../src/predict.js";
+
+/**
+ * A workflow from the probe tree, read rather than restated.
+ *
+ * The expectations below are only ground truth while the YAML under test is the
+ * YAML that ran, and a second copy is a copy that drifts. Inlining also forces
+ * every `${{` to be hand-escaped for the template literal, which is a silent way
+ * to change what a fixture asserts while it still parses.
+ */
+const workflow = (name: string) =>
+  readFileSync(
+    fileURLToPath(new URL(`../fixtures/willrun-probe/.github/workflows/${name}`, import.meta.url)),
+    "utf8",
+  );
 
 const ctx = { action: "opened", baseRef: "main", files: ["src/app.txt"] };
 
@@ -42,133 +58,7 @@ async function jobs(yaml: string, files: Record<string, string> = {}) {
 const nameSet = async (yaml: string, files?: Record<string, string>) =>
   (await jobs(yaml, files)).map((e) => e.checkName).sort();
 
-const NAMES_YML = `
-name: names
-on: pull_request
-jobs:
-  plain-job:
-    runs-on: ubuntu-latest
-  named-job:
-    name: Custom Name
-    runs-on: ubuntu-latest
-  m-auto:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        a: [x, y]
-        b: ["1", "2"]
-  m-interp:
-    name: build \${{ matrix.a }}-\${{ matrix.b }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        a: [x, y]
-        b: [p]
-  m-static-name:
-    name: Static Label
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        a: [x, y]
-  m-numeric:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [18, 20.5]
-  m-object:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        cfg:
-          - { os: linux, arch: x64 }
-          - { os: mac, arch: arm64 }
-  m-include:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        a: [x, y]
-        include:
-          - { a: x, extra: e1 }
-          - { a: z }
-  m-include-only:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - { a: "1" }
-          - { a: "2" }
-  m-exclude:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        a: [x, y]
-        b: [p, q]
-        exclude:
-          - { a: y, b: q }
-  expr-name:
-    name: on \${{ github.event_name }}
-    runs-on: ubuntu-latest
-  m-expr-name:
-    name: ev \${{ github.event_name }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        a: [x, y]
-  m-partial-name:
-    name: p \${{ matrix.a }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        a: [x]
-        b: ["1", "2"]
-  m-include2:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        a: [x]
-        include:
-          - { a: x, extra: e1 }
-          - { a: z, extra: e2 }
-  m-include-only2:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - { a: "1", b: one }
-          - { a: "2" }
-  m-include-noaxis:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        a: [x, y]
-        include:
-          - { extra: e }
-  m-include-overwrite:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        a: [x, y]
-        b: [p]
-        include:
-          - { a: x, b: q }
-  m-skipped:
-    if: false
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        a: [x, y]
-  m-skipped-named:
-    name: Skipped \${{ matrix.a }}
-    if: false
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        a: [x, y]
-  m-skipped-expr:
-    name: sk \${{ github.event_name }}
-    if: false
-    runs-on: ubuntu-latest
-`;
+const NAMES_YML = workflow("names.yml");
 
 /** The exact job names GitHub created for names.yml on probe PR #8. */
 const OBSERVED_NAMES = [
@@ -345,57 +235,11 @@ jobs:
 
 // ------------------------------------------------------- reusable workflows
 
-const REUSABLE = `
-name: names-reusable
-on: { workflow_call: {} }
-jobs:
-  inner:
-    runs-on: ubuntu-latest
-  inner-named:
-    name: Inner Label
-    runs-on: ubuntu-latest
-  inner-matrix:
-    runs-on: ubuntu-latest
-    strategy: { matrix: { z: ["1", "2"] } }
-`;
+const REUSABLE = workflow("names-reusable.yml");
 
-const MID = `
-name: names-mid
-on: { workflow_call: {} }
-jobs:
-  mid:
-    runs-on: ubuntu-latest
-  mid-call:
-    name: Mid Call
-    uses: ./.github/workflows/names-reusable.yml
-`;
+const MID = workflow("names-mid.yml");
 
-const CALLER = `
-name: names-caller
-on: pull_request
-jobs:
-  call-plain:
-    uses: ./.github/workflows/names-reusable.yml
-  call-named:
-    name: Caller Label
-    uses: ./.github/workflows/names-reusable.yml
-  call-matrix:
-    strategy: { matrix: { v: [a, b] } }
-    uses: ./.github/workflows/names-reusable.yml
-  call-matrix-named:
-    name: cm \${{ matrix.v }}
-    strategy: { matrix: { v: [a, b] } }
-    uses: ./.github/workflows/names-reusable.yml
-  call-nested:
-    uses: ./.github/workflows/names-mid.yml
-  call-skipped:
-    if: false
-    uses: ./.github/workflows/names-reusable.yml
-  call-skipped-named:
-    name: Skipped Caller
-    if: false
-    uses: ./.github/workflows/names-reusable.yml
-`;
+const CALLER = workflow("names-caller.yml");
 
 const SUB_FILES = {
   [local(".github/workflows/names-reusable.yml")]: REUSABLE,
@@ -484,36 +328,42 @@ jobs:
  * same reason: a lookup that resolves against the wrong ref finds the wrong
  * file rather than quietly finding the right one.
  */
-const remoteReusable = (innerJob: string) => `
-name: remote-reusable
-on:
-  workflow_call:
-    inputs:
-      tag: { type: string, required: false, default: "" }
-jobs:
-  ${innerJob}:
-    runs-on: ubuntu-latest
-  r-named:
-    name: Remote Label
-    runs-on: ubuntu-latest
-  r-matrix:
-    runs-on: ubuntu-latest
-    strategy: { matrix: { z: ["1", "2"] } }
-  r-call-local:
-    name: Remote Local Call
-    uses: ./.github/workflows/remote-inner.yml
-`;
+const REMOTE_REUSABLE = workflow("remote-reusable.yml");
+const REMOTE_INNER = workflow("remote-inner.yml");
 
-const remoteInner = (job: string) => `
-name: remote-inner
-on: { workflow_call: {} }
-jobs:
-  ${job}:
-    runs-on: ubuntu-latest
-`;
+/**
+ * The `remote-v0` variant of a checked-in file. `setup-probe.sh` builds that
+ * tag by renaming exactly these two jobs in the `main` copies, so mirroring the
+ * rename keeps both refs sourced from one file instead of two.
+ */
+const atV0 = (yaml: string) =>
+  yaml
+    .replace(/^  r-inner-at-main:$/m, "  r-inner:")
+    .replace(/^  deep-at-main:$/m, "  deep-at-v0:");
 
-/** The SHA `remote-v0` points at, spelled out the way the probe caller does. */
-const V0_SHA = "085aa5927d7ac296cc6e740713ef5b1a7e20d6b7";
+/**
+ * The decoy, and the one variant with no file behind it. The probe repo's PR
+ * head carries its own `remote-inner.yml`; this stands in for it under a third
+ * job name so resolving the callee's `./` call against the caller finds a file
+ * and produces a plausible wrong name rather than a miss.
+ */
+const REMOTE_INNER_AT_CALLER_HEAD = REMOTE_INNER.replace(
+  /^  deep-at-main:$/m,
+  "  deep-at-caller-head:",
+);
+
+const REMOTE_CALLER = workflow("remote-caller.yml");
+
+/**
+ * The SHA `remote-v0` points at. Read out of the caller that pins it rather
+ * than restated: `setup-probe.sh` rewrites that line to whatever the tag
+ * resolves to at push time, so a literal here would go stale on the next seed.
+ */
+const V0_SHA = (() => {
+  const m = REMOTE_CALLER.match(/remote-reusable\.yml@([0-9a-f]{40})$/m);
+  if (m == null) throw new Error("remote-caller.yml no longer pins a SHA");
+  return m[1];
+})();
 
 const PROBE = { owner: "thekevinbot", repo: "willrun-probe" };
 const V0: WorkflowSource = { ...PROBE, ref: "remote-v0" };
@@ -521,39 +371,14 @@ const MAIN: WorkflowSource = { ...PROBE, ref: "main" };
 const SHA: WorkflowSource = { ...PROBE, ref: V0_SHA };
 
 const REMOTE_FILES = {
-  [at(V0, ".github/workflows/remote-reusable.yml")]: remoteReusable("r-inner"),
-  [at(V0, ".github/workflows/remote-inner.yml")]: remoteInner("deep-at-v0"),
-  [at(SHA, ".github/workflows/remote-reusable.yml")]: remoteReusable("r-inner"),
-  [at(SHA, ".github/workflows/remote-inner.yml")]: remoteInner("deep-at-v0"),
-  [at(MAIN, ".github/workflows/remote-reusable.yml")]: remoteReusable("r-inner-at-main"),
-  [at(MAIN, ".github/workflows/remote-inner.yml")]: remoteInner("deep-at-main"),
-  // The decoy. The probe's PR head really does carry its own copy of
-  // `remote-inner.yml`, so resolving the callee's `./` call against the caller
-  // instead of the callee would find a file and produce a plausible wrong
-  // name, not a miss.
-  [local(".github/workflows/remote-inner.yml")]: remoteInner("deep-at-caller-head"),
+  [at(V0, ".github/workflows/remote-reusable.yml")]: atV0(REMOTE_REUSABLE),
+  [at(V0, ".github/workflows/remote-inner.yml")]: atV0(REMOTE_INNER),
+  [at(SHA, ".github/workflows/remote-reusable.yml")]: atV0(REMOTE_REUSABLE),
+  [at(SHA, ".github/workflows/remote-inner.yml")]: atV0(REMOTE_INNER),
+  [at(MAIN, ".github/workflows/remote-reusable.yml")]: REMOTE_REUSABLE,
+  [at(MAIN, ".github/workflows/remote-inner.yml")]: REMOTE_INNER,
+  [local(".github/workflows/remote-inner.yml")]: REMOTE_INNER_AT_CALLER_HEAD,
 };
-
-const REMOTE_CALLER = `
-name: remote-caller
-on: pull_request
-jobs:
-  call-remote-tag:
-    uses: thekevinbot/willrun-probe/.github/workflows/remote-reusable.yml@remote-v0
-  call-remote-named:
-    name: Remote Caller
-    uses: thekevinbot/willrun-probe/.github/workflows/remote-reusable.yml@remote-v0
-  call-remote-matrix:
-    strategy: { matrix: { v: [a, b] } }
-    uses: thekevinbot/willrun-probe/.github/workflows/remote-reusable.yml@remote-v0
-  call-remote-branch:
-    uses: thekevinbot/willrun-probe/.github/workflows/remote-reusable.yml@main
-  call-remote-sha:
-    uses: thekevinbot/willrun-probe/.github/workflows/remote-reusable.yml@${V0_SHA}
-  call-remote-skipped:
-    if: false
-    uses: thekevinbot/willrun-probe/.github/workflows/remote-reusable.yml@remote-v0
-`;
 
 /** The exact job names GitHub created for remote-caller.yml on probe PR #9. */
 const OBSERVED_REMOTE_CALLER = [

@@ -9,7 +9,7 @@ name: remote-reusable
 #   branch `main`    -> the same job is `r-inner-at-main`
 #
 # so a single dispatch reports which ref GitHub resolved instead of leaving it
-# to be assumed. See probe/README.md.
+# to be assumed. See this tree's README.md.
 on:
   workflow_call:
     inputs:
