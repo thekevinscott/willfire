@@ -20,9 +20,18 @@ pnpm add willfire
 import { predict } from "willfire";
 import { getOctokit } from "@actions/github"; // or new Octokit({ auth: token })
 
-const { entries, checkNames, skip } = await predict(getOctokit(token), "owner/repo", 123);
+const { entries, checkNames, skip } = await predict(getOctokit(token), "owner/repo", 123, {
+  action: context.payload.action, // "opened" | "synchronize" | "reopened"
+});
 // checkNames: sorted, deduped checkName of every entry with status "run"
 ```
+
+`action` is optional but worth passing. Omitted, the event action is inferred
+from the PR's commit count, which is wrong in both directions — a PR opened
+from a branch with several commits looks like `synchronize`, a force-push down
+to one commit looks like `opened` — and can never produce `reopened`. That only
+matters to a workflow narrowing `types:`, where it decides whether the workflow
+dispatches at all.
 
 `entries` is a union of two variants, both carrying `workflow` and `reason`:
 
@@ -58,7 +67,8 @@ Auth is any token with `contents: read`, `actions: read`, and
 ## CLI
 
 ```sh
-GH_TOKEN=... willfire --repo owner/repo --pr 123 [--json]
+GH_TOKEN=... willfire --repo owner/repo --pr 123 \
+  [--action opened|synchronize|reopened] [--json]
 ```
 
 ## What it handles
@@ -124,7 +134,10 @@ the docs do not state:
 
 Scope notes: validated on `opened` pull_request events; `synchronize`/`labeled`
 live events, `branches-ignore`, and diffs far beyond 301 files are not yet
-probe-verified. Reusable-workflow name prefixing is probe-verified to three
+probe-verified — passing `action` explicitly is what makes probing the other
+two possible. `action` accepts the three default `types:` only; `pull_request`
+fires on around twenty actions, and a workflow narrowing to `ready_for_review`
+or `edited` is out of scope either way. Reusable-workflow name prefixing is probe-verified to three
 levels; deeper nesting is inferred. The cross-repo probe calls back into the
 probe repo itself by full `owner/repo@ref` reference, so it pins ref
 resolution but not the owner/repo half of the address.
