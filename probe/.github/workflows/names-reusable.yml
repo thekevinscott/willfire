@@ -1,0 +1,25 @@
+name: names-reusable
+on:
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: false
+        default: ""
+jobs:
+  inner:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "inner ${{ inputs.tag }}"
+  inner-named:
+    name: Inner Label
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo inner-named
+  inner-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        z: ["1", "2"]
+    steps:
+      - run: echo "${{ matrix.z }}"

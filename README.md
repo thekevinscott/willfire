@@ -20,19 +20,35 @@ pnpm add willfire
 import { predict } from "willfire";
 import { getOctokit } from "@actions/github"; // or new Octokit({ auth: token })
 
-const { entries, skip } = await predict(getOctokit(token), "owner/repo", 123);
+const { entries, checkNames, skip } = await predict(getOctokit(token), "owner/repo", 123);
+// checkNames: sorted, deduped checkName of every entry with status "run"
 ```
 
 `entries` is a union of two variants, both carrying `workflow` and `reason`:
 
-| variant | `job` | `status` |
-| --- | --- | --- |
-| `WorkflowEntry` | `"*"` | `"run" \| "skipped" \| "no-dispatch"` |
-| `JobEntry` | the job's display name | `"run" \| "skipped" \| "unknown" \| "no-dispatch"` |
+| variant | `job` | `checkName` | `status` |
+| --- | --- | --- | --- |
+| `WorkflowEntry` | `"*"` | always `null` | `"run" \| "skipped" \| "no-dispatch"` |
+| `JobEntry` | the job id | the check name, or `null` | `"run" \| "skipped" \| "unknown" \| "no-dispatch"` |
 
 `"unknown"` is job-level only: every workflow-level verdict is decidable, so a
 `WorkflowEntry` cannot express one. Narrow with the exported `isWorkflowEntry`
 and `isJobEntry` guards rather than testing the `"*"` sentinel yourself.
+
+`checkName` is the name GitHub actually puts on the check — `name:` override,
+matrix parenthetical, and `<caller> / <callee>` prefixing for reusable
+workflows all applied. That is the unit required status checks key on, so it
+is the one worth comparing against. On a `JobEntry` it is `null` only where no
+single name is knowable ahead of the run:
+
+- a matrix computed at runtime (`fromJSON` of another job's output), reported
+  as one `unknown` entry for that job and nothing else;
+- a non-local reusable workflow, whose callee jobs we do not fetch;
+- a `name:` interpolating something we cannot evaluate statically.
+
+Duplicate names in `checkNames` are not possible (it is a set), but duplicate
+check names *are* — GitHub happily creates two identically named checks when a
+matrix job's `name:` does not vary per combination. `entries` shows them.
 
 Auth is any token with `contents: read`, `actions: read`, and
 `pull-requests: read` — inside an action, the workflow's `GITHUB_TOKEN`.
@@ -64,6 +80,23 @@ workflow per dispatch rule, and probe PRs exercise each complication
 non-default branches). The `verify` script diffs predictions against the
 check entries GitHub actually created. All probe PRs currently pass exactly.
 
+Check-name resolution is verified the same way, on probe PR #8. `pnpm test`
+replays those probe workflows through the resolver and asserts the exact job
+names the live run produced. Several of the rules it pins are ones the docs do
+not state:
+
+- a `name:` containing *any* `${{ }}` expression suppresses the matrix
+  parenthetical, even an expression that never reads the matrix — a literal
+  `name:` still gets one, so `name: Static Label` over `a: [x, y]` yields
+  `Static Label (x)` and `Static Label (y)`;
+- keys an `include` entry merges into an existing combination do not appear in
+  the name, but keys of a combination the `include` created from scratch do;
+- object matrix values flatten to their own values, so `{os: linux, arch: x64}`
+  renders as `(linux, x64)`;
+- a skipped job is never set up, so its matrix does not expand and its `name:`
+  is not interpolated: one check, expression text and all.
+
 Scope notes: validated on `opened` pull_request events; `synchronize`/`labeled`
 live events, cross-repo reusable workflows, `branches-ignore`, and diffs far
-beyond 301 files are not yet probe-verified.
+beyond 301 files are not yet probe-verified. Reusable-workflow name prefixing
+is probe-verified to three levels; deeper nesting is inferred.

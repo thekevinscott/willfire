@@ -1,0 +1,38 @@
+name: names-caller
+on: pull_request
+jobs:
+  call-plain:
+    uses: ./.github/workflows/names-reusable.yml
+
+  call-named:
+    name: Caller Label
+    uses: ./.github/workflows/names-reusable.yml
+
+  call-matrix:
+    strategy:
+      matrix:
+        v: [a, b]
+    uses: ./.github/workflows/names-reusable.yml
+    with:
+      tag: ${{ matrix.v }}
+
+  call-matrix-named:
+    name: cm ${{ matrix.v }}
+    strategy:
+      matrix:
+        v: [a, b]
+    uses: ./.github/workflows/names-reusable.yml
+    with:
+      tag: ${{ matrix.v }}
+
+  call-nested:
+    uses: ./.github/workflows/names-mid.yml
+
+  call-skipped:
+    if: false
+    uses: ./.github/workflows/names-reusable.yml
+
+  call-skipped-named:
+    name: Skipped Caller
+    if: false
+    uses: ./.github/workflows/names-reusable.yml

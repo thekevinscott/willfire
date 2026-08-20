@@ -77,5 +77,17 @@ git commit -m "pr6: 301 files, src file sorts last"
 git push origin pr6-many
 mkpr pr6-many main "pr6: 301-file diff"
 
+# PR7 was a one-off (predictor code under src/) and is closed.
+
+# PR8: plain src change -> main. Nothing special about the diff; this PR
+# exists so `names.yml` and `names-caller.yml` dispatch, and their job names
+# can be read back as ground truth for check-name resolution. The expected
+# names live in willfire's src/names.test.ts.
+git checkout -b pr8-names main
+echo namecheck >> src/app.txt
+git commit -am "pr8: src change for the check-name probes"
+git push origin pr8-names
+mkpr pr8-names main "pr8: check-name resolution probes"
+
 git checkout main
 echo "done"

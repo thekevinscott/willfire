@@ -36,6 +36,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "prepublishOnly": "pnpm build",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --import tsx --test src/*.test.ts",
     "predict": "tsx src/predict.ts",
     "verify": "tsx src/verify.ts"
   },
