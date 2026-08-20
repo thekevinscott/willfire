@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Predict the set of CI check entries GitHub Actions will create for a pull request",
   "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
   "author": "Kevin Scott <me@thekevinscott.com>",
   "repository": {
     "type": "git",
