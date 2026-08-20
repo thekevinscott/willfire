@@ -100,45 +100,46 @@ function getPrTrigger(wf: Workflow): Record<string, any> | typeof MISSING {
   return MISSING;
 }
 
-// Every workflow-level verdict is decidable, so this never returns "unknown".
-// Only job expansion can be genuinely undecidable (dynamic matrix, non-local
-// reusable workflow, unresolvable `if`), and that is a per-entry status.
+// A predicate: does this workflow produce a run for the PR? Every workflow-level
+// verdict is decidable, so there is no third answer to express. Only job
+// expansion can be genuinely undecidable (dynamic matrix, non-local reusable
+// workflow, unresolvable `if`), and that is a per-entry status.
 function workflowDispatches(
   wf: Workflow,
   ctx: Ctx,
-): ["dispatch" | "no-dispatch", string] {
+): [dispatches: boolean, reason: string] {
   const trig = getPrTrigger(wf);
-  if (trig === MISSING) return ["no-dispatch", "no pull_request trigger"];
+  if (trig === MISSING) return [false, "no pull_request trigger"];
 
   const types: string[] = trig["types"] ?? DEFAULT_TYPES;
   if (!types.includes(ctx.action)) {
-    return ["no-dispatch", `action '${ctx.action}' not in types [${types}]`];
+    return [false, `action '${ctx.action}' not in types [${types}]`];
   }
 
   // Setting a filter and its -ignore twin on one trigger is invalid config.
   // GitHub does not fall back to "no filter" or skip the workflow: it creates
   // the run and concludes `startup_failure`. The run exists, so it dispatches.
   if ("branches" in trig && "branches-ignore" in trig) {
-    return ["dispatch", "both branches and branches-ignore set: startup failure"];
+    return [true, "both branches and branches-ignore set: startup failure"];
   }
   if ("branches" in trig && !matchFilters(ctx.baseRef, trig["branches"])) {
-    return ["no-dispatch", `base branch '${ctx.baseRef}' not in branches`];
+    return [false, `base branch '${ctx.baseRef}' not in branches`];
   }
   if ("branches-ignore" in trig && matchFilters(ctx.baseRef, trig["branches-ignore"])) {
-    return ["no-dispatch", "base branch in branches-ignore"];
+    return [false, "base branch in branches-ignore"];
   }
 
   if ("paths" in trig && "paths-ignore" in trig) {
-    return ["dispatch", "both paths and paths-ignore set: startup failure"];
+    return [true, "both paths and paths-ignore set: startup failure"];
   }
   if ("paths" in trig && !ctx.files.some((f) => matchFilters(f, trig["paths"]))) {
-    return ["no-dispatch", "no changed file matches paths"];
+    return [false, "no changed file matches paths"];
   }
   if ("paths-ignore" in trig && ctx.files.every((f) => matchFilters(f, trig["paths-ignore"]))) {
-    return ["no-dispatch", "all changed files match paths-ignore"];
+    return [false, "all changed files match paths-ignore"];
   }
 
-  return ["dispatch", "trigger matched"];
+  return [true, "trigger matched"];
 }
 
 // ---------------------------------------------------------------- job expansion
@@ -388,9 +389,9 @@ export async function predict(
       });
       continue;
     }
-    const [verdict, reason] = workflowDispatches(wf, ctx);
-    if (verdict !== "dispatch") {
-      entries.push({ workflow: path, job: "*", status: verdict, reason });
+    const [dispatches, reason] = workflowDispatches(wf, ctx);
+    if (!dispatches) {
+      entries.push({ workflow: path, job: "*", status: "no-dispatch", reason });
       continue;
     }
     for (const [jobName, status, jreason] of await expandJobs(wf, ctx, fetchFile)) {
