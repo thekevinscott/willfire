@@ -35,7 +35,9 @@ real PR before you do.
 
 `unknown` is the honest answer for anything undecidable from the workflow files
 alone (a runtime-computed matrix, a cross-repo reusable workflow). Do not guess
-in order to make an entry look decided.
+in order to make an entry look decided. It is job-level only: `Entry` is a
+closed union and the workflow-level variant has no `unknown`, because every
+workflow-level verdict is decidable. Do not widen it back.
 
 ## Consumers
 

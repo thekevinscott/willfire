@@ -9,7 +9,8 @@
 // isolated from; its own behavior is covered in `predict.test.ts`.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Entry } from "./predict.js";
+import { jobName } from "./predict.js";
+import type { Entry, JobEntry, WorkflowEntry } from "./predict.js";
 
 const hoisted = vi.hoisted(() => ({
   makeOctokit: vi.fn(),
@@ -67,8 +68,15 @@ interface Invocation {
 const entry = (
   workflow: string,
   job: string,
-  status: Entry["status"],
-): Entry => ({ workflow, job, status, reason: "because" });
+  status: JobEntry["status"],
+): JobEntry => ({ workflow, job: jobName(job), status, reason: "because" });
+
+// `jobName` refuses the workflow-level sentinel at the type level — that is what
+// #11 bought — so the other variant needs its own constructor.
+const wfEntry = (
+  workflow: string,
+  status: WorkflowEntry["status"],
+): WorkflowEntry => ({ workflow, job: "*", status, reason: "because" });
 
 describe("verify", () => {
   const argv = process.argv;
@@ -201,14 +209,19 @@ describe("verify", () => {
     expect(out[0]).toBe("WARNING: runs still in progress: w.yml");
   });
 
-  it("reports a workflow-level unknown separately from the job comparison", async () => {
-    const code = await invoke({ predicted: [entry("w.yml", "*", "unknown")], runs: [] });
-    expect(out).toEqual(["  ?   w.yml :: workflow-level unknown: because", "PASS"]);
+  // #11 closed the workflow-level variant so it cannot carry `unknown`, and
+  // deleted the trailing "workflow-level unknown" report that existed to
+  // surface one. What is left to pin down is that neither workflow-level
+  // status leaks into the job comparison: `run` says a run exists, not that any
+  // check entry does, so it must not read as a MISS.
+  it("does not compare a dispatching workflow-level entry as a job", async () => {
+    const code = await invoke({ predicted: [wfEntry("w.yml", "run")], runs: [] });
+    expect(out).toEqual(["PASS"]);
     expect(code).toBe(0);
   });
 
   it("says nothing about a workflow-level entry that is already decided", async () => {
-    const code = await invoke({ predicted: [entry("w.yml", "*", "no-dispatch")], runs: [] });
+    const code = await invoke({ predicted: [wfEntry("w.yml", "no-dispatch")], runs: [] });
     expect(out).toEqual(["PASS"]);
     expect(code).toBe(0);
   });
