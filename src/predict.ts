@@ -171,6 +171,32 @@ const SKIP_TRAILER_RE = /^skip-checks:\s*true/im;
 
 const DEFAULT_TYPES = ["opened", "synchronize", "reopened"];
 
+/**
+ * The `pull_request` actions a caller can name.
+ *
+ * Deliberately the three default types and no more. `pull_request` fires on
+ * around twenty actions — `ready_for_review`, `edited`, `labeled` — and a
+ * workflow that narrows `types:` to one of those is not predictable today
+ * regardless of what is passed here. Widening this union later is a
+ * non-breaking change; narrowing it would not be, so it starts narrow.
+ */
+export type PrEventAction = "opened" | "synchronize" | "reopened";
+
+/** Options every caller may omit. */
+export interface PredictOptions {
+  /**
+   * The literal event action the run was triggered by — `github.event.action`
+   * inside an Action, or `--action` on the CLI.
+   *
+   * Omitting it falls back to inferring from the commit count, which is a
+   * guess and is wrong in both directions: a PR opened from a branch with
+   * several commits looks like `synchronize`, a force-push down to one commit
+   * looks like `opened`, and `reopened` is never produced. That only matters
+   * to a workflow narrowing `types:`, where it matters completely.
+   */
+  action?: PrEventAction;
+}
+
 export interface Ctx {
   action: string;
   baseRef: string;
@@ -765,6 +791,7 @@ export async function predict(
   octokit: Octokit,
   repo: string,
   prNumber: number,
+  opts: PredictOptions = {},
 ): Promise<Prediction> {
   const [owner, name] = repo.split("/");
   const base = { owner, repo: name };
@@ -776,7 +803,9 @@ export async function predict(
     per_page: 100,
   });
   const ctx: Ctx = {
-    action: pr.commits > 1 ? "synchronize" : "opened",
+    // The caller's answer wins whenever it has one. The commit-count fallback
+    // is a guess kept only so existing callers keep working.
+    action: opts.action ?? (pr.commits > 1 ? "synchronize" : "opened"),
     baseRef: pr.base.ref,
     files: files.map((f) => f.filename),
   };
@@ -896,7 +925,18 @@ function finalizePrediction(entries: DraftEntry[], skip: string | null): Predict
 
 // ------------------------------------------------------------------------ CLI
 
-function parseArgs(argv: string[]): { repo: string; pr: number; json: boolean } {
+const USAGE =
+  "usage: predict --repo owner/name --pr N [--action opened|synchronize|reopened] [--json]";
+
+const isPrEventAction = (v: string): v is PrEventAction =>
+  v === "opened" || v === "synchronize" || v === "reopened";
+
+function parseArgs(argv: string[]): {
+  repo: string;
+  pr: number;
+  json: boolean;
+  action?: PrEventAction;
+} {
   const get = (flag: string) => {
     const i = argv.indexOf(flag);
     return i >= 0 ? argv[i + 1] : undefined;
@@ -904,16 +944,27 @@ function parseArgs(argv: string[]): { repo: string; pr: number; json: boolean } 
   const repo = get("--repo");
   const pr = get("--pr");
   if (!repo || !pr) {
-    console.error("usage: predict --repo owner/name --pr N [--json]");
+    console.error(USAGE);
     process.exit(2);
   }
-  return { repo, pr: Number(pr), json: argv.includes("--json") };
+  // An unrecognised action is refused rather than ignored. Silently falling
+  // back to the guess would turn a typo into a wrong prediction, which is the
+  // failure this flag exists to remove.
+  const action = get("--action");
+  if (action !== undefined && !isPrEventAction(action)) {
+    console.error(`unknown --action: ${action}`);
+    console.error(USAGE);
+    process.exit(2);
+  }
+  return { repo, pr: Number(pr), json: argv.includes("--json"), action };
 }
 
 const isMain = /predict\.(ts|js)$|\/willfire$/.test(process.argv[1] ?? "");
 if (isMain) {
   const args = parseArgs(process.argv.slice(2));
-  const { entries, checkNames, skip } = await predict(makeOctokit(), args.repo, args.pr);
+  const { entries, checkNames, skip } = await predict(makeOctokit(), args.repo, args.pr, {
+    action: args.action,
+  });
   if (args.json) {
     console.log(JSON.stringify({ entries, checkNames, skip }, null, 2));
   } else if (skip) {

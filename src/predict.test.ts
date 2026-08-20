@@ -961,6 +961,62 @@ describe("evalIf", () => {
 
 // ------------------------------------------------------------------- octokit
 
+// The commit-count heuristic is wrong in both directions and cannot produce
+// `reopened` at all. It only matters to a workflow that narrows `types:`, and
+// there it decides whether the workflow dispatches — so a caller that knows
+// the real action has to be able to say so.
+describe("a caller-supplied event action", () => {
+  const runWith = (body: string, f: Fixture, opts: Parameters<typeof predict>[3]) =>
+    predict(fakeOctokit({ contents: { [WF]: body }, ...f }), "o/r", 1, opts);
+
+  const onTypes = (types: string) =>
+    `on:\n  pull_request:\n    types: [${types}]\njobs:\n  a: {}\n`;
+
+  it("beats the heuristic when the PR has several commits but was just opened", async () => {
+    // Three commits infers `synchronize`, which `types: [opened]` refuses.
+    const { entries } = await runWith(onTypes("opened"), { commits: 3 }, { action: "opened" });
+    expect(entries).toMatchObject([{ job: "a", status: "run" }]);
+  });
+
+  it("beats the heuristic when a force-push left one commit", async () => {
+    // One commit infers `opened`, which `types: [synchronize]` refuses.
+    const { entries } = await runWith(
+      onTypes("synchronize"),
+      { commits: 1 },
+      { action: "synchronize" },
+    );
+    expect(entries).toMatchObject([{ job: "a", status: "run" }]);
+  });
+
+  it("can say `reopened`, which the heuristic never produces", async () => {
+    const { entries } = await runWith(onTypes("reopened"), {}, { action: "reopened" });
+    expect(entries).toMatchObject([{ job: "a", status: "run" }]);
+  });
+
+  it("still refuses an action the workflow does not declare", async () => {
+    // Passing the action explicitly is not permission to dispatch — it is the
+    // input the existing `types:` test runs against.
+    const { entries } = await runWith(onTypes("opened"), {}, { action: "reopened" });
+    expect(entries).toMatchObject([
+      { status: "no-dispatch", reason: "action 'reopened' not in types [opened]" },
+    ]);
+  });
+
+  it("falls back to the heuristic when omitted", async () => {
+    expect(await only(onTypes("opened"), { commits: 3 })).toMatchObject({
+      reason: "action 'synchronize' not in types [opened]",
+    });
+    expect(await only(onTypes("opened"), { commits: 1 })).toMatchObject({ status: "run" });
+  });
+
+  it("falls back to the heuristic when the option is present but undefined", async () => {
+    const { entries } = await runWith(onTypes("opened"), { commits: 3 }, { action: undefined });
+    expect(entries).toMatchObject([
+      { status: "no-dispatch", reason: "action 'synchronize' not in types [opened]" },
+    ]);
+  });
+});
+
 describe("makeOctokit", () => {
   beforeEach(() => {
     hoisted.authSeen.length = 0;
@@ -1064,6 +1120,40 @@ describe("the CLI entrypoint", () => {
         { workflow: WF, job: "a", checkName: "a", status: "run", reason: "trigger matched" },
       ],
     });
+  });
+
+  it("passes --action through instead of inferring one", async () => {
+    // `types: [synchronize]` with a single commit: the heuristic says `opened`
+    // and the workflow would not dispatch.
+    await invoke(["--repo", "o/r", "--pr", "1", "--action", "synchronize"], {
+      contents: { [WF]: "on:\n  pull_request:\n    types: [synchronize]\njobs:\n  a: {}\n" },
+    });
+    expect(out).toEqual([`${WF} :: a :: run`]);
+  });
+
+  it("exits 2 on an --action it does not recognise", async () => {
+    // Refused, not ignored: falling back to the guess would turn a typo into a
+    // wrong prediction, which is the failure the flag exists to remove.
+    const exit = vi.spyOn(process, "exit").mockImplementation((() => {
+      throw new Error("exited");
+    }) as () => never);
+    await expect(
+      invoke(["--repo", "o/r", "--pr", "1", "--action", "syncronize"]),
+    ).rejects.toThrow("exited");
+    expect(exit).toHaveBeenCalledWith(2);
+    expect(vi.mocked(console.error).mock.calls[0][0]).toBe("unknown --action: syncronize");
+    expect(vi.mocked(console.error).mock.calls[1][0]).toMatch(/^usage: predict /);
+  });
+
+  it("names --action in the usage line", async () => {
+    const exit = vi.spyOn(process, "exit").mockImplementation((() => {
+      throw new Error("exited");
+    }) as () => never);
+    await expect(invoke(["--pr", "1"])).rejects.toThrow("exited");
+    expect(exit).toHaveBeenCalledWith(2);
+    expect(vi.mocked(console.error).mock.calls[0][0]).toContain(
+      "--action opened|synchronize|reopened",
+    );
   });
 
   it("exits 2 with a usage line when --repo or --pr is missing", async () => {
