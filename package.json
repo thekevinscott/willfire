@@ -36,11 +36,11 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "prepublishOnly": "pnpm build",
-    "typecheck": "tsc -p tsconfig.json",
+    "predict": "tsx src/predict.ts",
+    "prepare": "pnpm build",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "predict": "tsx src/predict.ts",
+    "typecheck": "tsc -p tsconfig.json",
     "verify": "tsx src/verify.ts"
   },
   "dependencies": {

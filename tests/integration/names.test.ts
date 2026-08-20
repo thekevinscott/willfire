@@ -8,7 +8,7 @@
 
 import { expect, test } from "vitest";
 import { parse as parseYaml } from "yaml";
-import { expandWorkflowJobs } from "./predict.js";
+import { expandWorkflowJobs } from "../../src/predict.js";
 
 const ctx = { action: "opened", baseRef: "main", files: ["src/app.txt"] };
 

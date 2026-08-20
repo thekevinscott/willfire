@@ -17,6 +17,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   evalIf,
   expandMatrix,
+  expandWorkflowJobs,
   makeOctokit,
   matchFilters,
   patternToRegex,
@@ -976,5 +977,63 @@ describe("the CLI entrypoint", () => {
     await expect(invoke(["--pr", "1"])).rejects.toThrow("exited");
     expect(exit).toHaveBeenCalledWith(2);
     expect(vi.mocked(console.error).mock.calls[0][0]).toMatch(/^usage: predict /);
+  });
+});
+
+// `expandWorkflowJobs` is the seam the recorded-behaviour suite drives
+// (tests/integration/names.test.ts). That suite pins check names against live
+// dispatches; this covers the wrapper itself — that it forwards to the job
+// expansion and hands back the entries unchanged.
+describe("expandWorkflowJobs", () => {
+  it("expands a parsed workflow into its job entries", async () => {
+    const wf = { on: { pull_request: null }, jobs: { build: { "runs-on": "ubuntu-latest" } } };
+    const entries = await expandWorkflowJobs(
+      wf as never,
+      { action: "opened", baseRef: "main", files: ["src/app.txt"] },
+      async () => null,
+    );
+    expect(entries).toEqual([
+      { job: "build", checkName: "build", status: "run", reason: "" },
+    ]);
+  });
+
+  const expand = (jobs: unknown) =>
+    expandWorkflowJobs(
+      { on: { pull_request: null }, jobs } as never,
+      { action: "opened", baseRef: "main", files: ["src/app.txt"] },
+      async () => null,
+    );
+
+  it("renders an object-valued matrix entry as its comma-joined values", async () => {
+    const entries = await expand({
+      m: { "runs-on": "ubuntu-latest", strategy: { matrix: { cfg: [{ os: "linux", arch: "x64" }] } } },
+    });
+    expect(entries.map((e) => e.checkName)).toEqual(["m (linux, x64)"]);
+  });
+
+  it("appends the matrix suffix to a literal name: that holds no expression", async () => {
+    const entries = await expand({
+      m: { "runs-on": "ubuntu-latest", name: "custom", strategy: { matrix: { a: ["x"] } } },
+    });
+    expect(entries.map((e) => e.checkName)).toEqual(["custom (x)"]);
+  });
+
+  it("names a skipped job after its id when it declares no name:", async () => {
+    const entries = await expand({
+      m: { "runs-on": "ubuntu-latest", if: false, strategy: { matrix: { a: ["x", "y"] } } },
+    });
+    expect(entries).toEqual([
+      { job: "m", checkName: "m", status: "skipped", reason: "if: false" },
+    ]);
+  });
+
+  // A skipped job is never set up, so `name:` is not interpolated: the check is
+  // named with the expression text intact. Probe-verified (see
+  // `skippedDisplayName`).
+  it("leaves a skipped job's name: uninterpolated", async () => {
+    const entries = await expand({
+      m: { "runs-on": "ubuntu-latest", if: false, name: "sk ${{ github.event_name }}" },
+    });
+    expect(entries.map((e) => e.checkName)).toEqual(["sk ${{ github.event_name }}"]);
   });
 });
