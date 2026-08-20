@@ -26,9 +26,12 @@ import {
   predict,
   type Entry,
   type ExpandedJob,
+  type FetchWorkflow,
   type JobEntry,
   type Prediction,
+  type ResolveRef,
   type WorkflowEntry,
+  type WorkflowReader,
 } from "./predict.js";
 
 // Compile-time only, checked by `tsc --noEmit` over this file rather than at
@@ -48,6 +51,27 @@ type _JobStatusExcludesNoDispatch = Assert<
 type _NoDispatchLivesOnTheWorkflow = Assert<
   Eq<Extract<WorkflowEntry["status"], "no-dispatch">, "no-dispatch">
 >;
+
+/**
+ * A 40-hex commit id, so anything pinned to it is already resolved.
+ *
+ * The literal matters: expansion decides whether to resolve a ref by its
+ * *shape*, so a fixture ref has to look like the real thing or it takes the
+ * other branch.
+ */
+const SHA = "a".repeat(40);
+
+/**
+ * Bundle a bare fetch as the reader expansion takes.
+ *
+ * The default resolver is the identity — every ref is its own commit — which
+ * is right for fixtures that never call across repos. Tests about resolution
+ * pass their own.
+ */
+const readerOf = (
+  fetchWorkflow: FetchWorkflow,
+  resolveRef: ResolveRef = async (src) => src.ref,
+): WorkflowReader => ({ fetchWorkflow, resolveRef });
 
 // The real `Octokit` constructor is the one third-party edge the module reaches
 // for on its own (`makeOctokit`, and through it the CLI). Replacing the class
@@ -90,7 +114,26 @@ interface Fixture {
   workflows?: { path: string; state: string }[];
   /** Repo contents at head, keyed by path. A missing key is a 404. */
   contents?: Record<string, string>;
+  /**
+   * What a cross-repo ref resolves to, keyed `owner/repo@ref`. A ref that is
+   * not listed 404s, which is the answer a deleted tag or a private repo gives.
+   */
+  refs?: Record<string, string>;
 }
+
+/** The head commit of the PR every fixture describes. */
+const HEAD_SHA = "deadbeef";
+
+/** The one source every prediction reads, whatever else it reaches. */
+const HEAD_SOURCE = { owner: "o", repo: "r", ref: HEAD_SHA, sha: HEAD_SHA };
+
+/**
+ * A commit in some other repo, spelled the full 40 hex digits.
+ *
+ * The length is the point: whether a ref needs resolving is decided by its
+ * shape, so a short stand-in would take the other branch.
+ */
+const REMOTE_SHA = "b".repeat(40);
 
 // Sentinels standing in for the paginating route methods. `predict` passes the
 // method itself to `octokit.paginate`, never calls it, so identity is all the
@@ -107,15 +150,22 @@ function fakeOctokit(f: Fixture): Octokit {
           data: {
             commits: f.commits ?? 1,
             base: { ref: f.baseRef ?? "main" },
-            head: { sha: "deadbeef" },
+            head: { sha: HEAD_SHA },
           },
         }),
         listFiles: LIST_FILES,
       },
       repos: {
-        getCommit: async () => ({
-          data: { commit: { message: f.message ?? "chore: routine" } },
-        }),
+        getCommit: async ({ owner, repo, ref }: { owner: string; repo: string; ref: string }) => {
+          // Two callers share this route: the head-commit read that looks for a
+          // skip instruction, and ref resolution. Only the first has a message.
+          if (ref === HEAD_SHA) {
+            return { data: { sha: ref, commit: { message: f.message ?? "chore: routine" } } };
+          }
+          const sha = (f.refs ?? {})[`${owner}/${repo}@${ref}`];
+          if (sha == null) throw new Error(`404 ${owner}/${repo}@${ref}`);
+          return { data: { sha, commit: { message: "" } } };
+        },
         getContent: async ({ path }: { path: string }) => {
           if (!(path in contents)) throw new Error(`404 ${path}`);
           return { data: contents[path] };
@@ -439,7 +489,12 @@ describe("predict", () => {
     const octokit = fakeOctokit({
       workflows: [{ path: "dynamic/pages/pages-build-deployment", state: "active" }],
     });
-    expect(await predict(octokit, "o/r", 1)).toEqual({ entries: [], checkNames: [], skip: null });
+    expect(await predict(octokit, "o/r", 1)).toEqual({
+      entries: [],
+      checkNames: [],
+      skip: null,
+      sources: [HEAD_SOURCE],
+    });
   });
 
   it.each([
@@ -453,6 +508,8 @@ describe("predict", () => {
       entries: [],
       checkNames: [],
       skip: "head commit message contains a skip instruction",
+      // Even a suppressed prediction names the commit it read to decide that.
+      sources: [HEAD_SOURCE],
     });
   });
 
@@ -462,11 +519,18 @@ describe("predict", () => {
       entries: [],
       checkNames: [],
       skip: "head commit message contains a skip instruction",
+      // Even a suppressed prediction names the commit it read to decide that.
+      sources: [HEAD_SOURCE],
     });
   });
 
   it("keeps a workflow with no jobs as a run with no entries", async () => {
-    expect(await run("on: pull_request\n")).toEqual({ entries: [], checkNames: [], skip: null });
+    expect(await run("on: pull_request\n")).toEqual({
+      entries: [],
+      checkNames: [],
+      skip: null,
+      sources: [HEAD_SOURCE],
+    });
   });
 
   it("carries the workflow reason onto jobs that have none of their own", async () => {
@@ -778,15 +842,49 @@ describe("job expansion", () => {
       });
     });
 
-    // A cross-repo callee is fetched like any other (#13); this stand-in has no
-    // content for it, so the case under test is the fetch failing rather than
-    // the address being cross-repo. The resolvable path is pinned against live
-    // dispatches in tests/integration/names.test.ts.
-    it("reports a cross-repo reusable it cannot fetch", async () => {
+    // A cross-repo callee is reached in two steps: resolve the ref to a commit,
+    // then read the file at it. Either step can fail, and they fail differently,
+    // so each has its own case. The path where both succeed is pinned against
+    // live dispatches in tests/integration/names.test.ts.
+    it("reports a cross-repo reusable whose ref will not resolve", async () => {
+      // No `refs` entry, so `@v1` 404s the way a deleted tag does. Falling back
+      // to reading the mutable ref is exactly what must not happen: the answer
+      // would be unnameable afterwards.
       const uses = "octo/repo/.github/workflows/x.yml@v1";
       expect(await only(caller(uses))).toMatchObject({
         job: "call",
         status: "unknown",
+        reason: `cannot resolve ref for ${uses}`,
+      });
+    });
+
+    it("reports a cross-repo reusable it resolved but cannot fetch", async () => {
+      const uses = "octo/repo/.github/workflows/x.yml@v1";
+      const body = caller(uses);
+      expect(
+        await only(body, {
+          contents: { [WF]: body },
+          refs: { "octo/repo@v1": REMOTE_SHA },
+        }),
+      ).toMatchObject({
+        job: "call",
+        status: "unknown",
+        reason: `cannot fetch ${uses}`,
+      });
+    });
+
+    it("skips resolution for a `uses:` already pinned to a commit", async () => {
+      // Nothing to look up: the ref is the commit. Asking anyway would spend a
+      // request per call site on an answer already written down.
+      const uses = `octo/repo/.github/workflows/x.yml@${REMOTE_SHA}`;
+      const body = caller(uses);
+      expect(
+        await only(body, { contents: { [WF]: body } }),
+      ).toMatchObject({
+        job: "call",
+        status: "unknown",
+        // `cannot fetch`, not `cannot resolve`: resolution never ran, and this
+        // fixture lists no ref that would have let it succeed if it had.
         reason: `cannot fetch ${uses}`,
       });
     });
@@ -807,6 +905,111 @@ describe("job expansion", () => {
         }),
       ).toMatchObject({ job: "call", status: "skipped", reason: 'if: false' });
     });
+  });
+});
+
+// A prediction is only reconcilable against a run if it can say which commits it
+// was computed from. `v0` is a tag someone moves; two reads an hour apart can be
+// two different programs. So every ref gets resolved before anything is read at
+// it, and the commit goes in the answer.
+describe("the commits a prediction was read from", () => {
+  const caller = (uses: string) => `on: pull_request\njobs:\n  call:\n    uses: ${uses}\n`;
+
+  const CALLEE = "on:\n  workflow_call:\njobs:\n  inner:\n    runs-on: ubuntu-latest\n";
+
+  it("names only the head when nothing else is read", async () => {
+    const { sources } = await run("on: pull_request\njobs:\n  a: {}\n");
+    expect(sources).toEqual([HEAD_SOURCE]);
+  });
+
+  it("does not name a second source for a local `./` call", async () => {
+    // A local callee is the same commit as the caller, already named.
+    const body = caller("./.github/workflows/sub.yml");
+    const { sources } = await run(body, { contents: { [WF]: body, [SUB]: CALLEE } });
+    expect(sources).toEqual([HEAD_SOURCE]);
+  });
+
+  it("names a cross-repo callee by the commit its ref resolved to", async () => {
+    const body = caller("octo/repo/.github/workflows/x.yml@v1");
+    const { sources } = await run(body, {
+      contents: { [WF]: body, ".github/workflows/x.yml": CALLEE },
+      refs: { "octo/repo@v1": REMOTE_SHA },
+    });
+    expect(sources).toEqual([
+      HEAD_SOURCE,
+      // The ref as written is kept alongside the commit: dropping it would lose
+      // what the workflow actually asked for.
+      { owner: "octo", repo: "repo", ref: "v1", sha: REMOTE_SHA },
+    ]);
+  });
+
+  it("does not name a source whose ref would not resolve", async () => {
+    // The entry behind it is unknown, which turns the gate red. Naming a source
+    // here would claim a commit was read when none was.
+    const body = caller("octo/repo/.github/workflows/x.yml@v1");
+    const { sources } = await run(body, { contents: { [WF]: body } });
+    expect(sources).toEqual([HEAD_SOURCE]);
+  });
+
+  it("reads a callee at the resolved commit, never at the ref that named it", async () => {
+    // The whole point of resolving. Fetching at `v1` would leave a prediction
+    // naming a commit it did not actually read.
+    const body = caller("octo/repo/.github/workflows/x.yml@v1");
+    const octokit = fakeOctokit({
+      contents: { [WF]: body, ".github/workflows/x.yml": CALLEE },
+      refs: { "octo/repo@v1": REMOTE_SHA },
+    });
+    const getContent = vi.spyOn(octokit.rest.repos, "getContent");
+    await predict(octokit, "o/r", 1);
+    expect(getContent).toHaveBeenCalledWith(
+      expect.objectContaining({ owner: "octo", repo: "repo", ref: REMOTE_SHA }),
+    );
+  });
+
+  it("resolves a ref once however many jobs name it", async () => {
+    const body =
+      "on: pull_request\njobs:\n" +
+      "  a:\n    uses: octo/repo/.github/workflows/x.yml@v1\n" +
+      "  b:\n    uses: octo/repo/.github/workflows/x.yml@v1\n";
+    const octokit = fakeOctokit({
+      contents: { [WF]: body, ".github/workflows/x.yml": CALLEE },
+      refs: { "octo/repo@v1": REMOTE_SHA },
+    });
+    const getCommit = vi.spyOn(octokit.rest.repos, "getCommit");
+    const { sources } = await predict(octokit, "o/r", 1);
+    // One for the head commit's message, one for `v1`. The second `v1` is the
+    // cache, not a request.
+    expect(getCommit).toHaveBeenCalledTimes(2);
+    expect(sources).toHaveLength(2);
+  });
+
+  it("remembers a ref that would not resolve rather than asking again", async () => {
+    const body =
+      "on: pull_request\njobs:\n" +
+      "  a:\n    uses: octo/repo/.github/workflows/x.yml@v1\n" +
+      "  b:\n    uses: octo/repo/.github/workflows/x.yml@v1\n";
+    const octokit = fakeOctokit({ contents: { [WF]: body } });
+    const getCommit = vi.spyOn(octokit.rest.repos, "getCommit");
+    const { entries } = await predict(octokit, "o/r", 1);
+    expect(getCommit).toHaveBeenCalledTimes(2);
+    expect(entries.map((e) => e.status)).toEqual(["unknown", "unknown"]);
+  });
+
+  it("reads a callee once when two refs name the same commit", async () => {
+    // `@v1` and the commit it points at are one file. Keying the read on the
+    // ref would fetch it twice and, worse, allow two different answers.
+    const body =
+      "on: pull_request\njobs:\n" +
+      "  a:\n    uses: octo/repo/.github/workflows/x.yml@v1\n" +
+      `  b:\n    uses: octo/repo/.github/workflows/x.yml@${REMOTE_SHA}\n`;
+    const octokit = fakeOctokit({
+      contents: { [WF]: body, ".github/workflows/x.yml": CALLEE },
+      refs: { "octo/repo@v1": REMOTE_SHA },
+    });
+    const getContent = vi.spyOn(octokit.rest.repos, "getContent");
+    await predict(octokit, "o/r", 1);
+    // The caller's own workflow, then the callee once for both jobs.
+    expect(getContent).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -890,7 +1093,7 @@ describe("expandMatrix", () => {
 // whose check is the bare job name — and that is a name GitHub never creates
 // for a job that declares a matrix, so predicting it invents a check.
 describe("a job whose matrix expands to nothing", () => {
-  const SOURCE = { owner: "o", repo: "r", ref: "main" };
+  const SOURCE = { owner: "o", repo: "r", ref: SHA, sha: SHA };
   const CTX = { action: "opened", baseRef: "main", files: ["src/app.txt"] };
   const NO_FETCH = async () => null;
 
@@ -906,7 +1109,7 @@ describe("a job whose matrix expands to nothing", () => {
         },
       } as never,
       CTX,
-      NO_FETCH,
+      readerOf(NO_FETCH),
       SOURCE,
     );
     expect(entries).toEqual([]);
@@ -925,10 +1128,10 @@ describe("a job whose matrix expands to nothing", () => {
         },
       } as never,
       CTX,
-      async (path: string) => {
+      readerOf(async (path: string) => {
         fetched.push(path);
         return JSON.stringify({ jobs: { inner: { "runs-on": "ubuntu-latest" } } });
-      },
+      }),
       SOURCE,
     );
     expect(entries).toEqual([]);
@@ -1077,6 +1280,9 @@ describe("the CLI entrypoint", () => {
 
   const WORKFLOW = "on: pull_request\njobs:\n  a: {}\n";
 
+  /** Provenance trails every plain-text run: one line, the head commit. */
+  const HEAD_READ = `# read o/r@${HEAD_SHA} -> ${HEAD_SHA}`;
+
   it("stays quiet when the module is imported rather than run", async () => {
     process.argv = ["node"];
     vi.resetModules();
@@ -1086,12 +1292,12 @@ describe("the CLI entrypoint", () => {
 
   it("prints one line per entry", async () => {
     await invoke(["--repo", "o/r", "--pr", "1"], { contents: { [WF]: WORKFLOW } });
-    expect(out).toEqual([`${WF} :: a :: run`]);
+    expect(out).toEqual([`${WF} :: a :: run`, HEAD_READ]);
   });
 
   it("comments out a workflow-level verdict", async () => {
     await invoke(["--repo", "o/r", "--pr", "1"], { contents: {} });
-    expect(out).toEqual([`# ${WF} :: no-dispatch (no workflow file at head)`]);
+    expect(out).toEqual([`# ${WF} :: no-dispatch (no workflow file at head)`, HEAD_READ]);
   });
 
   it("reports a suppressing skip instruction on its own", async () => {
@@ -1101,6 +1307,7 @@ describe("the CLI entrypoint", () => {
     });
     expect(out).toEqual([
       "# head commit message contains a skip instruction -> nothing dispatches",
+      HEAD_READ,
     ]);
   });
 
@@ -1108,7 +1315,7 @@ describe("the CLI entrypoint", () => {
     await invoke(["--repo", "o/r", "--pr", "1"], {
       contents: { [WF]: "on: pull_request\njobs:\n  a:\n    name: on ${{ inputs.x }}\n" },
     });
-    expect(out).toEqual([`${WF} :: on \${{ inputs.x }} (name unresolved) :: run`]);
+    expect(out).toEqual([`${WF} :: on \${{ inputs.x }} (name unresolved) :: run`, HEAD_READ]);
   });
 
   it("emits JSON under --json", async () => {
@@ -1119,6 +1326,7 @@ describe("the CLI entrypoint", () => {
       entries: [
         { workflow: WF, job: "a", checkName: "a", status: "run", reason: "trigger matched" },
       ],
+      sources: [HEAD_SOURCE],
     });
   });
 
@@ -1128,7 +1336,7 @@ describe("the CLI entrypoint", () => {
     await invoke(["--repo", "o/r", "--pr", "1", "--action", "synchronize"], {
       contents: { [WF]: "on:\n  pull_request:\n    types: [synchronize]\njobs:\n  a: {}\n" },
     });
-    expect(out).toEqual([`${WF} :: a :: run`]);
+    expect(out).toEqual([`${WF} :: a :: run`, HEAD_READ]);
   });
 
   it("exits 2 on an --action it does not recognise", async () => {
@@ -1171,7 +1379,7 @@ describe("the CLI entrypoint", () => {
 // unknown. The job status below is the readout: `run` means the guard resolved
 // true, `skipped` false, and `unknown` that the input never became a literal.
 describe("caller inputs reaching a called workflow", () => {
-  const SOURCE = { owner: "o", repo: "r", ref: "main" };
+  const SOURCE = { owner: "o", repo: "r", ref: "main", sha: SHA };
   const CTX = { action: "opened", baseRef: "main", files: ["src/app.txt"] };
 
   /**
@@ -1193,11 +1401,12 @@ describe("caller inputs reaching a called workflow", () => {
         jobs: { c: { uses: "./.github/workflows/callee.yml", with: withBlock } },
       } as never,
       CTX,
-      async () =>
+      readerOf(async () =>
         calleeDoc({
           ...(calleeOn === undefined ? {} : { [onKey]: calleeOn }),
           jobs: { inner: { "runs-on": "ubuntu-latest", if: cond } },
         }),
+      ),
       SOURCE,
     );
     return entries[0];
@@ -1279,11 +1488,12 @@ describe("caller inputs reaching a called workflow", () => {
         },
       } as never,
       CTX,
-      async () =>
+      readerOf(async () =>
         calleeDoc({
           on: { workflow_call: { inputs: { x: { type: "string" } } } },
           jobs: { inner: { "runs-on": "ubuntu-latest" } },
         }),
+      ),
       SOURCE,
     );
     expect(entries.find((e) => e.job === "sibling")?.status).toBe("unknown");
@@ -1297,14 +1507,14 @@ describe("caller inputs reaching a called workflow", () => {
 describe("expandWorkflowJobs", () => {
   // Where expansion starts from. Nothing here calls out to another workflow, so
   // the source is only carried, never followed.
-  const SOURCE = { owner: "o", repo: "r", ref: "main" };
+  const SOURCE = { owner: "o", repo: "r", ref: "main", sha: SHA };
 
   it("expands a parsed workflow into its job entries", async () => {
     const wf = { on: { pull_request: null }, jobs: { build: { "runs-on": "ubuntu-latest" } } };
     const entries = await expandWorkflowJobs(
       wf as never,
       { action: "opened", baseRef: "main", files: ["src/app.txt"] },
-      async () => null,
+      readerOf(async () => null),
       SOURCE,
     );
     expect(entries).toEqual([
@@ -1316,7 +1526,7 @@ describe("expandWorkflowJobs", () => {
     expandWorkflowJobs(
       { on: { pull_request: null }, jobs } as never,
       { action: "opened", baseRef: "main", files: ["src/app.txt"] },
-      async () => null,
+      readerOf(async () => null),
       SOURCE,
     );
 
