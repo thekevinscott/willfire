@@ -19,6 +19,6 @@ jobs:
     # The action has no timeout of its own (see monitor.ts) — this is the
     # backstop. If a predicted run never dispatches, the gate waits here
     # until the job is killed.
-    timeout-minutes: 45
+    timeout-minutes: 20
     steps:
       - uses: thekevinscott/pr-monitor@v1
