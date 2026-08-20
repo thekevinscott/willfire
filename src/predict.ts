@@ -14,6 +14,8 @@ import { parse as parseYaml } from "yaml";
 export interface Entry {
   workflow: string;
   job: string; // "*" = workflow-level verdict, no job entries
+  // `unknown` is job-level only. Every workflow-level verdict is decidable, so
+  // a `job: "*"` entry is always one of run / skipped / no-dispatch.
   status: "run" | "skipped" | "unknown" | "no-dispatch";
   reason: string;
 }
@@ -98,39 +100,46 @@ function getPrTrigger(wf: Workflow): Record<string, any> | typeof MISSING {
   return MISSING;
 }
 
+// A predicate: does this workflow produce a run for the PR? Every workflow-level
+// verdict is decidable, so there is no third answer to express. Only job
+// expansion can be genuinely undecidable (dynamic matrix, non-local reusable
+// workflow, unresolvable `if`), and that is a per-entry status.
 function workflowDispatches(
   wf: Workflow,
   ctx: Ctx,
-): ["dispatch" | "no-dispatch" | "unknown", string] {
+): [dispatches: boolean, reason: string] {
   const trig = getPrTrigger(wf);
-  if (trig === MISSING) return ["no-dispatch", "no pull_request trigger"];
+  if (trig === MISSING) return [false, "no pull_request trigger"];
 
   const types: string[] = trig["types"] ?? DEFAULT_TYPES;
   if (!types.includes(ctx.action)) {
-    return ["no-dispatch", `action '${ctx.action}' not in types [${types}]`];
+    return [false, `action '${ctx.action}' not in types [${types}]`];
   }
 
+  // Setting a filter and its -ignore twin on one trigger is invalid config.
+  // GitHub does not fall back to "no filter" or skip the workflow: it creates
+  // the run and concludes `startup_failure`. The run exists, so it dispatches.
   if ("branches" in trig && "branches-ignore" in trig) {
-    return ["unknown", "both branches and branches-ignore set"];
+    return [true, "both branches and branches-ignore set: startup failure"];
   }
   if ("branches" in trig && !matchFilters(ctx.baseRef, trig["branches"])) {
-    return ["no-dispatch", `base branch '${ctx.baseRef}' not in branches`];
+    return [false, `base branch '${ctx.baseRef}' not in branches`];
   }
   if ("branches-ignore" in trig && matchFilters(ctx.baseRef, trig["branches-ignore"])) {
-    return ["no-dispatch", "base branch in branches-ignore"];
+    return [false, "base branch in branches-ignore"];
   }
 
   if ("paths" in trig && "paths-ignore" in trig) {
-    return ["unknown", "both paths and paths-ignore set"];
+    return [true, "both paths and paths-ignore set: startup failure"];
   }
   if ("paths" in trig && !ctx.files.some((f) => matchFilters(f, trig["paths"]))) {
-    return ["no-dispatch", "no changed file matches paths"];
+    return [false, "no changed file matches paths"];
   }
   if ("paths-ignore" in trig && ctx.files.every((f) => matchFilters(f, trig["paths-ignore"]))) {
-    return ["no-dispatch", "all changed files match paths-ignore"];
+    return [false, "all changed files match paths-ignore"];
   }
 
-  return ["dispatch", "trigger matched"];
+  return [true, "trigger matched"];
 }
 
 // ---------------------------------------------------------------- job expansion
@@ -354,11 +363,14 @@ export async function predict(
     }
     const content = await fetchFile(path);
     if (content == null) {
+      // The Actions API keeps listing a workflow as `active` after its file is
+      // deleted. There is no file at head, so there is nothing to dispatch —
+      // the same verdict as the disabled case above, reached a different way.
       entries.push({
         workflow: path,
         job: "*",
-        status: "unknown",
-        reason: "cannot fetch workflow file at head",
+        status: "no-dispatch",
+        reason: "no workflow file at head",
       });
       continue;
     }
@@ -366,17 +378,20 @@ export async function predict(
     try {
       wf = parseYaml(content);
     } catch (e) {
+      // GitHub creates a run for an unparseable workflow file and concludes it
+      // `startup_failure`. The run exists but has no jobs, so this is a
+      // workflow-level "it dispatches" with nothing to expand.
       entries.push({
         workflow: path,
         job: "*",
-        status: "unknown",
+        status: "run",
         reason: `YAML parse error: ${e}`,
       });
       continue;
     }
-    const [verdict, reason] = workflowDispatches(wf, ctx);
-    if (verdict !== "dispatch") {
-      entries.push({ workflow: path, job: "*", status: verdict, reason });
+    const [dispatches, reason] = workflowDispatches(wf, ctx);
+    if (!dispatches) {
+      entries.push({ workflow: path, job: "*", status: "no-dispatch", reason });
       continue;
     }
     for (const [jobName, status, jreason] of await expandJobs(wf, ctx, fetchFile)) {
