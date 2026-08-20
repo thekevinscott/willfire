@@ -51,11 +51,21 @@ const pr = Number(prArg);
 
 const octokit = makeOctokit();
 const { entries: predictedRaw } = await predict(octokit, repo, pr);
+// Compare on the resolved check name — that is the string GitHub actually
+// puts on the job. Entries whose name could not be resolved statically have
+// no key to compare and are reported separately below.
 const predicted = new Map(
-  predictedRaw.filter(isJobEntry).map((r) => [`${r.workflow} :: ${r.job}`, r.status]),
+  predictedRaw
+    .filter(isJobEntry)
+    .filter((r) => r.checkName != null)
+    .map((r) => [`${r.workflow} :: ${r.checkName}`, r.status]),
 );
+const unresolved = predictedRaw.filter(isJobEntry).filter((r) => r.checkName == null);
 const unknownWfs = new Set(
-  predictedRaw.filter((r) => r.status === "unknown").map((r) => r.workflow),
+  predictedRaw
+    .filter((r) => r.status === "unknown")
+    .map((r) => r.workflow)
+    .concat(unresolved.map((r) => r.workflow)),
 );
 const { entries: actual, incomplete } = await actualEntries(octokit, repo, pr);
 
@@ -88,6 +98,11 @@ for (const key of keys) {
     console.log(`DIFF  ${key} :: predicted ${p}, actual ${a}`);
   }
 }
+
+for (const r of unresolved) {
+  console.log(`  ?   ${r.workflow} :: ${r.job} :: name unresolved: ${r.reason}`);
+}
+
 
 console.log(ok ? "PASS" : "FAIL");
 process.exit(ok ? 0 : 1);

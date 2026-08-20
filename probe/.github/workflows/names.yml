@@ -1,0 +1,192 @@
+name: names
+on: pull_request
+jobs:
+  plain-job:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo plain
+
+  named-job:
+    name: Custom Name
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo named
+
+  m-auto:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x, y]
+        b: ["1", "2"]
+    steps:
+      - run: echo "${{ matrix.a }} ${{ matrix.b }}"
+
+  m-interp:
+    name: build ${{ matrix.a }}-${{ matrix.b }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x, y]
+        b: [p]
+    steps:
+      - run: echo interp
+
+  m-static-name:
+    name: Static Label
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x, y]
+    steps:
+      - run: echo static
+
+  m-numeric:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18, 20.5]
+    steps:
+      - run: echo "${{ matrix.node }}"
+
+  m-object:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cfg:
+          - os: linux
+            arch: x64
+          - os: mac
+            arch: arm64
+    steps:
+      - run: echo "${{ matrix.cfg.os }}"
+
+  m-include:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x, y]
+        include:
+          - a: x
+            extra: e1
+          - a: z
+    steps:
+      - run: echo include
+
+  m-include-only:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - a: "1"
+          - a: "2"
+    steps:
+      - run: echo include-only
+
+  m-exclude:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x, y]
+        b: [p, q]
+        exclude:
+          - a: y
+            b: q
+    steps:
+      - run: echo exclude
+
+  expr-name:
+    name: on ${{ github.event_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo expr
+
+  m-expr-name:
+    name: ev ${{ github.event_name }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x, y]
+    steps:
+      - run: echo expr-matrix
+
+  m-partial-name:
+    name: p ${{ matrix.a }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x]
+        b: ["1", "2"]
+    steps:
+      - run: echo partial
+
+  m-include2:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x]
+        include:
+          - a: x
+            extra: e1
+          - a: z
+            extra: e2
+    steps:
+      - run: echo include2
+
+  m-include-only2:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - a: "1"
+            b: one
+          - a: "2"
+    steps:
+      - run: echo include-only2
+
+  m-skipped:
+    if: false
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x, y]
+    steps:
+      - run: echo skipped-matrix
+
+  m-skipped-named:
+    name: Skipped ${{ matrix.a }}
+    if: false
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x, y]
+    steps:
+      - run: echo skipped-named
+
+  m-include-noaxis:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x, y]
+        include:
+          - extra: e
+    steps:
+      - run: echo "${{ matrix.extra }}"
+
+  m-include-overwrite:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x, y]
+        b: [p]
+        include:
+          - a: x
+            b: q
+    steps:
+      - run: echo overwrite
+
+  m-skipped-expr:
+    name: sk ${{ github.event_name }}
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo skipped-expr

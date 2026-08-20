@@ -1,0 +1,34 @@
+name: test
+
+# Typecheck plus the check-name resolution suite. The suite is not a set of
+# opinions about how GitHub *should* name jobs: every expectation in
+# `src/names.test.ts` was read back off a live dispatch on
+# thekevinbot/willrun-probe. See `probe/README.md`.
+
+on:
+  pull_request: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: typecheck + tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test

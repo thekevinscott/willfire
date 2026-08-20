@@ -6,7 +6,9 @@
 // pull-requests read). Inside an action, pass the workflow's GITHUB_TOKEN.
 //
 // Faithful port of predict.py, which was verified entry-for-entry against
-// live dispatches on thekevinbot/willrun-probe (PRs 1-7).
+// live dispatches on thekevinbot/willrun-probe (PRs 1-7). Check-name
+// resolution was verified the same way on probe PR 8; the rules it turned up
+// are pinned in src/names.test.ts.
 
 import { Octokit } from "@octokit/rest";
 import { parse as parseYaml } from "yaml";
@@ -43,6 +45,8 @@ export const jobName = <S extends string>(name: S extends "*" ? never : S): JobN
  */
 export interface WorkflowEntry extends EntryBase {
   job: "*";
+  /** Always null: a workflow-level verdict is about the run, not a named check. */
+  checkName: null;
   status: "run" | "skipped" | "no-dispatch";
 }
 
@@ -55,6 +59,16 @@ export interface WorkflowEntry extends EntryBase {
  */
 export interface JobEntry extends EntryBase {
   job: JobName;
+  /**
+   * The check name GitHub will create for this entry, resolved the way the
+   * Actions runner names jobs: `name:` override, matrix parenthetical, and
+   * `<caller> / <callee>` prefixing for reusable workflows.
+   *
+   * null when there is no single statically-knowable name: a matrix computed
+   * at runtime, a non-local reusable workflow, or a `name:` that interpolates
+   * something we cannot evaluate ahead of the run.
+   */
+  checkName: string | null;
   status: "run" | "skipped" | "unknown" | "no-dispatch";
 }
 
@@ -68,8 +82,36 @@ export const isJobEntry = (e: Entry): e is JobEntry => e.job !== "*";
 
 export interface Prediction {
   entries: Entry[];
+  /**
+   * Convenience aggregate: the sorted, deduplicated check names of every
+   * entry with status "run" and a resolved name. Entries whose name could
+   * not be resolved are absent here — read `entries` to see them.
+   */
+  checkNames: string[];
   skip: string | null; // set when a skip instruction suppresses everything
 }
+
+/**
+ * Internal entry shapes. `checkName` is optional while entries are being
+ * accumulated so that workflow-level pushes stay one-liners; `finalize`
+ * settles the omitted ones to null.
+ *
+ * Deliberately a union of two Omits rather than `Omit<Entry, "checkName">`.
+ * `Omit` over a union collapses to its common keys, which would re-widen
+ * `job`/`status` back into the single flat shape that let
+ * `{ job: "*", status: "unknown" }` typecheck. The push sites are exactly
+ * where that has to stay illegal, so the draft type keeps the variants apart.
+ */
+type DraftWorkflowEntry = Omit<WorkflowEntry, "checkName">;
+type DraftJobEntry = Omit<JobEntry, "checkName"> & { checkName?: string | null };
+type DraftEntry = DraftWorkflowEntry | DraftJobEntry;
+
+const isWorkflowDraft = (e: DraftEntry): e is DraftWorkflowEntry => e.job === "*";
+
+const finalize = (e: DraftEntry): Entry =>
+  isWorkflowDraft(e)
+    ? { ...e, checkName: null }
+    : { ...e, checkName: e.checkName ?? null };
 
 // ------------------------------------------------- GitHub filter pattern glob
 // Grammar per docs: * (any chars except /), ** (any chars), ? (zero or one of
@@ -122,7 +164,7 @@ const SKIP_TRAILER_RE = /^skip-checks:\s*true/im;
 
 const DEFAULT_TYPES = ["opened", "synchronize", "reopened"];
 
-interface Ctx {
+export interface Ctx {
   action: string;
   baseRef: string;
   files: string[];
@@ -192,8 +234,26 @@ function workflowDispatches(
 
 type Combo = Record<string, any> | null;
 
-/** Return list of matrix combination dicts, or null if dynamic. */
-export function expandMatrix(strategy: any): Combo[] | null {
+/**
+ * A matrix combination plus the keys that appear in its check-name
+ * parenthetical. The two differ: a key contributed by an `include` entry that
+ * merged into an existing axis-product combination is readable as
+ * `${{ matrix.key }}` but is NOT shown in the name.
+ *
+ * Probe-verified with `a: [x]` plus `include: [{a: x, extra: e1},
+ * {a: z, extra: e2}]` -> checks `m-include2 (x)` and `m-include2 (z, e2)`.
+ * The merged combination shows the axis key only; the combination the include
+ * created from scratch shows all of its own keys.
+ */
+interface DetailedCombo {
+  values: Record<string, any>;
+  displayKeys: string[];
+}
+
+/** null element = no matrix at all (a single, unsuffixed job). */
+type DetailedCombos = Array<DetailedCombo | null> | null;
+
+function expandMatrixDetailed(strategy: any): DetailedCombos {
   const matrix = strategy?.matrix;
   if (matrix == null) return [null];
   if (typeof matrix === "string") return null; // ${{ fromJSON(...) }}
@@ -206,47 +266,156 @@ export function expandMatrix(strategy: any): Combo[] | null {
     if (!Array.isArray(v)) return null;
     axes[k] = v;
   }
-  let combos: Record<string, any>[] = [{}];
+  const axisKeys = Object.keys(axes);
+  let combos: DetailedCombo[] = [{ values: {}, displayKeys: axisKeys }];
   for (const [k, vals] of Object.entries(axes)) {
-    combos = combos.flatMap((c) => vals.map((v) => ({ ...c, [k]: v })));
+    combos = combos.flatMap((c) =>
+      vals.map((v) => ({ values: { ...c.values, [k]: v }, displayKeys: axisKeys })),
+    );
   }
-  if (Object.keys(axes).length === 0) combos = [];
+  if (axisKeys.length === 0) combos = [];
   combos = combos.filter(
-    (c) => !exclude.some((ex) => Object.entries(ex).every(([k, v]) => c[k] === v)),
+    (c) => !exclude.some((ex) => Object.entries(ex).every(([k, v]) => c.values[k] === v)),
   );
-  const extra: Record<string, any>[] = [];
+  const extra: DetailedCombo[] = [];
   for (const inc of include) {
     const overlapping = Object.fromEntries(
       Object.entries(inc).filter(([k]) => k in axes),
     );
     const targets = combos.filter((c) =>
-      Object.entries(overlapping).every(([k, v]) => c[k] === v),
+      Object.entries(overlapping).every(([k, v]) => c.values[k] === v),
     );
-    if (Object.keys(overlapping).length > 0 && targets.length > 0) {
-      for (const c of targets) Object.assign(c, inc);
+    if (axisKeys.length > 0 && targets.length > 0) {
+      // Merge into the matching combinations. With no overlapping keys this
+      // matches every combination, per the docs ("added to each of the matrix
+      // combinations if none of the key:value pairs overwrite any of the
+      // original matrix values").
+      for (const c of targets) Object.assign(c.values, inc);
     } else {
-      extra.push({ ...inc });
+      // No combination to attach to: the include entry becomes a combination
+      // of its own, and every one of its keys shows in the name.
+      extra.push({ values: { ...inc }, displayKeys: Object.keys(inc) });
     }
   }
   combos.push(...extra);
   return combos.length > 0 ? combos : [null];
 }
 
-function renderName(template: string, combo: Combo): string {
-  return template.replace(/\$\{\{(.*?)\}\}/g, (whole, inner) => {
-    const expr = String(inner).trim();
-    if (expr.startsWith("matrix.") && combo) {
-      return String(combo[expr.slice("matrix.".length)] ?? "");
-    }
-    return whole;
-  });
+/** Return list of matrix combination dicts, or null if dynamic. */
+export function expandMatrix(strategy: any): Combo[] | null {
+  const detailed = expandMatrixDetailed(strategy);
+  return detailed == null ? null : detailed.map((c) => (c == null ? null : c.values));
 }
 
-function jobDisplayName(jobId: string, job: Workflow, combo: Combo): string {
-  if ("name" in job && job.name != null) return renderName(String(job.name), combo);
-  let name = jobId;
-  if (combo) name += ` (${Object.values(combo).map(String).join(", ")})`;
-  return name;
+/**
+ * How a single matrix value is rendered inside a check name.
+ *
+ * Probe-verified: object values are flattened to their own values, so
+ * `cfg: {os: linux, arch: x64}` renders as `linux, x64` — the check is
+ * `m-object (linux, x64)`.
+ */
+function formatMatrixValue(v: unknown): string {
+  if (v == null) return "";
+  if (Array.isArray(v)) return v.map(formatMatrixValue).join(", ");
+  if (typeof v === "object") return Object.values(v).map(formatMatrixValue).join(", ");
+  return String(v);
+}
+
+/** The ` (v1, v2)` suffix GitHub appends for a matrix combination. */
+function matrixSuffix(combo: DetailedCombo): string {
+  const keys = combo.displayKeys.filter((k) => k in combo.values);
+  if (keys.length === 0) return "";
+  return ` (${keys.map((k) => formatMatrixValue(combo.values[k])).join(", ")})`;
+}
+
+/**
+ * A `name:` that contains any `${{ }}` expression suppresses the matrix
+ * parenthetical; a literal one does not.
+ *
+ * Probe-verified three ways over `a: [x, y]`: `name: Static Label` yields
+ * `Static Label (x)` / `Static Label (y)`, `name: ev ${{ github.event_name }}`
+ * yields two checks both called `ev pull_request`, and
+ * `name: p ${{ matrix.a }}` over `a: [x], b: ["1", "2"]` yields two checks
+ * both called `p x`. So the trigger is the presence of an expression, not
+ * whether the expression happens to read the matrix — and duplicate check
+ * names are a real outcome GitHub allows.
+ */
+const EXPRESSION_RE = /\$\{\{/;
+
+function lookupPath(obj: any, path: string): unknown {
+  let cur: any = obj;
+  for (const seg of path.split(".")) {
+    if (cur == null || typeof cur !== "object" || !(seg in cur)) return undefined;
+    cur = cur[seg];
+  }
+  return cur;
+}
+
+interface Rendered {
+  text: string;
+  /** false when an expression was left in place because we cannot evaluate it. */
+  resolved: boolean;
+}
+
+function renderName(template: string, combo: Combo): Rendered {
+  let resolved = true;
+  const text = template.replace(/\$\{\{(.*?)\}\}/g, (whole, inner) => {
+    const expr = String(inner).trim();
+    if (expr.startsWith("matrix.")) {
+      if (!combo) {
+        resolved = false;
+        return whole;
+      }
+      const val = lookupPath(combo, expr.slice("matrix.".length));
+      if (val === undefined) {
+        resolved = false;
+        return whole;
+      }
+      return formatMatrixValue(val);
+    }
+    // We only predict pull_request dispatch, so this one is knowable.
+    if (expr === "github.event_name") return "pull_request";
+    resolved = false;
+    return whole;
+  });
+  return { text, resolved };
+}
+
+interface DisplayName {
+  name: string;
+  resolved: boolean;
+}
+
+/** The check name for one job/combination. */
+function jobDisplayName(
+  jobId: string,
+  job: Workflow,
+  combo: DetailedCombo | null,
+): DisplayName {
+  const raw = job != null && job.name != null ? String(job.name) : null;
+  if (raw === null) {
+    return { name: jobId + (combo ? matrixSuffix(combo) : ""), resolved: true };
+  }
+  const { text, resolved } = renderName(raw, combo?.values ?? null);
+  const suffix = combo && !EXPRESSION_RE.test(raw) ? matrixSuffix(combo) : "";
+  return { name: text + suffix, resolved };
+}
+
+/**
+ * The check name a job gets when it is skipped.
+ *
+ * A skipped job is never set up, so nothing about it is evaluated: the matrix
+ * does not expand and `name:` is not interpolated. Probe-verified twice over:
+ * `if: false` with `a: [x, y]` produces the single check `m-skipped`, not
+ * `m-skipped (x)` / `m-skipped (y)`; and `name: sk ${{ github.event_name }}`
+ * with `if: false` produces a check literally called
+ * `sk ${{ github.event_name }}`, expression text and all. The same collapse
+ * applies to a skipped reusable-workflow call: one check named after the
+ * caller, with no `/ <callee job>` entries.
+ */
+function skippedDisplayName(jobId: string, job: Workflow): DisplayName {
+  const raw = job != null && job.name != null ? String(job.name) : null;
+  return { name: raw ?? jobId, resolved: true };
 }
 
 /** Return run|skipped|unknown for a job-level if. */
@@ -265,9 +434,25 @@ export function evalIf(cond: any): "run" | "skipped" | "unknown" {
   return "unknown";
 }
 
-// One expanded job, before it is paired with its workflow. Renamed off
-// `JobEntry`, which is now the exported job-level variant of `Entry`.
-type ExpandedJob = [name: string, status: "run" | "skipped" | "unknown", reason: string];
+/**
+ * One expanded job, before it is paired with its workflow. Named `ExpandedJob`
+ * because `JobEntry` is now the exported job-level variant of `Entry`.
+ */
+export interface ExpandedJob {
+  /** The job id this entry was built from. */
+  job: string;
+  /** The resolved check name, or null when it could not be settled statically. */
+  checkName: string | null;
+  status: "run" | "skipped" | "unknown";
+  reason: string;
+}
+
+/**
+ * GitHub allows a reusable-workflow call chain four levels deep. Past that the
+ * run itself fails, so anything deeper is not a name we could predict anyway.
+ * Probe-verified to three levels: `call-nested / Mid Call / inner`.
+ */
+const MAX_REUSABLE_DEPTH = 4;
 
 async function expandJobs(
   wf: Workflow,
@@ -275,6 +460,7 @@ async function expandJobs(
   fetchFile: (path: string) => Promise<string | null>,
   depth = 0,
   prefix = "",
+  prefixResolved = true,
 ): Promise<ExpandedJob[]> {
   const entries: ExpandedJob[] = [];
   const jobs: Record<string, Workflow> = wf.jobs ?? {};
@@ -299,44 +485,119 @@ async function expandJobs(
     }
     statuses[jobId] = status;
 
-    if ("uses" in job) {
-      // reusable workflow call
-      const uses: string = job.uses;
-      const baseName = prefix + (job.name != null ? String(job.name) : jobId);
-      if (depth >= 1) {
-        entries.push([baseName, "unknown", "nested reusable workflow"]);
-        continue;
-      }
-      const m = uses.match(/^\.\/(.+)$/);
-      if (!m) {
-        entries.push([baseName, "unknown", `non-local reusable: ${uses}`]);
-        continue;
-      }
-      const content = await fetchFile(m[1]);
-      if (content == null) {
-        entries.push([baseName, "unknown", `cannot fetch ${uses}`]);
-        continue;
-      }
-      if (status === "skipped") {
-        entries.push([baseName, "skipped", reason]);
-        continue;
-      }
-      const subWf = parseYaml(content);
-      const sub = await expandJobs(subWf, ctx, fetchFile, depth + 1, `${baseName} / `);
-      entries.push(...sub);
+    // A skipped job never expands its matrix and never dispatches a called
+    // workflow: it collapses to a single check under the bare job name.
+    if (status === "skipped") {
+      const disp = skippedDisplayName(jobId, job);
+      const name = prefix + disp.name;
+      entries.push({
+        job: name,
+        checkName: prefixResolved && disp.resolved ? name : null,
+        status,
+        reason,
+      });
       continue;
     }
 
-    const combos = expandMatrix(job.strategy);
+    const combos = expandMatrixDetailed(job.strategy);
+
+    if ("uses" in job) {
+      // Reusable workflow call. The calling job produces no check of its own;
+      // each called job becomes `<calling job name> / <called job name>`, and
+      // a matrix on the *caller* multiplies the whole callee set.
+      const uses: string = job.uses;
+      if (combos == null) {
+        entries.push({
+          job: prefix + jobId,
+          checkName: null,
+          status: "unknown",
+          reason: "dynamic matrix on reusable workflow call",
+        });
+        continue;
+      }
+
+      // Resolve the called workflow once, not once per matrix combination.
+      let subWf: Workflow | null = null;
+      let failure: string | null = null;
+      const m = uses.match(/^\.\/(.+)$/);
+      if (depth + 1 > MAX_REUSABLE_DEPTH) {
+        failure = `reusable workflow nested deeper than ${MAX_REUSABLE_DEPTH} levels`;
+      } else if (!m) {
+        failure = `non-local reusable: ${uses}`;
+      } else {
+        const content = await fetchFile(m[1]);
+        if (content == null) {
+          failure = `cannot fetch ${uses}`;
+        } else {
+          try {
+            subWf = parseYaml(content);
+          } catch (e) {
+            failure = `YAML parse error in ${uses}: ${e}`;
+          }
+        }
+      }
+
+      for (const combo of combos) {
+        const disp = jobDisplayName(jobId, job, combo);
+        const baseName = prefix + disp.name;
+        const nameResolved = prefixResolved && disp.resolved;
+        if (failure != null || subWf == null) {
+          entries.push({
+            job: baseName,
+            checkName: null,
+            status: "unknown",
+            reason: failure ?? `cannot resolve ${uses}`,
+          });
+          continue;
+        }
+        entries.push(
+          ...(await expandJobs(
+            subWf,
+            ctx,
+            fetchFile,
+            depth + 1,
+            `${baseName} / `,
+            nameResolved,
+          )),
+        );
+      }
+      continue;
+    }
+
     if (combos == null) {
-      entries.push([prefix + jobId, "unknown", "dynamic matrix"]);
+      entries.push({
+        job: prefix + jobId,
+        checkName: null,
+        status: "unknown",
+        reason: "dynamic matrix",
+      });
       continue;
     }
     for (const combo of combos) {
-      entries.push([prefix + jobDisplayName(jobId, job, combo), status, reason]);
+      const disp = jobDisplayName(jobId, job, combo);
+      const name = prefix + disp.name;
+      entries.push({
+        job: name,
+        checkName: prefixResolved && disp.resolved ? name : null,
+        status,
+        reason,
+      });
     }
   }
   return entries;
+}
+
+/**
+ * Expand one already-parsed workflow into its job entries. Exported so check
+ * names can be tested against recorded GitHub behaviour without a network
+ * round-trip; `predict` is the API you want.
+ */
+export function expandWorkflowJobs(
+  wf: Workflow,
+  ctx: Ctx,
+  fetchFile: (path: string) => Promise<string | null>,
+): Promise<ExpandedJob[]> {
+  return expandJobs(wf, ctx, fetchFile);
 }
 
 // ------------------------------------------------------------------- pipeline
@@ -374,7 +635,7 @@ export async function predict(
   const headMsg = headCommit.commit.message;
 
   if (SKIP_RE.test(headMsg) || SKIP_TRAILER_RE.test(headMsg)) {
-    return { entries: [], skip: "head commit message contains a skip instruction" };
+    return finalizePrediction([], "head commit message contains a skip instruction");
   }
 
   const fetchFile = async (path: string): Promise<string | null> => {
@@ -396,7 +657,7 @@ export async function predict(
     per_page: 100,
   });
 
-  const entries: Entry[] = [];
+  const entries: DraftEntry[] = [];
   for (const w of workflows) {
     const path = w.path;
     if (!path.startsWith(".github/workflows/")) continue;
@@ -442,11 +703,26 @@ export async function predict(
       entries.push({ workflow: path, job: "*", status: "no-dispatch", reason });
       continue;
     }
-    for (const [name, status, jreason] of await expandJobs(wf, ctx, fetchFile)) {
-      entries.push({ workflow: path, job: jobName(name), status, reason: jreason || reason });
+    for (const j of await expandJobs(wf, ctx, fetchFile)) {
+      entries.push({
+        workflow: path,
+        job: jobName(j.job),
+        checkName: j.checkName,
+        status: j.status,
+        reason: j.reason || reason,
+      });
     }
   }
-  return { entries, skip: null };
+  return finalizePrediction(entries, null);
+}
+
+function finalizePrediction(entries: DraftEntry[], skip: string | null): Prediction {
+  const final = entries.map(finalize);
+  const names = new Set<string>();
+  for (const e of final) {
+    if (e.status === "run" && e.checkName != null) names.add(e.checkName);
+  }
+  return { entries: final, checkNames: [...names].sort(), skip };
 }
 
 // ------------------------------------------------------------------------ CLI
@@ -468,15 +744,18 @@ function parseArgs(argv: string[]): { repo: string; pr: number; json: boolean } 
 const isMain = /predict\.(ts|js)$|\/willfire$/.test(process.argv[1] ?? "");
 if (isMain) {
   const args = parseArgs(process.argv.slice(2));
-  const { entries, skip } = await predict(makeOctokit(), args.repo, args.pr);
+  const { entries, checkNames, skip } = await predict(makeOctokit(), args.repo, args.pr);
   if (args.json) {
-    console.log(JSON.stringify({ entries, skip }, null, 2));
+    console.log(JSON.stringify({ entries, checkNames, skip }, null, 2));
   } else if (skip) {
     console.log(`# ${skip} -> nothing dispatches`);
   } else {
     for (const e of entries) {
       if (isWorkflowEntry(e)) console.log(`# ${e.workflow} :: ${e.status} (${e.reason})`);
-      else console.log(`${e.workflow} :: ${e.job} :: ${e.status}`);
+      else {
+        const name = e.checkName ?? `${e.job} (name unresolved)`;
+        console.log(`${e.workflow} :: ${name} :: ${e.status}`);
+      }
     }
   }
 }
