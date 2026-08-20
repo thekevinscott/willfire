@@ -14,6 +14,8 @@ import { parse as parseYaml } from "yaml";
 export interface Entry {
   workflow: string;
   job: string; // "*" = workflow-level verdict, no job entries
+  // `unknown` is job-level only. Every workflow-level verdict is decidable, so
+  // a `job: "*"` entry is always one of run / skipped / no-dispatch.
   status: "run" | "skipped" | "unknown" | "no-dispatch";
   reason: string;
 }
@@ -98,10 +100,13 @@ function getPrTrigger(wf: Workflow): Record<string, any> | typeof MISSING {
   return MISSING;
 }
 
+// Every workflow-level verdict is decidable, so this never returns "unknown".
+// Only job expansion can be genuinely undecidable (dynamic matrix, non-local
+// reusable workflow, unresolvable `if`), and that is a per-entry status.
 function workflowDispatches(
   wf: Workflow,
   ctx: Ctx,
-): ["dispatch" | "no-dispatch" | "unknown", string] {
+): ["dispatch" | "no-dispatch", string] {
   const trig = getPrTrigger(wf);
   if (trig === MISSING) return ["no-dispatch", "no pull_request trigger"];
 
@@ -110,8 +115,11 @@ function workflowDispatches(
     return ["no-dispatch", `action '${ctx.action}' not in types [${types}]`];
   }
 
+  // Setting a filter and its -ignore twin on one trigger is invalid config.
+  // GitHub does not fall back to "no filter" or skip the workflow: it creates
+  // the run and concludes `startup_failure`. The run exists, so it dispatches.
   if ("branches" in trig && "branches-ignore" in trig) {
-    return ["unknown", "both branches and branches-ignore set"];
+    return ["dispatch", "both branches and branches-ignore set: startup failure"];
   }
   if ("branches" in trig && !matchFilters(ctx.baseRef, trig["branches"])) {
     return ["no-dispatch", `base branch '${ctx.baseRef}' not in branches`];
@@ -121,7 +129,7 @@ function workflowDispatches(
   }
 
   if ("paths" in trig && "paths-ignore" in trig) {
-    return ["unknown", "both paths and paths-ignore set"];
+    return ["dispatch", "both paths and paths-ignore set: startup failure"];
   }
   if ("paths" in trig && !ctx.files.some((f) => matchFilters(f, trig["paths"]))) {
     return ["no-dispatch", "no changed file matches paths"];
@@ -354,11 +362,14 @@ export async function predict(
     }
     const content = await fetchFile(path);
     if (content == null) {
+      // The Actions API keeps listing a workflow as `active` after its file is
+      // deleted. There is no file at head, so there is nothing to dispatch —
+      // the same verdict as the disabled case above, reached a different way.
       entries.push({
         workflow: path,
         job: "*",
-        status: "unknown",
-        reason: "cannot fetch workflow file at head",
+        status: "no-dispatch",
+        reason: "no workflow file at head",
       });
       continue;
     }
@@ -366,10 +377,13 @@ export async function predict(
     try {
       wf = parseYaml(content);
     } catch (e) {
+      // GitHub creates a run for an unparseable workflow file and concludes it
+      // `startup_failure`. The run exists but has no jobs, so this is a
+      // workflow-level "it dispatches" with nothing to expand.
       entries.push({
         workflow: path,
         job: "*",
-        status: "unknown",
+        status: "run",
         reason: `YAML parse error: ${e}`,
       });
       continue;
