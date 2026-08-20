@@ -13,6 +13,7 @@
 
 import { Octokit } from "@octokit/rest";
 import { parse as parseYaml } from "yaml";
+import { evaluate, UNKNOWN, type Scope, type Val } from "./expr.js";
 
 interface EntryBase {
   workflow: string;
@@ -419,20 +420,80 @@ function skippedDisplayName(jobId: string, job: Workflow): DisplayName {
   return { name: raw ?? jobId, resolved: true };
 }
 
-/** Return run|skipped|unknown for a job-level if. */
-export function evalIf(cond: any): "run" | "skipped" | "unknown" {
+/**
+ * The `github.*` values that are fixed for everything this module predicts.
+ * `predict` only ever answers for a pull request, so `event_name` is not a
+ * variable — which is what lets a `github.event_name == 'pull_request'` guard
+ * resolve instead of hanging the job on an unknown.
+ */
+const PR_GITHUB_CONTEXT: Record<string, string> = { event_name: "pull_request" };
+
+/**
+ * Return run|skipped|unknown for a job-level `if:`.
+ *
+ * `scope` carries the inputs the calling workflow passed down. Without it a
+ * reusable workflow's guards are all unknown, because every one of them is
+ * written against `inputs.*`.
+ */
+export function evalIf(cond: any, scope: Scope = {}): "run" | "skipped" | "unknown" {
   if (cond == null) return "run";
-  let c = String(cond).trim();
-  c = c.replace(/^\$\{\{(.*)\}\}$/s, "$1").trim();
-  if (c === "false" || c === "False") return "skipped";
-  if (c === "true" || c === "True" || c === "always()") return "run";
-  const m = c.match(/^github\.event_name\s*(==|!=)\s*'([^']*)'$/);
-  if (m) {
-    const eq = m[2] === "pull_request";
-    const hit = m[1] === "==" ? eq : !eq;
-    return hit ? "run" : "skipped";
+  const verdict = evaluate(String(cond), {
+    inputs: scope.inputs,
+    github: { ...PR_GITHUB_CONTEXT, ...scope.github },
+  });
+  if (verdict === null) return "unknown";
+  return verdict ? "run" : "skipped";
+}
+
+/**
+ * A `with:` value as the callee will see it.
+ *
+ * A value carrying `${{ }}` is left unknown rather than evaluated. Resolving
+ * it would mean evaluating the caller's own expression context, and every
+ * caller in practice passes plain literals — so the reach that would buy is
+ * not worth the surface. Unknown here is the same unknown as before this
+ * existed; nothing regresses.
+ */
+function inputLiteral(raw: unknown): Val {
+  if (raw == null) return { kind: "value", v: "" };
+  if (typeof raw === "boolean" || typeof raw === "number") return { kind: "value", v: raw };
+  if (typeof raw === "string") return raw.includes("${{") ? UNKNOWN : { kind: "value", v: raw };
+  return UNKNOWN;
+}
+
+/** The `on.workflow_call.inputs` block, tolerating the YAML 1.1 `on` -> true key. */
+function workflowCallInputs(wf: Workflow): Record<string, any> {
+  const on = wf?.["on"] ?? wf?.["true"];
+  if (on == null || typeof on !== "object") return {};
+  const call = (on as Record<string, any>)["workflow_call"];
+  if (call == null || typeof call !== "object") return {};
+  const inputs = call["inputs"];
+  return inputs != null && typeof inputs === "object" ? inputs : {};
+}
+
+/**
+ * What `inputs.*` resolves to inside a called workflow: what the caller passed,
+ * over the defaults the callee declares.
+ *
+ * A declared input the caller omits falls back to its `default`. A declared
+ * input with no default and no caller value is unknown rather than empty — the
+ * workflow would be invalid if it were required, and guessing empty would
+ * silently decide guards that are not decided.
+ */
+function calleeInputs(withBlock: unknown, subWf: Workflow): Record<string, Val> {
+  const out: Record<string, Val> = {};
+  for (const [name, decl] of Object.entries(workflowCallInputs(subWf))) {
+    out[name] =
+      decl != null && typeof decl === "object" && "default" in decl
+        ? inputLiteral((decl as Record<string, unknown>)["default"])
+        : UNKNOWN;
   }
-  return "unknown";
+  if (withBlock != null && typeof withBlock === "object") {
+    for (const [name, raw] of Object.entries(withBlock as Record<string, unknown>)) {
+      out[name] = inputLiteral(raw);
+    }
+  }
+  return out;
 }
 
 /**
@@ -525,13 +586,14 @@ async function expandJobs(
   depth = 0,
   prefix = "",
   prefixResolved = true,
+  scope: Scope = {},
 ): Promise<ExpandedJob[]> {
   const entries: ExpandedJob[] = [];
   const jobs: Record<string, Workflow> = wf.jobs ?? {};
   const statuses: Record<string, string> = {};
   for (const [jobId, jobRaw] of Object.entries(jobs)) {
     const job = jobRaw ?? {};
-    let status = evalIf(job.if);
+    let status = evalIf(job.if, scope);
     let reason = job.if != null ? `if: ${JSON.stringify(job.if)}` : "";
     let needs: string[] = job.needs ?? [];
     if (typeof needs === "string") needs = [needs];
@@ -588,6 +650,8 @@ async function expandJobs(
       // Where the callee's own `./` calls will resolve. A remote `uses:` moves
       // this to the callee's repo and pinned ref; a local one leaves it alone.
       let subSource: WorkflowSource = source;
+      // What `inputs.*` means on the other side of the call.
+      let subScope: Scope = {};
       const target = parseUses(uses);
       if (depth + 1 > MAX_REUSABLE_DEPTH) {
         failure = `reusable workflow nested deeper than ${MAX_REUSABLE_DEPTH} levels`;
@@ -601,6 +665,7 @@ async function expandJobs(
         } else {
           try {
             subWf = parseYaml(content);
+            subScope = { inputs: calleeInputs(job.with, subWf ?? {}) };
           } catch (e) {
             failure = `YAML parse error in ${uses}: ${e}`;
           }
@@ -629,6 +694,7 @@ async function expandJobs(
             depth + 1,
             `${baseName} / `,
             nameResolved,
+            subScope,
           )),
         );
       }

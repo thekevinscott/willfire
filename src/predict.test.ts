@@ -15,6 +15,7 @@
 
 import type { Octokit } from "@octokit/rest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { stringify as stringifyYaml } from "yaml";
 import {
   evalIf,
   expandMatrix,
@@ -983,6 +984,129 @@ describe("the CLI entrypoint", () => {
     await expect(invoke(["--pr", "1"])).rejects.toThrow("exited");
     expect(exit).toHaveBeenCalledWith(2);
     expect(vi.mocked(console.error).mock.calls[0][0]).toMatch(/^usage: predict /);
+  });
+});
+
+// A called workflow's guards are written against `inputs.*`, so expansion has
+// to carry the caller's `with:` block across the call or every one of them is
+// unknown. The job status below is the readout: `run` means the guard resolved
+// true, `skipped` false, and `unknown` that the input never became a literal.
+describe("caller inputs reaching a called workflow", () => {
+  const SOURCE = { owner: "o", repo: "r", ref: "main" };
+  const CTX = { action: "opened", baseRef: "main", files: ["src/app.txt"] };
+
+  const call = async (
+    withBlock: unknown,
+    cond: string,
+    calleeOn: unknown = { workflow_call: { inputs: { x: { type: "string" } } } },
+  ) => {
+    const callee = { on: calleeOn, jobs: { inner: { "runs-on": "ubuntu-latest", if: cond } } };
+    const entries = await expandWorkflowJobs(
+      {
+        on: { pull_request: null },
+        jobs: { c: { uses: "./.github/workflows/callee.yml", with: withBlock } },
+      } as never,
+      CTX,
+      async () => stringifyYaml(callee),
+      SOURCE,
+    );
+    return entries[0];
+  };
+
+  it("resolves a guard against a literal string the caller passed", async () => {
+    expect((await call({ x: "v" }, "inputs.x == 'v'")).status).toBe("run");
+    expect((await call({ x: "w" }, "inputs.x == 'v'")).status).toBe("skipped");
+  });
+
+  it("resolves a boolean and a number", async () => {
+    expect((await call({ x: true }, "inputs.x")).status).toBe("run");
+    expect((await call({ x: false }, "inputs.x")).status).toBe("skipped");
+    expect((await call({ x: 1 }, "inputs.x")).status).toBe("run");
+    expect((await call({ x: 0 }, "inputs.x")).status).toBe("skipped");
+  });
+
+  it("reads an explicitly null value as the empty string", async () => {
+    expect((await call({ x: null }, "inputs.x == ''")).status).toBe("run");
+  });
+
+  it("leaves a templated value unknown rather than guessing at it", async () => {
+    // Resolving `${{ }}` here would mean evaluating the caller's own context.
+    // Every caller in the fleet passes plain literals, so the unknown costs
+    // nothing and the guess would cost correctness.
+    expect((await call({ x: "${{ github.ref }}" }, "inputs.x == 'v'")).status).toBe("unknown");
+  });
+
+  it("leaves a structured value unknown", async () => {
+    // `with:` takes scalars. A map or a sequence is not something the callee
+    // could compare against a string anyway.
+    expect((await call({ x: { nested: true } }, "inputs.x == 'v'")).status).toBe("unknown");
+    expect((await call({ x: ["a"] }, "inputs.x == 'v'")).status).toBe("unknown");
+  });
+
+  it("falls back to the input's declared default when the caller omits it", async () => {
+    const on = { workflow_call: { inputs: { x: { type: "string", default: "d" } } } };
+    expect((await call({}, "inputs.x == 'd'", on)).status).toBe("run");
+    // The caller still wins where it does supply a value.
+    expect((await call({ x: "v" }, "inputs.x == 'd'", on)).status).toBe("skipped");
+  });
+
+  it("leaves a declared input with no default unknown rather than empty", async () => {
+    // Guessing `''` here would silently decide a guard the workflow left open.
+    expect((await call({}, "inputs.x == ''")).status).toBe("unknown");
+  });
+
+  it("tolerates a with: block that is not a mapping", async () => {
+    expect((await call("not-a-mapping", "inputs.x == ''")).status).toBe("unknown");
+    expect((await call(undefined, "inputs.x == ''")).status).toBe("unknown");
+  });
+
+  it("reads the inputs block under a YAML 1.1 `on` parsed as true", async () => {
+    const callee = {
+      true: { workflow_call: { inputs: { x: { type: "string", default: "d" } } } },
+      jobs: { inner: { "runs-on": "ubuntu-latest", if: "inputs.x == 'd'" } },
+    };
+    const entries = await expandWorkflowJobs(
+      {
+        on: { pull_request: null },
+        jobs: { c: { uses: "./.github/workflows/callee.yml", with: {} } },
+      } as never,
+      CTX,
+      async () => stringifyYaml(callee),
+      SOURCE,
+    );
+    expect(entries[0].status).toBe("run");
+  });
+
+  it.each([
+    ["a callee with no on: block", undefined],
+    ["an on: block that is not a mapping", "pull_request"],
+    ["an on: block with no workflow_call", { pull_request: null }],
+    ["a workflow_call that is not a mapping", { workflow_call: "yes" }],
+    ["a workflow_call with no inputs", { workflow_call: null }],
+    ["an inputs block that is not a mapping", { workflow_call: { inputs: "x" } }],
+  ] as const)("still carries the caller's values past %s", async (_label, on) => {
+    expect((await call({ x: "v" }, "inputs.x == 'v'", on)).status).toBe("run");
+  });
+
+  it("does not leak the caller's inputs into a sibling job", async () => {
+    // Scope descends through a call; it does not spread sideways.
+    const entries = await expandWorkflowJobs(
+      {
+        on: { pull_request: null },
+        jobs: {
+          c: { uses: "./.github/workflows/callee.yml", with: { x: "v" } },
+          sibling: { "runs-on": "ubuntu-latest", if: "inputs.x == 'v'" },
+        },
+      } as never,
+      CTX,
+      async () =>
+        stringifyYaml({
+          on: { workflow_call: { inputs: { x: { type: "string" } } } },
+          jobs: { inner: { "runs-on": "ubuntu-latest" } },
+        }),
+      SOURCE,
+    );
+    expect(entries.find((e) => e.job === "sibling")?.status).toBe("unknown");
   });
 });
 
