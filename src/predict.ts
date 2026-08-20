@@ -252,7 +252,14 @@ interface DetailedCombo {
   displayKeys: string[];
 }
 
-/** null element = no matrix at all (a single, unsuffixed job). */
+/**
+ * null element = no matrix at all (a single, unsuffixed job).
+ *
+ * An *empty* array is different, and different again from a null return: it
+ * means the matrix is present and expanded to zero combinations, so the job
+ * schedules nothing. `[null]` would claim one check under the bare job name,
+ * which is a name GitHub never creates for a matrix job.
+ */
 type DetailedCombos = Array<DetailedCombo | null> | null;
 
 function expandMatrixDetailed(strategy: any): DetailedCombos {
@@ -300,7 +307,10 @@ function expandMatrixDetailed(strategy: any): DetailedCombos {
     }
   }
   combos.push(...extra);
-  return combos.length > 0 ? combos : [null];
+  // Zero combinations is a real answer, not a missing one: an empty axis, or an
+  // `exclude` that removes everything, schedules no jobs at all. Only an absent
+  // `matrix:` key means "one unsuffixed job", and that returned above.
+  return combos;
 }
 
 /** Return list of matrix combination dicts, or null if dynamic. */

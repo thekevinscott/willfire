@@ -825,10 +825,26 @@ describe("expandMatrix", () => {
     ).toEqual([{ os: "linux" }]);
   });
 
-  it("returns a single null combination when everything is excluded", () => {
-    expect(expandMatrix({ matrix: { os: ["linux"], exclude: [{ os: "linux" }] } })).toEqual([
-      null,
-    ]);
+  it("returns no combinations when everything is excluded", () => {
+    expect(expandMatrix({ matrix: { os: ["linux"], exclude: [{ os: "linux" }] } })).toEqual([]);
+  });
+
+  it("returns no combinations for an empty axis", () => {
+    expect(expandMatrix({ matrix: { language: [] } })).toEqual([]);
+  });
+
+  it("returns no combinations when any axis is empty", () => {
+    // The product with an empty axis is empty, however many values the other
+    // axes carry.
+    expect(expandMatrix({ matrix: { a: [], b: ["x"] } })).toEqual([]);
+    expect(expandMatrix({ matrix: { a: ["x"], b: [] } })).toEqual([]);
+    expect(expandMatrix({ matrix: { a: [], b: [] } })).toEqual([]);
+  });
+
+  it("returns no combinations for a matrix with no keys", () => {
+    // Distinct from an absent `matrix:`, which is the single-unsuffixed-job
+    // case above.
+    expect(expandMatrix({ matrix: {} })).toEqual([]);
   });
 
   it("merges an include that overlaps an existing combination", () => {
@@ -845,6 +861,59 @@ describe("expandMatrix", () => {
 
   it("appends an include that shares no axis at all", () => {
     expect(expandMatrix({ matrix: { include: [{ flag: "x" }] } })).toEqual([{ flag: "x" }]);
+  });
+});
+
+// The check-name readout for the case above: an empty matrix has to produce no
+// entries, not one. `[null]` inside the expander means "a job with no matrix",
+// whose check is the bare job name — and that is a name GitHub never creates
+// for a job that declares a matrix, so predicting it invents a check.
+describe("a job whose matrix expands to nothing", () => {
+  const SOURCE = { owner: "o", repo: "r", ref: "main" };
+  const CTX = { action: "opened", baseRef: "main", files: ["src/app.txt"] };
+  const NO_FETCH = async () => null;
+
+  it("produces no entries at all", async () => {
+    const entries = await expandWorkflowJobs(
+      {
+        on: { pull_request: null },
+        jobs: {
+          build: {
+            "runs-on": "ubuntu-latest",
+            strategy: { matrix: { language: [] } },
+          },
+        },
+      } as never,
+      CTX,
+      NO_FETCH,
+      SOURCE,
+    );
+    expect(entries).toEqual([]);
+  });
+
+  it("does not dispatch the workflow a caller with an empty matrix calls", async () => {
+    const fetched: string[] = [];
+    const entries = await expandWorkflowJobs(
+      {
+        on: { pull_request: null },
+        jobs: {
+          call: {
+            uses: "./.github/workflows/callee.yml",
+            strategy: { matrix: { language: [] } },
+          },
+        },
+      } as never,
+      CTX,
+      async (path: string) => {
+        fetched.push(path);
+        return JSON.stringify({ jobs: { inner: { "runs-on": "ubuntu-latest" } } });
+      },
+      SOURCE,
+    );
+    expect(entries).toEqual([]);
+    // The callee is still read once — resolution happens before the matrix is
+    // walked — but nothing it declares becomes a check.
+    expect(fetched).toEqual([".github/workflows/callee.yml"]);
   });
 });
 
