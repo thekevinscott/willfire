@@ -1,0 +1,363 @@
+import { describe, expect, it } from "vitest";
+import { evaluate, UNKNOWN, type Scope } from "./expr.js";
+
+/**
+ * `evaluate` is the whole public surface, so everything below drives it rather
+ * than the parser internals. The tri-state is the thing under test: `true` and
+ * `false` are claims that a job's fate is settled, and `null` is the refusal to
+ * claim. A test that turns a `null` into a `true` is widening what willfire
+ * asserts about a repo's CI, not tidying a return value.
+ */
+
+/** The scope the fleet's `testing-conventions` callers actually produce. */
+const FLEET: Scope = {
+  inputs: {
+    gates: {
+      kind: "value",
+      v: '["colocated-test", "unit-lint", "unit-coverage", "integration-lint"]',
+    },
+    languages: { kind: "value", v: '["typescript"]' },
+    source: { kind: "value", v: "src" },
+    run_e2e: { kind: "value", v: false },
+    packaging_artifact: { kind: "value", v: "" },
+  },
+  github: { event_name: "pull_request" },
+};
+
+describe("literals and truthiness", () => {
+  it.each([
+    ["true", true],
+    ["True", true],
+    ["false", false],
+    ["False", false],
+    ["'x'", true],
+    ["''", false],
+    ["1", true],
+    ["0", false],
+    ["-1", true],
+    ["1.5", true],
+    // A non-empty string is truthy whatever it spells — the JavaScript trap,
+    // kept deliberately, because GitHub has it too.
+    ["'false'", true],
+    ["'0'", true],
+    ["null", false],
+  ] as const)("reads %s as %s", (src, want) => {
+    expect(evaluate(src)).toBe(want);
+  });
+});
+
+describe("the ${{ }} wrapper", () => {
+  it("strips a fully wrapped expression", () => {
+    expect(evaluate("${{ true }}")).toBe(true);
+  });
+
+  it("strips one spanning newlines", () => {
+    expect(evaluate("${{\n  true\n}}")).toBe(true);
+  });
+
+  it("refuses a partially interpolated string", () => {
+    // `foo ${{ bar }}` is a template, not an expression. Evaluating the inner
+    // part would answer a question nobody asked.
+    expect(evaluate("'a' == 'a ${{ inputs.x }}'")).toBe(null);
+  });
+
+  it("refuses an empty condition", () => {
+    expect(evaluate("   ")).toBe(null);
+  });
+
+  it("refuses an empty wrapper", () => {
+    expect(evaluate("${{ }}")).toBe(null);
+  });
+});
+
+describe("&& short-circuits from either side", () => {
+  it("is false when the left is false, whatever the right is", () => {
+    expect(evaluate("false && needs.detect.outputs.x == 'y'")).toBe(false);
+  });
+
+  it("yields the right when the left is true", () => {
+    expect(evaluate("true && false")).toBe(false);
+    expect(evaluate("true && true")).toBe(true);
+  });
+
+  it("is false when the right is false and the left is unknown", () => {
+    // The point of the whole file: an undecided operand does not make the
+    // expression undecided when the other operand settles it.
+    expect(evaluate("needs.detect.outputs.x && false")).toBe(false);
+  });
+
+  it("is unknown when the left is unknown and the right does not settle it", () => {
+    expect(evaluate("needs.detect.outputs.x && true")).toBe(null);
+    expect(evaluate("needs.detect.outputs.x && needs.detect.outputs.y")).toBe(null);
+  });
+});
+
+describe("|| short-circuits from either side", () => {
+  it("is true when the left is true", () => {
+    expect(evaluate("true || needs.detect.outputs.x == 'y'")).toBe(true);
+  });
+
+  it("yields the right when the left is false", () => {
+    expect(evaluate("false || true")).toBe(true);
+    expect(evaluate("false || false")).toBe(false);
+  });
+
+  it("is true when the right is true and the left is unknown", () => {
+    expect(evaluate("needs.detect.outputs.x || true")).toBe(true);
+  });
+
+  it("is unknown when neither operand settles it", () => {
+    expect(evaluate("needs.detect.outputs.x || false")).toBe(null);
+    expect(evaluate("needs.detect.outputs.x || needs.detect.outputs.y")).toBe(null);
+  });
+
+  it("coalesces to a value rather than a boolean", () => {
+    // `a || b` yields the first truthy operand, so a comparison against the
+    // result compares the *value*, not the truthiness.
+    expect(evaluate("('' || 'b') == 'b'")).toBe(true);
+    expect(evaluate("('a' || 'b') == 'a'")).toBe(true);
+  });
+});
+
+describe("negation", () => {
+  it("flips a settled operand", () => {
+    expect(evaluate("!true")).toBe(false);
+    expect(evaluate("!false")).toBe(true);
+  });
+
+  it("leaves an unsettled one unsettled", () => {
+    expect(evaluate("!needs.detect.outputs.x")).toBe(null);
+  });
+
+  it("binds tighter than a comparison", () => {
+    expect(evaluate("!false == true")).toBe(true);
+  });
+
+  it("nests", () => {
+    expect(evaluate("!!true")).toBe(true);
+  });
+});
+
+describe("comparison", () => {
+  it.each([
+    ["'a' == 'a'", true],
+    ["'a' == 'b'", false],
+    ["'a' != 'b'", true],
+    ["'a' != 'a'", false],
+    ["1 < 2", true],
+    ["2 < 1", false],
+    ["1 <= 1", true],
+    ["2 > 1", true],
+    ["1 > 2", false],
+    ["1 >= 2", false],
+    ["2 >= 2", true],
+    ["'a' < 'b'", true],
+    ["true == true", true],
+    ["true != false", true],
+  ] as const)("reads %s as %s", (src, want) => {
+    expect(evaluate(src)).toBe(want);
+  });
+
+  it("refuses to compare across types", () => {
+    // GitHub coerces here and the corner cases are surprising (`'' == 0` is
+    // true). Not modelling the table is the honest option, not a gap.
+    expect(evaluate("'1' == 1")).toBe(null);
+    expect(evaluate("'' == 0")).toBe(null);
+    expect(evaluate("true == 'true'")).toBe(null);
+  });
+
+  it("refuses to order booleans", () => {
+    expect(evaluate("true > false")).toBe(null);
+    expect(evaluate("false < true")).toBe(null);
+  });
+
+  it("is unknown when either side is unknown", () => {
+    expect(evaluate("needs.detect.outputs.x == 'y'")).toBe(null);
+    expect(evaluate("'y' == needs.detect.outputs.x")).toBe(null);
+  });
+
+  it("cannot compare a value known only by its truthiness", () => {
+    // `(unknown && false)` is known-falsy but has no value to compare.
+    expect(evaluate("(needs.x && false) == ''")).toBe(null);
+  });
+});
+
+describe("context lookups", () => {
+  it("resolves a supplied input", () => {
+    expect(evaluate("inputs.mode == 'fast'", { inputs: { mode: { kind: "value", v: "fast" } } })).toBe(
+      true,
+    );
+  });
+
+  it("leaves an absent input unknown rather than empty", () => {
+    // Treating a missing input as `''` would silently decide guards that are
+    // not decided.
+    expect(evaluate("inputs.mode == ''", { inputs: {} })).toBe(null);
+    expect(evaluate("inputs.mode == ''")).toBe(null);
+  });
+
+  it("honours an input that is present but unresolvable", () => {
+    expect(evaluate("inputs.mode == 'fast'", { inputs: { mode: UNKNOWN } })).toBe(null);
+  });
+
+  it("resolves a supplied github value", () => {
+    expect(evaluate("github.event_name == 'pull_request'", FLEET)).toBe(true);
+    expect(evaluate("github.event_name == 'push'", FLEET)).toBe(false);
+  });
+
+  it("leaves an unsupplied github value unknown", () => {
+    expect(evaluate("github.ref == 'refs/heads/main'", FLEET)).toBe(null);
+  });
+
+  it("leaves every runtime context unknown", () => {
+    for (const path of [
+      "needs.detect.outputs.x",
+      "steps.scan.outputs.x",
+      "matrix.language",
+      "env.FOO",
+      "vars.FOO",
+      "secrets.FOO",
+      "runner.os",
+    ]) {
+      expect(evaluate(`${path} == 'x'`, FLEET)).toBe(null);
+    }
+  });
+
+  it("leaves a bare name with no context unknown", () => {
+    expect(evaluate("something == 'x'")).toBe(null);
+  });
+});
+
+describe("functions", () => {
+  it("treats always() as true", () => {
+    expect(evaluate("always()")).toBe(true);
+  });
+
+  it("evaluates contains over two known strings", () => {
+    expect(evaluate("contains('abc', 'b')")).toBe(true);
+    expect(evaluate("contains('abc', 'z')")).toBe(false);
+  });
+
+  it("evaluates startsWith and endsWith", () => {
+    expect(evaluate("startsWith('abc', 'ab')")).toBe(true);
+    expect(evaluate("startsWith('abc', 'bc')")).toBe(false);
+    expect(evaluate("endsWith('abc', 'bc')")).toBe(true);
+    expect(evaluate("endsWith('abc', 'ab')")).toBe(false);
+  });
+
+  it("leaves contains unknown when an argument is not a known string", () => {
+    expect(evaluate("contains(needs.x.outputs.y, 'b')")).toBe(null);
+    expect(evaluate("contains('abc', needs.x.outputs.y)")).toBe(null);
+    expect(evaluate("contains(1, 2)")).toBe(null);
+  });
+
+  it("leaves startsWith unknown when an argument is not a known string", () => {
+    expect(evaluate("startsWith(needs.x.outputs.y, 'b')")).toBe(null);
+    expect(evaluate("startsWith('abc', 1)")).toBe(null);
+  });
+
+  it("leaves the job-status functions unknown", () => {
+    // These depend on jobs that have not run.
+    expect(evaluate("success()")).toBe(null);
+    expect(evaluate("failure()")).toBe(null);
+    expect(evaluate("cancelled()")).toBe(null);
+  });
+
+  it("leaves an unmodelled function unknown but still consumes its arguments", () => {
+    // If the argument list were not parsed, the tokens after it would parse
+    // against the wrong position and the result would be arbitrary rather
+    // than unknown.
+    expect(evaluate("toJSON('a') == 'b'")).toBe(null);
+    expect(evaluate("format('{0}', 'a', 'b') == 'x' || true")).toBe(true);
+  });
+
+  it("leaves contains unknown at the wrong arity", () => {
+    expect(evaluate("contains('abc')")).toBe(null);
+  });
+});
+
+describe("the shapes that appear in testing-conventions", () => {
+  // Every condition below is copied from
+  // `thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0`.
+  // They are the reason this evaluator exists; if one of them regresses to
+  // `null`, a fleet gate loses a check name.
+
+  it("skips mutation, because the caller's gates list decides it", () => {
+    const cond =
+      "github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"mutation\"')) && (needs.detect.outputs.mutation_languages || needs.detect.outputs.coverage_languages) != '[]'";
+    expect(evaluate(cond, FLEET)).toBe(false);
+  });
+
+  it("skips packaging on the same reasoning", () => {
+    const cond =
+      "(inputs.gates == '' || contains(inputs.gates, '\"packaging\"')) && (inputs.packaging_artifact != '' || needs.detect.outputs.packaging_build != '' || needs.detect.outputs.packaging_dist == 'true')";
+    expect(evaluate(cond, FLEET)).toBe(false);
+  });
+
+  it("skips e2e-verify on the same reasoning", () => {
+    const cond =
+      "github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"e2e-verify\"')) && (inputs.run_e2e || needs.detect.outputs.e2e_attestation == 'true')";
+    expect(evaluate(cond, FLEET)).toBe(false);
+  });
+
+  it("leaves unit-coverage unknown, because only detect's outputs decide it", () => {
+    // The gate is requested, so the only remaining clause reads an output of a
+    // job that has not run. Short-circuiting cannot settle that, and guessing
+    // would be a claim about which languages the repo has sources for. If
+    // those outputs ever arrive in the scope, this becomes decidable there —
+    // not here.
+    const cond =
+      "(inputs.gates == '' || contains(inputs.gates, '\"unit-coverage\"')) && needs.detect.outputs.coverage_languages != '[]'";
+    expect(evaluate(cond, FLEET)).toBe(null);
+  });
+
+  it("leaves static unknown for the same reason", () => {
+    const cond =
+      "(inputs.gates == '' || contains(inputs.gates, '\"colocated-test\"') || contains(inputs.gates, '\"unit-lint\"') || contains(inputs.gates, '\"integration-lint\"')) && (needs.detect.outputs.static_languages || needs.detect.outputs.integration_lint_languages) != '[]'";
+    expect(evaluate(cond, FLEET)).toBe(null);
+  });
+
+  it("runs a gate the caller did request once its other clauses hold", () => {
+    const cond = "inputs.gates == '' || contains(inputs.gates, '\"unit-coverage\"')";
+    expect(evaluate(cond, FLEET)).toBe(true);
+  });
+
+  it("treats an empty gates list as every gate requested", () => {
+    const scope: Scope = { inputs: { gates: { kind: "value", v: "" } } };
+    expect(evaluate("inputs.gates == '' || contains(inputs.gates, '\"mutation\"')", scope)).toBe(true);
+  });
+});
+
+describe("malformed input is unknown, never a guess", () => {
+  it.each([
+    ["'unterminated", "an unterminated string"],
+    ["true @ false", "a character with no token"],
+    ["(true", "an unclosed group"],
+    ["true)", "a stray closing paren"],
+    ["true false", "two expressions with no operator"],
+    ["true &&", "a missing right operand"],
+    ["contains('a' 'b')", "a malformed argument list"],
+    ["&& true", "a missing left operand"],
+  ] as const)("refuses %s (%s)", (src, _why) => {
+    expect(evaluate(src)).toBe(null);
+  });
+});
+
+describe("tokenizer details", () => {
+  it("reads a doubled quote as one literal quote", () => {
+    expect(evaluate("'it''s' == 'it''s'")).toBe(true);
+    expect(evaluate("contains('it''s', '''')")).toBe(true);
+  });
+
+  it("ignores whitespace of every kind", () => {
+    expect(evaluate("\t true \n &&\r true ")).toBe(true);
+  });
+
+  it("accepts a call with no arguments", () => {
+    expect(evaluate("always()")).toBe(true);
+  });
+
+  it("keeps dots and dashes inside one path", () => {
+    expect(evaluate("needs.detect-languages.outputs.x == 'y'")).toBe(null);
+  });
+});
