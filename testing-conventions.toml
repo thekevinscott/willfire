@@ -1,0 +1,22 @@
+# testing-conventions config — the colocated-test, coverage and packaging rules for
+# the TypeScript sources under `src/`. See https://github.com/thekevinscott/testing-conventions
+#
+# The coverage rule measures the whole `src/` tree against this floor. The CLI runs
+# Vitest itself, so `vitest.config.mts` only scopes the local developer report, not
+# what CI counts.
+[typescript]
+coverage = { lines = 100, branches = 100, functions = 100, statements = 100 }
+
+# The packaging gate builds the publishable tarball before scanning it. npm
+# standardizes `pack` (which runs `prepare` / `prepack`) but not the name of the
+# compile script, and willfire's compile hangs off `prepublishOnly` — which `pack`
+# does not run. This names it, so the gate inspects a `dist/` that actually has
+# something in it.
+build_command = "pnpm build"
+
+# There are no `[[typescript.exempt]]` entries, and that is the point: both runtime
+# modules carry a colocated test and both are fully covered. `verify.ts` is a
+# top-level script — importing it runs it — which reads as untestable, but its test
+# stands up argv, `process.exit` and a stubbed `predict()` and drives the whole
+# script. Reach for an exemption only when a technique genuinely runs out; a waiver
+# here would have hidden a hundred lines of comparison logic.

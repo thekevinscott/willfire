@@ -1,0 +1,43 @@
+name: Testing Conventions
+
+# Enforce the testing-conventions standard on this repo's sources: every source
+# file has a colocated unit test (`foo.ts` -> `foo.test.ts`), the unit suite meets
+# the coverage floor, unit tests isolate their collaborators, and no test file
+# ships in the published tarball. Calls the upstream reusable workflow, which runs
+# the published `testing-conventions` binary and fails the build on any violation.
+#   https://github.com/thekevinscott/testing-conventions
+#
+# Pinned to the rolling `v0` tag, the same convention as check.yml's putitoutthere
+# pin: v0 tracks the latest backwards-compatible release of the reusable workflow.
+#
+# One call, one `source` root. willfire is a single TypeScript package, not the
+# polyglot monorepo template-lib is, so there is no per-language fan-out here.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  conventions:
+    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
+    with:
+      languages: '["typescript"]'
+      source: src
+      config: testing-conventions.toml
+      # `@v0` is rolling, so new gates arrive on their own. Name the ones that
+      # apply here rather than take every gate the tool grows; each omission is a
+      # fact about this repo, not a waiver of a failing check. Diff-scoped variants
+      # ride along — colocated-test brings co-change, unit-coverage brings the
+      # changed-line job.
+      #
+      # Left out:
+      #   mutation   — needs `@stryker-mutator/core` and a runner plugin in this
+      #     package's own deps, which it does not have. Worth adding on its own
+      #     merits, but that is a change to how the repo is tested rather than part
+      #     of first standing a suite up.
+      #   e2e-verify — no attestation to keep fresh (already self-skips).
+      gates: '["colocated-test", "unit-lint", "unit-coverage", "integration-lint", "packaging"]'
