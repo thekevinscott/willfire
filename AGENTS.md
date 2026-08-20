@@ -29,9 +29,9 @@ driven end to end by its colocated test rather than waived.
 The expectations in `src/predict.test.ts` are **not** opinions about how GitHub
 ought to behave. Every workflow-level verdict was read off a live dispatch on
 [willrun-probe](https://github.com/thekevinbot/willrun-probe); the workflows
-under `probe/` are the record, and `setup-probe.sh` pushes them. Changing one of
-those assertions is a claim that GitHub's behavior changed — verify it against a
-real PR before you do.
+under `tests/fixtures/willrun-probe/` are the record, and `setup-probe.sh` pushes
+them. Changing one of those assertions is a claim that GitHub's behavior
+changed — verify it against a real PR before you do.
 
 `unknown` is the honest answer for anything undecidable from the workflow files
 alone (a runtime-computed matrix, a cross-repo reusable workflow). Do not guess

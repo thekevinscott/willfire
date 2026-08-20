@@ -3,9 +3,9 @@
 // Every expectation in this file was read back from a live dispatch on
 // thekevinbot/willrun-probe: PR #8 for `.github/workflows/names.yml` and
 // `names-caller.yml`, PR #9 for `remote-caller.yml` (all mirrored under
-// `probe/`). The fixtures below are that same YAML; the expected names are the
-// `name` field of the jobs the run actually created. Nothing here is inferred
-// from the docs alone.
+// `tests/fixtures/willrun-probe/`). The fixtures below are that same YAML; the
+// expected names are the `name` field of the jobs the run actually created.
+// Nothing here is inferred from the docs alone.
 
 import { expect, test } from "vitest";
 import { parse as parseYaml } from "yaml";
@@ -470,7 +470,7 @@ jobs:
 
 /**
  * The `owner/repo/path@ref` form, pinned to probe PR #9
- * (`.github/workflows/remote-caller.yml`, mirrored under `probe/`).
+ * (`.github/workflows/remote-caller.yml`, mirrored under the fixture tree).
  *
  * The probe is built so the answers cannot be guessed. `remote-reusable.yml`
  * and `remote-inner.yml` exist at three refs that deliberately disagree:

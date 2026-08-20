@@ -4,7 +4,7 @@ set -euo pipefail
 
 REPO=thekevinbot/willrun-probe
 HERE="$(cd "$(dirname "$0")" && pwd)"
-cd "$HERE/probe"
+cd "$HERE/tests/fixtures/willrun-probe"
 
 # --- repo + main ---
 gh repo create "$REPO" --public \
@@ -24,8 +24,8 @@ gh api -X PUT "repos/$REPO/actions/workflows/disabled.yml/disable"
 
 # --- tag remote-v0, whose content differs from main on purpose ---
 # The cross-repo probe needs the callee to exist at two refs that disagree, so
-# a name observed in a check says which ref GitHub read. `probe/` mirrors main;
-# the tag is main's files with the two jobs renamed back. See probe/README.md.
+# a name observed in a check says which ref GitHub read. The fixture tree mirrors main;
+# the tag is main's files with the two jobs renamed back. See its README.md.
 git checkout -b tmp-v0 main
 sed -i 's/^  r-inner-at-main:$/  r-inner:/' .github/workflows/remote-reusable.yml
 sed -i 's/^  deep-at-main:$/  deep-at-v0:/' .github/workflows/remote-inner.yml

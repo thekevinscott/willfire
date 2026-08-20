@@ -9,8 +9,9 @@
 //
 // The expectations are not opinions about how GitHub *ought* to behave. The
 // workflow-level verdicts were settled in #7 against live dispatches on
-// thekevinbot/willrun-probe, and the probe workflows under `probe/` are the
-// record. Changing one of these assertions means claiming GitHub changed.
+// thekevinbot/willrun-probe, and the probe workflows under
+// `tests/fixtures/willrun-probe/` are the record. Changing one of these
+// assertions means claiming GitHub changed.
 
 import type { Octokit } from "@octokit/rest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
