@@ -20,10 +20,14 @@ pnpm add willfire
 import { predict } from "willfire";
 import { getOctokit } from "@actions/github"; // or new Octokit({ auth: token })
 
-const { entries, checkNames, skip } = await predict(getOctokit(token), "owner/repo", 123, {
-  action: context.payload.action, // "opened" | "synchronize" | "reopened"
-});
+const { entries, checkNames, skip, sources } = await predict(
+  getOctokit(token),
+  "owner/repo",
+  123,
+  { action: context.payload.action }, // "opened" | "synchronize" | "reopened"
+);
 // checkNames: sorted, deduped checkName of every entry with status "run"
+// sources: every repo read, and the commit each ref resolved to
 ```
 
 `action` is optional but worth passing. Omitted, the event action is inferred
@@ -57,6 +61,17 @@ single name is knowable ahead of the run:
   four-level limit;
 - a `name:` interpolating something we cannot evaluate statically.
 
+`sources` is the provenance of the answer: the PR's own repo at the head
+commit, then one entry per cross-repo `uses:` that was read, each carrying both
+the `ref` the workflow wrote and the `sha` it resolved to. A ref is resolved
+before the file behind it is read, so the commit named is the commit used. `v0`
+is a tag someone moves; without the sha, "willfire predicted these checks" is
+not a claim that can be checked against the run afterwards.
+
+A ref that will not resolve is not a source. Its callee is never read, the jobs
+behind it come back `unknown`, and nothing falls back to reading the mutable
+ref.
+
 Duplicate names in `checkNames` are not possible (it is a set), but duplicate
 check names *are* — GitHub happily creates two identically named checks when a
 matrix job's `name:` does not vary per combination. `entries` shows them.
@@ -71,6 +86,9 @@ GH_TOKEN=... willfire --repo owner/repo --pr 123 \
   [--action opened|synchronize|reopened] [--json]
 ```
 
+Plain-text output is one line per entry, then a `# read owner/repo@ref -> sha`
+line per source. `--json` prints the whole `Prediction`, `sources` included.
+
 ## What it handles
 
 Path filters (`paths`, `paths-ignore`, order-sensitive `!` negation), branch
@@ -78,8 +96,8 @@ filters, event `types`, combined filters, `[skip ci]` and friends, disabled
 workflows, multi-job workflows, static matrix expansion (including
 `exclude`/`include`), `needs` skip-propagation, job-level `if`, and reusable
 workflows — both the local `./.github/workflows/x.yml` form and the cross-repo
-`owner/repo/.github/workflows/x.yml@ref` form, whose callee is fetched from its
-own repo at the pinned tag, branch, or SHA. Jobs whose `if` is false are
+`owner/repo/.github/workflows/x.yml@ref` form, whose ref is resolved to a
+commit and the callee then read at that commit. Jobs whose `if` is false are
 predicted as `skipped` entries, matching how they appear in the checks UI.
 
 Things that cannot be known statically — e.g. a matrix computed at runtime

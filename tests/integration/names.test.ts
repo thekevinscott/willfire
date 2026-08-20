@@ -11,7 +11,12 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
 import { parse as parseYaml } from "yaml";
-import { expandWorkflowJobs, parseUses, type WorkflowSource } from "../../src/predict.js";
+import {
+  expandWorkflowJobs,
+  parseUses,
+  type SourceRef,
+  type WorkflowSource,
+} from "../../src/predict.js";
 
 /**
  * A workflow from the probe tree, read rather than restated.
@@ -34,6 +39,7 @@ const HEAD: WorkflowSource = {
   owner: "thekevinbot",
   repo: "willrun-probe",
   ref: "headsha",
+  sha: "headsha",
 };
 
 /**
@@ -41,7 +47,7 @@ const HEAD: WorkflowSource = {
  * path so a lookup that resolves against the wrong repo or the wrong ref
  * misses instead of quietly finding the caller's copy.
  */
-const at = (source: WorkflowSource, path: string) =>
+const at = (source: SourceRef, path: string) =>
   `${source.owner}/${source.repo}/${path}@${source.ref}`;
 
 /** Address a file in the probe repo at head, the way a local `./` call does. */
@@ -51,7 +57,12 @@ async function jobs(yaml: string, files: Record<string, string> = {}) {
   const wf = parseYaml(yaml);
   const fetchWorkflow = async (p: string, source: WorkflowSource) =>
     files[at(source, p)] ?? null;
-  const entries = await expandWorkflowJobs(wf, ctx, fetchWorkflow, HEAD);
+  // Every ref in these fixtures is its own commit. This suite is about the
+  // names expansion produces, and resolving `remote-v0` to a hex string here
+  // would only rename the keys in `files` — the ref-to-commit step has its own
+  // tests in the unit suite.
+  const resolveRef = async (source: SourceRef) => source.ref;
+  const entries = await expandWorkflowJobs(wf, ctx, { fetchWorkflow, resolveRef }, HEAD);
   return entries.map((e) => ({ job: e.job, checkName: e.checkName, status: e.status }));
 }
 

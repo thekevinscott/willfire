@@ -96,6 +96,15 @@ export interface Prediction {
    */
   checkNames: string[];
   skip: string | null; // set when a skip instruction suppresses everything
+  /**
+   * Every repo this prediction read, and the commit each ref resolved to —
+   * the PR's own head first, then any cross-repo `uses:` reached from it.
+   *
+   * Provenance, not input. `v0` is a moving tag, so "willfire said these
+   * checks" is only reconcilable against a run if it also says which commits
+   * it read to say it. Sorted by `owner/repo@ref`.
+   */
+  sources: WorkflowSource[];
 }
 
 /**
@@ -569,11 +578,25 @@ const MAX_REUSABLE_DEPTH = 4;
  * `owner/repo/path@ref` resolves against *that* repo at *that* ref — probe
  * verified, see `src/names.test.ts`.
  */
-export interface WorkflowSource {
+export interface SourceRef {
   owner: string;
   repo: string;
   /** Tag, branch, or SHA — whatever `@` was pinned to. */
   ref: string;
+}
+
+/**
+ * A source whose ref has been resolved to the commit it names.
+ *
+ * Expansion walks these and never a bare {@link SourceRef}: `v0` is a moving
+ * tag, so two reads an hour apart can be two different programs, and a
+ * prediction that cannot name the commit it read cannot be reconciled against
+ * the run afterwards. Making the SHA required is what stops an unresolved ref
+ * being expanded against by accident.
+ */
+export interface WorkflowSource extends SourceRef {
+  /** The commit `ref` names. Equal to `ref` when it was already a SHA. */
+  sha: string;
 }
 
 /** Read one workflow file, or null if it is not reachable. Must not throw. */
@@ -582,12 +605,43 @@ export type FetchWorkflow = (
   source: WorkflowSource,
 ) => Promise<string | null>;
 
+/**
+ * Resolve a tag, branch, or SHA to the commit it names, or null when it cannot
+ * be resolved. Must not throw.
+ *
+ * Null is not a cue to fall back to the mutable ref. It leaves every entry
+ * behind that source unresolved, which turns the gate red — reading a ref we
+ * cannot name is the thing this exists to stop.
+ */
+export type ResolveRef = (source: SourceRef) => Promise<string | null>;
+
+/** `ref` is already a commit id, so resolving it is a no-op. */
+const SHA_RE = /^[0-9a-f]{40}$/i;
+
+const isSha = (ref: string): boolean => SHA_RE.test(ref);
+
+/** Identity of a source as written, before resolution. */
+const sourceKey = (s: SourceRef) => `${s.owner}/${s.repo}@${s.ref}`;
+
+/**
+ * The two reads expansion needs from the outside world, bundled so the recursion
+ * carries one parameter instead of two.
+ */
+export interface WorkflowReader {
+  fetchWorkflow: FetchWorkflow;
+  resolveRef: ResolveRef;
+}
+
 /** A `uses:` that named a workflow file we know how to go and get. */
 export interface UsesTarget {
   /** Path inside the target repo, e.g. `.github/workflows/x.yml`. */
   path: string;
-  /** null for a local `./` call: the caller's own repo and ref. */
-  source: WorkflowSource | null;
+  /**
+   * null for a local `./` call: the caller's own repo and ref, already
+   * resolved. Non-null sources arrive unresolved — the ref is whatever the
+   * `uses:` string spelled.
+   */
+  source: SourceRef | null;
 }
 
 /**
@@ -622,7 +676,7 @@ export function parseUses(uses: string): UsesTarget | null {
 async function expandJobs(
   wf: Workflow,
   ctx: Ctx,
-  fetchWorkflow: FetchWorkflow,
+  reader: WorkflowReader,
   source: WorkflowSource,
   depth = 0,
   prefix = "",
@@ -699,16 +753,31 @@ async function expandJobs(
       } else if (target == null) {
         failure = `unresolvable reusable reference: ${uses}`;
       } else {
-        subSource = target.source ?? source;
-        const content = await fetchWorkflow(target.path, subSource);
-        if (content == null) {
-          failure = `cannot fetch ${uses}`;
+        // A local `./` call stays on the caller's source, which is already
+        // pinned to a commit. A cross-repo one arrives as whatever the `uses:`
+        // string spelled — `@v0` — and has to be resolved before anything is
+        // read from it, so the file that gets read and the commit the
+        // prediction names are the same one.
+        let resolved: WorkflowSource | null = source;
+        if (target.source != null) {
+          const { ref } = target.source;
+          const sha = isSha(ref) ? ref : await reader.resolveRef(target.source);
+          resolved = sha == null ? null : { ...target.source, sha };
+        }
+        if (resolved == null) {
+          failure = `cannot resolve ref for ${uses}`;
         } else {
-          try {
-            subWf = parseYaml(content);
-            subScope = { inputs: calleeInputs(job.with, subWf ?? {}) };
-          } catch (e) {
-            failure = `YAML parse error in ${uses}: ${e}`;
+          subSource = resolved;
+          const content = await reader.fetchWorkflow(target.path, subSource);
+          if (content == null) {
+            failure = `cannot fetch ${uses}`;
+          } else {
+            try {
+              subWf = parseYaml(content);
+              subScope = { inputs: calleeInputs(job.with, subWf ?? {}) };
+            } catch (e) {
+              failure = `YAML parse error in ${uses}: ${e}`;
+            }
           }
         }
       }
@@ -730,7 +799,7 @@ async function expandJobs(
           ...(await expandJobs(
             subWf,
             ctx,
-            fetchWorkflow,
+            reader,
             subSource,
             depth + 1,
             `${baseName} / `,
@@ -773,10 +842,10 @@ async function expandJobs(
 export function expandWorkflowJobs(
   wf: Workflow,
   ctx: Ctx,
-  fetchWorkflow: FetchWorkflow,
+  reader: WorkflowReader,
   source: WorkflowSource,
 ): Promise<ExpandedJob[]> {
-  return expandJobs(wf, ctx, fetchWorkflow, source);
+  return expandJobs(wf, ctx, reader, source);
 }
 
 // ------------------------------------------------------------------- pipeline
@@ -810,6 +879,18 @@ export async function predict(
     files: files.map((f) => f.filename),
   };
   const headSha = pr.head.sha;
+
+  /**
+   * The PR's own repo at the head commit — where expansion starts, and already
+   * a commit id, so its `ref` and `sha` are the same string.
+   */
+  const headSource: WorkflowSource = { owner, repo: name, ref: headSha, sha: headSha };
+
+  // Provenance for the answer, filled as expansion reaches each source. The head
+  // is in from the start: it is read even on the skip path, where the commit
+  // message is what decides the verdict.
+  const sources = new Map<string, WorkflowSource>([[sourceKey(headSource), headSource]]);
+
   const { data: headCommit } = await octokit.rest.repos.getCommit({
     ...base,
     ref: headSha,
@@ -817,18 +898,48 @@ export async function predict(
   const headMsg = headCommit.commit.message;
 
   if (SKIP_RE.test(headMsg) || SKIP_TRAILER_RE.test(headMsg)) {
-    return finalizePrediction([], "head commit message contains a skip instruction");
+    return finalizePrediction(
+      [],
+      "head commit message contains a skip instruction",
+      sources,
+    );
   }
 
-  /** The PR's own repo at the head commit — where expansion starts. */
-  const headSource: WorkflowSource = { owner, repo: name, ref: headSha };
+  // A `uses:` naming a tag is the same lookup from every caller that writes it,
+  // so resolve each `owner/repo@ref` once. Misses are cached too: a ref that
+  // cannot be resolved will not start resolving on the second ask.
+  const refCache = new Map<string, string | null>();
+  const resolveRef: ResolveRef = async (src) => {
+    const key = sourceKey(src);
+    const hit = refCache.get(key);
+    if (hit !== undefined) return hit;
+    let sha: string | null;
+    try {
+      const { data } = await octokit.rest.repos.getCommit({
+        owner: src.owner,
+        repo: src.repo,
+        ref: src.ref,
+      });
+      sha = data.sha;
+    } catch {
+      // Deleted tag, private repo, rate limit, network: all one answer here.
+      // The caller turns it into an `unknown` entry rather than throwing.
+      sha = null;
+    }
+    refCache.set(key, sha);
+    if (sha != null) sources.set(key, { ...src, sha });
+    return sha;
+  };
 
   // One callee is commonly reached from several callers — a fleet repo calls
   // the same `testing-conventions@v0` from eight workflows — so remember what
-  // each `owner/repo/path@ref` resolved to, misses included.
+  // each `owner/repo/path@sha` resolved to, misses included.
   const cache = new Map<string, string | null>();
   const fetchWorkflow: FetchWorkflow = async (path, src) => {
-    const key = `${src.owner}/${src.repo}/${path}@${src.ref}`;
+    // Keyed and fetched on the commit, never the ref that named it. Two callers
+    // writing `@v0` and `@abc123` for the same commit are one read, and a tag
+    // that moves mid-prediction cannot hand back two different files.
+    const key = `${src.owner}/${src.repo}/${path}@${src.sha}`;
     const hit = cache.get(key);
     if (hit !== undefined) return hit;
     let content: string | null;
@@ -837,7 +948,7 @@ export async function predict(
         owner: src.owner,
         repo: src.repo,
         path,
-        ref: src.ref,
+        ref: src.sha,
         mediaType: { format: "raw" },
       });
       content = data as unknown as string;
@@ -849,6 +960,8 @@ export async function predict(
     cache.set(key, content);
     return content;
   };
+
+  const reader: WorkflowReader = { fetchWorkflow, resolveRef };
 
   const workflows = await octokit.paginate(octokit.rest.actions.listRepoWorkflows, {
     ...base,
@@ -901,7 +1014,7 @@ export async function predict(
       entries.push({ workflow: path, job: "*", status: "no-dispatch", reason });
       continue;
     }
-    for (const j of await expandJobs(wf, ctx, fetchWorkflow, headSource)) {
+    for (const j of await expandJobs(wf, ctx, reader, headSource)) {
       entries.push({
         workflow: path,
         job: jobName(j.job),
@@ -911,16 +1024,25 @@ export async function predict(
       });
     }
   }
-  return finalizePrediction(entries, null);
+  return finalizePrediction(entries, null, sources);
 }
 
-function finalizePrediction(entries: DraftEntry[], skip: string | null): Prediction {
+function finalizePrediction(
+  entries: DraftEntry[],
+  skip: string | null,
+  sources: Map<string, WorkflowSource>,
+): Prediction {
   const final = entries.map(finalize);
   const names = new Set<string>();
   for (const e of final) {
     if (e.status === "run" && e.checkName != null) names.add(e.checkName);
   }
-  return { entries: final, checkNames: [...names].sort(), skip };
+  return {
+    entries: final,
+    checkNames: [...names].sort(),
+    skip,
+    sources: [...sources.values()].sort((a, b) => sourceKey(a).localeCompare(sourceKey(b))),
+  };
 }
 
 // ------------------------------------------------------------------------ CLI
@@ -962,20 +1084,26 @@ function parseArgs(argv: string[]): {
 const isMain = /predict\.(ts|js)$|\/willfire$/.test(process.argv[1] ?? "");
 if (isMain) {
   const args = parseArgs(process.argv.slice(2));
-  const { entries, checkNames, skip } = await predict(makeOctokit(), args.repo, args.pr, {
+  const prediction = await predict(makeOctokit(), args.repo, args.pr, {
     action: args.action,
   });
+  const { entries, skip, sources } = prediction;
   if (args.json) {
-    console.log(JSON.stringify({ entries, checkNames, skip }, null, 2));
-  } else if (skip) {
-    console.log(`# ${skip} -> nothing dispatches`);
+    console.log(JSON.stringify(prediction, null, 2));
   } else {
-    for (const e of entries) {
-      if (isWorkflowEntry(e)) console.log(`# ${e.workflow} :: ${e.status} (${e.reason})`);
-      else {
-        const name = e.checkName ?? `${e.job} (name unresolved)`;
-        console.log(`${e.workflow} :: ${name} :: ${e.status}`);
+    if (skip) {
+      console.log(`# ${skip} -> nothing dispatches`);
+    } else {
+      for (const e of entries) {
+        if (isWorkflowEntry(e)) console.log(`# ${e.workflow} :: ${e.status} (${e.reason})`);
+        else {
+          const name = e.checkName ?? `${e.job} (name unresolved)`;
+          console.log(`${e.workflow} :: ${name} :: ${e.status}`);
+        }
       }
     }
+    // Last, and on the skip path too, so a red gate's first question — which
+    // commits was this read from? — is answered wherever the reader lands.
+    for (const s of sources) console.log(`# read ${s.owner}/${s.repo}@${s.ref} -> ${s.sha}`);
   }
 }
