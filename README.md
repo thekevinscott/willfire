@@ -21,8 +21,18 @@ import { predict } from "willfire";
 import { getOctokit } from "@actions/github"; // or new Octokit({ auth: token })
 
 const { entries, skip } = await predict(getOctokit(token), "owner/repo", 123);
-// entries: [{ workflow, job, status: "run" | "skipped" | "unknown" | "no-dispatch", reason }]
 ```
+
+`entries` is a union of two variants, both carrying `workflow` and `reason`:
+
+| variant | `job` | `status` |
+| --- | --- | --- |
+| `WorkflowEntry` | `"*"` | `"run" \| "skipped" \| "no-dispatch"` |
+| `JobEntry` | the job's display name | `"run" \| "skipped" \| "unknown" \| "no-dispatch"` |
+
+`"unknown"` is job-level only: every workflow-level verdict is decidable, so a
+`WorkflowEntry` cannot express one. Narrow with the exported `isWorkflowEntry`
+and `isJobEntry` guards rather than testing the `"*"` sentinel yourself.
 
 Auth is any token with `contents: read`, `actions: read`, and
 `pull-requests: read` — inside an action, the workflow's `GITHUB_TOKEN`.

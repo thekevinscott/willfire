@@ -11,14 +11,60 @@
 import { Octokit } from "@octokit/rest";
 import { parse as parseYaml } from "yaml";
 
-export interface Entry {
+interface EntryBase {
   workflow: string;
-  job: string; // "*" = workflow-level verdict, no job entries
-  // `unknown` is job-level only. Every workflow-level verdict is decidable, so
-  // a `job: "*"` entry is always one of run / skipped / no-dispatch.
-  status: "run" | "skipped" | "unknown" | "no-dispatch";
   reason: string;
 }
+
+/**
+ * A job's display name, e.g. `test (18)`.
+ *
+ * Nominally distinct from `string` for one reason: `Entry` is a closed union
+ * and `"*"` is the workflow-level sentinel, so a plain `string` here would
+ * structurally admit `{ job: "*", status: "unknown" }` as a `JobEntry` — the
+ * exact shape this split exists to forbid. TypeScript cannot spell "string
+ * but not `"*"`", so the job side is branded instead. Build one with
+ * {@link jobName}; reading one is just a string.
+ */
+export type JobName = string & { readonly __jobName: true };
+
+/** Tag a job display name. Rejects the workflow-level sentinel. */
+export const jobName = <S extends string>(name: S extends "*" ? never : S): JobName =>
+  name as unknown as JobName;
+
+/**
+ * A verdict about the workflow as a whole: it produces no run at all, or it
+ * produces a run that expands into no job entries.
+ *
+ * There is no `"unknown"` here, and that is the point. Every workflow-level
+ * verdict is decidable, and this type is what enforces it — the previous
+ * single-interface shape let `{ job: "*", status: "unknown" }` typecheck, which
+ * is what shipped and what pr-monitor#17 had to grow a `tolerated` bucket for.
+ */
+export interface WorkflowEntry extends EntryBase {
+  job: "*";
+  status: "run" | "skipped" | "no-dispatch";
+}
+
+/**
+ * A verdict about one job entry inside a workflow that does dispatch.
+ *
+ * These can be genuinely undecidable statically — dynamic matrix, non-local
+ * reusable workflow, unresolvable `if`, or `needs` on any of those — so
+ * `"unknown"` lives here and only here.
+ */
+export interface JobEntry extends EntryBase {
+  job: JobName;
+  status: "run" | "skipped" | "unknown" | "no-dispatch";
+}
+
+export type Entry = WorkflowEntry | JobEntry;
+
+/** Narrow to the workflow-level variant without inspecting the sentinel. */
+export const isWorkflowEntry = (e: Entry): e is WorkflowEntry => e.job === "*";
+
+/** Narrow to the job-level variant without inspecting the sentinel. */
+export const isJobEntry = (e: Entry): e is JobEntry => e.job !== "*";
 
 export interface Prediction {
   entries: Entry[];
@@ -219,7 +265,9 @@ export function evalIf(cond: any): "run" | "skipped" | "unknown" {
   return "unknown";
 }
 
-type JobEntry = [name: string, status: "run" | "skipped" | "unknown", reason: string];
+// One expanded job, before it is paired with its workflow. Renamed off
+// `JobEntry`, which is now the exported job-level variant of `Entry`.
+type ExpandedJob = [name: string, status: "run" | "skipped" | "unknown", reason: string];
 
 async function expandJobs(
   wf: Workflow,
@@ -227,8 +275,8 @@ async function expandJobs(
   fetchFile: (path: string) => Promise<string | null>,
   depth = 0,
   prefix = "",
-): Promise<JobEntry[]> {
-  const entries: JobEntry[] = [];
+): Promise<ExpandedJob[]> {
+  const entries: ExpandedJob[] = [];
   const jobs: Record<string, Workflow> = wf.jobs ?? {};
   const statuses: Record<string, string> = {};
   for (const [jobId, jobRaw] of Object.entries(jobs)) {
@@ -394,8 +442,8 @@ export async function predict(
       entries.push({ workflow: path, job: "*", status: "no-dispatch", reason });
       continue;
     }
-    for (const [jobName, status, jreason] of await expandJobs(wf, ctx, fetchFile)) {
-      entries.push({ workflow: path, job: jobName, status, reason: jreason || reason });
+    for (const [name, status, jreason] of await expandJobs(wf, ctx, fetchFile)) {
+      entries.push({ workflow: path, job: jobName(name), status, reason: jreason || reason });
     }
   }
   return { entries, skip: null };
@@ -427,7 +475,7 @@ if (isMain) {
     console.log(`# ${skip} -> nothing dispatches`);
   } else {
     for (const e of entries) {
-      if (e.job === "*") console.log(`# ${e.workflow} :: ${e.status} (${e.reason})`);
+      if (isWorkflowEntry(e)) console.log(`# ${e.workflow} :: ${e.status} (${e.reason})`);
       else console.log(`${e.workflow} :: ${e.job} :: ${e.status}`);
     }
   }

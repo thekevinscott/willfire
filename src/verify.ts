@@ -6,7 +6,7 @@
 // and the job entries inside each run (skipped jobs included).
 
 import { Octokit } from "@octokit/rest";
-import { makeOctokit, predict } from "./predict.js";
+import { isJobEntry, makeOctokit, predict } from "./predict.js";
 
 async function actualEntries(octokit: Octokit, repo: string, prNumber: number) {
   const [owner, name] = repo.split("/");
@@ -52,9 +52,7 @@ const pr = Number(prArg);
 const octokit = makeOctokit();
 const { entries: predictedRaw } = await predict(octokit, repo, pr);
 const predicted = new Map(
-  predictedRaw
-    .filter((r) => r.job !== "*")
-    .map((r) => [`${r.workflow} :: ${r.job}`, r.status]),
+  predictedRaw.filter(isJobEntry).map((r) => [`${r.workflow} :: ${r.job}`, r.status]),
 );
 const unknownWfs = new Set(
   predictedRaw.filter((r) => r.status === "unknown").map((r) => r.workflow),
@@ -88,12 +86,6 @@ for (const key of keys) {
   } else {
     ok = false;
     console.log(`DIFF  ${key} :: predicted ${p}, actual ${a}`);
-  }
-}
-
-for (const r of predictedRaw) {
-  if (r.job === "*" && r.status === "unknown") {
-    console.log(`  ?   ${r.workflow} :: workflow-level unknown: ${r.reason}`);
   }
 }
 
