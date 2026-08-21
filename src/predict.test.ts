@@ -1764,3 +1764,33 @@ describe("cross-repo reusable references", () => {
     expect(subFetches).toHaveLength(1);
   });
 });
+
+describe("github.repository as a prediction-wide fact", () => {
+  it("decides a repository guard from the repo the PR is against", async () => {
+    const wf = JSON.stringify({
+      on: "pull_request",
+      jobs: {
+        published: { if: "github.repository != 'o/r'" },
+        hermetic: { if: "github.repository == 'o/r'" },
+      },
+    });
+    const { checkNames } = await predict(fakeOctokit({ contents: { [WF]: wf } }), "o/r", 1);
+    expect(checkNames).toEqual(["hermetic"]);
+  });
+
+  it("carries the fact across a reusable workflow call", async () => {
+    const sub = JSON.stringify({
+      on: { workflow_call: null },
+      jobs: { inner: { if: "github.repository == 'o/r'" } },
+    });
+    const wf = JSON.stringify({
+      on: "pull_request",
+      jobs: { call: { uses: "./.github/workflows/sub.yml" } },
+    });
+    const octokit = fakeOctokit({
+      contents: { [WF]: wf, ".github/workflows/sub.yml": sub },
+    });
+    const { checkNames } = await predict(octokit, "o/r", 1);
+    expect(checkNames).toEqual(["call / inner"]);
+  });
+});

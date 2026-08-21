@@ -806,7 +806,10 @@ async function expandJobs(
           } else {
             try {
               subWf = parseYaml(content);
-              subScope = { inputs: calleeInputs(job.with, subWf ?? {}) };
+              // `inputs.*` changes at the call boundary; `github.*` does not.
+              // A callee's jobs run in the caller's repo, so the facts seeded
+              // at the top of the prediction stay true all the way down.
+              subScope = { inputs: calleeInputs(job.with, subWf ?? {}), github: scope.github };
             } catch (e) {
               failure = `YAML parse error in ${uses}: ${e}`;
             }
@@ -1006,6 +1009,14 @@ export async function predict(
     per_page: 100,
   });
 
+  // `github.repository` is fixed for everything predicted here: reusable
+  // workflows and composite actions all run in the repo the PR is against.
+  // Seeding it once makes guards like the fleet's hermetic-vs-published
+  // `github.repository ==` checks decidable everywhere.
+  const prFacts: Scope = {
+    github: { repository: `${headSource.owner}/${headSource.repo}` },
+  };
+
   const entries: DraftEntry[] = [];
   for (const w of workflows) {
     const path = w.path;
@@ -1052,7 +1063,7 @@ export async function predict(
       entries.push({ workflow: path, job: "*", status: "no-dispatch", reason });
       continue;
     }
-    for (const j of await expandJobs(wf, ctx, reader, headSource)) {
+    for (const j of await expandJobs(wf, ctx, reader, headSource, 0, "", true, prFacts)) {
       entries.push({
         workflow: path,
         job: jobName(j.job),
