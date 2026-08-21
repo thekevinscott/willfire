@@ -84,7 +84,8 @@ Auth is any token with `contents: read`, `actions: read`, and
 
 ```sh
 GH_TOKEN=... willfire --repo owner/repo --pr 123 \
-  [--action opened|synchronize|reopened] [--json]
+  [--action opened|synchronize|reopened] [--json] \
+  [--execute owner/repo:job1,job2]...
 ```
 
 Plain-text output is one line per entry, then a `# read owner/repo@ref -> sha`
@@ -137,8 +138,51 @@ lookup against it then stays unknown.
 `needs` is workflow-scoped and is not inherited across a reusable-workflow
 call: a callee's `needs.detect` is the callee's own job.
 
-Nothing in willfire works out what those outputs are. `predict` supplies none,
-so a dynamic matrix stays `unknown` there.
+Nothing in willfire works out what those outputs are on its own. `predict`
+supplies none unless the caller grants execution — see below — so a dynamic
+matrix stays `unknown` by default.
+
+## Executing granted jobs
+
+The job those outputs come from is usually a few shell steps over the checked
+out tree — cheap to run for real. `predict` will do that, but only for jobs
+the caller names:
+
+```ts
+await predict(octokit, "owner/repo", 123, {
+  execute: [{ repo: "the-org/conventions", jobs: ["detect"] }],
+});
+```
+
+```sh
+willfire --repo owner/repo --pr 123 \
+  --execute the-org/conventions:detect
+```
+
+A grant names the repo the workflow *file* lives in — for a reusable workflow,
+the callee — and the job ids within it. Before expansion reads `needs`, each
+granted job that is predicted to run is executed: the PR's head tree is
+materialized from a tarball, the job's steps run in order under their declared
+shell and env, step-level `if:` guards are evaluated, composite actions are
+fetched at their pinned commit and recursed into, and a bare
+`actions/checkout` is satisfied by the tree already present. What the steps
+write to `$GITHUB_OUTPUT` becomes the job's outputs, exactly as if they had
+been supplied by hand.
+
+Execution is mechanism, not policy: willfire knows nothing about any repo, and
+with no grants nothing runs. The steps execute for real — nothing interprets
+or approximates shell — so grant only jobs whose code you trust at the commit
+being predicted; a granted job runs the PR's version of itself.
+
+Anything execution cannot do faithfully fails the grant rather than guessing:
+a JavaScript or Docker action, a checkout with inputs, a matrix'd or
+containerized granted job, an undecidable step `if:`, a non-zero exit, output
+willfire cannot parse. The failure does not change any verdict — entries that
+needed the outputs stay `unknown`, with the reason threaded through:
+
+```
+dynamic matrix; executing 'detect' failed: step 'scan': exited 1 (...)
+```
 
 ## Development
 

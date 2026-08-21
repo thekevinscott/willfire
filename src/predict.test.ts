@@ -32,7 +32,9 @@ import {
   type ResolveRef,
   type WorkflowEntry,
   type WorkflowReader,
+  type WorkflowSource,
 } from "./predict.js";
+import type { ExecOutcome } from "./execute.js";
 import type { Scope } from "./expr.js";
 
 // Compile-time only, checked by `tsc --noEmit` over this file rather than at
@@ -120,6 +122,12 @@ interface Fixture {
    * not listed 404s, which is the answer a deleted tag or a private repo gives.
    */
   refs?: Record<string, string>;
+  /**
+   * Tarball bytes by `owner/repo@ref`, for the executor's tree downloads. A
+   * missing key throws, which is what the tarball endpoint does for anything
+   * it will not serve.
+   */
+  tarballs?: Record<string, Uint8Array>;
 }
 
 /** The head commit of the PR every fixture describes. */
@@ -170,6 +178,11 @@ function fakeOctokit(f: Fixture): Octokit {
         getContent: async ({ path }: { path: string }) => {
           if (!(path in contents)) throw new Error(`404 ${path}`);
           return { data: contents[path] };
+        },
+        downloadTarballArchive: async ({ owner, repo, ref }: Record<string, string>) => {
+          const bytes = (f.tarballs ?? {})[`${owner}/${repo}@${ref}`];
+          if (bytes == null) throw new Error(`404 tarball ${owner}/${repo}@${ref}`);
+          return { data: bytes.buffer };
         },
       },
       actions: { listRepoWorkflows: LIST_WORKFLOWS },
@@ -1505,6 +1518,38 @@ describe("the CLI entrypoint", () => {
     expect(exit).toHaveBeenCalledWith(2);
     expect(vi.mocked(console.error).mock.calls[0][0]).toMatch(/^usage: predict /);
   });
+
+  it("passes --execute grants through to prediction", async () => {
+    // The grant names a repo no workflow here comes from, so nothing executes
+    // and nothing downloads — but the flag parses and the prediction runs.
+    await invoke(["--repo", "o/r", "--pr", "1", "--execute", "x/y:detect"], {
+      contents: { [WF]: WORKFLOW },
+    });
+    expect(out).toEqual([`${WF} :: a :: run`, HEAD_READ]);
+  });
+
+  it("exits 2 on an --execute it cannot parse", async () => {
+    const exit = vi.spyOn(process, "exit").mockImplementation((() => {
+      throw new Error("exited");
+    }) as () => never);
+    await expect(
+      invoke(["--repo", "o/r", "--pr", "1", "--execute", "nope"]),
+    ).rejects.toThrow("exited");
+    expect(exit).toHaveBeenCalledWith(2);
+    expect(vi.mocked(console.error).mock.calls[0][0]).toBe("bad --execute: nope");
+    expect(vi.mocked(console.error).mock.calls[1][0]).toMatch(/--execute owner\/repo:job1,job2/);
+  });
+
+  it("exits 2 on a trailing --execute with no grant", async () => {
+    const exit = vi.spyOn(process, "exit").mockImplementation((() => {
+      throw new Error("exited");
+    }) as () => never);
+    await expect(
+      invoke(["--repo", "o/r", "--pr", "1", "--execute"]),
+    ).rejects.toThrow("exited");
+    expect(exit).toHaveBeenCalledWith(2);
+    expect(vi.mocked(console.error).mock.calls[0][0]).toBe("bad --execute: undefined");
+  });
 });
 
 // A called workflow's guards are written against `inputs.*`, so expansion has
@@ -1765,6 +1810,10 @@ describe("cross-repo reusable references", () => {
   });
 });
 
+// The executor seam: expansion asks it, before anything reads `needs`,
+// whether the caller granted a job — and folds what an execution yields into
+// the scope every later evaluation sees. The executor itself is faked here;
+// what it actually does when it runs things is execute.test.ts's subject.
 describe("github.repository as a prediction-wide fact", () => {
   it("decides a repository guard from the repo the PR is against", async () => {
     const wf = JSON.stringify({
@@ -1792,5 +1841,251 @@ describe("github.repository as a prediction-wide fact", () => {
     });
     const { checkNames } = await predict(octokit, "o/r", 1);
     expect(checkNames).toEqual(["call / inner"]);
+  });
+});
+
+describe("granted execution during expansion", () => {
+  const SOURCE: WorkflowSource = { owner: "o", repo: "r", ref: "main", sha: SHA };
+  const CTX = { action: "opened", baseRef: "main", files: ["src/app.ts"] };
+  const reader = readerOf(async () => null);
+
+  /** A detect-shaped workflow: one producer, one dynamic-matrix consumer. */
+  const wfWith = (detect: Record<string, unknown>) => ({
+    on: { pull_request: null },
+    jobs: {
+      detect,
+      cover: {
+        needs: "detect",
+        name: "Coverage (${{ matrix.language }})",
+        strategy: { matrix: { language: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+      },
+    },
+  });
+
+  const executorReturning = (outcome: ExecOutcome, log: string[] = []) => ({
+    granted: (src: WorkflowSource, jobId: string) =>
+      `${src.owner}/${src.repo}` === "o/r" && jobId === "detect",
+    executeJob: async (jobId: string) => {
+      log.push(jobId);
+      return outcome;
+    },
+  });
+
+  it("resolves a dynamic matrix from what the granted job produced", async () => {
+    const entries = await expandWorkflowJobs(
+      wfWith({}),
+      CTX,
+      reader,
+      SOURCE,
+      {},
+      executorReturning({ ok: true, outputs: { langs: '["ts", "py"]' } }),
+    );
+    expect(entries).toEqual([
+      { job: "detect", checkName: "detect", status: "run", reason: "" },
+      { job: "Coverage (ts)", checkName: "Coverage (ts)", status: "run", reason: "" },
+      { job: "Coverage (py)", checkName: "Coverage (py)", status: "run", reason: "" },
+    ]);
+  });
+
+  it("schedules nothing for a matrix the execution resolved to empty", async () => {
+    const entries = await expandWorkflowJobs(
+      wfWith({}),
+      CTX,
+      reader,
+      SOURCE,
+      {},
+      executorReturning({ ok: true, outputs: { langs: "[]" } }),
+    );
+    // Zero combinations is a real answer: the job creates no check at all,
+    // which is exactly what GitHub does with an empty axis.
+    expect(entries).toEqual([{ job: "detect", checkName: "detect", status: "run", reason: "" }]);
+  });
+
+  it("threads an execution failure into the reasons of what needed it", async () => {
+    const entries = await expandWorkflowJobs(
+      wfWith({}),
+      CTX,
+      reader,
+      SOURCE,
+      {},
+      executorReturning({ ok: false, reason: "step 's': exited 1" }),
+    );
+    expect(entries[1]).toEqual({
+      job: "cover",
+      checkName: null,
+      status: "unknown",
+      reason: "dynamic matrix; executing 'detect' failed: step 's': exited 1",
+    });
+  });
+
+  it("normalizes a null granted job body before executing it", async () => {
+    const wf = {
+      on: { pull_request: null },
+      jobs: {
+        detect: null,
+        cover: {
+          needs: "detect",
+          name: "Coverage (${{ matrix.language }})",
+          strategy: { matrix: { language: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+        },
+      },
+    };
+    const entries = await expandWorkflowJobs(
+      wf,
+      CTX,
+      reader,
+      SOURCE,
+      {},
+      executorReturning({ ok: true, outputs: { langs: '["ts"]' } }),
+    );
+    expect(entries[1]).toMatchObject({ checkName: "Coverage (ts)", status: "run" });
+  });
+
+  it("leaves an ungranted job exactly as unresolved as before", async () => {
+    const log: string[] = [];
+    const executor = {
+      ...executorReturning({ ok: true, outputs: { langs: "[]" } }, log),
+      granted: () => false,
+    };
+    const entries = await expandWorkflowJobs(wfWith({}), CTX, reader, SOURCE, {}, executor);
+    expect(log).toEqual([]);
+    expect(entries[1]).toMatchObject({ status: "unknown", reason: "dynamic matrix" });
+  });
+
+  it("does not execute a granted job that would not run", async () => {
+    const log: string[] = [];
+    const entries = await expandWorkflowJobs(
+      wfWith({ if: "false" }),
+      CTX,
+      reader,
+      SOURCE,
+      {},
+      executorReturning({ ok: true, outputs: { langs: '["ts"]' } }, log),
+    );
+    expect(log).toEqual([]);
+    // The consumer collapses the way a skipped dependency always does,
+    // keeping its unresolved name the way every skipped matrix job does.
+    expect(entries[1]).toMatchObject({
+      job: "Coverage (${{ matrix.language }})",
+      status: "skipped",
+    });
+  });
+
+  it("executes a granted job whose guard the caller's scope decides", async () => {
+    const log: string[] = [];
+    const entries = await expandWorkflowJobs(
+      wfWith({ if: "github.repository == 'o/r'" }),
+      CTX,
+      reader,
+      SOURCE,
+      { github: { repository: "o/r" } },
+      executorReturning({ ok: true, outputs: { langs: '["ts"]' } }, log),
+    );
+    expect(log).toEqual(["detect"]);
+    expect(entries[1]).toMatchObject({ checkName: "Coverage (ts)", status: "run" });
+  });
+
+  it("threads a failure into a dynamic matrix on a reusable call too", async () => {
+    const wf = {
+      on: { pull_request: null },
+      jobs: {
+        detect: {},
+        call: {
+          needs: "detect",
+          uses: "./.github/workflows/sub.yml",
+          strategy: { matrix: { l: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+        },
+      },
+    };
+    const entries = await expandWorkflowJobs(
+      wf,
+      CTX,
+      reader,
+      SOURCE,
+      {},
+      executorReturning({ ok: false, reason: "boom" }),
+    );
+    expect(entries[1]).toEqual({
+      job: "call",
+      checkName: null,
+      status: "unknown",
+      reason: "dynamic matrix on reusable workflow call; executing 'detect' failed: boom",
+    });
+  });
+
+  it("reaches a granted job inside a called workflow", async () => {
+    // The grant names the repo the workflow *file* lives in; a local call
+    // keeps the caller's source, so the recursion is where it fires.
+    const sub = JSON.stringify(wfWith({}));
+    const entries = await expandWorkflowJobs(
+      {
+        on: { pull_request: null },
+        jobs: { call: { uses: "./.github/workflows/sub.yml" } },
+      },
+      CTX,
+      readerOf(async () => sub),
+      SOURCE,
+      {},
+      executorReturning({ ok: true, outputs: { langs: '["ts"]' } }),
+    );
+    expect(entries.map((e) => e.checkName)).toEqual([
+      "call / detect",
+      "call / Coverage (ts)",
+    ]);
+  });
+});
+
+// The wiring above the seam: `predict` builds a real executor only when the
+// caller granted something, and its tree downloads go to the tarball
+// endpoint. Failures surface as reasons, never as different answers — the
+// happy path through real subprocesses is execute.test.ts's subject.
+describe("execution grants through predict", () => {
+  const DYNAMIC = JSON.stringify({
+    on: "pull_request",
+    jobs: {
+      detect: { steps: [] },
+      cover: {
+        needs: "detect",
+        name: "Coverage (${{ matrix.language }})",
+        strategy: { matrix: { language: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+      },
+    },
+  });
+  const GRANT = { execute: [{ repo: "o/r", jobs: ["detect"] }] };
+
+  const coverEntry = async (f: Fixture, opts: Parameters<typeof predict>[3]) => {
+    const { entries } = await predict(
+      fakeOctokit({ contents: { [WF]: DYNAMIC }, ...f }),
+      "o/r",
+      1,
+      opts,
+    );
+    expect(entries).toHaveLength(2);
+    return entries[1];
+  };
+
+  it("says which execution failed when the tarball is not served", async () => {
+    const e = await coverEntry({}, GRANT);
+    expect(e).toMatchObject({
+      status: "unknown",
+      checkName: null,
+      reason: `dynamic matrix; executing 'detect' failed: cannot materialize workspace o/r@${HEAD_SHA}`,
+    });
+  });
+
+  it("says the same when the download yields something tar refuses", async () => {
+    const e = await coverEntry(
+      { tarballs: { [`o/r@${HEAD_SHA}`]: new Uint8Array([1, 2, 3]) } },
+      GRANT,
+    );
+    expect(e).toMatchObject({
+      status: "unknown",
+      reason: `dynamic matrix; executing 'detect' failed: cannot materialize workspace o/r@${HEAD_SHA}`,
+    });
+  });
+
+  it("builds no executor for an empty grant list", async () => {
+    const e = await coverEntry({}, { execute: [] });
+    expect(e).toMatchObject({ status: "unknown", reason: "dynamic matrix" });
   });
 });

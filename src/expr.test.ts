@@ -280,6 +280,47 @@ describe("needs outputs", () => {
   });
 });
 
+// `steps.*` mirrors `needs.*`: the executor's step walk is the one caller
+// that can supply it honestly, and the completeness contract is the same.
+describe("steps outputs", () => {
+  const STEPS: Scope = {
+    steps: {
+      scan_hermetic: { outputs: {} },
+      scan_published: { outputs: { static_languages: '["typescript"]' } },
+    },
+  };
+
+  it("resolves an output of a step the walk recorded", () => {
+    expect(evaluate("steps.scan_published.outputs.static_languages != '[]'", STEPS)).toBe(true);
+  });
+
+  it("coalesces past a skipped step the way the fleet's detect outputs do", () => {
+    // A skipped step is present with no outputs, so every read against it is
+    // '', which is falsy, so `||` yields the step that ran. This is the exact
+    // shape of every one of detect's ~25 `outputs:` entries.
+    const cond =
+      "(steps.scan_hermetic.outputs.static_languages || steps.scan_published.outputs.static_languages)" +
+      " == '[\"typescript\"]'";
+    expect(evaluate(cond, STEPS)).toBe(true);
+  });
+
+  it("reads an output the recorded step did not write as the empty string", () => {
+    expect(evaluate("steps.scan_published.outputs.missing == ''", STEPS)).toBe(true);
+  });
+
+  it("leaves a step the scope does not name unknown", () => {
+    expect(evaluate("steps.other.outputs.x == ''", STEPS)).toBe(null);
+    expect(evaluate("steps.scan_published.outputs.x == ''")).toBe(null);
+  });
+
+  it("leaves anything but an outputs lookup unknown", () => {
+    // `outcome` and `conclusion` are verdicts the executor does not track — a
+    // failed step fails the whole execution instead.
+    expect(evaluate("steps.scan_published.outcome == 'success'", STEPS)).toBe(null);
+    expect(evaluate("steps.scan_published.outputs.a.b == ''", STEPS)).toBe(null);
+  });
+});
+
 describe("functions", () => {
   it("treats always() as true", () => {
     expect(evaluate("always()")).toBe(true);

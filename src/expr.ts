@@ -79,6 +79,17 @@ export interface Scope {
    * thing that turns one into a structure, at the point the workflow asks.
    */
   needs?: Record<string, { outputs: Record<string, string> }>;
+  /**
+   * Outputs of steps that already ran, keyed by step id. Only one caller can
+   * fill this honestly: the executor's step walk (see execute.ts), which is
+   * the single place a step has actually run by the time an expression reads
+   * it. The contract is the same as `needs`: a step named here carries its
+   * *complete* output set, so an absent key is the empty string the runner
+   * substitutes, while a step this map does not name stays unknown. A skipped
+   * step is present with no outputs at all — which is exactly what lets
+   * `steps.a.outputs.x || steps.b.outputs.x` coalesce past it.
+   */
+  steps?: Record<string, { outputs: Record<string, string> }>;
 }
 
 /**
@@ -341,8 +352,19 @@ class Parser {
       // substitutes for an output no step wrote.
       return { kind: "value", v: job.outputs[parts[2]] ?? "" };
     }
-    // `steps.*`, `matrix.*`, `env.*`, `vars.*`, `secrets.*`: all require
-    // something that has not happened yet at prediction time.
+    if (head === "steps") {
+      // The same shape as `needs`, for the same reason: only
+      // `steps.<id>.outputs.<name>` is modelled. `steps.<id>.outcome` and
+      // `.conclusion` are verdicts on how a step ran, which the executor does
+      // not track — a failed step fails the whole execution instead.
+      const parts = rest.split(".");
+      if (parts.length !== 3 || parts[1] !== "outputs") return UNKNOWN;
+      const step = this.scope.steps?.[parts[0]];
+      if (step == null) return UNKNOWN;
+      return { kind: "value", v: step.outputs[parts[2]] ?? "" };
+    }
+    // `matrix.*`, `env.*`, `vars.*`, `secrets.*`: all require something that
+    // has not happened yet at prediction time.
     return UNKNOWN;
   }
 }
