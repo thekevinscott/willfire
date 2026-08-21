@@ -120,15 +120,10 @@ git commit -am "pr9: touch both remote-probe paths"
 git push origin pr9-remote
 mkpr pr9-remote main "pr9: remote reusable workflow probes"
 
-# PRs 10-12: the stacked-PR probe for issue #30. They replicate the stack
-# shape from dirsql#1002 — a child PR whose base branch is the head of an open
-# parent PR, the base pushed while both were open, one child opened after the
-# parent existed — and GitHub's stack-aware dispatch never engaged: every
-# child's merge preview sits on the plain base tip. That is the recorded
-# result. The machinery is a server-side rollout this repo is outside of, so
-# shape alone does not change dispatch, and willfire reads the mode off
-# merge_commit_sha instead of inferring it from structure. PR11 is the parent
-# and stays open and unmerged so PRs 10 and 12 keep the stack shape.
+# PRs 10-12: the stacked-PR probe for issue #30, replicating dirsql#1002's
+# stack shape. Recorded result: stack-aware dispatch never engaged here (it is
+# a per-repo rollout), so shape alone does not change dispatch. PR11, the
+# parent, stays open so PRs 10 and 12 keep the stack shape.
 git checkout -b stack-base main
 echo stackchange >> src/app.txt
 git commit -am "pr30: advance stack-base past main"
