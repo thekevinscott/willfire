@@ -128,6 +128,18 @@ interface Fixture {
    * it will not serve.
    */
   tarballs?: Record<string, Uint8Array>;
+  /** The PR's `merge_commit_sha` — its test merge. Absent means null. */
+  mergeSha?: string | null;
+  /**
+   * Parent shas by commit sha, read through `repos.getCommit` alongside
+   * `refs`. A commit that is not listed has no parents, like a root commit.
+   */
+  parents?: Record<string, string[]>;
+  /**
+   * The repo's open PRs, for the stack walk's `pulls.list` lookup by head
+   * branch. Only the fields the walk reads.
+   */
+  openPrs?: { headRef: string; baseRef: string; mergeSha: string | null }[];
 }
 
 /** The head commit of the PR every fixture describes. */
@@ -160,7 +172,13 @@ function fakeOctokit(f: Fixture): Octokit {
             commits: f.commits ?? 1,
             base: { ref: f.baseRef ?? "main" },
             head: { sha: HEAD_SHA },
+            merge_commit_sha: f.mergeSha ?? null,
           },
+        }),
+        list: async ({ head }: { head: string }) => ({
+          data: (f.openPrs ?? [])
+            .filter((p) => `o:${p.headRef}` === head)
+            .map((p) => ({ base: { ref: p.baseRef }, merge_commit_sha: p.mergeSha })),
         }),
         listFiles: LIST_FILES,
       },
@@ -173,7 +191,8 @@ function fakeOctokit(f: Fixture): Octokit {
           }
           const sha = (f.refs ?? {})[`${owner}/${repo}@${ref}`];
           if (sha == null) throw new Error(`404 ${owner}/${repo}@${ref}`);
-          return { data: { sha, commit: { message: "" } } };
+          const parents = ((f.parents ?? {})[sha] ?? []).map((p) => ({ sha: p }));
+          return { data: { sha, commit: { message: "" }, parents } };
         },
         getContent: async ({ path }: { path: string }) => {
           if (!(path in contents)) throw new Error(`404 ${path}`);
@@ -475,6 +494,134 @@ describe("workflow-level verdicts", () => {
     const wf = "on:\n  pull_request:\n    paths-ignore: ['docs/**']\njobs:\n  a: {}\n";
     expect(await only(wf, { files: ["docs/a.md", "src/app.ts"] })).toMatchObject({
       job: "a",
+    });
+  });
+
+  // ---- stacked PRs (#30) ----
+
+  // GitHub's stacked-PR machinery (rolled out per repo; on for dirsql, off for
+  // willrun-probe) builds a child PR's test merge on the parent PR's test
+  // merge and evaluates `branches:` against the branch the stack ultimately
+  // targets. Read off dirsql#1002: base `claude/tackle-957-lrm0z6`, yet
+  // `branches: [main]` workflows dispatched on synchronize. The mode is
+  // detected from `merge_commit_sha`: its first parent is the base tip in
+  // normal mode and the parent PR's own merge sha in stacked mode.
+
+  /** A child PR based on `feature-1`, whose parent PR targets `main`. */
+  const STACKED: Fixture = {
+    baseRef: "feature-1",
+    mergeSha: "m-child",
+    refs: {
+      "o/r@m-child": "m-child",
+      "o/r@feature-1": "tip-1", // the base tip is NOT what the preview sits on
+      "o/r@m-parent": "m-parent",
+      "o/r@main": "tip-main",
+    },
+    parents: {
+      "m-child": ["m-parent"], // built on the parent PR's test merge: stacked
+      "m-parent": ["tip-main"], // parent built on the main tip: walk ends here
+    },
+    openPrs: [{ headRef: "feature-1", baseRef: "main", mergeSha: "m-parent" }],
+  };
+
+  it("dispatches a `branches` workflow against the stack's target (#30)", async () => {
+    // dirsql#1002's shape: the literal base ref would decline, the stack
+    // target matches.
+    const wf = "on:\n  pull_request:\n    branches: [main]\njobs:\n  a: {}\n";
+    expect(await only(wf, STACKED)).toMatchObject({ job: "a", status: "run" });
+  });
+
+  it("names the stack target when `branches` declines", async () => {
+    const wf = "on:\n  pull_request:\n    branches: [releases/*]\njobs:\n  a: {}\n";
+    expect(await only(wf, STACKED)).toMatchObject({
+      status: "no-dispatch",
+      reason: "stack target 'main' not in branches",
+    });
+  });
+
+  it("declines a stack target inside `branches-ignore`", async () => {
+    const wf = "on:\n  pull_request:\n    branches-ignore: [main]\njobs:\n  a: {}\n";
+    expect(await only(wf, STACKED)).toMatchObject({
+      status: "no-dispatch",
+      reason: "stack target 'main' in branches-ignore",
+    });
+  });
+
+  it("keeps literal semantics when the preview sits on the base tip", async () => {
+    // A merge sha whose first parent IS the base tip: normal mode, whatever
+    // open PRs exist.
+    const wf = "on:\n  pull_request:\n    branches: [dev]\njobs:\n  a: {}\n";
+    const f: Fixture = {
+      mergeSha: "m0",
+      refs: { "o/r@m0": "m0", "o/r@main": "tip-main" },
+      parents: { m0: ["tip-main"] },
+      openPrs: [{ headRef: "main", baseRef: "dev", mergeSha: "m0" }],
+    };
+    expect(await only(wf, f)).toMatchObject({
+      status: "no-dispatch",
+      reason: "base branch 'main' not in branches",
+    });
+  });
+
+  it("keeps literal semantics when no open PR owns the preview parent", async () => {
+    // The preview is stale — its parent is an old base tip, not any open PR's
+    // merge sha — so nothing is proven and the literal base ref stands. One
+    // candidate matches the head branch with the wrong merge sha; one is a PR
+    // from some other branch entirely.
+    const wf = "on:\n  pull_request:\n    branches: [dev]\njobs:\n  a: {}\n";
+    const f: Fixture = {
+      mergeSha: "m0",
+      refs: { "o/r@m0": "m0", "o/r@main": "tip-main" },
+      parents: { m0: ["old-tip"] },
+      openPrs: [
+        { headRef: "main", baseRef: "dev", mergeSha: "other" },
+        { headRef: "elsewhere", baseRef: "dev", mergeSha: "old-tip" },
+      ],
+    };
+    expect(await only(wf, f)).toMatchObject({
+      status: "no-dispatch",
+      reason: "base branch 'main' not in branches",
+    });
+  });
+
+  it("keeps literal semantics when the preview cannot be read", async () => {
+    // The merge sha 404s — permissions, eventual consistency, whatever. The
+    // walk must not throw; the verdict falls back to the literal base ref.
+    const wf = "on:\n  pull_request:\n    branches: [dev]\njobs:\n  a: {}\n";
+    expect(await only(wf, { mergeSha: "m0" })).toMatchObject({
+      status: "no-dispatch",
+      reason: "base branch 'main' not in branches",
+    });
+  });
+
+  it("keeps literal semantics when the preview has no parents", async () => {
+    const wf = "on:\n  pull_request:\n    branches: [dev]\njobs:\n  a: {}\n";
+    const f: Fixture = { mergeSha: "m0", refs: { "o/r@m0": "m0" } };
+    expect(await only(wf, f)).toMatchObject({
+      status: "no-dispatch",
+      reason: "base branch 'main' not in branches",
+    });
+  });
+
+  it("stops the stack walk at the depth cap", async () => {
+    // A chain deeper than the cap: the walk stops after ten hops and the
+    // filters are evaluated against the deepest proven target, b10 — which
+    // only narrows how far the substitution reaches, never widens it.
+    const refs: Record<string, string> = {};
+    const parents: Record<string, string[]> = {};
+    const openPrs: NonNullable<Fixture["openPrs"]> = [];
+    for (let i = 0; i <= 12; i++) {
+      refs[`o/r@m${i}`] = `m${i}`;
+      refs[`o/r@b${i}`] = `t${i}`;
+      parents[`m${i}`] = [`m${i + 1}`];
+      openPrs.push({ headRef: `b${i}`, baseRef: `b${i + 1}`, mergeSha: `m${i + 1}` });
+    }
+    const wf = "on:\n  pull_request:\n    branches: [main]\njobs:\n  a: {}\n";
+    expect(
+      await only(wf, { baseRef: "b0", mergeSha: "m0", refs, parents, openPrs }),
+    ).toMatchObject({
+      status: "no-dispatch",
+      reason: "stack target 'b10' not in branches",
     });
   });
 });

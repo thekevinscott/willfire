@@ -228,6 +228,15 @@ export interface PredictOptions {
 export interface Ctx {
   action: string;
   baseRef: string;
+  /**
+   * The branch the PR's stack ultimately targets, present only when GitHub's
+   * stacked-PR machinery is engaged for this PR (see {@link stackTargetRef}).
+   * `branches` / `branches-ignore` are matched against this instead of
+   * `baseRef`, because that is what GitHub does — read off dirsql#1002, where
+   * `branches: [main]` workflows dispatched on a PR whose base was another
+   * PR's head branch (#30).
+   */
+  stackTarget?: string;
   files: string[];
 }
 
@@ -271,11 +280,22 @@ function workflowDispatches(
   if ("branches" in trig && "branches-ignore" in trig) {
     return [true, "both branches and branches-ignore set: startup failure"];
   }
-  if ("branches" in trig && !matchFilters(ctx.baseRef, trig["branches"])) {
-    return [false, `base branch '${ctx.baseRef}' not in branches`];
+  // The name the branch filters are matched against: the literal base branch,
+  // or — when the stacked-PR machinery is engaged — the branch the whole stack
+  // targets. The reasons name which one was used, so a verdict on a stacked PR
+  // is legible without re-deriving the stack.
+  const branchRef = ctx.stackTarget ?? ctx.baseRef;
+  if ("branches" in trig && !matchFilters(branchRef, trig["branches"])) {
+    const label = ctx.stackTarget == null ? "base branch" : "stack target";
+    return [false, `${label} '${branchRef}' not in branches`];
   }
-  if ("branches-ignore" in trig && matchFilters(ctx.baseRef, trig["branches-ignore"])) {
-    return [false, "base branch in branches-ignore"];
+  if ("branches-ignore" in trig && matchFilters(branchRef, trig["branches-ignore"])) {
+    return [
+      false,
+      ctx.stackTarget == null
+        ? "base branch in branches-ignore"
+        : `stack target '${branchRef}' in branches-ignore`,
+    ];
   }
 
   if ("paths" in trig && "paths-ignore" in trig) {
@@ -948,6 +968,93 @@ export function makeOctokit(): Octokit {
   return new Octokit({ auth: token });
 }
 
+/**
+ * GitHub allows unlimited stacking, but a stack this deep is not a shape any
+ * gated repo produces; past it the walk stops at the last proven hop, which
+ * only narrows how far up the stack the filter evaluation reaches.
+ */
+const MAX_STACK_DEPTH = 10;
+
+/** The two fields the stack walk reads off a PR, whichever route listed it. */
+interface StackNode {
+  base: { ref: string };
+  merge_commit_sha: string | null;
+}
+
+/**
+ * The branch this PR's stack ultimately targets, or null when the PR is a
+ * plain one.
+ *
+ * GitHub's stacked-PR machinery — a server-side feature rolled out per repo —
+ * changes how a child PR (one whose base branch is the head of another open
+ * PR) is dispatched: its test merge is built on the *parent PR's* test merge
+ * instead of the base branch tip, and `on.pull_request.branches` is evaluated
+ * against the branch the stack ultimately targets rather than the literal
+ * base ref. Observed live on dirsql#1002 (#30): base
+ * `claude/tackle-957-lrm0z6`, yet `branches: [main]` workflows dispatched on
+ * synchronize. Replicating the stack shape on willrun-probe did not engage
+ * the mode, so it cannot be inferred from PR structure — it has to be read
+ * off what GitHub actually computed.
+ *
+ * `merge_commit_sha` is that computation: the test merge's first parent is
+ * the base branch tip in normal mode and the parent PR's own
+ * `merge_commit_sha` in stacked mode. The walk follows the second equality up
+ * the stack to the terminal base ref. Anything undecidable — a null merge
+ * sha, an unreadable commit, no open parent PR whose merge sha matches —
+ * ends the walk at the last hop it proved, which for a plain PR is today's
+ * literal-name semantics. Workflow-level verdicts must stay decidable, so
+ * this never throws.
+ */
+async function stackTargetRef(
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  pr: StackNode,
+): Promise<string | null> {
+  let target: string | null = null;
+  let cur = pr;
+  try {
+    for (let hop = 0; hop < MAX_STACK_DEPTH; hop++) {
+      const mergeSha = cur.merge_commit_sha;
+      if (mergeSha == null) break;
+      const { data: preview } = await octokit.rest.repos.getCommit({
+        owner,
+        repo,
+        ref: mergeSha,
+      });
+      const previewParent = preview.parents[0]?.sha;
+      if (previewParent == null) break;
+      const { data: baseTip } = await octokit.rest.repos.getCommit({
+        owner,
+        repo,
+        ref: cur.base.ref,
+      });
+      // Built on the base branch tip: normal mode, the walk is done.
+      if (previewParent === baseTip.sha) break;
+      // The preview was not built on the base tip. Either the base moved since
+      // GitHub computed it (stale, and no open PR's merge sha will equal an
+      // old branch tip) or it was built on a parent PR's test merge — and only
+      // an exact match against an open PR whose head *is* the base branch
+      // counts as proof of the second.
+      const { data: candidates } = await octokit.rest.pulls.list({
+        owner,
+        repo,
+        state: "open",
+        head: `${owner}:${cur.base.ref}`,
+        per_page: 100,
+      });
+      const parent = candidates.find((p) => p.merge_commit_sha === previewParent);
+      if (parent == null) break;
+      target = parent.base.ref;
+      cur = parent;
+    }
+  } catch {
+    // Rate limit, permissions, network: stop at the last hop that was proven
+    // rather than guessing — same posture as every other read in this module.
+  }
+  return target;
+}
+
 export async function predict(
   octokit: Octokit,
   repo: string,
@@ -963,11 +1070,13 @@ export async function predict(
     pull_number: prNumber,
     per_page: 100,
   });
+  const stackTarget = await stackTargetRef(octokit, owner, name, pr);
   const ctx: Ctx = {
     // The caller's answer wins whenever it has one. The commit-count fallback
     // is a guess kept only so existing callers keep working.
     action: opts.action ?? (pr.commits > 1 ? "synchronize" : "opened"),
     baseRef: pr.base.ref,
+    ...(stackTarget != null ? { stackTarget } : {}),
     files: files.map((f) => f.filename),
   };
   const headSha = pr.head.sha;
