@@ -13,7 +13,15 @@
 
 import { Octokit } from "@octokit/rest";
 import { parse as parseYaml } from "yaml";
-import { evaluate, UNKNOWN, type Scope, type Val } from "./expr.js";
+import {
+  makeExecutor,
+  makeTreeProvider,
+  parseGrant,
+  runShell,
+  type ExecutionGrant,
+  type JobExecutor,
+} from "./execute.js";
+import { evaluate, evaluateValue, UNKNOWN, type Scope, type Val } from "./expr.js";
 
 interface EntryBase {
   workflow: string;
@@ -204,6 +212,17 @@ export interface PredictOptions {
    * to a workflow narrowing `types:`, where it matters completely.
    */
   action?: PrEventAction;
+  /**
+   * Jobs willfire may *execute* to resolve what reading cannot — the fleet's
+   * `detect` job, whose outputs feed every dynamic matrix downstream of it.
+   *
+   * Off by default, and mechanism only: willfire has no opinion about which
+   * jobs are safe to run. The caller that knows names them, one repo and job
+   * id at a time (see {@link ExecutionGrant}), and an execution that fails
+   * for any reason leaves the dependent entries exactly as unresolved as
+   * they were — with the failure spelled into their reasons.
+   */
+  execute?: ExecutionGrant[];
 }
 
 export interface Ctx {
@@ -302,18 +321,39 @@ interface DetailedCombo {
  */
 type DetailedCombos = Array<DetailedCombo | null> | null;
 
-function expandMatrixDetailed(strategy: any): DetailedCombos {
+/**
+ * The values of one matrix axis, or null when they cannot be known.
+ *
+ * A plain list is itself. An axis written as an expression —
+ * `language: ${{ fromJSON(needs.detect.outputs.coverage_languages) }}` — is
+ * the values another job computed, and is knowable exactly when the scope
+ * carries that job's outputs. Anything else stays null, which is what makes
+ * the whole job `unknown` rather than a guess at how many checks it creates.
+ */
+function axisValues(v: unknown, scope: Scope): unknown[] | null {
+  if (Array.isArray(v)) return v;
+  if (typeof v !== "string") return null;
+  const val = evaluateValue(v, scope);
+  if (val.kind !== "json" || !Array.isArray(val.v)) return null;
+  return val.v;
+}
+
+function expandMatrixDetailed(strategy: any, scope: Scope = {}): DetailedCombos {
   const matrix = strategy?.matrix;
   if (matrix == null) return [null];
-  if (typeof matrix === "string") return null; // ${{ fromJSON(...) }}
+  // `matrix: ${{ ... }}` — the whole matrix as one expression, rather than the
+  // per-axis form below. It yields include-style entries, not axes, so it is a
+  // separate expansion and is not modelled.
+  if (typeof matrix === "string") return null;
   const include: any[] = matrix.include ?? [];
   const exclude: any[] = matrix.exclude ?? [];
   if (typeof include === "string" || typeof exclude === "string") return null;
   const axes: Record<string, any[]> = {};
   for (const [k, v] of Object.entries(matrix)) {
     if (k === "include" || k === "exclude") continue;
-    if (!Array.isArray(v)) return null;
-    axes[k] = v;
+    const vals = axisValues(v, scope);
+    if (vals == null) return null;
+    axes[k] = vals;
   }
   const axisKeys = Object.keys(axes);
   let combos: DetailedCombo[] = [{ values: {}, displayKeys: axisKeys }];
@@ -354,8 +394,8 @@ function expandMatrixDetailed(strategy: any): DetailedCombos {
 }
 
 /** Return list of matrix combination dicts, or null if dynamic. */
-export function expandMatrix(strategy: any): Combo[] | null {
-  const detailed = expandMatrixDetailed(strategy);
+export function expandMatrix(strategy: any, scope: Scope = {}): Combo[] | null {
+  const detailed = expandMatrixDetailed(strategy, scope);
   return detailed == null ? null : detailed.map((c) => (c == null ? null : c.values));
 }
 
@@ -479,18 +519,29 @@ function skippedDisplayName(jobId: string, job: Workflow): DisplayName {
 const PR_GITHUB_CONTEXT: Record<string, string> = { event_name: "pull_request" };
 
 /**
+ * A scope with the fixed pull-request facts filled in.
+ *
+ * Every `${{ }}` this module evaluates — a job `if:`, a matrix axis — is
+ * evaluated for the same event, so they all get the same `github.*`. Anything
+ * the caller states wins; there is nothing here worth overriding, but a scope
+ * that silently ignored what it was handed would be the wrong shape.
+ */
+const prScope = (scope: Scope): Scope => ({
+  ...scope,
+  github: { ...PR_GITHUB_CONTEXT, ...scope.github },
+});
+
+/**
  * Return run|skipped|unknown for a job-level `if:`.
  *
- * `scope` carries the inputs the calling workflow passed down. Without it a
- * reusable workflow's guards are all unknown, because every one of them is
- * written against `inputs.*`.
+ * `scope` carries the inputs the calling workflow passed down, and any job
+ * outputs the caller knows. Without it a reusable workflow's guards are all
+ * unknown, because every one of them is written against `inputs.*` or
+ * `needs.*`.
  */
 export function evalIf(cond: any, scope: Scope = {}): "run" | "skipped" | "unknown" {
   if (cond == null) return "run";
-  const verdict = evaluate(String(cond), {
-    inputs: scope.inputs,
-    github: { ...PR_GITHUB_CONTEXT, ...scope.github },
-  });
+  const verdict = evaluate(String(cond), prScope(scope));
   if (verdict === null) return "unknown";
   return verdict ? "run" : "skipped";
 }
@@ -682,13 +733,43 @@ async function expandJobs(
   prefix = "",
   prefixResolved = true,
   scope: Scope = {},
+  executor?: JobExecutor,
 ): Promise<ExpandedJob[]> {
   const entries: ExpandedJob[] = [];
   const jobs: Record<string, Workflow> = wf.jobs ?? {};
   const statuses: Record<string, string> = {};
+
+  // Execute what the caller granted, before anything reads `needs`. The
+  // grant names the repo the workflow *file* lives in, so a granted callee
+  // job fires here in the recursion, where `source` is that repo. The guard
+  // is the same `evalIf` the main loop applies — same scope, same verdict —
+  // so a job is executed exactly when it is predicted to run. A job that
+  // would not run is not executed; a job that fails to execute contributes
+  // nothing but its reason, which `execNote` threads into the entries that
+  // needed it.
+  let scoped = scope;
+  const execFailures: Record<string, string> = {};
+  if (executor != null) {
+    for (const [jobId, jobRaw] of Object.entries(jobs)) {
+      if (!executor.granted(source, jobId)) continue;
+      const job = jobRaw ?? {};
+      if (evalIf(job.if, scoped) !== "run") continue;
+      const res = await executor.executeJob(jobId, job, wf, scoped);
+      if (res.ok) {
+        scoped = { ...scoped, needs: { ...scoped.needs, [jobId]: { outputs: res.outputs } } };
+      } else {
+        execFailures[jobId] = res.reason;
+      }
+    }
+  }
+  const execNote = (needs: string[]): string => {
+    const failed = needs.find((n) => n in execFailures);
+    return failed == null ? "" : `; executing '${failed}' failed: ${execFailures[failed]}`;
+  };
+
   for (const [jobId, jobRaw] of Object.entries(jobs)) {
     const job = jobRaw ?? {};
-    let status = evalIf(job.if, scope);
+    let status = evalIf(job.if, scoped);
     let reason = job.if != null ? `if: ${JSON.stringify(job.if)}` : "";
     let needs: string[] = job.needs ?? [];
     if (typeof needs === "string") needs = [needs];
@@ -720,7 +801,7 @@ async function expandJobs(
       continue;
     }
 
-    const combos = expandMatrixDetailed(job.strategy);
+    const combos = expandMatrixDetailed(job.strategy, prScope(scoped));
 
     if ("uses" in job) {
       // Reusable workflow call. The calling job produces no check of its own;
@@ -734,7 +815,7 @@ async function expandJobs(
           job: prefix + jobId,
           checkName: null,
           status: "unknown",
-          reason: "dynamic matrix on reusable workflow call",
+          reason: "dynamic matrix on reusable workflow call" + execNote(needs),
         });
         continue;
       }
@@ -774,7 +855,10 @@ async function expandJobs(
           } else {
             try {
               subWf = parseYaml(content);
-              subScope = { inputs: calleeInputs(job.with, subWf ?? {}) };
+              // `inputs.*` changes at the call boundary; `github.*` does not.
+              // A callee's jobs run in the caller's repo, so the facts seeded
+              // at the top of the prediction stay true all the way down.
+              subScope = { inputs: calleeInputs(job.with, subWf ?? {}), github: scoped.github };
             } catch (e) {
               failure = `YAML parse error in ${uses}: ${e}`;
             }
@@ -805,6 +889,7 @@ async function expandJobs(
             `${baseName} / `,
             nameResolved,
             subScope,
+            executor,
           )),
         );
       }
@@ -816,7 +901,7 @@ async function expandJobs(
         job: prefix + jobId,
         checkName: null,
         status: "unknown",
-        reason: "dynamic matrix",
+        reason: "dynamic matrix" + execNote(needs),
       });
       continue;
     }
@@ -838,14 +923,21 @@ async function expandJobs(
  * Expand one already-parsed workflow into its job entries. Exported so check
  * names can be tested against recorded GitHub behaviour without a network
  * round-trip; `predict` is the API you want.
+ *
+ * `scope` seeds what this workflow's own `${{ }}` resolve against — notably
+ * `needs`, the outputs of jobs that have not run. Nothing here works out what
+ * those are; a caller that knows hands them in, and a caller that does not
+ * leaves them out and gets `unknown` where they would have been used.
  */
 export function expandWorkflowJobs(
   wf: Workflow,
   ctx: Ctx,
   reader: WorkflowReader,
   source: WorkflowSource,
+  scope: Scope = {},
+  executor?: JobExecutor,
 ): Promise<ExpandedJob[]> {
-  return expandJobs(wf, ctx, reader, source);
+  return expandJobs(wf, ctx, reader, source, 0, "", true, scope, executor);
 }
 
 // ------------------------------------------------------------------- pipeline
@@ -963,10 +1055,48 @@ export async function predict(
 
   const reader: WorkflowReader = { fetchWorkflow, resolveRef };
 
+  // The executor exists only when the caller granted something. Trees come
+  // from the tarball endpoint at the resolved commit, and every subprocess —
+  // `tar` included — goes through the one `runShell` seam.
+  let executor: JobExecutor | undefined;
+  if (opts.execute != null && opts.execute.length > 0) {
+    const download = async (src: WorkflowSource): Promise<Uint8Array | null> => {
+      try {
+        const { data } = await octokit.rest.repos.downloadTarballArchive({
+          owner: src.owner,
+          repo: src.repo,
+          ref: src.sha,
+        });
+        return new Uint8Array(data as ArrayBuffer);
+      } catch {
+        // Private, deleted, rate limit, network: one answer, and the entries
+        // behind it stay unresolved with the failure named.
+        return null;
+      }
+    };
+    executor = makeExecutor({
+      grants: opts.execute,
+      workspace: headSource,
+      deps: {
+        provideTree: makeTreeProvider(download, runShell),
+        runCommand: runShell,
+        resolveRef,
+      },
+    });
+  }
+
   const workflows = await octokit.paginate(octokit.rest.actions.listRepoWorkflows, {
     ...base,
     per_page: 100,
   });
+
+  // `github.repository` is fixed for everything predicted here: reusable
+  // workflows and composite actions all run in the repo the PR is against.
+  // Seeding it once makes guards like the fleet's hermetic-vs-published
+  // `github.repository ==` checks decidable everywhere, granted or not.
+  const prFacts: Scope = {
+    github: { repository: `${headSource.owner}/${headSource.repo}` },
+  };
 
   const entries: DraftEntry[] = [];
   for (const w of workflows) {
@@ -1014,7 +1144,7 @@ export async function predict(
       entries.push({ workflow: path, job: "*", status: "no-dispatch", reason });
       continue;
     }
-    for (const j of await expandJobs(wf, ctx, reader, headSource)) {
+    for (const j of await expandJobs(wf, ctx, reader, headSource, 0, "", true, prFacts, executor)) {
       entries.push({
         workflow: path,
         job: jobName(j.job),
@@ -1048,7 +1178,8 @@ function finalizePrediction(
 // ------------------------------------------------------------------------ CLI
 
 const USAGE =
-  "usage: predict --repo owner/name --pr N [--action opened|synchronize|reopened] [--json]";
+  "usage: predict --repo owner/name --pr N [--action opened|synchronize|reopened]" +
+  " [--execute owner/repo:job1,job2]... [--json]";
 
 const isPrEventAction = (v: string): v is PrEventAction =>
   v === "opened" || v === "synchronize" || v === "reopened";
@@ -1058,6 +1189,7 @@ function parseArgs(argv: string[]): {
   pr: number;
   json: boolean;
   action?: PrEventAction;
+  execute: ExecutionGrant[];
 } {
   const get = (flag: string) => {
     const i = argv.indexOf(flag);
@@ -1078,7 +1210,22 @@ function parseArgs(argv: string[]): {
     console.error(USAGE);
     process.exit(2);
   }
-  return { repo, pr: Number(pr), json: argv.includes("--json"), action };
+  // Repeatable, one grant per flag. A malformed grant is refused for the same
+  // reason a bad --action is: silently dropping it would predict without the
+  // execution the caller thought they asked for.
+  const execute: ExecutionGrant[] = [];
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] !== "--execute") continue;
+    const spec = argv[i + 1];
+    const grant = spec == null ? null : parseGrant(spec);
+    if (grant == null) {
+      console.error(`bad --execute: ${spec}`);
+      console.error(USAGE);
+      process.exit(2);
+    }
+    execute.push(grant);
+  }
+  return { repo, pr: Number(pr), json: argv.includes("--json"), action, execute };
 }
 
 const isMain = /predict\.(ts|js)$|\/willfire$/.test(process.argv[1] ?? "");
@@ -1086,6 +1233,7 @@ if (isMain) {
   const args = parseArgs(process.argv.slice(2));
   const prediction = await predict(makeOctokit(), args.repo, args.pr, {
     action: args.action,
+    execute: args.execute,
   });
   const { entries, skip, sources } = prediction;
   if (args.json) {

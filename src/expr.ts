@@ -40,6 +40,13 @@
  */
 export type Val =
   | { kind: "value"; v: string | number | boolean }
+  /**
+   * An array or an object, which only `fromJSON` produces. Kept apart from
+   * `value` because nothing else in the language accepts one: comparison
+   * refuses it, and its truthiness is not modelled. Matrix expansion is the
+   * one consumer, and it asks for the array directly.
+   */
+  | { kind: "json"; v: unknown[] | Record<string, unknown> }
   | { kind: "truthy" }
   | { kind: "falsy" }
   | { kind: "unknown" };
@@ -56,6 +63,33 @@ export interface Scope {
   inputs?: Record<string, Val>;
   /** `github.*` values that are fixed for the run being predicted. */
   github?: Record<string, string>;
+  /**
+   * Outputs of jobs this workflow's jobs `needs`, keyed by job id.
+   *
+   * `outputs` is the *complete* set for that job, which is what makes a key
+   * that is absent from it mean the empty string — the same answer the runner
+   * gives for an output no step wrote. Handing in a partial map is therefore a
+   * lie, not a shortcut: leave the job out entirely instead, and every lookup
+   * against it stays unknown.
+   *
+   * The values are raw strings, because that is what a step wrote to
+   * `$GITHUB_OUTPUT` and what the runner substitutes. Parsing eagerly would
+   * break the guards written against them — `!= '[]'` compares a string to a
+   * string, and an array on the left makes it unknown. `fromJSON` is the only
+   * thing that turns one into a structure, at the point the workflow asks.
+   */
+  needs?: Record<string, { outputs: Record<string, string> }>;
+  /**
+   * Outputs of steps that already ran, keyed by step id. Only one caller can
+   * fill this honestly: the executor's step walk (see execute.ts), which is
+   * the single place a step has actually run by the time an expression reads
+   * it. The contract is the same as `needs`: a step named here carries its
+   * *complete* output set, so an absent key is the empty string the runner
+   * substitutes, while a step this map does not name stays unknown. A skipped
+   * step is present with no outputs at all — which is exactly what lets
+   * `steps.a.outputs.x || steps.b.outputs.x` coalesce past it.
+   */
+  steps?: Record<string, { outputs: Record<string, string> }>;
 }
 
 /**
@@ -70,6 +104,10 @@ function truthy(val: Val): boolean | null {
     case "falsy":
       return false;
     case "unknown":
+      return null;
+    // GitHub does cast an array or an object to a boolean, but no workflow
+    // asks it to, and the answer is not worth guessing at to find out.
+    case "json":
       return null;
     case "value": {
       const v = val.v;
@@ -301,10 +339,32 @@ class Parser {
       const v = this.scope.github?.[rest];
       return v === undefined ? UNKNOWN : { kind: "value", v };
     }
-    // `needs.*`, `steps.*`, `matrix.*`, `env.*`, `vars.*`, `secrets.*`: all
-    // require something that has not happened yet at prediction time. This is
-    // the seam where a `needs` context would attach if willfire ever computes
-    // a called workflow's outputs ahead of the run.
+    if (head === "needs") {
+      // Only `needs.<job>.outputs.<name>` is modelled. `needs.<job>.result`
+      // is a verdict on a run that has not happened; anything else is not a
+      // shape the context has.
+      const parts = rest.split(".");
+      if (parts.length !== 3 || parts[1] !== "outputs") return UNKNOWN;
+      const job = this.scope.needs?.[parts[0]];
+      if (job == null) return UNKNOWN;
+      // A known job's missing output is the empty string, not a hole: the
+      // caller promised the set is complete, and that is what the runner
+      // substitutes for an output no step wrote.
+      return { kind: "value", v: job.outputs[parts[2]] ?? "" };
+    }
+    if (head === "steps") {
+      // The same shape as `needs`, for the same reason: only
+      // `steps.<id>.outputs.<name>` is modelled. `steps.<id>.outcome` and
+      // `.conclusion` are verdicts on how a step ran, which the executor does
+      // not track — a failed step fails the whole execution instead.
+      const parts = rest.split(".");
+      if (parts.length !== 3 || parts[1] !== "outputs") return UNKNOWN;
+      const step = this.scope.steps?.[parts[0]];
+      if (step == null) return UNKNOWN;
+      return { kind: "value", v: step.outputs[parts[2]] ?? "" };
+    }
+    // `matrix.*`, `env.*`, `vars.*`, `secrets.*`: all require something that
+    // has not happened yet at prediction time.
     return UNKNOWN;
   }
 }
@@ -363,15 +423,39 @@ function compare(op: string, left: Val, right: Val): Val {
 }
 
 /**
+ * `fromJSON(s)` on a known string.
+ *
+ * The result is sorted into the lattice rather than dropped in whole: a scalar
+ * is an ordinary value and stays comparable, `null` has a known truthiness and
+ * no useful value, and only an array or an object needs the `json` point.
+ * Anything unparseable is unknown — a workflow that reaches this at runtime
+ * fails, and predicting a failure is not this function's job.
+ */
+function fromJson(arg: Val): Val {
+  if (arg.kind !== "value" || typeof arg.v !== "string") return UNKNOWN;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(arg.v);
+  } catch {
+    return UNKNOWN;
+  }
+  if (parsed === null) return { kind: "falsy" };
+  if (typeof parsed === "object") return { kind: "json", v: parsed as unknown[] };
+  return { kind: "value", v: parsed as string | number | boolean };
+}
+
+/**
  * The functions worth modelling.
  *
  * `always()` is true by definition. `contains` on two known strings is the one
- * that unlocks the fleet's `gates` pattern. `success()`, `failure()` and
- * `cancelled()` depend on jobs that have not run, and everything else is
- * simply not modelled — all unknown.
+ * that unlocks the fleet's `gates` pattern. `fromJSON` is what a dynamic matrix
+ * axis is built out of. `success()`, `failure()` and `cancelled()` depend on
+ * jobs that have not run, and everything else is simply not modelled — all
+ * unknown.
  */
 function applyFunction(name: string, args: Val[]): Val {
   if (name === "always") return { kind: "value", v: true };
+  if (name === "fromjson" && args.length === 1) return fromJson(args[0]);
   if (name === "contains" && args.length === 2) {
     const [hay, needle] = args;
     if (hay.kind !== "value" || needle.kind !== "value") return UNKNOWN;
@@ -390,22 +474,32 @@ function applyFunction(name: string, args: Val[]): Val {
 // ---------------------------------------------------------------------- entry
 
 /**
- * Evaluate a condition to a truthiness, or null when it cannot be settled.
+ * Evaluate an expression to a value, or UNKNOWN when it cannot be settled.
  *
- * The `${{ }}` wrapper is optional in `if:` and stripped when present. A
- * condition that is only *partly* wrapped (`foo ${{ bar }} baz`) is a string
+ * The `${{ }}` wrapper is optional in `if:` and stripped when present. An
+ * expression that is only *partly* wrapped (`foo ${{ bar }} baz`) is a string
  * interpolation rather than an expression, and is not modelled.
+ *
+ * A `if:` wants {@link evaluate}, which is this narrowed to truthiness. This
+ * one is for the places that need the value itself — a matrix axis written as
+ * `${{ fromJSON(...) }}` is an array, and its truthiness says nothing about
+ * how many jobs it schedules.
  */
-export function evaluate(cond: string, scope: Scope = {}): boolean | null {
-  const stripped = cond.trim().replace(/^\$\{\{(.*)\}\}$/s, "$1").trim();
-  if (stripped === "") return null;
-  if (stripped.includes("${{")) return null;
+export function evaluateValue(expr: string, scope: Scope = {}): Val {
+  const stripped = expr.trim().replace(/^\$\{\{(.*)\}\}$/s, "$1").trim();
+  if (stripped === "") return UNKNOWN;
+  if (stripped.includes("${{")) return UNKNOWN;
   const toks = tokenize(stripped);
-  if (toks == null || toks.length === 0) return null;
+  if (toks == null || toks.length === 0) return UNKNOWN;
   const p = new Parser(toks, scope);
   const val = p.or();
-  // Trailing tokens mean the grammar did not cover this condition; whatever
+  // Trailing tokens mean the grammar did not cover this expression; whatever
   // was parsed describes only a prefix of it, so it decides nothing.
-  if (!p.done()) return null;
-  return truthy(val);
+  if (!p.done()) return UNKNOWN;
+  return val;
+}
+
+/** Evaluate a condition to a truthiness, or null when it cannot be settled. */
+export function evaluate(cond: string, scope: Scope = {}): boolean | null {
+  return truthy(evaluateValue(cond, scope));
 }

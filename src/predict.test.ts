@@ -32,7 +32,10 @@ import {
   type ResolveRef,
   type WorkflowEntry,
   type WorkflowReader,
+  type WorkflowSource,
 } from "./predict.js";
+import type { ExecOutcome } from "./execute.js";
+import type { Scope } from "./expr.js";
 
 // Compile-time only, checked by `tsc --noEmit` over this file rather than at
 // run time. `expandJobs` is the sole producer of job entries, so the status a
@@ -119,6 +122,12 @@ interface Fixture {
    * not listed 404s, which is the answer a deleted tag or a private repo gives.
    */
   refs?: Record<string, string>;
+  /**
+   * Tarball bytes by `owner/repo@ref`, for the executor's tree downloads. A
+   * missing key throws, which is what the tarball endpoint does for anything
+   * it will not serve.
+   */
+  tarballs?: Record<string, Uint8Array>;
 }
 
 /** The head commit of the PR every fixture describes. */
@@ -169,6 +178,11 @@ function fakeOctokit(f: Fixture): Octokit {
         getContent: async ({ path }: { path: string }) => {
           if (!(path in contents)) throw new Error(`404 ${path}`);
           return { data: contents[path] };
+        },
+        downloadTarballArchive: async ({ owner, repo, ref }: Record<string, string>) => {
+          const bytes = (f.tarballs ?? {})[`${owner}/${repo}@${ref}`];
+          if (bytes == null) throw new Error(`404 tarball ${owner}/${repo}@${ref}`);
+          return { data: bytes.buffer };
         },
       },
       actions: { listRepoWorkflows: LIST_WORKFLOWS },
@@ -1032,6 +1046,45 @@ describe("expandMatrix", () => {
 
   it("gives up on an axis that is not a list", () => {
     expect(expandMatrix({ matrix: { os: "${{ x }}" } })).toBeNull();
+    expect(expandMatrix({ matrix: { os: 3 } })).toBeNull();
+  });
+
+  it("expands an axis written as an expression over known outputs", () => {
+    // The fleet shape: the axis is the values another job computed, and they
+    // are knowable exactly when the scope carries that job's outputs.
+    const strategy = { matrix: { language: "${{ fromJSON(needs.d.outputs.langs) }}" } };
+    const scope = { needs: { d: { outputs: { langs: '["typescript","rust"]' } } } };
+    expect(expandMatrix(strategy, scope)).toEqual([
+      { language: "typescript" },
+      { language: "rust" },
+    ]);
+  });
+
+  it("expands such an axis to nothing when the output is an empty array", () => {
+    const strategy = { matrix: { language: "${{ fromJSON(needs.d.outputs.langs) }}" } };
+    expect(expandMatrix(strategy, { needs: { d: { outputs: { langs: "[]" } } } })).toEqual([]);
+  });
+
+  it("multiplies a dynamic axis against a static one", () => {
+    const strategy = {
+      matrix: { language: "${{ fromJSON(needs.d.outputs.langs) }}", os: ["linux"] },
+    };
+    const scope = { needs: { d: { outputs: { langs: '["ts"]' } } } };
+    expect(expandMatrix(strategy, scope)).toEqual([{ language: "ts", os: "linux" }]);
+  });
+
+  it("gives up on an axis expression the scope cannot settle", () => {
+    const strategy = { matrix: { language: "${{ fromJSON(needs.d.outputs.langs) }}" } };
+    expect(expandMatrix(strategy)).toBeNull();
+    expect(expandMatrix(strategy, { needs: { other: { outputs: {} } } })).toBeNull();
+  });
+
+  it("gives up on an axis expression that is not an array", () => {
+    // A scalar cannot be an axis, and neither can an object. Treating either
+    // as one combination would invent a check name.
+    const scope = { needs: { d: { outputs: { s: '"ts"', o: "{}" } } } };
+    expect(expandMatrix({ matrix: { l: "${{ fromJSON(needs.d.outputs.s) }}" } }, scope)).toBeNull();
+    expect(expandMatrix({ matrix: { l: "${{ fromJSON(needs.d.outputs.o) }}" } }, scope)).toBeNull();
   });
 
   it("takes the cartesian product of the axes", () => {
@@ -1138,6 +1191,99 @@ describe("a job whose matrix expands to nothing", () => {
     // The callee is still read once — resolution happens before the matrix is
     // walked — but nothing it declares becomes a check.
     expect(fetched).toEqual([".github/workflows/callee.yml"]);
+  });
+});
+
+// The fleet shape, end to end: a `detect` job writes JSON to `$GITHUB_OUTPUT`,
+// and the jobs downstream of it take both their `if:` and their matrix from
+// what it wrote. Nothing here works out what `detect` writes — the outputs are
+// handed in, which is the whole point of the seam.
+describe("a matrix taken from another job's outputs", () => {
+  const SOURCE = { owner: "o", repo: "r", ref: SHA, sha: SHA };
+  const CTX = { action: "opened", baseRef: "main", files: ["src/app.txt"] };
+  const NO_FETCH = async () => null;
+
+  /** The fleet's `unit-coverage`, reduced to the two lines that matter. */
+  const WORKFLOW = {
+    on: { pull_request: null },
+    jobs: {
+      detect: { "runs-on": "ubuntu-latest", name: "Detect" },
+      "unit-coverage": {
+        "runs-on": "ubuntu-latest",
+        name: "Unit-test coverage (${{ matrix.language }})",
+        needs: "detect",
+        if: "${{ needs.detect.outputs.langs != '[]' }}",
+        strategy: { matrix: { language: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+      },
+    },
+  };
+
+  const expand = (scope?: Scope) =>
+    expandWorkflowJobs(WORKFLOW as never, CTX, readerOf(NO_FETCH), SOURCE, scope);
+
+  it("names one check per value the output carries", async () => {
+    const entries = await expand({ needs: { detect: { outputs: { langs: '["typescript"]' } } } });
+    expect(entries).toEqual([
+      { job: "Detect", checkName: "Detect", status: "run", reason: "" },
+      {
+        job: "Unit-test coverage (typescript)",
+        checkName: "Unit-test coverage (typescript)",
+        status: "run",
+        reason: "if: \"${{ needs.detect.outputs.langs != '[]' }}\"",
+      },
+    ]);
+  });
+
+  it("collapses to the uninterpolated name when the output is empty", async () => {
+    // The guard decides `skipped` first, and a skipped job never expands its
+    // matrix or interpolates its `name:` — so GitHub creates one check called
+    // exactly what the YAML says, expression text and all.
+    const entries = await expand({ needs: { detect: { outputs: { langs: "[]" } } } });
+    expect(entries.map((e) => e.checkName)).toEqual([
+      "Detect",
+      "Unit-test coverage (${{ matrix.language }})",
+    ]);
+    expect(entries[1].status).toBe("skipped");
+  });
+
+  it("stays one unknown entry when the outputs are not supplied", async () => {
+    const entries = await expand();
+    expect(entries[1]).toEqual({
+      job: "unit-coverage",
+      checkName: null,
+      status: "unknown",
+      reason: "dynamic matrix",
+    });
+  });
+
+  it("does not carry the outputs into a called workflow", async () => {
+    // `needs` is workflow-scoped: a callee's `needs.detect` is the callee's own
+    // job, not the caller's. Inheriting the map would answer for the wrong one.
+    const entries = await expandWorkflowJobs(
+      {
+        on: { pull_request: null },
+        jobs: { call: { uses: "./.github/workflows/callee.yml" } },
+      } as never,
+      CTX,
+      readerOf(async () =>
+        JSON.stringify({
+          jobs: {
+            inner: { "runs-on": "ubuntu-latest", if: "needs.detect.outputs.langs != '[]'" },
+          },
+        }),
+      ),
+      SOURCE,
+      { needs: { detect: { outputs: { langs: '["typescript"]' } } } },
+    );
+    // The name is still resolvable — it is the guard that is not.
+    expect(entries).toEqual([
+      {
+        job: "call / inner",
+        checkName: "call / inner",
+        status: "unknown",
+        reason: "if: \"needs.detect.outputs.langs != '[]'\"",
+      },
+    ]);
   });
 });
 
@@ -1371,6 +1517,38 @@ describe("the CLI entrypoint", () => {
     await expect(invoke(["--pr", "1"])).rejects.toThrow("exited");
     expect(exit).toHaveBeenCalledWith(2);
     expect(vi.mocked(console.error).mock.calls[0][0]).toMatch(/^usage: predict /);
+  });
+
+  it("passes --execute grants through to prediction", async () => {
+    // The grant names a repo no workflow here comes from, so nothing executes
+    // and nothing downloads — but the flag parses and the prediction runs.
+    await invoke(["--repo", "o/r", "--pr", "1", "--execute", "x/y:detect"], {
+      contents: { [WF]: WORKFLOW },
+    });
+    expect(out).toEqual([`${WF} :: a :: run`, HEAD_READ]);
+  });
+
+  it("exits 2 on an --execute it cannot parse", async () => {
+    const exit = vi.spyOn(process, "exit").mockImplementation((() => {
+      throw new Error("exited");
+    }) as () => never);
+    await expect(
+      invoke(["--repo", "o/r", "--pr", "1", "--execute", "nope"]),
+    ).rejects.toThrow("exited");
+    expect(exit).toHaveBeenCalledWith(2);
+    expect(vi.mocked(console.error).mock.calls[0][0]).toBe("bad --execute: nope");
+    expect(vi.mocked(console.error).mock.calls[1][0]).toMatch(/--execute owner\/repo:job1,job2/);
+  });
+
+  it("exits 2 on a trailing --execute with no grant", async () => {
+    const exit = vi.spyOn(process, "exit").mockImplementation((() => {
+      throw new Error("exited");
+    }) as () => never);
+    await expect(
+      invoke(["--repo", "o/r", "--pr", "1", "--execute"]),
+    ).rejects.toThrow("exited");
+    expect(exit).toHaveBeenCalledWith(2);
+    expect(vi.mocked(console.error).mock.calls[0][0]).toBe("bad --execute: undefined");
   });
 });
 
@@ -1629,5 +1807,285 @@ describe("cross-repo reusable references", () => {
     expect(entries.map((e) => e.job)).toEqual(["a / Inner", "b / Inner"]);
     const subFetches = spy.mock.calls.filter((c) => c[0]?.path === SUB);
     expect(subFetches).toHaveLength(1);
+  });
+});
+
+// The executor seam: expansion asks it, before anything reads `needs`,
+// whether the caller granted a job — and folds what an execution yields into
+// the scope every later evaluation sees. The executor itself is faked here;
+// what it actually does when it runs things is execute.test.ts's subject.
+describe("github.repository as a prediction-wide fact", () => {
+  it("decides a repository guard from the repo the PR is against", async () => {
+    const wf = JSON.stringify({
+      on: "pull_request",
+      jobs: {
+        published: { if: "github.repository != 'o/r'" },
+        hermetic: { if: "github.repository == 'o/r'" },
+      },
+    });
+    const { checkNames } = await predict(fakeOctokit({ contents: { [WF]: wf } }), "o/r", 1);
+    expect(checkNames).toEqual(["hermetic"]);
+  });
+
+  it("carries the fact across a reusable workflow call", async () => {
+    const sub = JSON.stringify({
+      on: { workflow_call: null },
+      jobs: { inner: { if: "github.repository == 'o/r'" } },
+    });
+    const wf = JSON.stringify({
+      on: "pull_request",
+      jobs: { call: { uses: "./.github/workflows/sub.yml" } },
+    });
+    const octokit = fakeOctokit({
+      contents: { [WF]: wf, ".github/workflows/sub.yml": sub },
+    });
+    const { checkNames } = await predict(octokit, "o/r", 1);
+    expect(checkNames).toEqual(["call / inner"]);
+  });
+});
+
+describe("granted execution during expansion", () => {
+  const SOURCE: WorkflowSource = { owner: "o", repo: "r", ref: "main", sha: SHA };
+  const CTX = { action: "opened", baseRef: "main", files: ["src/app.ts"] };
+  const reader = readerOf(async () => null);
+
+  /** A detect-shaped workflow: one producer, one dynamic-matrix consumer. */
+  const wfWith = (detect: Record<string, unknown>) => ({
+    on: { pull_request: null },
+    jobs: {
+      detect,
+      cover: {
+        needs: "detect",
+        name: "Coverage (${{ matrix.language }})",
+        strategy: { matrix: { language: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+      },
+    },
+  });
+
+  const executorReturning = (outcome: ExecOutcome, log: string[] = []) => ({
+    granted: (src: WorkflowSource, jobId: string) =>
+      `${src.owner}/${src.repo}` === "o/r" && jobId === "detect",
+    executeJob: async (jobId: string) => {
+      log.push(jobId);
+      return outcome;
+    },
+  });
+
+  it("resolves a dynamic matrix from what the granted job produced", async () => {
+    const entries = await expandWorkflowJobs(
+      wfWith({}),
+      CTX,
+      reader,
+      SOURCE,
+      {},
+      executorReturning({ ok: true, outputs: { langs: '["ts", "py"]' } }),
+    );
+    expect(entries).toEqual([
+      { job: "detect", checkName: "detect", status: "run", reason: "" },
+      { job: "Coverage (ts)", checkName: "Coverage (ts)", status: "run", reason: "" },
+      { job: "Coverage (py)", checkName: "Coverage (py)", status: "run", reason: "" },
+    ]);
+  });
+
+  it("schedules nothing for a matrix the execution resolved to empty", async () => {
+    const entries = await expandWorkflowJobs(
+      wfWith({}),
+      CTX,
+      reader,
+      SOURCE,
+      {},
+      executorReturning({ ok: true, outputs: { langs: "[]" } }),
+    );
+    // Zero combinations is a real answer: the job creates no check at all,
+    // which is exactly what GitHub does with an empty axis.
+    expect(entries).toEqual([{ job: "detect", checkName: "detect", status: "run", reason: "" }]);
+  });
+
+  it("threads an execution failure into the reasons of what needed it", async () => {
+    const entries = await expandWorkflowJobs(
+      wfWith({}),
+      CTX,
+      reader,
+      SOURCE,
+      {},
+      executorReturning({ ok: false, reason: "step 's': exited 1" }),
+    );
+    expect(entries[1]).toEqual({
+      job: "cover",
+      checkName: null,
+      status: "unknown",
+      reason: "dynamic matrix; executing 'detect' failed: step 's': exited 1",
+    });
+  });
+
+  it("normalizes a null granted job body before executing it", async () => {
+    const wf = {
+      on: { pull_request: null },
+      jobs: {
+        detect: null,
+        cover: {
+          needs: "detect",
+          name: "Coverage (${{ matrix.language }})",
+          strategy: { matrix: { language: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+        },
+      },
+    };
+    const entries = await expandWorkflowJobs(
+      wf,
+      CTX,
+      reader,
+      SOURCE,
+      {},
+      executorReturning({ ok: true, outputs: { langs: '["ts"]' } }),
+    );
+    expect(entries[1]).toMatchObject({ checkName: "Coverage (ts)", status: "run" });
+  });
+
+  it("leaves an ungranted job exactly as unresolved as before", async () => {
+    const log: string[] = [];
+    const executor = {
+      ...executorReturning({ ok: true, outputs: { langs: "[]" } }, log),
+      granted: () => false,
+    };
+    const entries = await expandWorkflowJobs(wfWith({}), CTX, reader, SOURCE, {}, executor);
+    expect(log).toEqual([]);
+    expect(entries[1]).toMatchObject({ status: "unknown", reason: "dynamic matrix" });
+  });
+
+  it("does not execute a granted job that would not run", async () => {
+    const log: string[] = [];
+    const entries = await expandWorkflowJobs(
+      wfWith({ if: "false" }),
+      CTX,
+      reader,
+      SOURCE,
+      {},
+      executorReturning({ ok: true, outputs: { langs: '["ts"]' } }, log),
+    );
+    expect(log).toEqual([]);
+    // The consumer collapses the way a skipped dependency always does,
+    // keeping its unresolved name the way every skipped matrix job does.
+    expect(entries[1]).toMatchObject({
+      job: "Coverage (${{ matrix.language }})",
+      status: "skipped",
+    });
+  });
+
+  it("executes a granted job whose guard the caller's scope decides", async () => {
+    const log: string[] = [];
+    const entries = await expandWorkflowJobs(
+      wfWith({ if: "github.repository == 'o/r'" }),
+      CTX,
+      reader,
+      SOURCE,
+      { github: { repository: "o/r" } },
+      executorReturning({ ok: true, outputs: { langs: '["ts"]' } }, log),
+    );
+    expect(log).toEqual(["detect"]);
+    expect(entries[1]).toMatchObject({ checkName: "Coverage (ts)", status: "run" });
+  });
+
+  it("threads a failure into a dynamic matrix on a reusable call too", async () => {
+    const wf = {
+      on: { pull_request: null },
+      jobs: {
+        detect: {},
+        call: {
+          needs: "detect",
+          uses: "./.github/workflows/sub.yml",
+          strategy: { matrix: { l: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+        },
+      },
+    };
+    const entries = await expandWorkflowJobs(
+      wf,
+      CTX,
+      reader,
+      SOURCE,
+      {},
+      executorReturning({ ok: false, reason: "boom" }),
+    );
+    expect(entries[1]).toEqual({
+      job: "call",
+      checkName: null,
+      status: "unknown",
+      reason: "dynamic matrix on reusable workflow call; executing 'detect' failed: boom",
+    });
+  });
+
+  it("reaches a granted job inside a called workflow", async () => {
+    // The grant names the repo the workflow *file* lives in; a local call
+    // keeps the caller's source, so the recursion is where it fires.
+    const sub = JSON.stringify(wfWith({}));
+    const entries = await expandWorkflowJobs(
+      {
+        on: { pull_request: null },
+        jobs: { call: { uses: "./.github/workflows/sub.yml" } },
+      },
+      CTX,
+      readerOf(async () => sub),
+      SOURCE,
+      {},
+      executorReturning({ ok: true, outputs: { langs: '["ts"]' } }),
+    );
+    expect(entries.map((e) => e.checkName)).toEqual([
+      "call / detect",
+      "call / Coverage (ts)",
+    ]);
+  });
+});
+
+// The wiring above the seam: `predict` builds a real executor only when the
+// caller granted something, and its tree downloads go to the tarball
+// endpoint. Failures surface as reasons, never as different answers — the
+// happy path through real subprocesses is execute.test.ts's subject.
+describe("execution grants through predict", () => {
+  const DYNAMIC = JSON.stringify({
+    on: "pull_request",
+    jobs: {
+      detect: { steps: [] },
+      cover: {
+        needs: "detect",
+        name: "Coverage (${{ matrix.language }})",
+        strategy: { matrix: { language: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+      },
+    },
+  });
+  const GRANT = { execute: [{ repo: "o/r", jobs: ["detect"] }] };
+
+  const coverEntry = async (f: Fixture, opts: Parameters<typeof predict>[3]) => {
+    const { entries } = await predict(
+      fakeOctokit({ contents: { [WF]: DYNAMIC }, ...f }),
+      "o/r",
+      1,
+      opts,
+    );
+    expect(entries).toHaveLength(2);
+    return entries[1];
+  };
+
+  it("says which execution failed when the tarball is not served", async () => {
+    const e = await coverEntry({}, GRANT);
+    expect(e).toMatchObject({
+      status: "unknown",
+      checkName: null,
+      reason: `dynamic matrix; executing 'detect' failed: cannot materialize workspace o/r@${HEAD_SHA}`,
+    });
+  });
+
+  it("says the same when the download yields something tar refuses", async () => {
+    const e = await coverEntry(
+      { tarballs: { [`o/r@${HEAD_SHA}`]: new Uint8Array([1, 2, 3]) } },
+      GRANT,
+    );
+    expect(e).toMatchObject({
+      status: "unknown",
+      reason: `dynamic matrix; executing 'detect' failed: cannot materialize workspace o/r@${HEAD_SHA}`,
+    });
+  });
+
+  it("builds no executor for an empty grant list", async () => {
+    const e = await coverEntry({}, { execute: [] });
+    expect(e).toMatchObject({ status: "unknown", reason: "dynamic matrix" });
   });
 });

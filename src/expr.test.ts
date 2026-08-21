@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluate, UNKNOWN, type Scope } from "./expr.js";
+import { evaluate, evaluateValue, UNKNOWN, type Scope } from "./expr.js";
 
 /**
  * `evaluate` is the whole public surface, so everything below drives it rather
@@ -211,7 +211,6 @@ describe("context lookups", () => {
 
   it("leaves every runtime context unknown", () => {
     for (const path of [
-      "needs.detect.outputs.x",
       "steps.scan.outputs.x",
       "matrix.language",
       "env.FOO",
@@ -225,6 +224,100 @@ describe("context lookups", () => {
 
   it("leaves a bare name with no context unknown", () => {
     expect(evaluate("something == 'x'")).toBe(null);
+  });
+});
+
+// `needs.*` is the one runtime context that can be supplied: the outputs are
+// computed before the jobs that read them expand. Nothing in this file works
+// out what they are — they are handed in.
+describe("needs outputs", () => {
+  const NEEDS: Scope = {
+    needs: { detect: { outputs: { coverage_languages: '["typescript"]', e2e: "true" } } },
+  };
+
+  it("resolves an output the caller supplied", () => {
+    expect(evaluate("needs.detect.outputs.coverage_languages != '[]'", NEEDS)).toBe(true);
+  });
+
+  it("keeps the output a raw string", () => {
+    // The runner substitutes what a step wrote, and the guards compare against
+    // strings. Parsing here would make `!= '[]'` a mixed-type comparison, which
+    // is unknown — turning a decidable guard undecidable.
+    expect(evaluate("needs.detect.outputs.coverage_languages == '[\"typescript\"]'", NEEDS)).toBe(
+      true,
+    );
+    expect(evaluate("needs.detect.outputs.e2e == 'true'", NEEDS)).toBe(true);
+  });
+
+  it("reads an output the supplied job does not list as the empty string", () => {
+    // The caller promised the set is complete, so an absent key is an output no
+    // step wrote — which the runner substitutes as `''`.
+    expect(evaluate("needs.detect.outputs.missing == ''", NEEDS)).toBe(true);
+  });
+
+  it("leaves a job the caller said nothing about unknown", () => {
+    expect(evaluate("needs.other.outputs.x == ''", NEEDS)).toBe(null);
+    expect(evaluate("needs.detect.outputs.x == ''")).toBe(null);
+  });
+
+  it("leaves anything but an outputs lookup unknown", () => {
+    // `result` is a verdict on a run that has not happened; the rest are not
+    // shapes the context has.
+    expect(evaluate("needs.detect.result == 'success'", NEEDS)).toBe(null);
+    expect(evaluate("needs.detect.outputs.a.b == ''", NEEDS)).toBe(null);
+    expect(evaluate("needs.detect == ''", NEEDS)).toBe(null);
+  });
+
+  it("coalesces two outputs the way the fleet's mutation guard does", () => {
+    const scope: Scope = {
+      needs: { detect: { outputs: { mutation_languages: "[]", coverage_languages: '["rust"]' } } },
+    };
+    const cond =
+      "(needs.detect.outputs.mutation_languages || needs.detect.outputs.coverage_languages) != '[]'";
+    // `'[]'` is a non-empty string, so it is truthy, so `||` yields it and the
+    // comparison is false. This is the GitHub trap the evaluator keeps.
+    expect(evaluate(cond, scope)).toBe(false);
+  });
+});
+
+// `steps.*` mirrors `needs.*`: the executor's step walk is the one caller
+// that can supply it honestly, and the completeness contract is the same.
+describe("steps outputs", () => {
+  const STEPS: Scope = {
+    steps: {
+      scan_hermetic: { outputs: {} },
+      scan_published: { outputs: { static_languages: '["typescript"]' } },
+    },
+  };
+
+  it("resolves an output of a step the walk recorded", () => {
+    expect(evaluate("steps.scan_published.outputs.static_languages != '[]'", STEPS)).toBe(true);
+  });
+
+  it("coalesces past a skipped step the way the fleet's detect outputs do", () => {
+    // A skipped step is present with no outputs, so every read against it is
+    // '', which is falsy, so `||` yields the step that ran. This is the exact
+    // shape of every one of detect's ~25 `outputs:` entries.
+    const cond =
+      "(steps.scan_hermetic.outputs.static_languages || steps.scan_published.outputs.static_languages)" +
+      " == '[\"typescript\"]'";
+    expect(evaluate(cond, STEPS)).toBe(true);
+  });
+
+  it("reads an output the recorded step did not write as the empty string", () => {
+    expect(evaluate("steps.scan_published.outputs.missing == ''", STEPS)).toBe(true);
+  });
+
+  it("leaves a step the scope does not name unknown", () => {
+    expect(evaluate("steps.other.outputs.x == ''", STEPS)).toBe(null);
+    expect(evaluate("steps.scan_published.outputs.x == ''")).toBe(null);
+  });
+
+  it("leaves anything but an outputs lookup unknown", () => {
+    // `outcome` and `conclusion` are verdicts the executor does not track — a
+    // failed step fails the whole execution instead.
+    expect(evaluate("steps.scan_published.outcome == 'success'", STEPS)).toBe(null);
+    expect(evaluate("steps.scan_published.outputs.a.b == ''", STEPS)).toBe(null);
   });
 });
 
@@ -273,6 +366,82 @@ describe("functions", () => {
 
   it("leaves contains unknown at the wrong arity", () => {
     expect(evaluate("contains('abc')")).toBe(null);
+  });
+});
+
+// `fromJSON` is what a dynamic matrix axis is built out of, so unlike the other
+// functions its *value* is the point, not its truthiness. `evaluateValue` is
+// the entry point that hands it back.
+describe("fromJSON", () => {
+  const NEEDS: Scope = {
+    needs: {
+      detect: {
+        outputs: { langs: '["typescript","rust"]', empty: "[]", flag: "true", n: "3" },
+      },
+    },
+  };
+
+  it("parses an array out of an output", () => {
+    expect(evaluateValue("fromJSON(needs.detect.outputs.langs)", NEEDS)).toEqual({
+      kind: "json",
+      v: ["typescript", "rust"],
+    });
+    expect(evaluateValue("fromJSON(needs.detect.outputs.empty)", NEEDS)).toEqual({
+      kind: "json",
+      v: [],
+    });
+  });
+
+  it("parses an object", () => {
+    expect(evaluateValue("fromJSON('{\"a\":1}')")).toEqual({ kind: "json", v: { a: 1 } });
+  });
+
+  it("hands back a scalar as an ordinary value, so it stays comparable", () => {
+    expect(evaluate("fromJSON(needs.detect.outputs.flag)", NEEDS)).toBe(true);
+    expect(evaluate("fromJSON(needs.detect.outputs.n) == 3", NEEDS)).toBe(true);
+    expect(evaluate("fromJSON('\"s\"') == 's'")).toBe(true);
+  });
+
+  it("reads a parsed null as falsy", () => {
+    expect(evaluate("fromJSON('null')")).toBe(false);
+  });
+
+  it("does not model the truthiness of an array or an object", () => {
+    // GitHub casts them, but no workflow asks it to, and the answer is not
+    // worth guessing at to find out.
+    expect(evaluate("fromJSON('[]')")).toBe(null);
+    expect(evaluate("fromJSON('[1]')")).toBe(null);
+    expect(evaluate("fromJSON('{}')")).toBe(null);
+  });
+
+  it("refuses to compare a structure against anything", () => {
+    expect(evaluate("fromJSON('[1]') == '[1]'")).toBe(null);
+  });
+
+  it("is unknown on a string it cannot parse", () => {
+    // A workflow that reaches this at runtime fails; predicting the failure is
+    // not this function's job.
+    expect(evaluateValue("fromJSON('not json')")).toEqual(UNKNOWN);
+  });
+
+  it("is unknown when its argument is not a known string", () => {
+    expect(evaluateValue("fromJSON(needs.other.outputs.x)", NEEDS)).toEqual(UNKNOWN);
+    expect(evaluateValue("fromJSON(3)")).toEqual(UNKNOWN);
+    expect(evaluateValue("fromJSON('[]', 'x')")).toEqual(UNKNOWN);
+  });
+});
+
+describe("evaluateValue", () => {
+  it("refuses the same shapes evaluate refuses", () => {
+    expect(evaluateValue("")).toEqual(UNKNOWN);
+    expect(evaluateValue("${{ }}")).toEqual(UNKNOWN);
+    expect(evaluateValue("a ${{ b }} c")).toEqual(UNKNOWN);
+    expect(evaluateValue("'a' 'b'")).toEqual(UNKNOWN);
+    expect(evaluateValue("@")).toEqual(UNKNOWN);
+  });
+
+  it("strips the wrapper the way an if: does", () => {
+    expect(evaluateValue("${{ 'a' }}")).toEqual({ kind: "value", v: "a" });
   });
 });
 
