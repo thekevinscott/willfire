@@ -1,0 +1,10 @@
+name: branches-ignore
+on:
+  pull_request:
+    branches-ignore:
+      - main
+jobs:
+  not-into-main:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo PR not into main
