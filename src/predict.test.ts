@@ -130,15 +130,9 @@ interface Fixture {
   tarballs?: Record<string, Uint8Array>;
   /** The PR's `merge_commit_sha` — its test merge. Absent means null. */
   mergeSha?: string | null;
-  /**
-   * Parent shas by commit sha, read through `repos.getCommit` alongside
-   * `refs`. A commit that is not listed has no parents, like a root commit.
-   */
+  /** Parent shas by commit sha, via `repos.getCommit`. Unlisted: no parents. */
   parents?: Record<string, string[]>;
-  /**
-   * The repo's open PRs, for the stack walk's `pulls.list` lookup by head
-   * branch. Only the fields the walk reads.
-   */
+  /** Open PRs, for the stack walk's `pulls.list` lookup by head branch. */
   openPrs?: { headRef: string; baseRef: string; mergeSha: string | null }[];
 }
 
@@ -499,13 +493,9 @@ describe("workflow-level verdicts", () => {
 
   // ---- stacked PRs (#30) ----
 
-  // GitHub's stacked-PR machinery (rolled out per repo; on for dirsql, off for
-  // willrun-probe) builds a child PR's test merge on the parent PR's test
-  // merge and evaluates `branches:` against the branch the stack ultimately
-  // targets. Read off dirsql#1002: base `claude/tackle-957-lrm0z6`, yet
-  // `branches: [main]` workflows dispatched on synchronize. The mode is
-  // detected from `merge_commit_sha`: its first parent is the base tip in
-  // normal mode and the parent PR's own merge sha in stacked mode.
+  // GitHub's stack-aware dispatch (a per-repo rollout, read off dirsql#1002)
+  // evaluates `branches:` against the stack's terminal target; the mode shows
+  // in `merge_commit_sha`'s first parent.
 
   /** A child PR based on `feature-1`, whose parent PR targets `main`. */
   const STACKED: Fixture = {
@@ -525,8 +515,6 @@ describe("workflow-level verdicts", () => {
   };
 
   it("dispatches a `branches` workflow against the stack's target (#30)", async () => {
-    // dirsql#1002's shape: the literal base ref would decline, the stack
-    // target matches.
     const wf = "on:\n  pull_request:\n    branches: [main]\njobs:\n  a: {}\n";
     expect(await only(wf, STACKED)).toMatchObject({ job: "a", status: "run" });
   });
@@ -548,8 +536,6 @@ describe("workflow-level verdicts", () => {
   });
 
   it("keeps literal semantics when the preview sits on the base tip", async () => {
-    // A merge sha whose first parent IS the base tip: normal mode, whatever
-    // open PRs exist.
     const wf = "on:\n  pull_request:\n    branches: [dev]\njobs:\n  a: {}\n";
     const f: Fixture = {
       mergeSha: "m0",
@@ -564,10 +550,7 @@ describe("workflow-level verdicts", () => {
   });
 
   it("keeps literal semantics when no open PR owns the preview parent", async () => {
-    // The preview is stale — its parent is an old base tip, not any open PR's
-    // merge sha — so nothing is proven and the literal base ref stands. One
-    // candidate matches the head branch with the wrong merge sha; one is a PR
-    // from some other branch entirely.
+    // The preview parent is an old base tip, not any open PR's merge sha.
     const wf = "on:\n  pull_request:\n    branches: [dev]\njobs:\n  a: {}\n";
     const f: Fixture = {
       mergeSha: "m0",
@@ -585,8 +568,7 @@ describe("workflow-level verdicts", () => {
   });
 
   it("keeps literal semantics when the preview cannot be read", async () => {
-    // The merge sha 404s — permissions, eventual consistency, whatever. The
-    // walk must not throw; the verdict falls back to the literal base ref.
+    // The merge sha 404s; the walk must not throw.
     const wf = "on:\n  pull_request:\n    branches: [dev]\njobs:\n  a: {}\n";
     expect(await only(wf, { mergeSha: "m0" })).toMatchObject({
       status: "no-dispatch",
@@ -604,9 +586,7 @@ describe("workflow-level verdicts", () => {
   });
 
   it("stops the stack walk at the depth cap", async () => {
-    // A chain deeper than the cap: the walk stops after ten hops and the
-    // filters are evaluated against the deepest proven target, b10 — which
-    // only narrows how far the substitution reaches, never widens it.
+    // Ten hops in, the walk stops; filters run against the deepest proven target.
     const refs: Record<string, string> = {};
     const parents: Record<string, string[]> = {};
     const openPrs: NonNullable<Fixture["openPrs"]> = [];
