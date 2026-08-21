@@ -4,12 +4,11 @@
 // `runShell` and an actual bash, because "run it, never interpret it" is the
 // module's whole claim and a faked shell would test the interpretation this
 // module promises not to do. Everything network-shaped — trees, refs — is
-// injected. Fixture `action.yml` files are written as JSON, which is valid
-// YAML, so the suite never imports a parser of its own.
+// injected, and the unit under test is the suite's only collaborator: fixture
+// trees are built through `runShell` itself, tarballs are embedded bytes, and
+// `action.yml` files are written as JSON, which is valid YAML, so the suite
+// never imports a parser, a filesystem, or a path library of its own.
 
-import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
-import { tmpdir } from "node:os";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   makeExecutor,
@@ -28,14 +27,45 @@ const REMOTE_SHA = "d".repeat(40);
 /** The PR head every execution here materializes as its workspace. */
 const WORKSPACE: WorkflowSource = { owner: "o", repo: "r", ref: SHA, sha: SHA };
 
-/** Write a file tree under a fresh temp dir and return its root. */
+const TMP = (process.env.TMPDIR ?? "/tmp").replace(/\/$/, "");
+const SH_ENV = { PATH: process.env.PATH ?? "" };
+let treeSeq = 0;
+
+/**
+ * Write a file tree under a fresh temp dir and return its root — through
+ * `runShell`, so the module under test is the only thing the suite touches
+ * the filesystem with.
+ */
 async function tempTree(files: Record<string, string>): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "wf-exec-test-"));
+  const root = `${TMP}/wf-exec-test-${process.pid}-${treeSeq++}`;
+  const r0 = await runShell({
+    script: 'mkdir -p "$D"',
+    shell: "bash",
+    cwd: TMP,
+    env: { ...SH_ENV, D: root },
+  });
+  expect(r0.code).toBe(0);
   for (const [rel, content] of Object.entries(files)) {
-    await mkdir(join(root, dirname(rel)), { recursive: true });
-    await writeFile(join(root, rel), content);
+    const r = await runShell({
+      script: 'mkdir -p "$(dirname "$F")" && printf %s "$C" > "$F"',
+      shell: "bash",
+      cwd: TMP,
+      env: { ...SH_ENV, F: `${root}/${rel}`, C: content },
+    });
+    expect(r.code).toBe(0);
   }
   return root;
+}
+
+/** True when `path` holds exactly `want` — read through `runShell`, again. */
+async function fileIs(path: string, want: string): Promise<boolean> {
+  const r = await runShell({
+    script: '[ "$(cat "$F")" = "$W" ]',
+    shell: "bash",
+    cwd: TMP,
+    env: { ...SH_ENV, F: path, W: want },
+  });
+  return r.code === 0;
 }
 
 /**
@@ -402,7 +432,7 @@ describe("composite actions", () => {
     );
     expect(out.got).toBe("caller-who");
     // $GITHUB_ACTION_PATH points into the materialized tree.
-    expect(out.ap).toBe(join(tree, "action"));
+    expect(out.ap).toBe(`${tree}/action`);
   });
 
   it("falls back to a declared default when with: omits the input", async () => {
@@ -648,10 +678,8 @@ describe("composite actions", () => {
 // ------------------------------------------------------------------ runShell
 
 describe("runShell", () => {
-  const ENV = { PATH: process.env.PATH ?? "" };
-
   it("reports a spawn that never starts as exit 127", async () => {
-    const r = await runShell({ script: "true", shell: "bash", cwd: "/nonexistent-dir", env: ENV });
+    const r = await runShell({ script: "true", shell: "bash", cwd: "/nonexistent-dir", env: SH_ENV });
     expect(r.code).toBe(127);
   });
 
@@ -659,8 +687,8 @@ describe("runShell", () => {
     const r = await runShell({
       script: 'for i in $(seq 1 200); do printf "%050d\\n" "$i" >&2; done; exit 1',
       shell: "bash",
-      cwd: tmpdir(),
-      env: ENV,
+      cwd: TMP,
+      env: SH_ENV,
     });
     expect(r.code).toBe(1);
     expect(r.stderr.length).toBeLessThanOrEqual(4096);
@@ -669,7 +697,7 @@ describe("runShell", () => {
   });
 
   it("reports a signal death as exit 1", async () => {
-    const r = await runShell({ script: 'kill -9 "$$"', shell: "bash", cwd: tmpdir(), env: ENV });
+    const r = await runShell({ script: 'kill -9 "$$"', shell: "bash", cwd: TMP, env: SH_ENV });
     expect(r.code).toBe(1);
   });
 
@@ -684,48 +712,46 @@ describe("runShell", () => {
 
 // ----------------------------------------------------------- makeTreeProvider
 
-/** Build a real gzipped tarball of `files` and return its bytes. */
-async function tarballOf(files: Record<string, string>): Promise<Uint8Array> {
-  const src = await tempTree(files);
-  const out = join(await mkdtemp(join(tmpdir(), "wf-tarball-")), "t.tar.gz");
-  const r = await runShell({
-    script: 'tar -czf "$OUT" -C "$SRC" .',
-    shell: "bash",
-    cwd: tmpdir(),
-    env: { PATH: process.env.PATH ?? "", OUT: out, SRC: src },
-  });
-  expect(r.code).toBe(0);
-  return new Uint8Array(await readFile(out));
-}
+/**
+ * Real gzipped tarballs, embedded so the suite needs no filesystem of its
+ * own to produce bytes. Each was made with
+ * `tar --owner=0 --group=0 --mtime=@0 --sort=name -czf` over the tree its
+ * name describes; extraction below runs the real `tar`.
+ */
+const tarball = (base64: string): Uint8Array => new Uint8Array(Buffer.from(base64, "base64"));
+
+/** `o-r-ccccccc/file.txt` = "content" — the GitHub single-wrapper shape. */
+const WRAPPED_TB = "H4sIAAAAAAAAA+3S0QrCIBSA4fMovsCcw6nPE2ODICaYQY/fqqvGWAQzqP3fzRH0QvnVtRRnJiG4x5zM58I6eNeKcuWvJnI550NSSlKMee3cu/0fpetYpap7KvQXPu7fNKGx9P+G1/7D8dTrfN34ofeo3rcr/cOsv7XBiDLbXmPZzvt3ccz9+I8vAwAAAAAAAAAAAAAA2IcbvGawBgAoAAA=";
+/** `a.txt` = "1", `b.txt` = "2" — two top-level entries. */
+const TWO_TB = "H4sIAAAAAAAAA+3TSwqDMBSF4buUrCAPyWM9dgOCRnD5xtKJUuygxLT4f5MbSAYnHK42Up0tUgrPWRznm3OKwYsK9aOJzFPuR6VkHIZ89u7T/Z/Sptd5qfuzrdQY/Un/bt+/s7Er/duqqV5u3r9rHQBNafP4zf0P7P8VutYBAAAAAAAAAAAAAADA11aiM229ACgAAA==";
+/** `only.txt` = "1" — a single top-level *file*, not a directory. */
+const ONE_TB = "H4sIAAAAAAAAA+3RTQqAIBCG4TmKJ7Ck1PO0j4QyqNv3s4kiCgKJ6H02M6CLb/h0JsnlM+/tOmfHebJ7Z0tRNn00kb6LVauUtCHEq3937x+ls9DUo45DwuOWUp0rL/o3+/6NKZwVlaeLtPl5/+btAAAAAAAAAAAAAAAAAAAemwDJjzcgACgAAA==";
 
 describe("makeTreeProvider", () => {
   it("downloads once per commit and unwraps the single wrapping directory", async () => {
     // GitHub tarballs wrap the tree in one `owner-repo-shortsha/` directory.
-    const bytes = await tarballOf({ "o-r-ccccccc/file.txt": "content" });
     let downloads = 0;
     const provide = makeTreeProvider(async () => {
       downloads++;
-      return bytes;
+      return tarball(WRAPPED_TB);
     }, runShell);
     const first = await provide(WORKSPACE);
     const second = await provide(WORKSPACE);
     expect(second).toBe(first);
     expect(downloads).toBe(1);
-    expect(await readFile(join(first as string, "file.txt"), "utf8")).toBe("content");
+    expect(await fileIs(`${first}/file.txt`, "content")).toBe(true);
   });
 
   it("returns the extraction root when there is no single wrapping directory", async () => {
-    const bytes = await tarballOf({ "a.txt": "1", "b.txt": "2" });
-    const provide = makeTreeProvider(async () => bytes, runShell);
+    const provide = makeTreeProvider(async () => tarball(TWO_TB), runShell);
     const tree = await provide(WORKSPACE);
-    expect(await readFile(join(tree as string, "a.txt"), "utf8")).toBe("1");
+    expect(await fileIs(`${tree}/a.txt`, "1")).toBe(true);
   });
 
   it("does not unwrap a single top-level file", async () => {
-    const bytes = await tarballOf({ "only.txt": "1" });
-    const provide = makeTreeProvider(async () => bytes, runShell);
+    const provide = makeTreeProvider(async () => tarball(ONE_TB), runShell);
     const tree = await provide(WORKSPACE);
-    expect(await readFile(join(tree as string, "only.txt"), "utf8")).toBe("1");
+    expect(await fileIs(`${tree}/only.txt`, "1")).toBe(true);
   });
 
   it("hands a failed download through as null", async () => {
@@ -756,49 +782,22 @@ describe("makeTreeProvider", () => {
 // ------------------------------------------------- the fleet's detect, whole
 
 describe("the whole path, tarball to job outputs", () => {
+  // The workspace: `o-r-cccc/package.json` = "{}". The callee:
+  // `tk-tc-dddd/actions/detect/action.yml`, a composite whose one step runs
+  // `"$GITHUB_ACTION_PATH/../scan.sh" >> "$GITHUB_OUTPUT"`, next to
+  // `actions/scan.sh` (mode 755, preserved by tar) which echoes
+  // `languages=["typescript"]` when `$GITHUB_WORKSPACE/package.json` exists
+  // — reading the workspace to decide, the way detect.py does.
+  const WORKSPACE_TB = "H4sIAAAAAAAAA+3S3QrCIBiAYS/FG5hz5s/1yIigIMOto+jeWzuKUYtoFtH7nCgo+MGrqkVxehCCG9fBdL2zD95ZIV350YQ4dn3MUoqcUj9379n5j1J1qnLVDsp9hJf7N42xhv6fcNP/ENtd3KzVtkv7Rd+4RvXezvQ3k/4rZ7SQetEpHvjz/qfztycAAAAAAAAAAAAAAADAOy7gGhoPACgAAA==";
+  const CALLEE_TB = "H4sIAAAAAAAAA+2UXWvbMBSGfZ1fcaYVerPYzocd2FghK6MtHU1YHXaRhKI6SqzVlY0lFYrxf5/ldhnLkowwJ2XbeW5k6RzrlfTqyHasveOW9Hpe1Zastmu+e77XtcDb/9IsS0tFMwArSxK1Le938b8U21F3TRU2ZyX7ugo7+99qeb0O+n8IfvKfhoonQtZ9D3b3v9PuoP8HYa3/M6ZYqGq7Brv73/Vc9P8gbPP/qWs/3sd/pmFM9f3uRv+7fnvFf99zPQvcera4nf/c/5xkWkjyFnKiJReL8ouEyX2aSK4YeQNEKpaa+DgnfGaiMqSiCkQsjs3ALZWRGWDioZrnU//q7NoEjvIcuEi1knZMxULTBZNQFKQok0tVkzIhR2cXwfnow03/NLgYXN0M+8G5Y9uOUbFlNCFwcgI/sgajYDgKJoQUUzPL0+yV6lKh6s3YnOpYGQlSmMxEqw2pDzTW7Ptyq93alfjzHytLL4qXdqxe1tb/8+HXpVG9/97m97/ter+8/60W1v8heP3K0TJzbrlwyvoFU8sNPocxNOewrLovg8+X18P+6UcnpeFdWQv2V5kIAtN3oCImGgAsjBI4XpbK+zFRjymTYcZTRabHDRZLti6tDM1546UPAUEQBEEQBEEQBEEQBEEQBEEQ5B/iG0SKYN8AKAAA";
+
   it("executes a detect-shaped job from a real tarball through real steps", async () => {
     // The fleet's actual shape, miniaturized: checkout, a skipped hermetic
     // step, a published step running a script from the *callee's* tree over
     // the *caller's* workspace, outputs coalescing past the skipped step.
-    const manifest = compositeAction(
-      [
-        {
-          id: "scan",
-          shell: "bash",
-          env: { LANGS: "${{ inputs.languages }}" },
-          run: '"$GITHUB_ACTION_PATH/../scan.sh" >> "$GITHUB_OUTPUT"',
-        },
-      ],
-      {
-        inputs: { languages: { default: "" } },
-        outputs: { languages: { value: "${{ steps.scan.outputs.languages }}" } },
-      },
-    );
-    const scanScript =
-      "#!/usr/bin/env bash\n" +
-      // Reads the workspace to decide, the way detect.py does.
-      'if [ -f "$GITHUB_WORKSPACE/package.json" ]; then\n' +
-      '  echo \'languages=["typescript"]\'\n' +
-      "else\n" +
-      "  echo 'languages=[]'\n" +
-      "fi\n";
-    const workspaceBytes = await tarballOf({ "o-r-cccc/package.json": "{}" });
-    const calleeBytes = await tarballOf({
-      "tk-tc-dddd/actions/detect/action.yml": manifest,
-      "tk-tc-dddd/actions/scan.sh": scanScript,
-    });
     const download = async (src: WorkflowSource) =>
-      src.repo === "r" ? workspaceBytes : calleeBytes;
+      tarball(src.repo === "r" ? WORKSPACE_TB : CALLEE_TB);
     const provide = makeTreeProvider(download, runShell);
-    // The scripts need the execute bit, which tar preserved from the fixture
-    // write; set it explicitly so the fixture does not depend on umask.
-    const calleeTree = await provide({ owner: "tk", repo: "tc", ref: REMOTE_SHA, sha: REMOTE_SHA });
-    await runShell({
-      script: 'chmod +x "$T/actions/scan.sh"',
-      shell: "bash",
-      cwd: tmpdir(),
-      env: { PATH: process.env.PATH ?? "", T: calleeTree as string },
-    });
     const ex = makeExecutor({
       grants: [{ repo: "tk/tc", jobs: ["detect"] }],
       workspace: WORKSPACE,
