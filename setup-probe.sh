@@ -120,5 +120,28 @@ git commit -am "pr9: touch both remote-probe paths"
 git push origin pr9-remote
 mkpr pr9-remote main "pr9: remote reusable workflow probes"
 
+# PRs 10-12: the stacked-PR probe for issue #30, replicating dirsql#1002's
+# stack shape. Recorded result: stack-aware dispatch never engaged here (it is
+# a per-repo rollout), so shape alone does not change dispatch. PR11, the
+# parent, stays open so PRs 10 and 12 keep the stack shape.
+git checkout -b stack-base main
+echo stackchange >> src/app.txt
+git commit -am "pr30: advance stack-base past main"
+git push origin stack-base
+
+git checkout -b pr30-head stack-base
+echo childchange >> src/app.txt
+git commit -am "pr30: child change"
+git push origin pr30-head
+mkpr pr30-head stack-base "pr30: stacked PR, base even with main"
+
+mkpr stack-base main "pr30 parent: stack-base into main"
+
+git checkout -b pr30-head2 stack-base
+echo childchange2 >> src/app.txt
+git commit -am "pr30: second child, opened after the parent"
+git push origin pr30-head2
+mkpr pr30-head2 stack-base "pr30 child2: opened under an existing parent PR"
+
 git checkout main
 echo "done"

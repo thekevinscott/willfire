@@ -17,16 +17,16 @@
     "prediction"
   ],
   "type": "module",
-  "main": "dist/predict.js",
-  "types": "dist/predict.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/predict.d.ts",
-      "default": "./dist/predict.js"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     }
   },
   "bin": {
-    "willfire": "dist/predict.js"
+    "willfire": "dist/cli.js"
   },
   "files": [
     "dist"
@@ -36,7 +36,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "predict": "tsx src/predict.ts",
+    "predict": "tsx src/cli.ts",
     "prepare": "pnpm build",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",

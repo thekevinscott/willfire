@@ -40,6 +40,13 @@ in order to make an entry look decided. It is job-level only: `Entry` is a
 closed union and the workflow-level variant has no `unknown`, because every
 workflow-level verdict is decidable. Do not widen it back.
 
+## Comments
+
+A comment earns its place by stating what the code cannot: a constraint, a
+workaround's cause, a verified external behavior. One or two lines. No
+narrative comments, no doc-comment essays, no restating the diff or the PR
+description. When in doubt, delete it.
+
 ## Consumers
 
 `thekevinscott/pr-monitor` gates the fleet on willfire's predicted run set. A

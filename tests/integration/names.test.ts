@@ -16,7 +16,7 @@ import {
   parseUses,
   type SourceRef,
   type WorkflowSource,
-} from "../../src/predict.js";
+} from "../../src/index.js";
 
 /**
  * A workflow from the probe tree, read rather than restated.
