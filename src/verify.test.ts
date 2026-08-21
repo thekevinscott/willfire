@@ -5,20 +5,20 @@
 // stand-in for the workflow-run queries — then re-imports the module and reads
 // back what it printed and the code it exited with.
 //
-// `./predict.js` is mocked because it is the collaborator this script is being
-// isolated from; its own behavior is covered in `predict.test.ts`.
+// `./index.js` is mocked because it is the collaborator this script is being
+// isolated from; its own behavior is covered in `predict/predict.test.ts`.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { jobName } from "./predict.js";
-import type { Entry, JobEntry, WorkflowEntry } from "./predict.js";
+import { jobName } from "./index.js";
+import type { Entry, JobEntry, WorkflowEntry } from "./index.js";
 
 const hoisted = vi.hoisted(() => ({
   makeOctokit: vi.fn(),
   predict: vi.fn(),
 }));
 
-vi.mock("./predict.js", async () => {
-  const actual = await vi.importActual<typeof import("./predict.js")>("./predict.js");
+vi.mock("./index.js", async () => {
+  const actual = await vi.importActual<typeof import("./index.js")>("./index.js");
   return { ...actual, makeOctokit: hoisted.makeOctokit, predict: hoisted.predict };
 });
 
