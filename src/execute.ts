@@ -36,7 +36,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { evaluate, evaluateValue, UNKNOWN, type Scope, type Val } from "./expr.js";
-import type { ResolveRef, SourceRef, WorkflowSource } from "./predict.js";
+import type { ResolveRef, SourceRef, WorkflowSource } from "./types.js";
 
 /**
  * Permission to execute named jobs from one repo's workflows.

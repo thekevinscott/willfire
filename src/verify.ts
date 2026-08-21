@@ -6,7 +6,7 @@
 // and the job entries inside each run (skipped jobs included).
 
 import { Octokit } from "@octokit/rest";
-import { isJobEntry, makeOctokit, predict } from "./predict.js";
+import { isJobEntry, makeOctokit, predict } from "./index.js";
 
 async function actualEntries(octokit: Octokit, repo: string, prNumber: number) {
   const [owner, name] = repo.split("/");
