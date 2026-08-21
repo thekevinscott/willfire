@@ -22,3 +22,9 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: thekevinscott/pr-monitor@v1
+        with:
+          # conventions.yml fans its jobs out over a matrix its `detect` job
+          # computes, so the gate must execute `detect` (it lives in the
+          # testing-conventions repo) to resolve the predicted set. Removable
+          # once pr-monitor derives grants itself (thekevinscott/pr-monitor#25).
+          execute: thekevinscott/testing-conventions:detect
