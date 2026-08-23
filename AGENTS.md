@@ -6,6 +6,13 @@ expression language that job `if:` conditions use), and `src/verify.ts` (a
 script that diffs a prediction against what GitHub actually dispatched). `README.md` describes the model; this file is the
 operating contract for working in the repo.
 
+## Goals
+
+@GOALS.md holds Kevin's design goals. They are settled and they outrank
+everything below: when this contract and a goal disagree, the goal wins and the
+contract is wrong. Read them before proposing a change to verdict logic, to the
+gate's config, or to how a red gate gets repaired.
+
 ## Local commands
 
 | | |
