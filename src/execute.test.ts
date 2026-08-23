@@ -19,7 +19,7 @@ import {
   type ExecDeps,
   type ExecOutcome,
 } from "./execute.js";
-import type { WorkflowSource } from "./predict.js";
+import type { WorkflowSource } from "./types.js";
 
 const SHA = "c".repeat(40);
 const REMOTE_SHA = "d".repeat(40);
