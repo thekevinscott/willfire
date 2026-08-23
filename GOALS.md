@@ -1,32 +1,17 @@
 # Goals
 
-Kevin's design goals for willfire, the gate it feeds, and the repos that gate
-runs in. They are settled. Everything else — the agent contract, issue policy,
-review practice — is downstream of this file. Changing the list is Kevin's call
-alone, and the numbering is stable because issues and reviews cite it.
+Design goals for willfire. Everything else is downstream of these goals.
 
-1. **Exactness.** The prediction is the set of check names GitHub will create,
-   character for character, one entry per matrix combination. Not a superset,
-   not approximately.
+1. **Exactness.** The prediction is exactly the set of check names GitHub will create, character for character, one entry per matrix combination.
 2. **Divergence either direction is red.** No third state, no tolerated
    bucket, no escape hatch.
-3. **No repo knowledge in willfire.** It is a general tool. It must not encode
-   any consumer's internals — not testing-conventions, not its script paths.
-   Mechanism lives in willfire; policy comes from outside.
-4. **Never interpret shell.** Don't read `run:` text to infer what it does.
-   Run it and capture what comes out.
-5. **Execute, don't reimplement.** Where behavior lives as code in another
-   repo, run that code at the commit its `uses:` reference resolves to. One
-   implementation, two call sites, cannot drift.
-6. **Fail closed and honestly.** An entry that cannot be resolved stays
+3. **No repo knowledge in willfire.** `willfire` is a general tool and must not encode any consumer's internals. No hard coded repositories.
+4. **Never interpret shell.** Don't read `run:` text to infer what it does. Run it and capture what comes out. Where behavior lives as code in another repo, run that code at the commit its `uses:` reference resolves to.
+5. **Fail closed and honestly.** An entry that cannot be resolved stays
    unresolved and the gate stays red, with a reason naming what failed. Never
    guess to make an entry look decided.
-7. **One concern per issue and per PR.**
-8. **As little config as possible.** The gate should work by reading what is
-   already true, not by being told.
-9. **No SHA pins.** Don't pin an action, dependency, or tag to a SHA — not as
-   a repair, not to hold a version still. Breakage from upstream is fixed
-   forward, in the thing that broke.
+8. **As little config as possible.** If the tool can be designed in such a way as to not require config, that is preferred. The best is no config, the second best is as little as possible.
+9. **No SHA pins.** Never pin an action, dependency, or tag to a SHA.
 
 ## What these rule out
 
