@@ -10,8 +10,8 @@ Design goals for willfire. Everything else is downstream of these goals.
 5. **Fail closed and honestly.** An entry that cannot be resolved stays
    unresolved and the gate stays red, with a reason naming what failed. Never
    guess to make an entry look decided.
-8. **As little config as possible.** If the tool can be designed in such a way as to not require config, that is preferred. The best is no config, the second best is as little as possible.
-9. **No SHA pins.** Never pin an action, dependency, or tag to a SHA.
+6. **As little config as possible.** If the tool can be designed in such a way as to not require config, that is preferred. The best is no config, the second best is as little as possible.
+7. **No SHA pins.** Never pin an action, dependency, or tag to a SHA.
 
 ## What these rule out
 
