@@ -7,29 +7,21 @@
 // src/names.test.ts.
 
 import type { Octokit } from "@octokit/rest";
-import { parse as parseYaml } from "yaml";
-import { jobName } from "../entries/jobName.js";
 import type { Scope } from "../expr/val.js";
-import { expandJobs } from "../jobs/expandJobs.js";
-import { workflowDispatches } from "../triggers/workflowDispatches.js";
 import { finalizePrediction } from "./finalizePrediction.js";
 import { makeLiveExecutor } from "./makeLiveExecutor.js";
+import { makeReader } from "./makeReader.js";
+import { hasSkipInstruction } from "./skipInstruction.js";
 import { sourceKey } from "./sourceKey.js";
 import { stackTargetRef } from "./stackTargetRef.js";
+import { workflowEntries } from "./workflowEntries.js";
 import type {
   Ctx,
   DraftEntry,
-  FetchWorkflow,
   Prediction,
   PredictOptions,
-  ResolveRef,
-  Workflow,
-  WorkflowReader,
   WorkflowSource,
 } from "../types.js";
-
-const SKIP_RE = /\[(skip ci|ci skip|no ci|skip actions|actions skip)\]/i;
-const SKIP_TRAILER_RE = /^skip-checks:\s*true/im;
 
 export async function predict(
   octokit: Octokit,
@@ -72,9 +64,8 @@ export async function predict(
     ...base,
     ref: headSha,
   });
-  const headMsg = headCommit.commit.message;
 
-  if (SKIP_RE.test(headMsg) || SKIP_TRAILER_RE.test(headMsg)) {
+  if (hasSkipInstruction(headCommit.commit.message)) {
     return finalizePrediction(
       [],
       "head commit message contains a skip instruction",
@@ -82,68 +73,12 @@ export async function predict(
     );
   }
 
-  // A `uses:` naming a tag is the same lookup from every caller that writes it,
-  // so resolve each `owner/repo@ref` once. Misses are cached too: a ref that
-  // cannot be resolved will not start resolving on the second ask.
-  const refCache = new Map<string, string | null>();
-  const resolveRef: ResolveRef = async (src) => {
-    const key = sourceKey(src);
-    const hit = refCache.get(key);
-    if (hit !== undefined) return hit;
-    let sha: string | null;
-    try {
-      const { data } = await octokit.rest.repos.getCommit({
-        owner: src.owner,
-        repo: src.repo,
-        ref: src.ref,
-      });
-      sha = data.sha;
-    } catch {
-      // Deleted tag, private repo, rate limit, network: all one answer here.
-      // The caller turns it into an `unknown` entry rather than throwing.
-      sha = null;
-    }
-    refCache.set(key, sha);
-    if (sha != null) sources.set(key, { ...src, sha });
-    return sha;
-  };
-
-  // One callee is commonly reached from several callers — a fleet repo calls
-  // the same `testing-conventions@v0` from eight workflows — so remember what
-  // each `owner/repo/path@sha` resolved to, misses included.
-  const cache = new Map<string, string | null>();
-  const fetchWorkflow: FetchWorkflow = async (path, src) => {
-    // Keyed and fetched on the commit, never the ref that named it. Two callers
-    // writing `@v0` and `@abc123` for the same commit are one read, and a tag
-    // that moves mid-prediction cannot hand back two different files.
-    const key = `${src.owner}/${src.repo}/${path}@${src.sha}`;
-    const hit = cache.get(key);
-    if (hit !== undefined) return hit;
-    let content: string | null;
-    try {
-      const { data } = await octokit.rest.repos.getContent({
-        owner: src.owner,
-        repo: src.repo,
-        path,
-        ref: src.sha,
-        mediaType: { format: "raw" },
-      });
-      content = data as unknown as string;
-    } catch {
-      // Private, deleted, bad ref, rate limit, network: all one answer here.
-      // The caller turns it into an `unknown` entry rather than throwing.
-      content = null;
-    }
-    cache.set(key, content);
-    return content;
-  };
-
-  const reader: WorkflowReader = { fetchWorkflow, resolveRef };
+  const reader = makeReader(octokit, sources);
 
   // Execution is on by default and costs nothing until a workflow needs it.
   const executor =
     opts.executor === undefined
-      ? makeLiveExecutor(octokit, headSource, resolveRef)
+      ? makeLiveExecutor(octokit, headSource, reader.resolveRef)
       : (opts.executor ?? undefined);
 
   const workflows = await octokit.paginate(octokit.rest.actions.listRepoWorkflows, {
@@ -161,59 +96,8 @@ export async function predict(
 
   const entries: DraftEntry[] = [];
   for (const w of workflows) {
-    const path = w.path;
-    if (!path.startsWith(".github/workflows/")) continue;
-    if (w.state !== "active") {
-      entries.push({
-        workflow: path,
-        job: "*",
-        status: "no-dispatch",
-        reason: `workflow state: ${w.state}`,
-      });
-      continue;
-    }
-    const content = await fetchWorkflow(path, headSource);
-    if (content == null) {
-      // The Actions API keeps listing a workflow as `active` after its file is
-      // deleted. There is no file at head, so there is nothing to dispatch —
-      // the same verdict as the disabled case above, reached a different way.
-      entries.push({
-        workflow: path,
-        job: "*",
-        status: "no-dispatch",
-        reason: "no workflow file at head",
-      });
-      continue;
-    }
-    let wf: Workflow;
-    try {
-      wf = parseYaml(content);
-    } catch (e) {
-      // GitHub creates a run for an unparseable workflow file and concludes it
-      // `startup_failure`. The run exists but has no jobs, so this is a
-      // workflow-level "it dispatches" with nothing to expand.
-      entries.push({
-        workflow: path,
-        job: "*",
-        status: "run",
-        reason: `YAML parse error: ${e}`,
-      });
-      continue;
-    }
-    const [dispatches, reason] = workflowDispatches(wf, ctx);
-    if (!dispatches) {
-      entries.push({ workflow: path, job: "*", status: "no-dispatch", reason });
-      continue;
-    }
-    for (const j of await expandJobs(wf, ctx, reader, headSource, 0, "", true, prFacts, executor)) {
-      entries.push({
-        workflow: path,
-        job: jobName(j.job),
-        checkName: j.checkName,
-        status: j.status,
-        reason: j.reason || reason,
-      });
-    }
+    if (!w.path.startsWith(".github/workflows/")) continue;
+    entries.push(...(await workflowEntries(w, ctx, reader, headSource, prFacts, executor)));
   }
   return finalizePrediction(entries, null, sources);
 }
