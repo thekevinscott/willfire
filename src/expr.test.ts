@@ -414,8 +414,8 @@ describe("fromJSON", () => {
     expect(evaluate("fromJSON('{}')")).toBe(null);
   });
 
-  it("refuses to compare a structure against anything", () => {
-    expect(evaluate("fromJSON('[1]') == '[1]'")).toBe(null);
+  it("compares a structure by instance, so it equals nothing written beside it", () => {
+    expect(evaluate("fromJSON('[1]') == '[1]'")).toBe(false);
   });
 
   it("is unknown on a string it cannot parse", () => {
@@ -528,5 +528,64 @@ describe("tokenizer details", () => {
 
   it("keeps dots and dashes inside one path", () => {
     expect(evaluate("needs.detect-languages.outputs.x == 'y'")).toBe(null);
+  });
+});
+
+describe("index access on fromJSON results", () => {
+  /** The gate putitoutthere's build job actually writes. */
+  const GATE = "fromJSON(needs.plan.outputs.matrix || '[]')[0] != null";
+  const planScope = (matrix: string): Scope => ({
+    needs: { plan: { outputs: { matrix } } },
+  });
+
+  it("decides the fleet's did-the-plan-schedule-anything gate, both ways", () => {
+    expect(evaluate(GATE, planScope('[{"kind":"npm"}]'))).toBe(true);
+    expect(evaluate(GATE, planScope(""))).toBe(false);
+    expect(evaluate(GATE, planScope("[]"))).toBe(false);
+  });
+
+  it("leaves the gate unknown when the plan output is unknown", () => {
+    expect(evaluate(GATE)).toBe(null);
+  });
+
+  it("reads a scalar element as an ordinary comparable value", () => {
+    expect(evaluate("fromJSON('[5]')[0] == 5")).toBe(true);
+    expect(evaluate("fromJSON('{\"k\":\"v\"}')['k'] == 'v'")).toBe(true);
+  });
+
+  it("keeps a structured element structured, one level per bracket", () => {
+    expect(evaluate("fromJSON('[[7]]')[0][0] == 7")).toBe(true);
+  });
+
+  it("reads a missing element as the empty string, the way null reads", () => {
+    // GitHub yields null past the end; null coerces equal to ''.
+    expect(evaluate("fromJSON('[]')[0] == ''")).toBe(true);
+    expect(evaluate("fromJSON('[null]')[0] == null")).toBe(true);
+    expect(evaluate("fromJSON('[]')[0]")).toBe(false);
+  });
+
+  it.each([
+    ["'abc'[0]", "an index into a non-json"],
+    ["fromJSON('[1]')['k']", "a string index into an array"],
+    ["fromJSON('{\"k\":1}')[0]", "a number index into an object"],
+    ["fromJSON('[1]')[needs.x.outputs.y]", "an index that is itself unknown"],
+    ["fromJSON('[1]')[0", "an unclosed bracket"],
+  ] as const)("refuses %s (%s)", (src, _why) => {
+    expect(evaluate(src)).toBe(null);
+  });
+});
+
+describe("comparison against a fromJSON structure", () => {
+  it("decides equality by instance: a structure equals nothing written beside it", () => {
+    // GitHub compares arrays and objects by instance, and two sides of one
+    // comparison are never the same instance.
+    expect(evaluate("fromJSON('[1]') == fromJSON('[1]')")).toBe(false);
+    expect(evaluate("fromJSON('[1]') != null")).toBe(true);
+    expect(evaluate("fromJSON('{}') == ''")).toBe(false);
+    expect(evaluate("'' != fromJSON('{}')")).toBe(true);
+  });
+
+  it("does not order a structure", () => {
+    expect(evaluate("fromJSON('[1]') < 'x'")).toBe(null);
   });
 });
