@@ -13,4 +13,11 @@ describe("skippedDisplayName", () => {
     expect(skippedDisplayName("a", {})).toEqual({ name: "a", resolved: true });
     expect(skippedDisplayName("a", { name: null })).toEqual({ name: "a", resolved: true });
   });
+
+  it("caps the name at GitHub's 100-character display limit", () => {
+    expect(skippedDisplayName("a", { name: "y".repeat(120) })).toEqual({
+      name: `${"y".repeat(97)}...`,
+      resolved: true,
+    });
+  });
 });
