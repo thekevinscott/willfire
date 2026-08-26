@@ -7,3 +7,4 @@ Design goals for `willfire` include:
 1. **Exactness.** The prediction includes exactly the set of CI checks that GitHub CI will run, including one entry per matrix combination, exposed as a list of strings.
 2. **No repo knowledge in willfire.** `willfire` is a general tool and must not encode any consumer's internals or repositories.
 3. **No configuration required.**
+4. **Speed.** The job should execute as fast as is possible. Instant is ideal, and should be strived for.
