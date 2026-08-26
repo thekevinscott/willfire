@@ -4,7 +4,8 @@ import { makeExecutor } from "../execute/makeExecutor.js";
 import { makeTreeProvider } from "../execute/makeTreeProvider.js";
 import { runShell } from "../execute/runShell.js";
 import type { JobExecutor, ProvideTree, RunCommand } from "../execute/types.js";
-import { makeSandboxRunner, SANDBOX_NODE_MAJOR } from "../sandbox.js";
+import { makeSandboxRunner } from "../sandbox/makeSandboxRunner.js";
+import { SANDBOX_NODE_MAJOR } from "../sandbox/sandboxConfig.js";
 import type { ResolveRef, WorkflowSource } from "../types.js";
 
 export interface LiveExecutorOpts {

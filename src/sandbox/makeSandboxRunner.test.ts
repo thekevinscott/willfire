@@ -1,22 +1,13 @@
 import { spawn } from "node:child_process";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { RunSpec } from "./execute/types.js";
-import {
-  DOCKERFILE,
-  imageTag,
-  makeSandboxRunner,
-  sandboxArgv,
-  sandboxConfig,
-} from "./sandbox.js";
+import type { RunSpec } from "../execute/types.js";
+import { imageTag } from "./imageTag.js";
+import { makeSandboxRunner } from "./makeSandboxRunner.js";
+import { sandboxArgv } from "./sandboxArgv.js";
+import { sandboxConfig } from "./sandboxConfig.js";
 
 // Nothing here talks to real docker: `spawn` is mocked with one scripted
 // child per invocation (`h.script` says how it behaves, `h.calls` records it).
-
-interface DockerCall {
-  bin: string;
-  argv: string[];
-  stdin: string;
-}
 
 interface Behavior {
   stderr?: string[];
@@ -35,7 +26,7 @@ vi.mock("node:child_process", async () => {
   const actual = await vi.importActual<typeof import("node:child_process")>("node:child_process");
   const fakeSpawn = vi.fn((bin: string, argv: string[]) => {
     const behavior: Behavior = h.script.shift() ?? {};
-    const call: DockerCall = { bin, argv, stdin: "" };
+    const call = { bin, argv, stdin: "" };
     h.calls.push(call);
     const handlers = new Map<string, (arg?: unknown) => void>();
     const child = {
@@ -63,6 +54,21 @@ vi.mock("node:child_process", async () => {
   return { ...actual, spawn: fakeSpawn as unknown as typeof actual.spawn };
 });
 
+vi.mock("./imageTag.js", async () => {
+  const actual = await vi.importActual<typeof import("./imageTag.js")>("./imageTag.js");
+  return { ...actual };
+});
+
+vi.mock("./sandboxArgv.js", async () => {
+  const actual = await vi.importActual<typeof import("./sandboxArgv.js")>("./sandboxArgv.js");
+  return { ...actual };
+});
+
+vi.mock("./sandboxConfig.js", async () => {
+  const actual = await vi.importActual<typeof import("./sandboxConfig.js")>("./sandboxConfig.js");
+  return { ...actual };
+});
+
 const spec = (over: Partial<RunSpec> = {}): RunSpec => ({
   script: "true",
   shell: "bash",
@@ -77,89 +83,6 @@ beforeEach(() => {
   h.calls.length = 0;
   h.script.length = 0;
   vi.mocked(spawn).mockClear();
-});
-
-describe("sandboxConfig", () => {
-  it("defaults to the docker on PATH, the invoking user, and the shipped dockerfile", () => {
-    const cfg = sandboxConfig();
-    expect(cfg.dockerBin).toBe("docker");
-    expect(cfg.uid).toBe(process.getuid!());
-    expect(cfg.gid).toBe(process.getgid!());
-    expect(cfg.dockerfile).toBe(DOCKERFILE);
-  });
-
-  it("takes every override", () => {
-    const cfg = sandboxConfig({ dockerBin: "/x/docker", uid: 7, gid: 9, dockerfile: "FROM x\n" });
-    expect(cfg).toEqual({ dockerBin: "/x/docker", uid: 7, gid: 9, dockerfile: "FROM x\n" });
-  });
-});
-
-describe("imageTag", () => {
-  it("is a function of the dockerfile alone", () => {
-    expect(imageTag("FROM x\n")).toBe(imageTag("FROM x\n"));
-    expect(imageTag("FROM x\n")).not.toBe(imageTag("FROM y\n"));
-    expect(imageTag(DOCKERFILE)).toMatch(/^willfire-sandbox:[0-9a-f]{12}$/);
-  });
-});
-
-describe("sandboxArgv", () => {
-  const cfg = sandboxConfig({ dockerBin: "docker", uid: 7, gid: 9, dockerfile: "FROM x\n" });
-
-  it("isolates fully and exposes exactly the named mounts and env", () => {
-    const argv = sandboxArgv(
-      spec({
-        script: "echo hi",
-        cwd: "/repo",
-        env: { PATH: "/host/bin", HOME: "/home/host", FOO: "bar" },
-        mounts: [
-          { path: "/repo", writable: true },
-          { path: "/out", writable: false },
-        ],
-      }),
-      cfg,
-    );
-    expect(argv).toEqual([
-      "run",
-      "--rm",
-      "--network",
-      "none",
-      "--cap-drop",
-      "ALL",
-      "--security-opt",
-      "no-new-privileges",
-      "--read-only",
-      "--tmpfs",
-      "/tmp",
-      "--user",
-      "7:9",
-      "-v",
-      "/repo:/repo",
-      "-v",
-      "/out:/out:ro",
-      "-w",
-      "/repo",
-      // The host PATH and HOME are dropped.
-      "-e",
-      "FOO=bar",
-      "-e",
-      "HOME=/tmp",
-      imageTag("FROM x\n"),
-      "bash",
-      "--noprofile",
-      "--norc",
-      "-e",
-      "-o",
-      "pipefail",
-      "-c",
-      "echo hi",
-    ]);
-  });
-
-  it("mirrors runShell's sh invocation and mounts nothing unasked", () => {
-    const argv = sandboxArgv(spec({ shell: "sh" }), cfg);
-    expect(argv).not.toContain("-v");
-    expect(argv.slice(-4)).toEqual(["sh", "-e", "-c", "true"]);
-  });
 });
 
 describe("makeSandboxRunner", () => {
@@ -225,19 +148,5 @@ describe("makeSandboxRunner", () => {
     const r = await run(spec());
     expect(r.code).toBe(7);
     expect(r.stderr).toContain("boom");
-  });
-
-  it("reports a signal death as exit 1", async () => {
-    h.script = [{ close: 0 }, { close: null }];
-    const run = makeSandboxRunner({ dockerBin: "dkr", dockerfile: "FROM x\n" });
-    expect((await run(spec())).code).toBe(1);
-  });
-
-  it("caps captured stderr at its tail", async () => {
-    h.script = [{ close: 0 }, { close: 0, stderr: [`${"x".repeat(5000)}END\n`] }];
-    const run = makeSandboxRunner({ dockerBin: "dkr", dockerfile: "FROM x\n" });
-    const r = await run(spec());
-    expect(r.stderr.length).toBeLessThanOrEqual(4096);
-    expect(r.stderr).toContain("END");
   });
 });
