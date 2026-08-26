@@ -533,6 +533,38 @@ describe("composite actions", () => {
     expect(out.ap).toBe(`${tree}/action`);
   });
 
+  it("mounts a remote composite's whole repo for its run steps, read-only", async () => {
+    // The fleet's detect does exactly this: its run step reads
+    // `$GITHUB_ACTION_PATH/../../../internals/...`, legitimate on a runner
+    // because the whole action repo is checked out. The mount must be the
+    // repo root; `$GITHUB_ACTION_PATH` still names the action's own dir.
+    const specs: RunSpec[] = [];
+    const remote = await tempTree({
+      "actions/c/action.yml": compositeAction([{ shell: "bash", run: "true" }]),
+    });
+    const tree = await tempTree({});
+    const ex = executorOf(
+      { [`o/r@${SHA}`]: tree, [`x/y@${REMOTE_SHA}`]: remote },
+      {
+        runCommand: async (spec) => {
+          specs.push(spec);
+          return { code: 0, stderr: "" };
+        },
+      },
+    );
+    const out = success(
+      await ex.executeJob("detect", { steps: [{ uses: `x/y/actions/c@${REMOTE_SHA}` }] }, {}, {}),
+    );
+    expect(out).toEqual({});
+    const [spec] = specs;
+    expect(spec.env.GITHUB_ACTION_PATH).toBe(`${remote}/actions/c`);
+    expect(spec.mounts).toEqual([
+      { path: tree, writable: true },
+      { path: remote, writable: false },
+      { path: spec.env.GITHUB_OUTPUT.replace(/\/output$/, ""), writable: true },
+    ]);
+  });
+
   it("falls back to a declared default when with: omits the input", async () => {
     const manifest = compositeAction(
       [{ id: "s", shell: "bash", run: 'echo "got=${{ inputs.who }}-${{ inputs.other }}" >> "$GITHUB_OUTPUT"' }],
@@ -823,7 +855,7 @@ describe("node actions", () => {
     expect(out).toEqual({ got: "default-who/x" });
   });
 
-  it("hands the sandbox the workspace, the action dir, and the output dir", async () => {
+  it("hands the sandbox the workspace and the output dir; a local action needs no mount", async () => {
     const specs: RunSpec[] = [];
     const tree = await tempTree({ "action/action.yml": nodeAction("index.js") });
     const ex = executorOf(
@@ -843,9 +875,37 @@ describe("node actions", () => {
     expect(spec.env.WILLFIRE_ACTION_MAIN).toBe(`${tree}/action/index.js`);
     expect(spec.env.GITHUB_REPOSITORY).toBe("o/r");
     expect(spec.env.GITHUB_EVENT_NAME).toBe("pull_request");
+    // The local action lives inside the workspace mount already.
     expect(spec.mounts).toEqual([
       { path: tree, writable: true },
-      { path: `${tree}/action`, writable: false },
+      { path: spec.env.GITHUB_OUTPUT.replace(/\/output$/, ""), writable: true },
+    ]);
+  });
+
+  it("mounts a remote node action's whole repo read-only, not just its dir", async () => {
+    // A real runner checks out the whole action repo under `_actions/`, and
+    // an action's code may reach past its own dir into that checkout.
+    const specs: RunSpec[] = [];
+    const remote = await tempTree({ "actions/n/action.yml": nodeAction("index.js") });
+    const tree = await tempTree({});
+    const ex = executorOf(
+      { [`o/r@${SHA}`]: tree, [`x/y@${REMOTE_SHA}`]: remote },
+      {
+        runCommand: async (spec) => {
+          specs.push(spec);
+          return { code: 0, stderr: "" };
+        },
+      },
+    );
+    const out = success(
+      await ex.executeJob("detect", { steps: [{ uses: `x/y/actions/n@${REMOTE_SHA}` }] }, {}, {}),
+    );
+    expect(out).toEqual({});
+    const [spec] = specs;
+    expect(spec.env.WILLFIRE_ACTION_MAIN).toBe(`${remote}/actions/n/index.js`);
+    expect(spec.mounts).toEqual([
+      { path: tree, writable: true },
+      { path: remote, writable: false },
       { path: spec.env.GITHUB_OUTPUT.replace(/\/output$/, ""), writable: true },
     ]);
   });

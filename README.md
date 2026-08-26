@@ -164,7 +164,7 @@ The steps execute for real — nothing interprets or approximates shell — and
 the code that runs is the PR's own version of itself. What makes that safe to
 do by default is the sandbox: steps run in a docker container with no network,
 none of the host's environment, no credentials, an unprivileged user, and a
-read-only image (`node:24-slim` plus git), with only the workspace tree
+read-only image (`node:24-slim` plus git and python3), with only the workspace tree
 writable. Docker is the one runtime requirement; where it is missing,
 execution fails and the entries that needed it stay `unknown` with the reason
 attached.

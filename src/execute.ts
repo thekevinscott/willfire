@@ -270,6 +270,14 @@ interface WalkCtx {
   hasHistory: boolean;
   /** Set inside a composite action — where `$GITHUB_ACTION_PATH` points. */
   actionPath?: string;
+  /**
+   * The materialized repo a remote action came from — the read-only mount
+   * unit. A real runner checks out the whole action repo, not just the
+   * `uses:` subdirectory, and actions do reach past their own dir
+   * (`$GITHUB_ACTION_PATH/../...`), so the mount must match. Unset for local
+   * `./` actions, which live inside `tree` and need no extra mount.
+   */
+  actionRoot?: string;
   /** Raw `env:` blocks from enclosing scopes, outermost first. */
   envLayers: unknown[];
   deps: ExecDeps;
@@ -362,6 +370,7 @@ async function runUses(
     return err(`${label}: actions nested deeper than ${MAX_ACTION_DEPTH} levels`);
   }
   let actionDir: string;
+  let actionRoot: string | undefined;
   if (uses.startsWith("./")) {
     // Relative to the workspace, hermetic-style: the tree under test carries
     // the action. GitHub resolves it the same way.
@@ -378,6 +387,7 @@ async function runUses(
       return err(`${label}: cannot materialize ${source.owner}/${source.repo}@${sha}`);
     }
     actionDir = target.path === "" ? root : join(root, target.path);
+    actionRoot = root;
   }
   const manifest = await readActionManifest(actionDir);
   if (manifest == null) return err(`${label}: no action.yml under ${uses}`);
@@ -390,7 +400,17 @@ async function runUses(
   const using = action?.runs?.using;
   const nodeUsing = /^node(\d+)$/.exec(String(using));
   if (nodeUsing != null) {
-    return runNodeAction(step, label, uses, action, actionDir, Number(nodeUsing[1]), scope, ctx);
+    return runNodeAction(
+      step,
+      label,
+      uses,
+      action,
+      actionDir,
+      actionRoot,
+      Number(nodeUsing[1]),
+      scope,
+      ctx,
+    );
   }
   if (using !== "composite") {
     // A Docker action is a program with its own runtime and its own view of
@@ -406,6 +426,7 @@ async function runUses(
   const walked = await runSteps(action?.runs?.steps ?? [], childScope, {
     ...ctx,
     actionPath: actionDir,
+    actionRoot,
     depth: ctx.depth + 1,
   });
   if (!walked.ok) return err(`${label} (${uses}): ${walked.reason}`);
@@ -436,6 +457,7 @@ async function runNodeAction(
   uses: string,
   action: any,
   actionDir: string,
+  actionRoot: string | undefined,
   usingMajor: number,
   scope: Scope,
   ctx: WalkCtx,
@@ -486,7 +508,7 @@ async function runNodeAction(
     env,
     mounts: [
       { path: ctx.tree, writable: true },
-      { path: actionDir, writable: false },
+      ...(actionRoot != null ? [{ path: actionRoot, writable: false }] : []),
       { path: outDir, writable: true },
     ],
   });
@@ -547,7 +569,7 @@ async function runRun(
     env,
     mounts: [
       { path: ctx.tree, writable: true },
-      ...(ctx.actionPath != null ? [{ path: ctx.actionPath, writable: false }] : []),
+      ...(ctx.actionRoot != null ? [{ path: ctx.actionRoot, writable: false }] : []),
       { path: outDir, writable: true },
     ],
   });

@@ -15,10 +15,11 @@
  * and `/tmp` is a tmpfs, both so writable mounts under the host's tmpdir keep
  * working and so nothing a step writes survives the run.
  *
- * The image is node:24-slim plus git — enough for `actions/checkout`'s
- * postcondition and every node action — built once from the inline dockerfile
- * and tagged by its hash, so a dockerfile change is a new image and an
- * unchanged one is a cache hit.
+ * The image is node:24-slim plus git and python3 — `actions/checkout`'s
+ * postcondition, every node action, and the interpreters a script on a
+ * GitHub-hosted runner takes for granted — built once from the inline
+ * dockerfile and tagged by its hash, so a dockerfile change is a new image
+ * and an unchanged one is a cache hit.
  */
 
 import { spawn } from "node:child_process";
@@ -34,7 +35,7 @@ import type { RunCommand, RunSpec } from "./execute.js";
 export const SANDBOX_NODE_MAJOR = 24;
 
 export const DOCKERFILE = `FROM node:${SANDBOX_NODE_MAJOR}-slim
-RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates python3 && rm -rf /var/lib/apt/lists/*
 `;
 
 export interface SandboxConfig {
