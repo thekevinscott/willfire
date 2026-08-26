@@ -727,7 +727,7 @@ describe("github.repository as a prediction-wide fact", () => {
   });
 });
 
-describe("execution grants through predict", () => {
+describe("the executor seam through predict", () => {
   const DYNAMIC = JSON.stringify({
     on: "pull_request",
     jobs: {
@@ -739,9 +739,8 @@ describe("execution grants through predict", () => {
       },
     },
   });
-  const GRANT = { execute: [{ repo: "o/r", jobs: ["detect"] }] };
 
-  const coverEntry = async (f: Fixture, opts: Parameters<typeof predict>[3]) => {
+  const coverEntry = async (f: Fixture, opts: Parameters<typeof predict>[3] = {}) => {
     const { entries } = await predict(
       fakeOctokit({ contents: { [WF]: DYNAMIC }, ...f }),
       "o/r",
@@ -752,8 +751,12 @@ describe("execution grants through predict", () => {
     return entries[1];
   };
 
-  it("says which execution failed when the tarball is not served", async () => {
-    const e = await coverEntry({}, GRANT);
+  it("executes by default, and says which execution failed when it does", async () => {
+    // No options at all: the live executor is on. It materializes the
+    // workspace from the tarball endpoint, which this fixture does not serve,
+    // so execution fails before anything would run — and the entry that
+    // needed the outputs names the failure.
+    const e = await coverEntry({});
     expect(e).toMatchObject({
       status: "unknown",
       checkName: null,
@@ -762,18 +765,36 @@ describe("execution grants through predict", () => {
   });
 
   it("says the same when the download yields something tar refuses", async () => {
-    const e = await coverEntry(
-      { tarballs: { [`o/r@${HEAD_SHA}`]: new Uint8Array([1, 2, 3]) } },
-      GRANT,
-    );
+    const e = await coverEntry({ tarballs: { [`o/r@${HEAD_SHA}`]: new Uint8Array([1, 2, 3]) } });
     expect(e).toMatchObject({
       status: "unknown",
       reason: `dynamic matrix; executing 'detect' failed: cannot materialize workspace o/r@${HEAD_SHA}`,
     });
   });
 
-  it("builds no executor for an empty grant list", async () => {
-    const e = await coverEntry({}, { execute: [] });
+  it("turns execution off under executor: null", async () => {
+    const e = await coverEntry({}, { executor: null });
     expect(e).toMatchObject({ status: "unknown", reason: "dynamic matrix" });
+  });
+
+  it("resolves the dynamic matrix through an injected executor", async () => {
+    const executed: string[] = [];
+    const { checkNames } = await predict(
+      fakeOctokit({ contents: { [WF]: DYNAMIC } }),
+      "o/r",
+      1,
+      {
+        executor: {
+          executeJob: async (jobId) => {
+            executed.push(jobId);
+            return { ok: true, outputs: { langs: '["ts","py"]' } };
+          },
+        },
+      },
+    );
+    // Only the job whose outputs a sibling reads was executed, and its
+    // outputs turned the matrix into named entries.
+    expect(executed).toEqual(["detect"]);
+    expect(checkNames).toEqual(["Coverage (py)", "Coverage (ts)", "detect"]);
   });
 });

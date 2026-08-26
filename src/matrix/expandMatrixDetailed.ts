@@ -18,6 +18,21 @@ function axisValues(v: unknown, scope: Scope): unknown[] | null {
   return val.v;
 }
 
+/**
+ * An `include:` or `exclude:` block: a literal list, or an expression that
+ * evaluates to one — `include: ${{ fromJSON(needs.plan.outputs.matrix) }}` is
+ * how a computed plan becomes build legs. Absent means empty; anything that
+ * will not resolve to a list means the matrix cannot be expanded.
+ */
+function comboList(v: unknown, scope: Scope): any[] | null {
+  if (v == null) return [];
+  if (Array.isArray(v)) return v;
+  if (typeof v !== "string") return null;
+  const val = evaluateValue(v, scope);
+  if (val.kind !== "json" || !Array.isArray(val.v)) return null;
+  return val.v;
+}
+
 export function expandMatrixDetailed(strategy: any, scope: Scope = {}): DetailedCombos {
   const matrix = strategy?.matrix;
   if (matrix == null) return [null];
@@ -25,9 +40,9 @@ export function expandMatrixDetailed(strategy: any, scope: Scope = {}): Detailed
   // per-axis form below. It yields include-style entries, not axes, so it is a
   // separate expansion and is not modelled.
   if (typeof matrix === "string") return null;
-  const include: any[] = matrix.include ?? [];
-  const exclude: any[] = matrix.exclude ?? [];
-  if (typeof include === "string" || typeof exclude === "string") return null;
+  const include = comboList(matrix.include, scope);
+  const exclude = comboList(matrix.exclude, scope);
+  if (include == null || exclude == null) return null;
   const axes: Record<string, any[]> = {};
   for (const [k, v] of Object.entries(matrix)) {
     if (k === "include" || k === "exclude") continue;

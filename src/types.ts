@@ -1,4 +1,4 @@
-import type { ExecutionGrant } from "./execute.js";
+import type { JobExecutor } from "./execute.js";
 
 export interface EntryBase {
   workflow: string;
@@ -122,16 +122,17 @@ export interface PredictOptions {
    */
   action?: PrEventAction;
   /**
-   * Jobs willfire may *execute* to resolve what reading cannot — the fleet's
-   * `detect` job, whose outputs feed every dynamic matrix downstream of it.
+   * The executor that resolves what reading cannot — the fleet's `detect`
+   * job, whose outputs feed every dynamic matrix downstream of it.
    *
-   * Off by default, and mechanism only: willfire has no opinion about which
-   * jobs are safe to run. The caller that knows names them, one repo and job
-   * id at a time (see {@link ExecutionGrant}), and an execution that fails
-   * for any reason leaves the dependent entries exactly as unresolved as
-   * they were — with the failure spelled into their reasons.
+   * Omitted, prediction builds the live one: hermetically sandboxed, run only
+   * for jobs some sibling's `needs.*.outputs` read depends on, nothing to
+   * configure. `null` disables execution. Passing a {@link JobExecutor} is a
+   * test seam, not configuration. However execution goes, a job that fails to
+   * execute leaves its dependent entries exactly as unresolved as they were —
+   * with the failure spelled into their reasons.
    */
-  execute?: ExecutionGrant[];
+  executor?: JobExecutor | null;
 }
 
 export interface Ctx {

@@ -1,6 +1,6 @@
 import { parse as parseYaml } from "yaml";
-import { UNKNOWN, type Scope, type Val } from "../expr.js";
-import type { JobExecutor } from "../execute.js";
+import { evaluateValue, UNKNOWN, type Scope, type Val } from "../expr.js";
+import { renderTemplate, type JobExecutor } from "../execute.js";
 import { expandMatrixDetailed } from "../matrix/expandMatrixDetailed.js";
 import { jobDisplayName } from "../names/jobDisplayName.js";
 import { skippedDisplayName } from "../names/skippedDisplayName.js";
@@ -16,19 +16,29 @@ import type {
 } from "../types.js";
 
 /**
- * A `with:` value as the callee will see it.
+ * A `with:` value as the callee will see it, evaluated in the caller's scope.
  *
- * A value carrying `${{ }}` is left unknown rather than evaluated. Resolving
- * it would mean evaluating the caller's own expression context, and every
- * caller in practice passes plain literals — so the reach that would buy is
- * not worth the surface. Unknown here is the same unknown as before this
- * existed; nothing regresses.
+ * A plain literal passes through unchanged. A value carrying `${{ }}` is
+ * evaluated against the caller's own context — after execution that context
+ * can hold real `needs.*.outputs`, which is how a computed value crosses a
+ * call boundary. A value that is exactly one expression keeps the evaluated
+ * type (a `fromJSON(...)` stays a structure); one that mixes expressions into
+ * text renders to a string, all or nothing. Anything unresolvable stays
+ * unknown — the same unknown as before this could evaluate.
  */
-function inputLiteral(raw: unknown): Val {
+function inputValue(raw: unknown, scope: Scope): Val {
   if (raw == null) return { kind: "value", v: "" };
   if (typeof raw === "boolean" || typeof raw === "number") return { kind: "value", v: raw };
-  if (typeof raw === "string") return raw.includes("${{") ? UNKNOWN : { kind: "value", v: raw };
-  return UNKNOWN;
+  if (typeof raw !== "string") return UNKNOWN;
+  if (!raw.includes("${{")) return { kind: "value", v: raw };
+  const t = raw.trim();
+  // Whole-value form: the first `}}` closes the value. `${{a}} x ${{b}}`
+  // fails this test and takes the render path instead.
+  if (t.startsWith("${{") && t.indexOf("}}") === t.length - 2) {
+    return evaluateValue(t.slice(3, -2), prScope(scope));
+  }
+  const rendered = renderTemplate(raw, prScope(scope));
+  return rendered == null ? UNKNOWN : { kind: "value", v: rendered };
 }
 
 /** The `on.workflow_call.inputs` block, tolerating the YAML 1.1 `on` -> true key. */
@@ -50,17 +60,23 @@ function workflowCallInputs(wf: Workflow): Record<string, any> {
  * workflow would be invalid if it were required, and guessing empty would
  * silently decide guards that are not decided.
  */
-function calleeInputs(withBlock: unknown, subWf: Workflow): Record<string, Val> {
+function calleeInputs(
+  withBlock: unknown,
+  subWf: Workflow,
+  scope: Scope,
+): Record<string, Val> {
   const out: Record<string, Val> = {};
   for (const [name, decl] of Object.entries(workflowCallInputs(subWf))) {
     out[name] =
       decl != null && typeof decl === "object" && "default" in decl
-        ? inputLiteral((decl as Record<string, unknown>)["default"])
+        ? // Defaults live in the callee, where the caller's context does not
+          // reach; they are evaluated against nothing.
+          inputValue((decl as Record<string, unknown>)["default"], {})
         : UNKNOWN;
   }
   if (withBlock != null && typeof withBlock === "object") {
     for (const [name, raw] of Object.entries(withBlock as Record<string, unknown>)) {
-      out[name] = inputLiteral(raw);
+      out[name] = inputValue(raw, scope);
     }
   }
   return out;
@@ -81,6 +97,25 @@ const SHA_RE = /^[0-9a-f]{40}$/i;
 
 const isSha = (ref: string): boolean => SHA_RE.test(ref);
 
+const NEEDS_OUTPUTS_RE = /needs\s*\.\s*([A-Za-z_][A-Za-z0-9_-]*)\s*\.\s*outputs\b/g;
+
+/**
+ * The jobs some sibling reads outputs from — the only jobs worth executing.
+ * Matching over the serialized job catches every read site — a matrix, an
+ * `if:`, a `with:`, an env value — without modelling any of them. A false
+ * positive (the text appears where it is never evaluated) costs one sandboxed
+ * run whose outputs nothing consumes; it cannot change a verdict.
+ */
+function neededJobIds(jobs: Record<string, Workflow>): Set<string> {
+  const needed = new Set<string>();
+  for (const job of Object.values(jobs)) {
+    for (const m of JSON.stringify(job ?? {}).matchAll(NEEDS_OUTPUTS_RE)) {
+      needed.add(m[1]);
+    }
+  }
+  return needed;
+}
+
 export async function expandJobs(
   wf: Workflow,
   ctx: Ctx,
@@ -96,20 +131,24 @@ export async function expandJobs(
   const jobs: Record<string, Workflow> = wf.jobs ?? {};
   const statuses: Record<string, string> = {};
 
-  // Execute what the caller granted, before anything reads `needs`. The
-  // grant names the repo the workflow *file* lives in, so a granted callee
-  // job fires here in the recursion, where `source` is that repo. The guard
-  // is the same `evalIf` the main loop applies — same scope, same verdict —
-  // so a job is executed exactly when it is predicted to run. A job that
-  // would not run is not executed; a job that fails to execute contributes
-  // nothing but its reason, which `execNote` threads into the entries that
-  // needed it.
+  // Execute the jobs some sibling's `needs.*.outputs` read depends on, before
+  // anything reads `needs`. Selection is derived, never configured: a job is
+  // worth executing exactly when another job consumes what it computes, and
+  // that fact is written in the workflow itself. The guard is the same
+  // `evalIf` the main loop applies — same scope, same verdict — so a job is
+  // executed exactly when it is predicted to run. A job that would not run is
+  // not executed; a job that fails to execute contributes nothing but its
+  // reason, which `execNote` threads into the entries that needed it.
   let scoped = scope;
   const execFailures: Record<string, string> = {};
   if (executor != null) {
+    const needed = neededJobIds(jobs);
     for (const [jobId, jobRaw] of Object.entries(jobs)) {
-      if (!executor.granted(source, jobId)) continue;
+      if (!needed.has(jobId)) continue;
       const job = jobRaw ?? {};
+      // A reusable-call job has no steps of its own to run; its outputs come
+      // from the callee's jobs, which execution does not model.
+      if ("uses" in job) continue;
       if (evalIf(job.if, scoped) !== "run") continue;
       const res = await executor.executeJob(jobId, job, wf, scoped);
       if (res.ok) {
@@ -215,7 +254,10 @@ export async function expandJobs(
               // `inputs.*` changes at the call boundary; `github.*` does not.
               // A callee's jobs run in the caller's repo, so the facts seeded
               // at the top of the prediction stay true all the way down.
-              subScope = { inputs: calleeInputs(job.with, subWf ?? {}), github: scoped.github };
+              subScope = {
+                inputs: calleeInputs(job.with, subWf ?? {}, scoped),
+                github: scoped.github,
+              };
             } catch (e) {
               failure = `YAML parse error in ${uses}: ${e}`;
             }
