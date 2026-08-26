@@ -6,6 +6,10 @@ expression language that job `if:` conditions use), and `src/verify.ts` (a
 script that diffs a prediction against what GitHub actually dispatched). `README.md` describes the model; this file is the
 operating contract for working in the repo.
 
+## Goals
+
+@GOALS.md
+
 ## Local commands
 
 | | |
