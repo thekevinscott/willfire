@@ -1,4 +1,4 @@
-import { UNKNOWN, type Scope, type Val } from "../expr.js";
+import { UNKNOWN, type Scope, type Val } from "../expr/val.js";
 import { renderTemplate } from "./renderTemplate.js";
 
 /**

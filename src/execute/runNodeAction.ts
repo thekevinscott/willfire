@@ -1,7 +1,7 @@
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { Scope } from "../expr.js";
+import type { Scope } from "../expr/val.js";
 import { bindActionInputs } from "./bindActionInputs.js";
 import { parseGithubOutput } from "./parseGithubOutput.js";
 import { renderEnvLayer } from "./renderEnvLayer.js";

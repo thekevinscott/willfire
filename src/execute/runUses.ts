@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
-import type { Scope } from "../expr.js";
+import type { Scope } from "../expr/val.js";
 import type { WorkflowSource } from "../types.js";
 import { bindActionInputs } from "./bindActionInputs.js";
 import { parseActionUses } from "./parseActionUses.js";

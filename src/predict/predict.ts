@@ -9,7 +9,7 @@
 import type { Octokit } from "@octokit/rest";
 import { parse as parseYaml } from "yaml";
 import { jobName } from "../entries/jobName.js";
-import type { Scope } from "../expr.js";
+import type { Scope } from "../expr/val.js";
 import { expandJobs } from "../jobs/expandJobs.js";
 import { workflowDispatches } from "../triggers/workflowDispatches.js";
 import { finalizePrediction } from "./finalizePrediction.js";

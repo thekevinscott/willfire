@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { Scope } from "../expr/val.js";
 import { expandMatrixDetailed } from "./expandMatrixDetailed.js";
 
 describe("expandMatrixDetailed", () => {
@@ -26,7 +27,8 @@ describe("expandMatrixDetailed", () => {
 
   it("resolves an include: written as an expression through the scope", () => {
     // The plan-job shape: `include: ${{ fromJSON(needs.plan.outputs.matrix) }}`.
-    const scope = {
+    // Typed as the expr module's own Scope — the seam this function takes.
+    const scope: Scope = {
       needs: { plan: { outputs: { matrix: '[{"os":"linux"},{"os":"mac"}]' } } },
     };
     expect(

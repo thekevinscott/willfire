@@ -1,5 +1,5 @@
 import { expandMatrixDetailed } from "./expandMatrixDetailed.js";
-import type { Scope } from "../expr.js";
+import type { Scope } from "../expr/val.js";
 import type { Combo } from "../types.js";
 
 /** Return list of matrix combination dicts, or null if dynamic. */

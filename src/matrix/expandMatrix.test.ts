@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { Scope } from "../expr/val.js";
 import { expandMatrix } from "./expandMatrix.js";
 
 describe("expandMatrix", () => {
@@ -25,7 +26,8 @@ describe("expandMatrix", () => {
     // The fleet shape: the axis is the values another job computed, and they
     // are knowable exactly when the scope carries that job's outputs.
     const strategy = { matrix: { language: "${{ fromJSON(needs.d.outputs.langs) }}" } };
-    const scope = { needs: { d: { outputs: { langs: '["typescript","rust"]' } } } };
+    // Typed as the expr module's own Scope — the seam expandMatrix takes.
+    const scope: Scope = { needs: { d: { outputs: { langs: '["typescript","rust"]' } } } };
     expect(expandMatrix(strategy, scope)).toEqual([
       { language: "typescript" },
       { language: "rust" },

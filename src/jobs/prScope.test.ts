@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { Scope } from "../expr/val.js";
 import { prScope } from "./prScope.js";
 
 describe("prScope", () => {
@@ -13,7 +14,9 @@ describe("prScope", () => {
   });
 
   it("keeps every other key the caller stated", () => {
-    expect(prScope({ inputs: { x: { kind: "value", v: "v" } } })).toEqual({
+    // In and out are the expr module's own Scope, not structural copies.
+    const caller: Scope = { inputs: { x: { kind: "value", v: "v" } } };
+    expect(prScope(caller)).toEqual({
       inputs: { x: { kind: "value", v: "v" } },
       github: { event_name: "pull_request" },
     });

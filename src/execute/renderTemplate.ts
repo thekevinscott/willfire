@@ -1,4 +1,5 @@
-import { evaluateValue, type Scope } from "../expr.js";
+import { evaluateValue } from "../expr/evaluateValue.js";
+import type { Scope } from "../expr/val.js";
 
 /**
  * Render every `${{ }}` to literal text, or null when any cannot be settled —

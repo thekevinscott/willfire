@@ -1,4 +1,4 @@
-import type { Scope } from "../expr.js";
+import type { Scope } from "../expr/val.js";
 import type { ResolveRef, WorkflowSource } from "../types.js";
 
 /** A host path a sandboxed runner must expose inside, at the same path. */

@@ -1,4 +1,4 @@
-import type { Scope } from "../expr.js";
+import type { Scope } from "../expr/val.js";
 import { renderTemplate } from "./renderTemplate.js";
 import { err, type Res } from "./result.js";
 import type { WalkCtx } from "./walkCtx.js";

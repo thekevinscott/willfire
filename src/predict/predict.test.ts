@@ -776,23 +776,24 @@ describe("the executor seam through predict", () => {
   });
 
   it("resolves the dynamic matrix through an injected executor", async () => {
-    const executed: string[] = [];
+    const executed: { jobId: string; repo: unknown }[] = [];
     const { checkNames } = await predict(
       fakeOctokit({ contents: { [WF]: DYNAMIC } }),
       "o/r",
       1,
       {
         executor: {
-          executeJob: async (jobId) => {
-            executed.push(jobId);
+          executeJob: async (jobId, _job, _wf, scope) => {
+            executed.push({ jobId, repo: scope.github?.repository });
             return { ok: true, outputs: { langs: '["ts","py"]' } };
           },
         },
       },
     );
-    // Only the job whose outputs a sibling reads was executed, and its
-    // outputs turned the matrix into named entries.
-    expect(executed).toEqual(["detect"]);
+    // Only the job whose outputs a sibling reads was executed, it was handed
+    // the scope predict seeded (`github.repository`), and its outputs turned
+    // the matrix into named entries.
+    expect(executed).toEqual([{ jobId: "detect", repo: "o/r" }]);
     expect(checkNames).toEqual(["Coverage (py)", "Coverage (ts)", "detect"]);
   });
 });

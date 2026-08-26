@@ -1,4 +1,4 @@
-import type { Scope } from "../expr.js";
+import type { Scope } from "../expr/val.js";
 import type { WorkflowSource } from "../types.js";
 import { renderTemplate } from "./renderTemplate.js";
 import { runSteps } from "./runSteps.js";

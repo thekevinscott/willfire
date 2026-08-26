@@ -1,4 +1,5 @@
-import { evaluate, type Scope } from "../expr.js";
+import { evaluate } from "../expr/evaluate.js";
+import type { Scope } from "../expr/val.js";
 import { err, type Res } from "./result.js";
 import { runRun } from "./runRun.js";
 import { runUses } from "./runUses.js";
