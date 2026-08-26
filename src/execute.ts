@@ -70,12 +70,21 @@ export function parseGrant(spec: string): ExecutionGrant | null {
   return { repo, jobs };
 }
 
+/** A host path a sandboxed runner must expose inside, at the same path. */
+export interface Mount {
+  path: string;
+  writable: boolean;
+}
+
 /** One shell invocation, fully specified — nothing is inherited implicitly. */
 export interface RunSpec {
   script: string;
   shell: "bash" | "sh";
   cwd: string;
   env: Record<string, string>;
+  /** For runners that isolate: what of the host this run may see. A direct
+   * shell ignores this — it already sees everything. */
+  mounts?: Mount[];
 }
 
 export interface RunResult {
