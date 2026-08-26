@@ -140,7 +140,7 @@ type Tok =
   | { t: "path"; v: string }
   | { t: "op"; v: string };
 
-const OPS = ["&&", "||", "==", "!=", "<=", ">=", "!", "<", ">", "(", ")", ","];
+const OPS = ["&&", "||", "==", "!=", "<=", ">=", "!", "<", ">", "(", ")", "[", "]", ","];
 
 /**
  * Split a condition into tokens, or return null if it contains something this
@@ -277,7 +277,18 @@ class Parser {
     return this.primary();
   }
 
+  /** An atom plus any `[...]` accesses hanging off it, tightest-binding. */
   private primary(): Val {
+    let v = this.atom();
+    while (this.eatOp("[")) {
+      const idx = this.or();
+      if (!this.eatOp("]")) return UNKNOWN;
+      v = indexVal(v, idx);
+    }
+    return v;
+  }
+
+  private atom(): Val {
     const t = this.peek();
     if (t == null) return UNKNOWN;
     if (t.t === "op" && t.v === "(") {
@@ -374,6 +385,34 @@ function negate(b: boolean | null): boolean | null {
 }
 
 /**
+ * `a[i]` on what `fromJSON` produced — a number into an array, a string into
+ * an object. This is how a workflow asks "did the computed matrix schedule
+ * anything": `fromJSON(needs.plan.outputs.matrix || '[]')[0] != null`.
+ *
+ * GitHub yields `null` for an index that is not there, and null models here
+ * as the empty string, the same way the null literal does — falsy, and equal
+ * to `''`, which is the coercion GitHub applies. An element that is itself an
+ * array or object stays a `json`; a scalar element is an ordinary value.
+ * Everything else — an index into a non-json, an index that is not itself a
+ * concrete value, a string into an array — is unknown, never a guess.
+ */
+function indexVal(base: Val, idx: Val): Val {
+  if (base.kind !== "json") return UNKNOWN;
+  if (idx.kind !== "value") return UNKNOWN;
+  let el: unknown;
+  if (Array.isArray(base.v)) {
+    if (typeof idx.v !== "number") return UNKNOWN;
+    el = base.v[idx.v];
+  } else {
+    if (typeof idx.v !== "string") return UNKNOWN;
+    el = base.v[idx.v];
+  }
+  if (el == null) return { kind: "value", v: "" };
+  if (typeof el === "object") return { kind: "json", v: el as unknown[] };
+  return { kind: "value", v: el as string | number | boolean };
+}
+
+/**
  * `A && B`. Short-circuits from either side: a falsy left decides it, and so
  * does a falsy right, because a truthy left would then yield the falsy right.
  * Only "left unknown, right not falsy" is genuinely undecided.
@@ -407,6 +446,15 @@ function coalesceOr(left: Val, right: Val): Val {
  * would add risk without adding reach. Mixed types return unknown.
  */
 function compare(op: string, left: Val, right: Val): Val {
+  // GitHub compares arrays and objects by instance, and the two sides of one
+  // written comparison are never the same instance — so a `json` on either
+  // side decides equality outright, whatever the other side is: `==` is
+  // false, `!=` is true. Ordering on one is not a question with an answer.
+  if (left.kind === "json" || right.kind === "json") {
+    if (op === "==") return asBool(false);
+    if (op === "!=") return asBool(true);
+    return UNKNOWN;
+  }
   if (left.kind !== "value" || right.kind !== "value") return UNKNOWN;
   const a = left.v;
   const b = right.v;
