@@ -1,20 +1,15 @@
-import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import type { Scope } from "../expr/val.js";
-import type { WorkflowSource } from "../types.js";
 import { bindActionInputs } from "./bindActionInputs.js";
-import { parseActionUses } from "./parseActionUses.js";
+import { compositeOutputs } from "./compositeOutputs.js";
 import { readActionManifest } from "./readActionManifest.js";
-import { renderTemplate } from "./renderTemplate.js";
+import { resolveActionDir } from "./resolveActionDir.js";
 import { err, type Res } from "./result.js";
 import { runCheckout } from "./runCheckout.js";
 import { runNodeAction } from "./runNodeAction.js";
 import { runSetupNode } from "./runSetupNode.js";
 import { runSteps } from "./runSteps.js";
 import { CHECKOUT_RE, MAX_ACTION_DEPTH, SETUP_NODE_RE, type WalkCtx } from "./walkCtx.js";
-
-/** `ref` is already a commit id, so resolving it is a no-op. */
-const SHA_RE = /^[0-9a-f]{40}$/i;
 
 /** A `uses:` step: a runner-provided postcondition, an action to run, or a stop. */
 export async function runUses(
@@ -24,31 +19,24 @@ export async function runUses(
   ctx: WalkCtx,
 ): Promise<Res<Record<string, string>>> {
   const uses: string = step.uses;
-  if (CHECKOUT_RE.test(uses)) return runCheckout(step, label, ctx);
-  if (SETUP_NODE_RE.test(uses)) return runSetupNode(step, label, scope, ctx);
+  if (CHECKOUT_RE.test(uses)) {
+    return runCheckout(step, label, ctx);
+  }
+  if (SETUP_NODE_RE.test(uses)) {
+    return runSetupNode(step, label, scope, ctx);
+  }
   if (ctx.depth + 1 > MAX_ACTION_DEPTH) {
     return err(`${label}: actions nested deeper than ${MAX_ACTION_DEPTH} levels`);
   }
-  let actionDir: string;
-  let actionRoot: string | undefined;
-  if (uses.startsWith("./")) {
-    actionDir = join(ctx.tree, uses.slice(2));
-  } else {
-    const target = parseActionUses(uses);
-    if (target == null) return err(`${label}: unresolvable uses: ${uses}`);
-    const { ref } = target.source;
-    const sha = SHA_RE.test(ref) ? ref : await ctx.deps.resolveRef(target.source);
-    if (sha == null) return err(`${label}: cannot resolve ref for ${uses}`);
-    const source: WorkflowSource = { ...target.source, sha };
-    const root = await ctx.deps.provideTree(source);
-    if (root == null) {
-      return err(`${label}: cannot materialize ${source.owner}/${source.repo}@${sha}`);
-    }
-    actionDir = target.path === "" ? root : join(root, target.path);
-    actionRoot = root;
+  const dir = await resolveActionDir(uses, label, ctx);
+  if (!dir.ok) {
+    return dir;
   }
+  const { actionDir, actionRoot } = dir.v;
   const manifest = await readActionManifest(actionDir);
-  if (manifest == null) return err(`${label}: no action.yml under ${uses}`);
+  if (manifest == null) {
+    return err(`${label}: no action.yml under ${uses}`);
+  }
   let action: any;
   try {
     action = parseYaml(manifest);
@@ -85,16 +73,8 @@ export async function runUses(
     actionRoot,
     depth: ctx.depth + 1,
   });
-  if (!walked.ok) return err(`${label} (${uses}): ${walked.reason}`);
-  // Every declared output must land; a partial map would be a lie.
-  const outScope: Scope = { ...childScope, steps: walked.v };
-  const outputs: Record<string, string> = {};
-  for (const [name, decl] of Object.entries(action.outputs ?? {})) {
-    const raw = (decl as Record<string, unknown> | null)?.["value"];
-    if (raw == null) return err(`${label}: output '${name}' of ${uses} has no value`);
-    const rendered = renderTemplate(String(raw), outScope);
-    if (rendered == null) return err(`${label}: cannot resolve output '${name}' of ${uses}`);
-    outputs[name] = rendered;
+  if (!walked.ok) {
+    return err(`${label} (${uses}): ${walked.reason}`);
   }
-  return { ok: true, v: outputs };
+  return compositeOutputs(action, uses, label, { ...childScope, steps: walked.v });
 }
