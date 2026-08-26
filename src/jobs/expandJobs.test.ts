@@ -91,6 +91,19 @@ describe("job expansion", () => {
       expect(entries[1].reason).toBe("needs 'a' which is skipped");
     });
 
+    it("propagates a skip transitively down the chain", async () => {
+      const entries = await expand({
+        a: { if: false },
+        b: { needs: ["a"] },
+        c: { needs: ["b"] },
+      });
+      expect(entries[2]).toMatchObject({
+        job: "c",
+        status: "skipped",
+        reason: "needs 'b' which is skipped",
+      });
+    });
+
     it("accepts a scalar `needs`", async () => {
       const entries = await expand({ a: { if: false }, b: { needs: "a" } });
       expect(entries[1]).toMatchObject({ job: "b", status: "skipped" });
