@@ -10,6 +10,19 @@ import { runShell } from "../execute.js";
 import { makeLiveExecutor } from "./makeLiveExecutor.js";
 import type { WorkflowSource } from "../types.js";
 
+const hoisted = vi.hoisted(() => ({
+  makeCloneProvider: vi.fn(),
+}));
+
+// Mostly the real module: the providers and `runShell` behave for real, and
+// the spy on `makeCloneProvider` is where the wiring — which token reaches a
+// clone — becomes observable.
+vi.mock("../execute.js", async () => {
+  const actual = await vi.importActual<typeof import("../execute.js")>("../execute.js");
+  hoisted.makeCloneProvider.mockImplementation(actual.makeCloneProvider);
+  return { ...actual, makeCloneProvider: hoisted.makeCloneProvider };
+});
+
 const SHA = "c".repeat(40);
 const WORKSPACE: WorkflowSource = { owner: "o", repo: "r", ref: SHA, sha: SHA };
 
@@ -91,13 +104,20 @@ describe("makeLiveExecutor", () => {
   it("reads clone auth from the environment only when no token is given", () => {
     // Construction is where the token is read; nothing here executes, so the
     // sandbox runner these defaults build stays unprovisioned and free.
+    hoisted.makeCloneProvider.mockClear();
     vi.stubEnv("GH_TOKEN", "from-gh-token");
     vi.stubEnv("GITHUB_TOKEN", "from-github-token");
     makeLiveExecutor(octokitOf({}), WORKSPACE, resolveRef);
     vi.stubEnv("GH_TOKEN", undefined);
     makeLiveExecutor(octokitOf({}), WORKSPACE, resolveRef);
     vi.stubEnv("GITHUB_TOKEN", undefined);
-    const ex = makeLiveExecutor(octokitOf({}), WORKSPACE, resolveRef);
-    expect(typeof ex.executeJob).toBe("function");
+    makeLiveExecutor(octokitOf({}), WORKSPACE, resolveRef);
+    makeLiveExecutor(octokitOf({}), WORKSPACE, resolveRef, { token: "explicit" });
+    expect(hoisted.makeCloneProvider.mock.calls.map((c) => c[1])).toEqual([
+      "from-gh-token",
+      "from-github-token",
+      null,
+      "explicit",
+    ]);
   });
 });

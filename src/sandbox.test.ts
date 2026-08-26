@@ -1,7 +1,5 @@
-import { chmod, mkdtemp, readFile, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { spawn } from "node:child_process";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { RunSpec } from "./execute.js";
 import {
   DOCKERFILE,
@@ -12,12 +10,63 @@ import {
 } from "./sandbox.js";
 
 /**
- * Nothing here talks to real docker. The pure pieces — config resolution, the
- * tag, the argv — are asserted as data, and the runner is driven against a
- * stub `docker` script that records every invocation to a log and fakes
- * `image inspect` / `build` / `run` with files in its directory. What the
- * stub's log shows *is* what a real daemon would have been asked to do.
+ * Nothing here talks to real docker — or any subprocess. `spawn` is mocked
+ * with a scripted child per invocation: each entry in `h.script` says what
+ * that docker call writes to stderr and how it exits, and `h.calls` records
+ * what it was asked to do. The pure pieces — config resolution, the tag, the
+ * argv — are asserted as data.
  */
+
+interface DockerCall {
+  bin: string;
+  argv: string[];
+  stdin: string;
+}
+
+interface Behavior {
+  stderr?: string[];
+  /** Exit code; `null` is a signal death. Omitted means 0. */
+  close?: number | null;
+  /** Fire the spawn-failure path (no binary) instead of running. */
+  error?: true;
+}
+
+const h = vi.hoisted(() => ({
+  calls: [] as { bin: string; argv: string[]; stdin: string }[],
+  script: [] as { stderr?: string[]; close?: number | null; error?: true }[],
+}));
+
+vi.mock("node:child_process", async () => {
+  const actual = await vi.importActual<typeof import("node:child_process")>("node:child_process");
+  const fakeSpawn = vi.fn((bin: string, argv: string[]) => {
+    const behavior: Behavior = h.script.shift() ?? {};
+    const call: DockerCall = { bin, argv, stdin: "" };
+    h.calls.push(call);
+    const handlers = new Map<string, (arg?: unknown) => void>();
+    const child = {
+      stderr: { on: (ev: string, cb: (d: unknown) => void) => handlers.set(`stderr:${ev}`, cb) },
+      stdin: {
+        write: (d: string) => {
+          call.stdin += d;
+        },
+        end: () => {},
+      },
+      on: (ev: string, cb: (arg?: unknown) => void) => handlers.set(ev, cb),
+    };
+    // After the synchronous return, so every handler is registered first.
+    queueMicrotask(() => {
+      if (behavior.error) {
+        handlers.get("error")?.(new Error("spawn ENOENT"));
+        return;
+      }
+      handlers.get("spawn")?.();
+      for (const chunk of behavior.stderr ?? []) handlers.get("stderr:data")?.(chunk);
+      handlers.get("close")?.(behavior.close === undefined ? 0 : behavior.close);
+    });
+    return child as unknown as ReturnType<typeof actual.spawn>;
+  });
+  return { ...actual, spawn: fakeSpawn as unknown as typeof actual.spawn };
+});
 
 const spec = (over: Partial<RunSpec> = {}): RunSpec => ({
   script: "true",
@@ -27,38 +76,13 @@ const spec = (over: Partial<RunSpec> = {}): RunSpec => ({
   ...over,
 });
 
-/** A fake docker binary in a fresh directory; returns both paths. */
-async function stubDocker(): Promise<{ bin: string; dir: string }> {
-  const dir = await mkdtemp(join(tmpdir(), "willfire-stub-"));
-  const bin = join(dir, "docker");
-  const script = `#!/bin/sh
-printf '%s\\n' "$*" >> "${dir}/log"
-case "$1" in
-  image)
-    if test -f "${dir}/image-exists"; then exit 0; else exit 1; fi
-    ;;
-  build)
-    cat > "${dir}/dockerfile-received"
-    if test -f "${dir}/fail-build"; then
-      echo "stub build broke" >&2
-      exit 1
-    fi
-    touch "${dir}/image-exists"
-    ;;
-  run)
-    if test -f "${dir}/run-signal"; then kill -9 "$$"; fi
-    if test -f "${dir}/run-stderr"; then cat "${dir}/run-stderr" >&2; fi
-    if test -f "${dir}/run-exit"; then exit "$(cat "${dir}/run-exit")"; fi
-    ;;
-esac
-`;
-  await writeFile(bin, script);
-  await chmod(bin, 0o755);
-  return { bin, dir };
-}
+const kinds = (): string[] => h.calls.map((c) => c.argv[0]);
 
-const logLines = async (dir: string): Promise<string[]> =>
-  (await readFile(join(dir, "log"), "utf8")).trim().split("\n");
+beforeEach(() => {
+  h.calls.length = 0;
+  h.script.length = 0;
+  vi.mocked(spawn).mockClear();
+});
 
 describe("sandboxConfig", () => {
   it("defaults to the docker on PATH, the invoking user, and the shipped dockerfile", () => {
@@ -148,44 +172,44 @@ describe("makeSandboxRunner", () => {
   it("touches nothing until a spec runs", () => {
     // Safe with real defaults precisely because provisioning is lazy.
     expect(typeof makeSandboxRunner()).toBe("function");
+    expect(spawn).not.toHaveBeenCalled();
   });
 
   it("provisions on first use — inspect, miss, build from the inline dockerfile — then runs", async () => {
-    const { bin, dir } = await stubDocker();
-    const run = makeSandboxRunner({ dockerBin: bin, dockerfile: "FROM x\n" });
+    h.script = [{ close: 1 }, {}, {}];
+    const run = makeSandboxRunner({ dockerBin: "dkr", dockerfile: "FROM x\n" });
     const r = await run(spec({ env: { FOO: "bar" } }));
     expect(r.code).toBe(0);
-    expect(await readFile(join(dir, "dockerfile-received"), "utf8")).toBe("FROM x\n");
-    const lines = await logLines(dir);
     const tag = imageTag("FROM x\n");
-    expect(lines[0]).toBe(`image inspect ${tag}`);
-    expect(lines[1]).toBe(`build -t ${tag} -`);
-    expect(lines[2]).toContain(`${tag} bash`);
-    expect(lines[2]).toContain("-e FOO=bar");
+    expect(h.calls.map((c) => c.bin)).toEqual(["dkr", "dkr", "dkr"]);
+    expect(h.calls[0].argv).toEqual(["image", "inspect", tag]);
+    expect(h.calls[1].argv).toEqual(["build", "-t", tag, "-"]);
+    // The dockerfile arrives on stdin; the inspect got none.
+    expect(h.calls[1].stdin).toBe("FROM x\n");
+    expect(h.calls[0].stdin).toBe("");
+    expect(h.calls[2].argv).toEqual(
+      sandboxArgv(spec({ env: { FOO: "bar" } }), sandboxConfig({ dockerfile: "FROM x\n" })),
+    );
   });
 
   it("provisions once, however many specs run", async () => {
-    const { bin, dir } = await stubDocker();
-    const run = makeSandboxRunner({ dockerBin: bin, dockerfile: "FROM x\n" });
+    h.script = [{ close: 1 }, {}, {}, {}];
+    const run = makeSandboxRunner({ dockerBin: "dkr", dockerfile: "FROM x\n" });
     await run(spec());
     await run(spec());
-    const kinds = (await logLines(dir)).map((l) => l.split(" ")[0]);
-    expect(kinds).toEqual(["image", "build", "run", "run"]);
+    expect(kinds()).toEqual(["image", "build", "run", "run"]);
   });
 
   it("skips the build when the image already exists", async () => {
-    const { bin, dir } = await stubDocker();
-    await writeFile(join(dir, "image-exists"), "");
-    const run = makeSandboxRunner({ dockerBin: bin, dockerfile: "FROM x\n" });
+    h.script = [{ close: 0 }, {}];
+    const run = makeSandboxRunner({ dockerBin: "dkr", dockerfile: "FROM x\n" });
     await run(spec());
-    const kinds = (await logLines(dir)).map((l) => l.split(" ")[0]);
-    expect(kinds).toEqual(["image", "run"]);
+    expect(kinds()).toEqual(["image", "run"]);
   });
 
   it("reports a failed build as 125 with the reason, and never runs the spec", async () => {
-    const { bin, dir } = await stubDocker();
-    await writeFile(join(dir, "fail-build"), "");
-    const run = makeSandboxRunner({ dockerBin: bin, dockerfile: "FROM x\n" });
+    h.script = [{ close: 1 }, { close: 1, stderr: ["step 1/1\n", "stub build broke\n"] }];
+    const run = makeSandboxRunner({ dockerBin: "dkr", dockerfile: "FROM x\n" });
     const r = await run(spec());
     expect(r.code).toBe(125);
     expect(r.stderr).toContain("cannot build sandbox image");
@@ -193,11 +217,11 @@ describe("makeSandboxRunner", () => {
     // The failure is remembered: the next spec fails the same way without
     // retrying a build that already failed.
     expect((await run(spec())).code).toBe(125);
-    const kinds = (await logLines(dir)).map((l) => l.split(" ")[0]);
-    expect(kinds).toEqual(["image", "build"]);
+    expect(kinds()).toEqual(["image", "build"]);
   });
 
   it("reports a missing docker binary as a provisioning failure", async () => {
+    h.script = [{ error: true }, { error: true }];
     const run = makeSandboxRunner({ dockerBin: "/nonexistent/docker", dockerfile: "FROM x\n" });
     const r = await run(spec());
     expect(r.code).toBe(125);
@@ -205,29 +229,22 @@ describe("makeSandboxRunner", () => {
   });
 
   it("hands back the container's exit code and stderr tail", async () => {
-    const { bin, dir } = await stubDocker();
-    await writeFile(join(dir, "image-exists"), "");
-    await writeFile(join(dir, "run-exit"), "7");
-    await writeFile(join(dir, "run-stderr"), "boom\n");
-    const run = makeSandboxRunner({ dockerBin: bin, dockerfile: "FROM x\n" });
+    h.script = [{ close: 0 }, { close: 7, stderr: ["boom\n"] }];
+    const run = makeSandboxRunner({ dockerBin: "dkr", dockerfile: "FROM x\n" });
     const r = await run(spec());
     expect(r.code).toBe(7);
     expect(r.stderr).toContain("boom");
   });
 
   it("reports a signal death as exit 1", async () => {
-    const { bin, dir } = await stubDocker();
-    await writeFile(join(dir, "image-exists"), "");
-    await writeFile(join(dir, "run-signal"), "");
-    const run = makeSandboxRunner({ dockerBin: bin, dockerfile: "FROM x\n" });
+    h.script = [{ close: 0 }, { close: null }];
+    const run = makeSandboxRunner({ dockerBin: "dkr", dockerfile: "FROM x\n" });
     expect((await run(spec())).code).toBe(1);
   });
 
   it("caps captured stderr at its tail", async () => {
-    const { bin, dir } = await stubDocker();
-    await writeFile(join(dir, "image-exists"), "");
-    await writeFile(join(dir, "run-stderr"), `${"x".repeat(5000)}END\n`);
-    const run = makeSandboxRunner({ dockerBin: bin, dockerfile: "FROM x\n" });
+    h.script = [{ close: 0 }, { close: 0, stderr: [`${"x".repeat(5000)}END\n`] }];
+    const run = makeSandboxRunner({ dockerBin: "dkr", dockerfile: "FROM x\n" });
     const r = await run(spec());
     expect(r.stderr.length).toBeLessThanOrEqual(4096);
     expect(r.stderr).toContain("END");
