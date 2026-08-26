@@ -1,33 +1,9 @@
 /**
- * Execute a job the caller granted, to learn what static reading cannot.
- *
- * A dynamic matrix — `language: ${{ fromJSON(needs.detect.outputs.x) }}` — is
- * the values another job computes at runtime. No amount of reading the YAML
- * yields them; the fleet's `detect` job runs a script over the repo tree and
- * writes what it finds to `$GITHUB_OUTPUT`. So this module runs that job the
- * way the runner would: materialize the tree at the pinned commit, walk the
- * steps in order, execute each `run:` under its declared shell and env, and
- * assemble the job's `outputs:` map from what the steps actually wrote.
- *
- * Three rules keep this honest:
- *
- * 1. **Nothing runs without a grant.** willfire has no opinion about which
- *    jobs are safe to execute; the caller names them, one repo and job id at
- *    a time, and everything else stays as unresolved as it was.
- * 2. **Run it, never interpret it.** The `run:` script is handed to the shell
- *    the step declares, with the env it declares. What lands in
- *    `$GITHUB_OUTPUT` is the answer; no shell text is ever parsed for meaning.
- * 3. **Anything off the modelled path is a hard stop with a reason.** A
- *    JavaScript action, an undecidable `if:`, a `${{ }}` that will not
- *    resolve, a step that exits non-zero — each fails the execution and says
- *    what it hit, and the consumers of that job's outputs stay unresolved.
- *    Guessing is the one move this module never makes.
- *
- * `actions/checkout` is the deliberate exception to rule 2. It is provided by
- * the runner, not run from its repo, and its whole postcondition — the
- * workspace tree at the commit under test — is something the executor has
- * already satisfied by materializing the tree. A bare checkout is therefore
- * recorded as done; a checkout *with inputs* is not modelled and stops.
+ * Execute a job whose outputs another job reads, the way the runner would:
+ * materialize the tree, walk the steps, read what they wrote to
+ * `$GITHUB_OUTPUT`. Two invariants: run it, never interpret it (no shell text
+ * is parsed for meaning), and anything off the modelled path is a hard stop
+ * with a reason — never a guess.
  */
 
 import { spawn } from "node:child_process";
@@ -39,44 +15,6 @@ import { evaluate } from "./expr/evaluate.js";
 import { evaluateValue } from "./expr/evaluateValue.js";
 import { UNKNOWN, type Scope, type Val } from "./expr/val.js";
 import type { ResolveRef, SourceRef, WorkflowSource } from "./types.js";
-
-/**
- * Permission to execute named jobs from one repo's workflows.
- *
- * `repo` is the repo the *workflow file* lives in — for a fleet consumer
- * calling `testing-conventions/.github/workflows/testing-conventions.yml@v0`,
- * that is `thekevinscott/testing-conventions`, whatever repo the PR is on.
- * The grant is deliberately this narrow: a job id alone would execute
- * whatever any transitively-reached workflow happens to call by that name.
- */
-export interface ExecutionGrant {
-  /** `owner/name` of the repo whose workflow defines the jobs. */
-  repo: string;
-  /** Job ids within that repo's workflows that may be executed. */
-  jobs: string[];
-}
-
-/** `owner/repo:job1,job2` as the CLI spells a grant. */
-export function parseGrant(spec: string): ExecutionGrant | null {
-  const colon = spec.indexOf(":");
-  if (colon <= 0) {
-    return null;
-  }
-  const repo = spec.slice(0, colon);
-  const parts = repo.split("/");
-  if (parts.length !== 2 || parts.some((p) => p === "")) {
-    return null;
-  }
-  const jobs = spec
-    .slice(colon + 1)
-    .split(",")
-    .map((s) => s.trim())
-    .filter((s) => s !== "");
-  if (jobs.length === 0) {
-    return null;
-  }
-  return { repo, jobs };
-}
 
 /** A host path a sandboxed runner must expose inside, at the same path. */
 export interface Mount {
@@ -97,23 +35,27 @@ export interface RunSpec {
 
 export interface RunResult {
   code: number;
-  /** Captured so a failing step can say *why* in its reason. */
   stderr: string;
 }
 
 export type RunCommand = (spec: RunSpec) => Promise<RunResult>;
 
 /**
- * Materialize a repo tree at a commit and return its root directory, or null
- * when it cannot be had. Must not throw.
+ * Materialize a repo tree at a commit, or null when it cannot be had. Must not
+ * throw. `history: true` demands full git history (the `fetch-depth: 0`
+ * postcondition); a provider that cannot supply it answers null.
  */
-export type ProvideTree = (source: WorkflowSource) => Promise<string | null>;
+export type ProvideTree = (
+  source: WorkflowSource,
+  opts?: { history?: boolean },
+) => Promise<string | null>;
 
-/** The three reaches into the world an execution needs, bundled for injection. */
 export interface ExecDeps {
   provideTree: ProvideTree;
   runCommand: RunCommand;
   resolveRef: ResolveRef;
+  /** The node major `runCommand`'s world provides; asking for another is refused. */
+  nodeMajor: number;
 }
 
 export type ExecOutcome =
@@ -121,20 +63,15 @@ export type ExecOutcome =
   | { ok: false; reason: string };
 
 /**
- * What expansion asks of an executor. The caller decides *whether* a job
- * runs with its own scope — the executor only decides what running it
- * yields. Step-level guards inside the job are evaluated here, against the
- * fixed facts of the run (notably `github.repository`, which the fleet's
- * hermetic-vs-published guards are written against).
+ * The caller decides *whether* a job runs; the executor only decides what
+ * running it yields.
  */
 export interface JobExecutor {
-  granted(source: WorkflowSource, jobId: string): boolean;
   executeJob(jobId: string, job: any, wf: any, scope: Scope): Promise<ExecOutcome>;
 }
 
 // ------------------------------------------------------------------ plumbing
 
-/** Internal result: a value or the reason there is none. */
 type Res<T> = { ok: true; v: T } | { ok: false; reason: string };
 
 const err = (reason: string): { ok: false; reason: string } => ({ ok: false, reason });
@@ -142,12 +79,10 @@ const err = (reason: string): { ok: false; reason: string } => ({ ok: false, rea
 const SHA_RE = /^[0-9a-f]{40}$/i;
 
 /**
- * Render every `${{ }}` in a template to its literal text, or null when any
- * of them cannot be settled. Null rather than a partial render: a script with
- * a hole in it is a different program, and running a different program is the
- * exact lie rule 2 exists to prevent.
+ * Render every `${{ }}` to literal text, or null when any cannot be settled —
+ * a partial render would be a different program.
  */
-function renderTemplate(text: string, scope: Scope): string | null {
+export function renderTemplate(text: string, scope: Scope): string | null {
   let failed = false;
   const out = text.replace(/\$\{\{(.*?)\}\}/g, (_whole, inner) => {
     const val = evaluateValue(String(inner), scope);
@@ -180,10 +115,8 @@ function renderEnvLayer(layer: unknown, scope: Scope): Res<Record<string, string
 }
 
 /**
- * The `$GITHUB_OUTPUT` file format: `name=value` lines, or a
- * `name<<DELIMITER … DELIMITER` heredoc for multi-line values. Anything else
- * fails the parse — the runner fails the step on a malformed line, so
- * tolerating one here would invent outputs a real run never had.
+ * `name=value` lines or `name<<DELIMITER` heredocs. Anything else fails the
+ * parse, as the runner fails the step on a malformed line.
  */
 export function parseGithubOutput(text: string): Record<string, string> | null {
   const out: Record<string, string> = {};
@@ -225,9 +158,8 @@ export function parseGithubOutput(text: string): Record<string, string> | null {
 // ------------------------------------------------------------------- actions
 
 /**
- * A step-level `uses:` naming another repo: `owner/repo[/path]@ref`. Unlike a
- * reusable-workflow reference the path may be empty — an action commonly
- * lives at the repo root. Expressions and `docker://` images return null.
+ * `owner/repo[/path]@ref` — unlike a reusable-workflow reference the path may
+ * be empty, since an action commonly lives at the repo root.
  */
 function parseActionUses(uses: string): { path: string; source: SourceRef } | null {
   if (uses.includes("${{") || uses.startsWith("docker://")) {
@@ -248,25 +180,21 @@ function parseActionUses(uses: string): { path: string; source: SourceRef } | nu
   return { path: rest.join("/"), source: { owner, repo, ref } };
 }
 
-/** Read `action.yml` (or `.yaml`) from a directory, or null if neither exists. */
 async function readActionManifest(dir: string): Promise<string | null> {
   for (const name of ["action.yml", "action.yaml"]) {
     try {
       return await readFile(join(dir, name), "utf8");
     } catch {
-      // fall through to the next spelling
+      /* try the other spelling */
     }
   }
   return null;
 }
 
 /**
- * What `inputs.*` means inside a composite action: the caller's `with:`
- * values over the action's declared defaults, everything a string — action
- * inputs are untyped, and an input nobody set is the empty string, not a
- * hole. A value whose `${{ }}` cannot be rendered stays unknown rather than
- * failing here: it only matters if a step actually reads it, and the read is
- * where that failure is honest.
+ * Caller's `with:` over declared defaults, everything a string — action inputs
+ * are untyped, and an unset input is the empty string. An unrenderable value
+ * stays unknown; it only fails if a step reads it.
  */
 function bindActionInputs(action: any, withBlock: unknown, scope: Scope): Record<string, Val> {
   const bind = (raw: unknown): Val => {
@@ -296,31 +224,32 @@ function bindActionInputs(action: any, withBlock: unknown, scope: Scope): Record
 
 // ----------------------------------------------------------------- step walk
 
-/**
- * A cycle guard, not a fidelity claim: a composite action that includes
- * itself would otherwise recurse forever. No granted job in practice nests
- * past one level.
- */
+/** A cycle guard, not a fidelity claim — a self-including composite would recurse forever. */
 const MAX_ACTION_DEPTH = 4;
 
 const CHECKOUT_RE = /^actions\/checkout@/;
 
-/** What one walk carries besides the expression scope. */
+const SETUP_NODE_RE = /^actions\/setup-node@/;
+
 interface WalkCtx {
   /** Workspace root: the PR head tree, where every step runs by default. */
   tree: string;
+  /** Whether that tree carries its full git history (a clone, not a tarball). */
+  hasHistory: boolean;
   /** Set inside a composite action — where `$GITHUB_ACTION_PATH` points. */
   actionPath?: string;
+  /**
+   * The whole materialized repo a remote action came from. A real runner
+   * checks out the action's repo, not its `uses:` subdirectory, and actions do
+   * reach past their own dir — so this, not `actionPath`, is the mount unit.
+   */
+  actionRoot?: string;
   /** Raw `env:` blocks from enclosing scopes, outermost first. */
   envLayers: unknown[];
   deps: ExecDeps;
   depth: number;
 }
 
-/**
- * Walk steps in order, growing the `steps` context as each one completes.
- * Returns the finished context, or the reason the walk stopped.
- */
 async function runSteps(
   steps: any[],
   scope: Scope,
@@ -337,11 +266,8 @@ async function runSteps(
         return err(`cannot decide if: for ${label}`);
       }
       if (!verdict) {
-        // A skipped step still occupies its id, with no outputs — that is the
-        // empty string every later read gets, and what `||` coalesces past.
-        if (typeof step.id === "string") {
-          stepsCtx[step.id] = { outputs: {} };
-        }
+        // A skipped step still occupies its id, with no outputs.
+        if (typeof step.id === "string") stepsCtx[step.id] = { outputs: {} };
         continue;
       }
     }
@@ -363,7 +289,7 @@ async function runSteps(
   return { ok: true, v: stepsCtx };
 }
 
-/** A `uses:` step: checkout's postcondition, or a composite action, or a stop. */
+/** A `uses:` step: a runner-provided postcondition, an action to run, or a stop. */
 async function runUses(
   step: any,
   label: string,
@@ -373,20 +299,42 @@ async function runUses(
   const uses: string = step.uses;
   if (CHECKOUT_RE.test(uses)) {
     // Runner-provided, and its postcondition — the head tree at the workspace
-    // path — is already true. But only the bare form: `ref:`, `path:`,
-    // `repository:` each make it a different tree than the one provided.
-    if (step.with != null && Object.keys(step.with).length > 0) {
-      return err(`${label}: actions/checkout with inputs is not modelled`);
+    // path — is already true. Any input beyond `fetch-depth: 0` asks for a
+    // different tree than the one provided.
+    const withKeys = step.with == null ? [] : Object.keys(step.with);
+    if (withKeys.length === 0) return { ok: true, v: {} };
+    if (withKeys.length === 1 && String(step.with["fetch-depth"]) === "0") {
+      // Unmet inside a composite: the pre-scan that picks the tree provider
+      // only reads the job's own steps.
+      if (!ctx.hasHistory) {
+        return err(`${label}: checkout wants history the workspace does not have`);
+      }
+      return { ok: true, v: {} };
     }
-    return { ok: true, v: {} };
+    return err(`${label}: actions/checkout with inputs is not modelled`);
+  }
+  if (SETUP_NODE_RE.test(uses)) {
+    // The execution world ships exactly one node: asking for it is already
+    // satisfied, asking for anything else cannot be.
+    const withKeys = step.with == null ? [] : Object.keys(step.with);
+    if (withKeys.length === 0) return { ok: true, v: {} };
+    if (withKeys.length === 1 && withKeys[0] === "node-version") {
+      const wanted = renderTemplate(String(step.with["node-version"]), scope);
+      if (wanted == null) return err(`${label}: cannot resolve node-version`);
+      const m = /^v?(\d+)(\..*)?$/.exec(wanted.trim());
+      if (m != null && Number(m[1]) === ctx.deps.nodeMajor) return { ok: true, v: {} };
+      return err(
+        `${label}: setup-node wants node ${wanted}; the sandbox has node ${ctx.deps.nodeMajor}`,
+      );
+    }
+    return err(`${label}: setup-node with inputs beyond node-version is not modelled`);
   }
   if (ctx.depth + 1 > MAX_ACTION_DEPTH) {
     return err(`${label}: actions nested deeper than ${MAX_ACTION_DEPTH} levels`);
   }
   let actionDir: string;
+  let actionRoot: string | undefined;
   if (uses.startsWith("./")) {
-    // Relative to the workspace, hermetic-style: the tree under test carries
-    // the action. GitHub resolves it the same way.
     actionDir = join(ctx.tree, uses.slice(2));
   } else {
     const target = parseActionUses(uses);
@@ -404,6 +352,7 @@ async function runUses(
       return err(`${label}: cannot materialize ${source.owner}/${source.repo}@${sha}`);
     }
     actionDir = target.path === "" ? root : join(root, target.path);
+    actionRoot = root;
   }
   const manifest = await readActionManifest(actionDir);
   if (manifest == null) {
@@ -416,11 +365,24 @@ async function runUses(
     return err(`${label}: YAML parse error in ${uses}: ${e}`);
   }
   const using = action?.runs?.using;
+  const nodeUsing = /^node(\d+)$/.exec(String(using));
+  if (nodeUsing != null) {
+    return runNodeAction(
+      step,
+      label,
+      uses,
+      action,
+      actionDir,
+      actionRoot,
+      Number(nodeUsing[1]),
+      scope,
+      ctx,
+    );
+  }
   if (using !== "composite") {
-    // A JavaScript or Docker action is a program with its own runtime and its
-    // own view of the world. Running one is a much larger promise than
-    // running a shell step, and no granted job needs it.
-    return err(`${label}: action ${uses} runs via '${using}'; only composite actions are executed`);
+    return err(
+      `${label}: action ${uses} runs via '${using}'; only composite and node actions are executed`,
+    );
   }
   const childScope: Scope = {
     inputs: bindActionInputs(action, step.with, scope),
@@ -429,13 +391,11 @@ async function runUses(
   const walked = await runSteps(action?.runs?.steps ?? [], childScope, {
     ...ctx,
     actionPath: actionDir,
+    actionRoot,
     depth: ctx.depth + 1,
   });
-  if (!walked.ok) {
-    return err(`${label} (${uses}): ${walked.reason}`);
-  }
-  // The action's declared outputs are its whole surface: each `value:` is
-  // evaluated against the child's own steps, and every one must land.
+  if (!walked.ok) return err(`${label} (${uses}): ${walked.reason}`);
+  // Every declared output must land; a partial map would be a lie.
   const outScope: Scope = { ...childScope, steps: walked.v };
   const outputs: Record<string, string> = {};
   for (const [name, decl] of Object.entries(action.outputs ?? {})) {
@@ -449,6 +409,80 @@ async function runUses(
     }
     outputs[name] = rendered;
   }
+  return { ok: true, v: outputs };
+}
+
+/**
+ * `node <main>` with inputs bound as `INPUT_*` env vars. What lands in
+ * `$GITHUB_OUTPUT` is the whole output surface — a node action's manifest
+ * `outputs:` block is documentation, not a mapping.
+ */
+async function runNodeAction(
+  step: any,
+  label: string,
+  uses: string,
+  action: any,
+  actionDir: string,
+  actionRoot: string | undefined,
+  usingMajor: number,
+  scope: Scope,
+  ctx: WalkCtx,
+): Promise<Res<Record<string, string>>> {
+  if (usingMajor !== ctx.deps.nodeMajor) {
+    return err(
+      `${label}: action ${uses} wants node ${usingMajor}; the sandbox has node ${ctx.deps.nodeMajor}`,
+    );
+  }
+  if (action?.runs?.pre != null) {
+    return err(`${label}: action ${uses} declares a pre: step; not modelled`);
+  }
+  // `post:` runs after the job's own steps, so no job output can depend on it.
+  const main = action?.runs?.main;
+  if (typeof main !== "string") return err(`${label}: action ${uses} has no runs.main`);
+  const env: Record<string, string> = {
+    PATH: process.env.PATH ?? "",
+    HOME: process.env.HOME ?? "",
+    GITHUB_WORKSPACE: ctx.tree,
+  };
+  if (scope.github?.repository != null) env.GITHUB_REPOSITORY = scope.github.repository;
+  if (scope.github?.event_name != null) env.GITHUB_EVENT_NAME = scope.github.event_name;
+  for (const layer of [...ctx.envLayers, step.env]) {
+    const rendered = renderEnvLayer(layer, scope);
+    if (!rendered.ok) return err(`${label}: ${rendered.reason}`);
+    Object.assign(env, rendered.v);
+  }
+  // Unlike a composite's, a node action's input reads are opaque, so every
+  // binding must be concrete up front.
+  for (const [name, val] of Object.entries(bindActionInputs(action, step.with, scope))) {
+    if (val.kind !== "value") {
+      return err(`${label}: cannot resolve input '${name}' of ${uses}`);
+    }
+    env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] = String(val.v);
+  }
+  const outDir = await mkdtemp(join(tmpdir(), "willfire-out-"));
+  const outFile = join(outDir, "output");
+  await writeFile(outFile, "");
+  // After the layers, so no `env:` block can redirect either one.
+  env.GITHUB_OUTPUT = outFile;
+  env.WILLFIRE_ACTION_MAIN = join(actionDir, main);
+  const r = await ctx.deps.runCommand({
+    script: 'exec node "$WILLFIRE_ACTION_MAIN"',
+    shell: "bash",
+    cwd: ctx.tree,
+    env,
+    mounts: [
+      { path: ctx.tree, writable: true },
+      ...(actionRoot != null ? [{ path: actionRoot, writable: false }] : []),
+      { path: outDir, writable: true },
+    ],
+  });
+  if (r.code !== 0) {
+    const trimmed = r.stderr.trim();
+    const tail = trimmed.slice(trimmed.lastIndexOf("\n") + 1);
+    return err(`${label}: exited ${r.code}${tail === "" ? "" : ` (${tail})`}`);
+  }
+  const outputs = parseGithubOutput(await readFile(outFile, "utf8"));
+  if (outputs == null) return err(`${label}: malformed GITHUB_OUTPUT`);
   return { ok: true, v: outputs };
 }
 
@@ -468,15 +502,15 @@ async function runRun(
     return err(`${label}: cannot resolve \${{ }} in run`);
   }
   const env: Record<string, string> = {
-    // The two the runner always provides and scripts assume. Everything else
-    // a step sees, it declared.
+    // Everything else a step sees, it declared. A sandboxed runner swaps PATH
+    // and HOME for its own.
     PATH: process.env.PATH ?? "",
     HOME: process.env.HOME ?? "",
     GITHUB_WORKSPACE: ctx.tree,
   };
-  if (ctx.actionPath != null) {
-    env.GITHUB_ACTION_PATH = ctx.actionPath;
-  }
+  if (scope.github?.repository != null) env.GITHUB_REPOSITORY = scope.github.repository;
+  if (scope.github?.event_name != null) env.GITHUB_EVENT_NAME = scope.github.event_name;
+  if (ctx.actionPath != null) env.GITHUB_ACTION_PATH = ctx.actionPath;
   for (const layer of [...ctx.envLayers, step.env]) {
     const rendered = renderEnvLayer(layer, scope);
     if (!rendered.ok) {
@@ -497,7 +531,17 @@ async function runRun(
   await writeFile(outFile, "");
   // After the layers, so no `env:` block can redirect where outputs land.
   env.GITHUB_OUTPUT = outFile;
-  const r = await ctx.deps.runCommand({ script, shell, cwd, env });
+  const r = await ctx.deps.runCommand({
+    script,
+    shell,
+    cwd,
+    env,
+    mounts: [
+      { path: ctx.tree, writable: true },
+      ...(ctx.actionRoot != null ? [{ path: ctx.actionRoot, writable: false }] : []),
+      { path: outDir, writable: true },
+    ],
+  });
   if (r.code !== 0) {
     const trimmed = r.stderr.trim();
     const tail = trimmed.slice(trimmed.lastIndexOf("\n") + 1);
@@ -513,42 +557,37 @@ async function runRun(
 // ------------------------------------------------------------------ executor
 
 export function makeExecutor(opts: {
-  grants: ExecutionGrant[];
   /**
-   * The PR's own repo at the head commit — what `actions/checkout` provides
-   * on a real runner, wherever the workflow file itself lives. A reusable
-   * workflow's jobs run in the caller's workspace; this is that fact.
+   * The PR's own repo at the head commit. A reusable workflow's jobs run in
+   * the caller's workspace, wherever the workflow file lives.
    */
   workspace: WorkflowSource;
   deps: ExecDeps;
 }): JobExecutor {
-  const { grants, workspace, deps } = opts;
+  const { workspace, deps } = opts;
   const github: Record<string, string> = {
     event_name: "pull_request",
-    // Fixed for the run being predicted, and the fact the fleet's
-    // hermetic-vs-published guards branch on.
     repository: `${workspace.owner}/${workspace.repo}`,
   };
   const fail = (reason: string): ExecOutcome => ({ ok: false, reason });
   return {
-    granted: (source, jobId) =>
-      grants.some(
-        (g) => g.repo === `${source.owner}/${source.repo}` && g.jobs.includes(jobId),
-      ),
     async executeJob(jobId, job, wf, scope) {
-      // The shapes execution does not model, refused by name rather than run
-      // wrong: a matrix'd job is several executions, and a container changes
-      // what every step means.
-      if (job.strategy != null) {
-        return fail(`job '${jobId}' has a strategy; not modelled`);
-      }
+      if (job.strategy != null) return fail(`job '${jobId}' has a strategy; not modelled`);
       if (job.container != null || job.services != null) {
         return fail(`job '${jobId}' uses a container or services; not modelled`);
       }
-      if (!Array.isArray(job.steps)) {
-        return fail(`job '${jobId}' has no steps`);
-      }
-      const tree = await deps.provideTree(workspace);
+      if (!Array.isArray(job.steps)) return fail(`job '${jobId}' has no steps`);
+      // Any checkout input might be the `fetch-depth: 0` form. Over-asking for
+      // one the walk will refuse anyway costs a clone, never correctness.
+      const needsHistory = job.steps.some(
+        (s: any) =>
+          s != null &&
+          typeof s.uses === "string" &&
+          CHECKOUT_RE.test(s.uses) &&
+          s.with != null &&
+          Object.keys(s.with).length > 0,
+      );
+      const tree = await deps.provideTree(workspace, { history: needsHistory });
       if (tree == null) {
         return fail(
           `cannot materialize workspace ${workspace.owner}/${workspace.repo}@${workspace.sha}`,
@@ -557,16 +596,13 @@ export function makeExecutor(opts: {
       const jobScope: Scope = { ...scope, github: { ...github, ...scope.github } };
       const walked = await runSteps(job.steps, jobScope, {
         tree,
+        hasHistory: needsHistory,
         envLayers: [wf?.env, job.env],
         deps,
         depth: 0,
       });
-      if (!walked.ok) {
-        return fail(walked.reason);
-      }
-      // The job's `outputs:` map is the whole point of having run anything.
-      // Every declared entry must land; a hole here would hand consumers a
-      // partial map, which the Scope contract calls a lie.
+      if (!walked.ok) return fail(walked.reason);
+      // Every declared output must land; a partial map would be a lie.
       const outScope: Scope = { ...jobScope, steps: walked.v };
       const outputs: Record<string, string> = {};
       for (const [name, raw] of Object.entries(job.outputs ?? {})) {
@@ -584,9 +620,8 @@ export function makeExecutor(opts: {
 // ------------------------------------------------------------ real-world deps
 
 /**
- * The runner's default shell invocations, faithfully: `bash --noprofile
- * --norc -e -o pipefail` and `sh -e`. Nothing of the parent environment
- * leaks in beyond what the spec names.
+ * The runner's default shell invocations, faithfully. Nothing of the parent
+ * environment leaks in beyond what the spec names.
  */
 export const runShell: RunCommand = (spec) =>
   new Promise((resolvePromise) => {
@@ -602,28 +637,24 @@ export const runShell: RunCommand = (spec) =>
     let stderr = "";
     child.stderr.on("data", (d: Buffer) => {
       stderr += String(d);
-      // Keep the tail; a failure reason wants the last line, not a transcript.
-      if (stderr.length > 4096) {
-        stderr = stderr.slice(-4096);
-      }
+      if (stderr.length > 4096) stderr = stderr.slice(-4096);
     });
     child.on("error", () => resolvePromise({ code: 127, stderr }));
     child.on("close", (code) => resolvePromise({ code: code ?? 1, stderr }));
   });
 
 /**
- * Materialize repo trees from tarballs, one download per commit however many
- * steps ask. GitHub's tarballs wrap the tree in a single
- * `owner-repo-shortsha/` directory, which is unwrapped so callers get the
- * tree root itself. Extraction shells out to `tar` through the same
- * `RunCommand` seam every other subprocess uses.
+ * Materialize repo trees from tarballs, one download per commit. GitHub wraps
+ * the tree in a single `owner-repo-shortsha/` directory, unwrapped here.
  */
 export function makeTreeProvider(
   download: (source: WorkflowSource) => Promise<Uint8Array | null>,
   runCommand: RunCommand,
 ): ProvideTree {
   const cache = new Map<string, Promise<string | null>>();
-  return (source) => {
+  return (source, opts) => {
+    // A tarball has no history to give.
+    if (opts?.history === true) return Promise.resolve(null);
     const key = `${source.owner}/${source.repo}@${source.sha}`;
     const hit = cache.get(key);
     if (hit !== undefined) {
@@ -633,6 +664,73 @@ export function makeTreeProvider(
     cache.set(key, p);
     return p;
   };
+}
+
+/**
+ * Materialize repo trees by full clone, on the host — it needs the network
+ * the sandbox denies. The token never touches the URL or persisted git
+ * config, because `.git/config` later rides into the sandbox: auth travels
+ * as a per-invocation `http.extraheader` and is gone when the command is.
+ */
+export function makeCloneProvider(
+  runCommand: RunCommand,
+  token: string | null,
+  opts: { remoteUrl?: (source: WorkflowSource) => string } = {},
+): ProvideTree {
+  const remoteUrl =
+    opts.remoteUrl ?? ((s: WorkflowSource) => `https://github.com/${s.owner}/${s.repo}.git`);
+  const cache = new Map<string, Promise<string | null>>();
+  return (source) => {
+    const key = `${source.owner}/${source.repo}@${source.sha}`;
+    const hit = cache.get(key);
+    if (hit !== undefined) return hit;
+    const p = cloneAt(source, remoteUrl(source), token, runCommand);
+    cache.set(key, p);
+    return p;
+  };
+}
+
+async function cloneAt(
+  source: WorkflowSource,
+  remote: string,
+  token: string | null,
+  runCommand: RunCommand,
+): Promise<string | null> {
+  const dir = await mkdtemp(join(tmpdir(), "willfire-clone-"));
+  const dest = join(dir, "tree");
+  const env: Record<string, string> = {
+    PATH: process.env.PATH ?? "",
+    // A fresh HOME and no system config: none of the invoking user's git
+    // identity or credential helpers reach this clone.
+    HOME: dir,
+    GIT_TERMINAL_PROMPT: "0",
+    GIT_CONFIG_NOSYSTEM: "1",
+    WILLFIRE_REMOTE: remote,
+    WILLFIRE_DEST: dest,
+    WILLFIRE_SHA: source.sha,
+  };
+  let auth = "";
+  if (token != null) {
+    const basic = Buffer.from(`x-access-token:${token}`).toString("base64");
+    env.WILLFIRE_AUTH = `http.extraheader=AUTHORIZATION: basic ${basic}`;
+    auth = ' -c "$WILLFIRE_AUTH"';
+  }
+  // A PR head commit may live only under `refs/pull/N/head`, which a plain
+  // clone does not fetch, so a failed checkout retries via a direct fetch.
+  const r = await runCommand({
+    script: [
+      `git${auth} clone --quiet "$WILLFIRE_REMOTE" "$WILLFIRE_DEST"`,
+      'cd "$WILLFIRE_DEST"',
+      `git checkout --quiet --detach "$WILLFIRE_SHA" 2>/dev/null || {`,
+      `  git${auth} fetch --quiet origin "$WILLFIRE_SHA"`,
+      '  git checkout --quiet --detach "$WILLFIRE_SHA"',
+      "}",
+    ].join("\n"),
+    shell: "bash",
+    cwd: dir,
+    env,
+  });
+  return r.code === 0 ? dest : null;
 }
 
 async function materialize(

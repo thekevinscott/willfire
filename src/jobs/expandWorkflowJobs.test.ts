@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { expandWorkflowJobs } from "./expandWorkflowJobs.js";
-import type { ExecOutcome } from "../execute.js";
+import type { ExecOutcome, JobExecutor } from "../execute.js";
 import type { Scope } from "../expr/val.js";
 import type { FetchWorkflow, ResolveRef, WorkflowReader, WorkflowSource } from "../types.js";
 
@@ -348,11 +348,9 @@ describe("caller inputs reaching a called workflow", () => {
   });
 });
 
-// The executor seam: expansion asks it, before anything reads `needs`,
-// whether the caller granted a job — and folds what an execution yields into
-// the scope every later evaluation sees. The executor itself is faked here;
-// what it actually does when it runs things is execute.test.ts's subject.
-describe("granted execution during expansion", () => {
+// The executor here is faked; what it actually does when it runs things is
+// execute.test.ts's subject.
+describe("derived execution during expansion", () => {
   const SOURCE: WorkflowSource = { owner: "o", repo: "r", ref: "main", sha: SHA };
   const CTX = { action: "opened", baseRef: "main", files: ["src/app.ts"] };
   const reader = readerOf(async () => null);
@@ -370,16 +368,14 @@ describe("granted execution during expansion", () => {
     },
   });
 
-  const executorReturning = (outcome: ExecOutcome, log: string[] = []) => ({
-    granted: (src: WorkflowSource, jobId: string) =>
-      `${src.owner}/${src.repo}` === "o/r" && jobId === "detect",
+  const executorReturning = (outcome: ExecOutcome, log: string[] = []): JobExecutor => ({
     executeJob: async (jobId: string) => {
       log.push(jobId);
       return outcome;
     },
   });
 
-  it("resolves a dynamic matrix from what the granted job produced", async () => {
+  it("resolves a dynamic matrix from what the needed job produced", async () => {
     const entries = await expandWorkflowJobs(
       wfWith({}),
       CTX,
@@ -426,7 +422,7 @@ describe("granted execution during expansion", () => {
     });
   });
 
-  it("normalizes a null granted job body before executing it", async () => {
+  it("normalizes a null needed job body before executing it", async () => {
     const entries = await expandWorkflowJobs(
       wfWith(null),
       CTX,
@@ -438,18 +434,7 @@ describe("granted execution during expansion", () => {
     expect(entries[1]).toMatchObject({ checkName: "Coverage (ts)", status: "run" });
   });
 
-  it("leaves an ungranted job exactly as unresolved as before", async () => {
-    const log: string[] = [];
-    const executor = {
-      ...executorReturning({ ok: true, outputs: { langs: "[]" } }, log),
-      granted: () => false,
-    };
-    const entries = await expandWorkflowJobs(wfWith({}), CTX, reader, SOURCE, {}, executor);
-    expect(log).toEqual([]);
-    expect(entries[1]).toMatchObject({ status: "unknown", reason: "dynamic matrix" });
-  });
-
-  it("does not execute a granted job that would not run", async () => {
+  it("does not execute a needed job that would not run", async () => {
     const log: string[] = [];
     const entries = await expandWorkflowJobs(
       wfWith({ if: "false" }),
@@ -468,7 +453,7 @@ describe("granted execution during expansion", () => {
     });
   });
 
-  it("executes a granted job whose guard the caller's scope decides", async () => {
+  it("executes a needed job whose guard the caller's scope decides", async () => {
     const log: string[] = [];
     const entries = await expandWorkflowJobs(
       wfWith({ if: "github.repository == 'o/r'" }),
@@ -510,9 +495,8 @@ describe("granted execution during expansion", () => {
     });
   });
 
-  it("reaches a granted job inside a called workflow", async () => {
-    // The grant names the repo the workflow *file* lives in; a local call
-    // keeps the caller's source, so the recursion is where it fires.
+  it("reaches a needed job inside a called workflow", async () => {
+    // The recursion is where the callee's producer gets picked up and executed.
     const sub = JSON.stringify(wfWith({}));
     const entries = await expandWorkflowJobs(
       {

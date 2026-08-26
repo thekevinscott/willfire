@@ -11,13 +11,14 @@
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  makeCloneProvider,
   makeExecutor,
   makeTreeProvider,
   parseGithubOutput,
-  parseGrant,
   runShell,
   type ExecDeps,
   type ExecOutcome,
+  type RunSpec,
 } from "./execute.js";
 import type { WorkflowSource } from "./types.js";
 
@@ -78,14 +79,14 @@ function depsOf(trees: Record<string, string>, overrides: Partial<ExecDeps> = {}
     provideTree: async (src) => trees[`${src.owner}/${src.repo}@${src.sha}`] ?? null,
     runCommand: runShell,
     resolveRef: async (src) => src.ref,
+    nodeMajor: 24,
     ...overrides,
   };
 }
 
-/** An executor granted `detect` in the workspace repo, over real subprocesses. */
+/** An executor over the workspace repo, over real subprocesses. */
 function executorOf(trees: Record<string, string>, overrides: Partial<ExecDeps> = {}) {
   return makeExecutor({
-    grants: [{ repo: "o/r", jobs: ["detect"] }],
     workspace: WORKSPACE,
     deps: depsOf(trees, overrides),
   });
@@ -122,24 +123,6 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
-// ---------------------------------------------------------------- parseGrant
-
-describe("parseGrant", () => {
-  it("parses owner/repo:job1,job2, trimming around the commas", () => {
-    expect(parseGrant("o/r:detect, scan")).toEqual({ repo: "o/r", jobs: ["detect", "scan"] });
-  });
-
-  it("rejects everything that is not exactly owner/repo:jobs", () => {
-    expect(parseGrant("o/r")).toBe(null); // no colon
-    expect(parseGrant(":detect")).toBe(null); // no repo
-    expect(parseGrant("or:detect")).toBe(null); // no slash
-    expect(parseGrant("o/r/x:detect")).toBe(null); // too many segments
-    expect(parseGrant("o/:detect")).toBe(null); // empty half
-    expect(parseGrant("o/r:")).toBe(null); // no jobs
-    expect(parseGrant("o/r: , ")).toBe(null); // only empty jobs
-  });
-});
-
 // -------------------------------------------------------- parseGithubOutput
 
 describe("parseGithubOutput", () => {
@@ -170,18 +153,6 @@ describe("parseGithubOutput", () => {
   });
 });
 
-// ------------------------------------------------------------------- grants
-
-describe("granted", () => {
-  const ex = executorOf({});
-
-  it("matches on the repo the workflow file lives in, and the job id", () => {
-    expect(ex.granted(WORKSPACE, "detect")).toBe(true);
-    expect(ex.granted(WORKSPACE, "build")).toBe(false);
-    expect(ex.granted({ owner: "other", repo: "r", ref: SHA, sha: SHA }, "detect")).toBe(false);
-  });
-});
-
 // ------------------------------------------------------------ run: execution
 
 describe("executing run steps", () => {
@@ -196,6 +167,28 @@ describe("executing run steps", () => {
     );
     // Raw string, exactly as written to $GITHUB_OUTPUT — never parsed.
     expect(out).toEqual({ languages: '["ts"]' });
+  });
+
+  it("omits the github env seeds when the scope nulls them out", async () => {
+    // Contrived: only an explicit undefined reaches this. The seeds must go absent, not "undefined".
+    const out = success(
+      await execute(
+        {
+          steps: [
+            {
+              id: "s",
+              run: 'echo "r=${GITHUB_REPOSITORY-absent}/${GITHUB_EVENT_NAME-absent}" >> "$GITHUB_OUTPUT"',
+            },
+          ],
+          outputs: { r: "${{ steps.s.outputs.r }}" },
+        },
+        {},
+        {},
+        {},
+        { github: { repository: undefined, event_name: undefined } },
+      ),
+    );
+    expect(out).toEqual({ r: "absent/absent" });
   });
 
   it("satisfies a bare actions/checkout instead of running it", async () => {
@@ -216,8 +209,63 @@ describe("executing run steps", () => {
   });
 
   it("stops on a checkout with inputs — that is a different tree", async () => {
-    const o = await execute({ steps: [{ uses: "actions/checkout@v6", with: { ref: "main" } }] });
-    expect(failure(o)).toMatch(/actions\/checkout with inputs is not modelled/);
+    for (const withBlock of [
+      { ref: "main" },
+      { "fetch-depth": 1 },
+      { "fetch-depth": 0, ref: "main" },
+    ]) {
+      const o = await execute({ steps: [{ uses: "actions/checkout@v6", with: withBlock }] });
+      expect(failure(o)).toMatch(/actions\/checkout with inputs is not modelled/);
+    }
+  });
+
+  it("treats a checkout with an empty with: as bare", async () => {
+    const out = success(
+      await execute(
+        {
+          steps: [
+            { uses: "actions/checkout@v6", with: {} },
+            { id: "s", run: 'echo "f=$(cat file.txt)" >> "$GITHUB_OUTPUT"' },
+          ],
+          outputs: { f: "${{ steps.s.outputs.f }}" },
+        },
+        { "file.txt": "tree-content" },
+      ),
+    );
+    expect(out).toEqual({ f: "tree-content" });
+  });
+
+  it("satisfies fetch-depth: 0 by asking for the workspace with history", async () => {
+    const tree = await tempTree({ "file.txt": "deep" });
+    const asked: Array<{ history?: boolean } | undefined> = [];
+    const ex = makeExecutor({
+      workspace: WORKSPACE,
+      deps: depsOf(
+        {},
+        {
+          provideTree: async (_src, opts) => {
+            asked.push(opts);
+            return tree;
+          },
+        },
+      ),
+    });
+    const out = success(
+      await ex.executeJob(
+        "detect",
+        {
+          steps: [
+            { uses: "actions/checkout@v6", with: { "fetch-depth": 0 } },
+            { id: "s", run: 'echo "f=$(cat file.txt)" >> "$GITHUB_OUTPUT"' },
+          ],
+          outputs: { f: "${{ steps.s.outputs.f }}" },
+        },
+        {},
+        {},
+      ),
+    );
+    expect(out).toEqual({ f: "deep" });
+    expect(asked).toEqual([{ history: true }]);
   });
 
   it("skips a step whose if is false and coalesces past its empty outputs", async () => {
@@ -409,6 +457,55 @@ describe("executing run steps", () => {
   });
 });
 
+// -------------------------------------------------------- actions/setup-node
+
+describe("actions/setup-node", () => {
+  it("satisfies a bare setup-node, and one asking for the sandbox's node", async () => {
+    const out = success(
+      await execute({
+        steps: [
+          { uses: "actions/setup-node@v5" },
+          { uses: "actions/setup-node@v5", with: { "node-version": "24" } },
+          { uses: "actions/setup-node@v5", with: { "node-version": "v24.1" } },
+          { id: "s", run: 'echo "x=ran" >> "$GITHUB_OUTPUT"' },
+        ],
+        outputs: { x: "${{ steps.s.outputs.x }}" },
+      }),
+    );
+    expect(out).toEqual({ x: "ran" });
+  });
+
+  it("stops on a setup-node wanting another node", async () => {
+    const o = await execute({
+      steps: [{ uses: "actions/setup-node@v5", with: { "node-version": 20 } }],
+    });
+    expect(failure(o)).toBe("step '#1': setup-node wants node 20; the sandbox has node 24");
+  });
+
+  it("stops on a version it cannot read a major out of", async () => {
+    const o = await execute({
+      steps: [{ uses: "actions/setup-node@v5", with: { "node-version": "latest" } }],
+    });
+    expect(failure(o)).toBe("step '#1': setup-node wants node latest; the sandbox has node 24");
+  });
+
+  it("stops on a node-version it cannot resolve", async () => {
+    const o = await execute({
+      steps: [{ uses: "actions/setup-node@v5", with: { "node-version": "${{ env.nope }}" } }],
+    });
+    expect(failure(o)).toBe("step '#1': cannot resolve node-version");
+  });
+
+  it("stops on inputs beyond node-version", async () => {
+    for (const withBlock of [{ "node-version": "24", cache: "pnpm" }, { cache: "pnpm" }]) {
+      const o = await execute({ steps: [{ uses: "actions/setup-node@v5", with: withBlock }] });
+      expect(failure(o)).toBe(
+        "step '#1': setup-node with inputs beyond node-version is not modelled",
+      );
+    }
+  });
+});
+
 // ---------------------------------------------------------- composite actions
 
 /** A composite action manifest, JSON-spelled. */
@@ -453,6 +550,36 @@ describe("composite actions", () => {
     expect(out.got).toBe("caller-who");
     // $GITHUB_ACTION_PATH points into the materialized tree.
     expect(out.ap).toBe(`${tree}/action`);
+  });
+
+  it("mounts a remote composite's whole repo for its run steps, read-only", async () => {
+    // Run steps legitimately reach past their own dir — a runner checks out the
+    // whole action repo. `$GITHUB_ACTION_PATH` still names the action's own dir.
+    const specs: RunSpec[] = [];
+    const remote = await tempTree({
+      "actions/c/action.yml": compositeAction([{ shell: "bash", run: "true" }]),
+    });
+    const tree = await tempTree({});
+    const ex = executorOf(
+      { [`o/r@${SHA}`]: tree, [`x/y@${REMOTE_SHA}`]: remote },
+      {
+        runCommand: async (spec) => {
+          specs.push(spec);
+          return { code: 0, stderr: "" };
+        },
+      },
+    );
+    const out = success(
+      await ex.executeJob("detect", { steps: [{ uses: `x/y/actions/c@${REMOTE_SHA}` }] }, {}, {}),
+    );
+    expect(out).toEqual({});
+    const [spec] = specs;
+    expect(spec.env.GITHUB_ACTION_PATH).toBe(`${remote}/actions/c`);
+    expect(spec.mounts).toEqual([
+      { path: tree, writable: true },
+      { path: remote, writable: false },
+      { path: spec.env.GITHUB_OUTPUT.replace(/\/output$/, ""), writable: true },
+    ]);
   });
 
   it("falls back to a declared default when with: omits the input", async () => {
@@ -657,14 +784,29 @@ describe("composite actions", () => {
     expect(failure(o)).toMatch(/^step '#1': YAML parse error in \.\/action:/);
   });
 
-  it("refuses to execute a JavaScript action", async () => {
+  it("refuses to execute a docker action", async () => {
     const tree = await tempTree({
-      "action/action.yml": JSON.stringify({ runs: { using: "node20", main: "index.js" } }),
+      "action/action.yml": JSON.stringify({ runs: { using: "docker", image: "Dockerfile" } }),
     });
     const ex = executorOf({ [`o/r@${SHA}`]: tree });
     const o = await ex.executeJob("detect", { steps: [{ uses: "./action" }] }, {}, {});
     expect(failure(o)).toBe(
-      "step '#1': action ./action runs via 'node20'; only composite actions are executed",
+      "step '#1': action ./action runs via 'docker'; only composite and node actions are executed",
+    );
+  });
+
+  it("stops on a fetch-depth: 0 checkout hidden inside a composite", async () => {
+    // The provider pre-scan reads only the job's own steps, so this checkout
+    // finds no history — and refuses, rather than serving a shallow tree as deep.
+    const tree = await tempTree({
+      "action/action.yml": compositeAction([
+        { uses: "actions/checkout@v6", with: { "fetch-depth": 0 } },
+      ]),
+    });
+    const ex = executorOf({ [`o/r@${SHA}`]: tree });
+    const o = await ex.executeJob("detect", { steps: [{ uses: "./action" }] }, {}, {});
+    expect(failure(o)).toBe(
+      "step '#1' (./action): step '#1': checkout wants history the workspace does not have",
     );
   });
 
@@ -692,6 +834,201 @@ describe("composite actions", () => {
     const ex = executorOf({ [`o/r@${SHA}`]: tree });
     const o = await ex.executeJob("detect", { steps: [{ uses: "./action" }] }, {}, {});
     expect(failure(o)).toMatch(/actions nested deeper than 4 levels/);
+  });
+});
+
+// --------------------------------------------------------------- node actions
+
+/** A node action manifest, JSON-spelled. `main` is a path next to it. */
+const nodeAction = (main: string, extra: Record<string, unknown> = {}): string =>
+  JSON.stringify({ runs: { using: "node24", main }, ...extra });
+
+describe("node actions", () => {
+  it("runs main under node, binding inputs as INPUT_* and reading GITHUB_OUTPUT", async () => {
+    // `post:` present and ignored: it runs after the job's own steps on a real
+    // runner, so nothing the job's outputs depend on can come from it.
+    const tree = await tempTree({
+      "action/action.yml": JSON.stringify({
+        runs: { using: "node24", main: "main.cjs", post: "cleanup.js" },
+        inputs: { who: { default: "default-who" }, "two words": {} },
+      }),
+      "action/main.cjs":
+        'require("node:fs").appendFileSync(process.env.GITHUB_OUTPUT,' +
+        " `got=${process.env.INPUT_WHO}/${process.env.INPUT_TWO_WORDS}\\n`);",
+    });
+    const ex = executorOf({ [`o/r@${SHA}`]: tree });
+    const out = success(
+      await ex.executeJob(
+        "detect",
+        {
+          steps: [{ id: "a", uses: "./action", with: { "two words": "x" } }],
+          outputs: { got: "${{ steps.a.outputs.got }}" },
+        },
+        {},
+        {},
+      ),
+    );
+    expect(out).toEqual({ got: "default-who/x" });
+  });
+
+  it("hands the sandbox the workspace and the output dir; a local action needs no mount", async () => {
+    const specs: RunSpec[] = [];
+    const tree = await tempTree({ "action/action.yml": nodeAction("index.js") });
+    const ex = executorOf(
+      { [`o/r@${SHA}`]: tree },
+      {
+        runCommand: async (spec) => {
+          specs.push(spec);
+          return { code: 0, stderr: "" };
+        },
+      },
+    );
+    const out = success(await ex.executeJob("detect", { steps: [{ uses: "./action" }] }, {}, {}));
+    expect(out).toEqual({});
+    const [spec] = specs;
+    expect(spec.script).toBe('exec node "$WILLFIRE_ACTION_MAIN"');
+    expect(spec.cwd).toBe(tree);
+    expect(spec.env.WILLFIRE_ACTION_MAIN).toBe(`${tree}/action/index.js`);
+    expect(spec.env.GITHUB_REPOSITORY).toBe("o/r");
+    expect(spec.env.GITHUB_EVENT_NAME).toBe("pull_request");
+    // The local action lives inside the workspace mount already.
+    expect(spec.mounts).toEqual([
+      { path: tree, writable: true },
+      { path: spec.env.GITHUB_OUTPUT.replace(/\/output$/, ""), writable: true },
+    ]);
+  });
+
+  it("mounts a remote node action's whole repo read-only, not just its dir", async () => {
+    // A real runner checks out the whole action repo under `_actions/`, and
+    // an action's code may reach past its own dir into that checkout.
+    const specs: RunSpec[] = [];
+    const remote = await tempTree({ "actions/n/action.yml": nodeAction("index.js") });
+    const tree = await tempTree({});
+    const ex = executorOf(
+      { [`o/r@${SHA}`]: tree, [`x/y@${REMOTE_SHA}`]: remote },
+      {
+        runCommand: async (spec) => {
+          specs.push(spec);
+          return { code: 0, stderr: "" };
+        },
+      },
+    );
+    const out = success(
+      await ex.executeJob("detect", { steps: [{ uses: `x/y/actions/n@${REMOTE_SHA}` }] }, {}, {}),
+    );
+    expect(out).toEqual({});
+    const [spec] = specs;
+    expect(spec.env.WILLFIRE_ACTION_MAIN).toBe(`${remote}/actions/n/index.js`);
+    expect(spec.mounts).toEqual([
+      { path: tree, writable: true },
+      { path: remote, writable: false },
+      { path: spec.env.GITHUB_OUTPUT.replace(/\/output$/, ""), writable: true },
+    ]);
+  });
+
+  it("seeds empty PATH and HOME and no github vars when the host has none to give", async () => {
+    // The env the action sees must still be complete — empty strings and
+    // absent keys, never the literal "undefined".
+    vi.stubEnv("PATH", undefined);
+    vi.stubEnv("HOME", undefined);
+    const specs: RunSpec[] = [];
+    const out = await execute(
+      { steps: [{ uses: "./action" }] },
+      { "action/action.yml": nodeAction("index.js") },
+      {
+        runCommand: async (spec) => {
+          specs.push(spec);
+          return { code: 0, stderr: "" };
+        },
+      },
+      {},
+      { github: { repository: undefined, event_name: undefined } },
+    );
+    expect(success(out)).toEqual({});
+    const [spec] = specs;
+    expect([spec.env.PATH, spec.env.HOME]).toEqual(["", ""]);
+    expect("GITHUB_REPOSITORY" in spec.env).toBe(false);
+    expect("GITHUB_EVENT_NAME" in spec.env).toBe(false);
+  });
+
+  it("refuses a node action wanting another node", async () => {
+    const tree = await tempTree({
+      "action/action.yml": JSON.stringify({ runs: { using: "node20", main: "index.js" } }),
+    });
+    const ex = executorOf({ [`o/r@${SHA}`]: tree });
+    const o = await ex.executeJob("detect", { steps: [{ uses: "./action" }] }, {}, {});
+    expect(failure(o)).toBe(
+      "step '#1': action ./action wants node 20; the sandbox has node 24",
+    );
+  });
+
+  it("refuses a node action that declares a pre: step", async () => {
+    const tree = await tempTree({
+      "action/action.yml": JSON.stringify({
+        runs: { using: "node24", main: "index.js", pre: "setup.js" },
+      }),
+    });
+    const ex = executorOf({ [`o/r@${SHA}`]: tree });
+    const o = await ex.executeJob("detect", { steps: [{ uses: "./action" }] }, {}, {});
+    expect(failure(o)).toBe("step '#1': action ./action declares a pre: step; not modelled");
+  });
+
+  it("refuses a node action with no runs.main", async () => {
+    const tree = await tempTree({
+      "action/action.yml": JSON.stringify({ runs: { using: "node24" } }),
+    });
+    const ex = executorOf({ [`o/r@${SHA}`]: tree });
+    const o = await ex.executeJob("detect", { steps: [{ uses: "./action" }] }, {}, {});
+    expect(failure(o)).toBe("step '#1': action ./action has no runs.main");
+  });
+
+  it("stops on an input it cannot resolve — the program's reads are opaque", async () => {
+    const tree = await tempTree({ "action/action.yml": nodeAction("index.js") });
+    const ex = executorOf({ [`o/r@${SHA}`]: tree });
+    const o = await ex.executeJob(
+      "detect",
+      { steps: [{ uses: "./action", with: { who: "${{ env.nope }}" } }] },
+      {},
+      {},
+    );
+    expect(failure(o)).toBe("step '#1': cannot resolve input 'who' of ./action");
+  });
+
+  it("stops on a step env it cannot resolve", async () => {
+    const tree = await tempTree({ "action/action.yml": nodeAction("index.js") });
+    const ex = executorOf({ [`o/r@${SHA}`]: tree });
+    const o = await ex.executeJob(
+      "detect",
+      { steps: [{ uses: "./action", env: { B: "${{ env.nope }}" } }] },
+      {},
+      {},
+    );
+    expect(failure(o)).toBe("step '#1': cannot resolve env 'B'");
+  });
+
+  it("stops when the program exits non-zero, keeping the last stderr line", async () => {
+    const tree = await tempTree({
+      "a1/action.yml": nodeAction("main.cjs"),
+      "a1/main.cjs": 'console.error("kaboom"); process.exit(2);',
+      "a2/action.yml": nodeAction("main.cjs"),
+      "a2/main.cjs": "process.exit(3);",
+    });
+    const ex = executorOf({ [`o/r@${SHA}`]: tree });
+    const o1 = await ex.executeJob("detect", { steps: [{ uses: "./a1" }] }, {}, {});
+    expect(failure(o1)).toBe("step '#1': exited 2 (kaboom)");
+    const o2 = await ex.executeJob("detect", { steps: [{ uses: "./a2" }] }, {}, {});
+    expect(failure(o2)).toBe("step '#1': exited 3");
+  });
+
+  it("stops on malformed GITHUB_OUTPUT", async () => {
+    const tree = await tempTree({
+      "action/action.yml": nodeAction("main.cjs"),
+      "action/main.cjs":
+        'require("node:fs").appendFileSync(process.env.GITHUB_OUTPUT, "garbage\\n");',
+    });
+    const ex = executorOf({ [`o/r@${SHA}`]: tree });
+    const o = await ex.executeJob("detect", { steps: [{ uses: "./action" }] }, {}, {});
+    expect(failure(o)).toBe("step '#1': malformed GITHUB_OUTPUT");
   });
 });
 
@@ -808,6 +1145,125 @@ describe("makeTreeProvider", () => {
     const provide = makeTreeProvider(async () => new Uint8Array([1, 2, 3]), runShell);
     expect(await provide(WORKSPACE)).toBe(null);
   });
+
+  it("declines a history request rather than serving a shallow tree as deep", async () => {
+    const provide = makeTreeProvider(async () => tarball(WRAPPED_TB), runShell);
+    expect(await provide(WORKSPACE, { history: true })).toBe(null);
+  });
+});
+
+// ---------------------------------------------------------- makeCloneProvider
+
+/** Read a small file back through `runShell` — stderr is the return channel. */
+async function readVia(path: string): Promise<string> {
+  const r = await runShell({
+    script: 'cat "$F" >&2',
+    shell: "bash",
+    cwd: TMP,
+    env: { ...SH_ENV, F: path },
+  });
+  expect(r.code).toBe(0);
+  return r.stderr.trim();
+}
+
+/**
+ * A real repo with two commits: `main` at "one", and "two" parked under
+ * `refs/pull/1/head` the way GitHub parks PR heads — reachable from no branch.
+ */
+async function gitFixture(): Promise<{ repo: string; main: string; parked: string }> {
+  const repo = await tempTree({});
+  const r = await runShell({
+    script: [
+      'git -C "$R" init -q -b main',
+      'printf a > "$R/f.txt"',
+      'git -C "$R" add f.txt',
+      'git -C "$R" commit -qm one',
+      'git -C "$R" rev-parse HEAD > "$R/.main-sha"',
+      'printf b > "$R/f.txt"',
+      'git -C "$R" commit -aqm two',
+      'git -C "$R" update-ref refs/pull/1/head HEAD',
+      'git -C "$R" rev-parse HEAD > "$R/.parked-sha"',
+      'git -C "$R" reset -q --hard "$(cat "$R/.main-sha")"',
+      'git -C "$R" config uploadpack.allowAnySHA1InWant true',
+    ].join("\n"),
+    shell: "bash",
+    cwd: TMP,
+    env: {
+      ...SH_ENV,
+      R: repo,
+      HOME: repo,
+      GIT_CONFIG_NOSYSTEM: "1",
+      GIT_AUTHOR_NAME: "t",
+      GIT_AUTHOR_EMAIL: "t@t",
+      GIT_COMMITTER_NAME: "t",
+      GIT_COMMITTER_EMAIL: "t@t",
+    },
+  });
+  expect([r.code, r.stderr]).toEqual([0, ""]);
+  return {
+    repo,
+    main: await readVia(`${repo}/.main-sha`),
+    parked: await readVia(`${repo}/.parked-sha`),
+  };
+}
+
+describe("makeCloneProvider", () => {
+  const sourceAt = (sha: string): WorkflowSource => ({ owner: "o", repo: "r", ref: sha, sha });
+
+  it("clones once per commit and detaches at a sha a branch reaches", async () => {
+    const { repo, main } = await gitFixture();
+    const provide = makeCloneProvider(runShell, null, { remoteUrl: () => `file://${repo}` });
+    const tree = await provide(sourceAt(main), { history: true });
+    expect(tree).not.toBe(null);
+    expect(await fileIs(`${tree}/f.txt`, "a")).toBe(true);
+    expect(await provide(sourceAt(main))).toBe(tree);
+  });
+
+  it("falls back to fetching a sha parked under refs/pull", async () => {
+    const { repo, parked } = await gitFixture();
+    const provide = makeCloneProvider(runShell, null, { remoteUrl: () => `file://${repo}` });
+    const tree = await provide(sourceAt(parked));
+    expect(tree).not.toBe(null);
+    expect(await fileIs(`${tree}/f.txt`, "b")).toBe(true);
+  });
+
+  it("yields null for a sha the remote does not have", async () => {
+    const { repo } = await gitFixture();
+    const provide = makeCloneProvider(runShell, null, { remoteUrl: () => `file://${repo}` });
+    expect(await provide(sourceAt("e".repeat(40)))).toBe(null);
+  });
+
+  it("passes auth as an ephemeral header env var, never in the remote URL", async () => {
+    const specs: RunSpec[] = [];
+    const provide = makeCloneProvider(async (spec) => {
+      specs.push(spec);
+      return { code: 1, stderr: "" };
+    }, "tok-123");
+    expect(await provide(sourceAt(SHA))).toBe(null);
+    const [spec] = specs;
+    // The default remote is GitHub's, with no credentials in it.
+    expect(spec.env.WILLFIRE_REMOTE).toBe("https://github.com/o/r.git");
+    const basic = Buffer.from("x-access-token:tok-123").toString("base64");
+    expect(spec.env.WILLFIRE_AUTH).toBe(`http.extraheader=AUTHORIZATION: basic ${basic}`);
+    expect(spec.script).toContain('-c "$WILLFIRE_AUTH"');
+    expect(spec.script).not.toContain("tok-123");
+    // A fresh HOME, no prompts, no system config: the invoking user's git
+    // identity and credential helpers never reach the clone.
+    expect(spec.env.GIT_TERMINAL_PROMPT).toBe("0");
+    expect(spec.env.GIT_CONFIG_NOSYSTEM).toBe("1");
+    expect(spec.env.HOME).not.toBe(process.env.HOME);
+  });
+
+  it("hands the clone an empty PATH when the parent has none", async () => {
+    vi.stubEnv("PATH", undefined);
+    const seen: string[] = [];
+    const provide = makeCloneProvider(async (spec) => {
+      seen.push(spec.env.PATH);
+      return { code: 1, stderr: "" };
+    }, null);
+    expect(await provide(sourceAt(SHA))).toBe(null);
+    expect(seen).toEqual([""]);
+  });
 });
 
 // ------------------------------------------------- the fleet's detect, whole
@@ -830,9 +1286,13 @@ describe("the whole path, tarball to job outputs", () => {
       tarball(src.repo === "r" ? WORKSPACE_TB : CALLEE_TB);
     const provide = makeTreeProvider(download, runShell);
     const ex = makeExecutor({
-      grants: [{ repo: "tk/tc", jobs: ["detect"] }],
       workspace: WORKSPACE,
-      deps: { provideTree: provide, runCommand: runShell, resolveRef: async (s) => s.ref },
+      deps: {
+        provideTree: provide,
+        runCommand: runShell,
+        resolveRef: async (s) => s.ref,
+        nodeMajor: 24,
+      },
     });
     const out = success(
       await ex.executeJob(

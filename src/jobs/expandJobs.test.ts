@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { expandJobs } from "./expandJobs.js";
 import type { Scope } from "../expr/val.js";
+import type { JobExecutor } from "../execute.js";
 import type {
   Ctx,
   FetchWorkflow,
@@ -41,6 +42,24 @@ const readerFor = (files: Record<string, string>) =>
 
 const expand = (jobs: Record<string, unknown>, reader: WorkflowReader = readerFor({})) =>
   expandJobs({ on: { pull_request: null }, jobs } as Workflow, CTX, reader, SOURCE);
+
+/** The same expansion with an executor wired in, scope starting empty. */
+const expandWith = (
+  jobs: Record<string, unknown>,
+  executor: JobExecutor,
+  reader: WorkflowReader = readerFor({}),
+) =>
+  expandJobs(
+    { on: { pull_request: null }, jobs } as Workflow,
+    CTX,
+    reader,
+    SOURCE,
+    0,
+    "",
+    true,
+    {},
+    executor,
+  );
 
 describe("job expansion", () => {
   it("decides job guards against the scope the caller handed in", async () => {
@@ -459,5 +478,260 @@ describe("reusable workflows", () => {
       status: "unknown",
       reason: "unresolvable reusable reference: not-a-reference",
     });
+  });
+});
+
+describe("derived execution", () => {
+  /** An executor that records what it is asked to run and answers `outputs`. */
+  const recording = (outputs: Record<string, string>) => {
+    const executed: string[] = [];
+    const executor: JobExecutor = {
+      executeJob: async (jobId) => {
+        executed.push(jobId);
+        return { ok: true, outputs };
+      },
+    };
+    return { executed, executor };
+  };
+
+  it("executes exactly the jobs a sibling reads outputs from", async () => {
+    const { executed, executor } = recording({ langs: '["ts","py"]' });
+    const entries = await expandWith(
+      {
+        detect: { steps: [] },
+        helper: { steps: [] },
+        cover: {
+          needs: "detect",
+          strategy: { matrix: { lang: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+        },
+      },
+      executor,
+    );
+    expect(executed).toEqual(["detect"]);
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["detect", "run"],
+      ["helper", "run"],
+      ["cover (ts)", "run"],
+      ["cover (py)", "run"],
+    ]);
+  });
+
+  it("never executes a reusable-call job, even when a sibling reads its outputs", async () => {
+    // A call job has no steps of its own; its outputs come from the callee's
+    // jobs, which execution does not model. The read stays unresolved.
+    const { executed, executor } = recording({});
+    const entries = await expandWith(
+      {
+        plan: { uses: "./.github/workflows/sub.yml" },
+        build: { needs: "plan", if: "needs.plan.outputs.x == 'y'" },
+      },
+      executor,
+      readerFor({
+        ".github/workflows/sub.yml": JSON.stringify({
+          on: { workflow_call: null },
+          jobs: { inner: {} },
+        }),
+      }),
+    );
+    expect(executed).toEqual([]);
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["plan / inner", "run"],
+      ["build", "unknown"],
+    ]);
+  });
+
+  it("does not execute a needed job that is predicted not to run", async () => {
+    const { executed, executor } = recording({ langs: '["ts"]' });
+    const entries = await expandWith(
+      {
+        detect: { if: false, steps: [] },
+        cover: {
+          needs: "detect",
+          strategy: { matrix: { lang: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+        },
+      },
+      executor,
+    );
+    expect(executed).toEqual([]);
+    expect(entries.map((e) => [e.job, e.status, e.reason])).toEqual([
+      ["detect", "skipped", "if: false"],
+      ["cover", "skipped", "needs 'detect' which is skipped"],
+    ]);
+  });
+
+  it("threads an execution failure into the entry that needed the outputs", async () => {
+    const executor: JobExecutor = {
+      executeJob: async () => ({ ok: false, reason: "docker not found" }),
+    };
+    const entries = await expandWith(
+      {
+        detect: { steps: [] },
+        cover: {
+          needs: "detect",
+          strategy: { matrix: { lang: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+        },
+      },
+      executor,
+    );
+    expect(entries.map((e) => [e.job, e.status, e.reason])).toEqual([
+      ["detect", "run", ""],
+      ["cover", "unknown", "dynamic matrix; executing 'detect' failed: docker not found"],
+    ]);
+  });
+});
+
+describe("with: values across the call boundary", () => {
+  const CALLEE = ".github/workflows/callee.yml";
+
+  it("keeps a whole-expression value structured, so a computed matrix crosses the call", async () => {
+    const executor: JobExecutor = {
+      executeJob: async () => ({
+        ok: true,
+        outputs: { matrix: '[{"os":"linux"},{"os":"mac"}]' },
+      }),
+    };
+    const entries = await expandWith(
+      {
+        plan: { steps: [] },
+        build: {
+          needs: "plan",
+          uses: "./.github/workflows/callee.yml",
+          with: { m: "${{ fromJSON(needs.plan.outputs.matrix) }}" },
+        },
+      },
+      executor,
+      readerFor({
+        [CALLEE]: JSON.stringify({
+          on: { workflow_call: { inputs: { m: { type: "string" } } } },
+          jobs: { leg: { strategy: { matrix: { include: "${{ inputs.m }}" } } } },
+        }),
+      }),
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["plan", "run"],
+      ["build / leg (linux)", "run"],
+      ["build / leg (mac)", "run"],
+    ]);
+  });
+
+  it("renders a mixed template to a string on the way across", async () => {
+    const executor: JobExecutor = {
+      executeJob: async () => ({ ok: true, outputs: { lang: "ts" } }),
+    };
+    const entries = await expandWith(
+      {
+        plan: { steps: [] },
+        build: {
+          needs: "plan",
+          uses: "./.github/workflows/callee.yml",
+          with: { flavour: "on-${{ needs.plan.outputs.lang }}" },
+        },
+      },
+      executor,
+      readerFor({
+        [CALLEE]: JSON.stringify({
+          on: { workflow_call: { inputs: { flavour: { type: "string" } } } },
+          jobs: { leg: { if: "inputs.flavour == 'on-ts'" } },
+        }),
+      }),
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["plan", "run"],
+      ["build / leg", "run"],
+    ]);
+  });
+
+  it("passes literals through with their types and falls back to declared defaults", async () => {
+    // Job ids mirror the input each guard reads: a–d literal from the caller,
+    // e defaulted, f never passed (unknown, not empty), g–h malformed (unknown).
+    const entries = await expand(
+      {
+        call: {
+          uses: "./.github/workflows/callee.yml",
+          with: { a: null, b: true, c: 5, d: "txt" },
+        },
+      },
+      readerFor({
+        [CALLEE]: JSON.stringify({
+          on: {
+            workflow_call: {
+              inputs: {
+                e: { default: "dflt" },
+                f: { type: "string" },
+                g: null,
+                h: "string",
+              },
+            },
+          },
+          jobs: {
+            a: { if: "inputs.a == ''" },
+            b: { if: "inputs.b" },
+            c: { if: "inputs.c == 5" },
+            d: { if: "inputs.d == 'txt'" },
+            e: { if: "inputs.e == 'dflt'" },
+            f: { if: "inputs.f == 'x'" },
+            g: { if: "inputs.g == 'x'" },
+            h: { if: "inputs.h == 'x'" },
+          },
+        }),
+      }),
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["call / a", "run"],
+      ["call / b", "run"],
+      ["call / c", "run"],
+      ["call / d", "run"],
+      ["call / e", "run"],
+      ["call / f", "unknown"],
+      ["call / g", "unknown"],
+      ["call / h", "unknown"],
+    ]);
+  });
+
+  it("leaves an unresolvable with: value unknown", async () => {
+    // Whole-expression and mixed forms both read outputs nothing executed; a
+    // structured value is nothing GitHub accepts in `with:` at all.
+    for (const flag of ["${{ needs.plan.outputs.x }}", "x-${{ needs.plan.outputs.x }}", [1]]) {
+      const entries = await expand(
+        { call: { uses: "./.github/workflows/callee.yml", with: { flag } } },
+        readerFor({
+          [CALLEE]: JSON.stringify({
+            on: { workflow_call: null },
+            jobs: { leg: { if: "inputs.flag == 'x'" } },
+          }),
+        }),
+      );
+      expect(entries.map((e) => [e.job, e.status])).toEqual([["call / leg", "unknown"]]);
+    }
+  });
+
+  it("treats a malformed or absent workflow_call block as no declared inputs", async () => {
+    const jobs = { leg: { if: "inputs.q == 'x'" } };
+    const shapes: unknown[] = [
+      { jobs },
+      { on: "push", jobs },
+      { on: { workflow_call: "yes" }, jobs },
+      { on: { workflow_call: { inputs: 5 } }, jobs },
+    ];
+    for (const shape of shapes) {
+      const entries = await expand(
+        { call: { uses: "./.github/workflows/callee.yml" } },
+        readerFor({ [CALLEE]: JSON.stringify(shape) }),
+      );
+      expect(entries.map((e) => [e.job, e.status])).toEqual([["call / leg", "unknown"]]);
+    }
+  });
+
+  it("reads the declared inputs when YAML 1.1 parsed `on:` as a boolean key", async () => {
+    const entries = await expand(
+      { call: { uses: "./.github/workflows/callee.yml" } },
+      readerFor({
+        [CALLEE]: JSON.stringify({
+          true: { workflow_call: { inputs: { e: { default: "x" } } } },
+          jobs: { leg: { if: "inputs.e == 'x'" } },
+        }),
+      }),
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([["call / leg", "run"]]);
   });
 });

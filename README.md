@@ -54,9 +54,9 @@ workflows all applied. That is the unit required status checks key on, so it
 is the one worth comparing against. On a `JobEntry` it is `null` only where no
 single name is knowable ahead of the run:
 
-- a matrix computed at runtime (`fromJSON` of another job's output) whose
-  outputs were not supplied, reported as one `unknown` entry for that job and
-  nothing else — see "Supplying job outputs" below;
+- a matrix computed at runtime (`fromJSON` of another job's output) that
+  execution could not resolve, reported as one `unknown` entry for that job
+  and nothing else — see "Executing needed jobs" below;
 - a reusable workflow we cannot read — private, deleted, a ref that does not
   exist, a `uses:` built from an expression, or one nested past GitHub's
   four-level limit;
@@ -84,8 +84,7 @@ Auth is any token with `contents: read`, `actions: read`, and
 
 ```sh
 GH_TOKEN=... willfire --repo owner/repo --pr 123 \
-  [--action opened|synchronize|reopened] [--json] \
-  [--execute owner/repo:job1,job2]...
+  [--action opened|synchronize|reopened] [--json]
 ```
 
 Plain-text output is one line per entry, then a `# read owner/repo@ref -> sha`
@@ -102,8 +101,9 @@ workflows — both the local `./.github/workflows/x.yml` form and the cross-repo
 commit and the callee then read at that commit. Jobs whose `if` is false are
 predicted as `skipped` entries, matching how they appear in the checks UI.
 
-Things that cannot be known statically are reported as `unknown` rather than
-guessed.
+A matrix computed by another job's outputs is not static; willfire resolves it
+by running that job in a sandbox — see "Executing needed jobs". Everything
+else that cannot be known is reported as `unknown` rather than guessed.
 
 ## Supplying job outputs
 
@@ -138,47 +138,46 @@ lookup against it then stays unknown.
 `needs` is workflow-scoped and is not inherited across a reusable-workflow
 call: a callee's `needs.detect` is the callee's own job.
 
-Nothing in willfire works out what those outputs are on its own. `predict`
-supplies none unless the caller grants execution — see below — so a dynamic
-matrix stays `unknown` by default.
+Nothing here guesses what those outputs are. By default `predict` computes
+them, by executing the jobs that produce them — the section below. With
+execution turned off (`executor: null` in `PredictOptions`) a dynamic matrix
+stays `unknown`.
 
-## Executing granted jobs
+## Executing needed jobs
 
 The job those outputs come from is usually a few shell steps over the checked
-out tree — cheap to run for real. `predict` will do that, but only for jobs
-the caller names:
+out tree — cheap to run for real. `predict` does that, and works out for
+itself which jobs are worth it: a job is executed exactly when some sibling
+job reads its `needs.<id>.outputs`. That fact is written in the workflow being
+predicted, so there is nothing to configure and no repo knowledge in willfire.
 
-```ts
-await predict(octokit, "owner/repo", 123, {
-  execute: [{ repo: "the-org/conventions", jobs: ["detect"] }],
-});
-```
+Each selected job that is predicted to run is executed before expansion reads
+`needs`: the PR's head tree is materialized from a tarball, the job's steps
+run in order under their declared shell and env, step-level `if:` guards are
+evaluated, composite actions are fetched at their pinned commit and recursed
+into, and a bare `actions/checkout` is satisfied by the tree already present.
+A checkout asking for history (`fetch-depth: 0`) switches the workspace to a
+real clone at the same commit. What the steps write to `$GITHUB_OUTPUT`
+becomes the job's outputs, exactly as if they had been supplied by hand.
 
-```sh
-willfire --repo owner/repo --pr 123 \
-  --execute the-org/conventions:detect
-```
+The steps execute for real — nothing interprets or approximates shell — and
+the code that runs is the PR's own version of itself. What makes that safe to
+do by default is the sandbox: steps run in a docker container with no network,
+none of the host's environment, no credentials, an unprivileged user, and a
+read-only image (`node:24-slim` plus git and python3), with only the workspace tree
+writable. Docker is the one runtime requirement; where it is missing,
+execution fails and the entries that needed it stay `unknown` with the reason
+attached.
 
-A grant names the repo the workflow *file* lives in — for a reusable workflow,
-the callee — and the job ids within it. Before expansion reads `needs`, each
-granted job that is predicted to run is executed: the PR's head tree is
-materialized from a tarball, the job's steps run in order under their declared
-shell and env, step-level `if:` guards are evaluated, composite actions are
-fetched at their pinned commit and recursed into, and a bare
-`actions/checkout` is satisfied by the tree already present. What the steps
-write to `$GITHUB_OUTPUT` becomes the job's outputs, exactly as if they had
-been supplied by hand.
-
-Execution is mechanism, not policy: willfire knows nothing about any repo, and
-with no grants nothing runs. The steps execute for real — nothing interprets
-or approximates shell — so grant only jobs whose code you trust at the commit
-being predicted; a granted job runs the PR's version of itself.
-
-Anything execution cannot do faithfully fails the grant rather than guessing:
-a JavaScript or Docker action, a checkout with inputs, a matrix'd or
-containerized granted job, an undecidable step `if:`, a non-zero exit, output
-willfire cannot parse. The failure does not change any verdict — entries that
-needed the outputs stay `unknown`, with the reason threaded through:
+Node actions (`runs.using: node24`) run under the sandbox's node with their
+`inputs:` bound as `INPUT_*` variables; `actions/setup-node` is satisfied as a
+no-op when it asks for exactly the node the sandbox has. Anything execution
+cannot do faithfully fails rather than guessing: a Docker action, a node
+action wanting another major, a checkout with inputs beyond `fetch-depth`, a
+matrix'd or containerized job, an undecidable step `if:`, a non-zero exit,
+output willfire cannot parse. The failure does not change any verdict —
+entries that needed the outputs stay `unknown`, with the reason threaded
+through:
 
 ```
 dynamic matrix; executing 'detect' failed: step 'scan': exited 1 (...)
