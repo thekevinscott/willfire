@@ -12,7 +12,9 @@ export function runCheckout(
   ctx: WalkCtx,
 ): Res<Record<string, string>> {
   const withKeys = step.with == null ? [] : Object.keys(step.with);
-  if (withKeys.length === 0) return { ok: true, v: {} };
+  if (withKeys.length === 0) {
+    return { ok: true, v: {} };
+  }
   if (withKeys.length === 1 && String(step.with["fetch-depth"]) === "0") {
     // Unmet inside a composite: the pre-scan that picks the tree provider
     // only reads the job's own steps.

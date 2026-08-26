@@ -28,7 +28,9 @@ export function sandboxArgv(spec: RunSpec, cfg: SandboxConfig): string[] {
   }
   argv.push("-w", spec.cwd);
   for (const [k, v] of Object.entries(spec.env)) {
-    if (k === "PATH" || k === "HOME") continue;
+    if (k === "PATH" || k === "HOME") {
+      continue;
+    }
     argv.push("-e", `${k}=${v}`);
   }
   argv.push("-e", "HOME=/tmp");

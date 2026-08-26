@@ -15,7 +15,9 @@ export function runDocker(
     let stderr = "";
     child.stderr!.on("data", (d: Buffer) => {
       stderr += String(d);
-      if (stderr.length > 4096) stderr = stderr.slice(-4096);
+      if (stderr.length > 4096) {
+        stderr = stderr.slice(-4096);
+      }
     });
     child.on("spawn", () => {
       if (stdin != null) {

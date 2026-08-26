@@ -12,7 +12,9 @@ export function bindActionInputs(
   scope: Scope,
 ): Record<string, Val> {
   const bind = (raw: unknown): Val => {
-    if (raw == null) return { kind: "value", v: "" };
+    if (raw == null) {
+      return { kind: "value", v: "" };
+    }
     if (typeof raw === "boolean" || typeof raw === "number") {
       return { kind: "value", v: String(raw) };
     }

@@ -17,10 +17,14 @@ export async function runSteps(
     const stepScope: Scope = { ...scope, steps: stepsCtx };
     if (step.if != null) {
       const verdict = evaluate(String(step.if), stepScope);
-      if (verdict == null) return err(`cannot decide if: for ${label}`);
+      if (verdict == null) {
+        return err(`cannot decide if: for ${label}`);
+      }
       if (!verdict) {
         // A skipped step still occupies its id, with no outputs.
-        if (typeof step.id === "string") stepsCtx[step.id] = { outputs: {} };
+        if (typeof step.id === "string") {
+          stepsCtx[step.id] = { outputs: {} };
+        }
         continue;
       }
     }
@@ -32,8 +36,12 @@ export async function runSteps(
     } else {
       return err(`${label} has neither uses nor run`);
     }
-    if (!res.ok) return res;
-    if (typeof step.id === "string") stepsCtx[step.id] = { outputs: res.v };
+    if (!res.ok) {
+      return res;
+    }
+    if (typeof step.id === "string") {
+      stepsCtx[step.id] = { outputs: res.v };
+    }
   }
   return { ok: true, v: stepsCtx };
 }

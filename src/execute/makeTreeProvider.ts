@@ -13,10 +13,14 @@ export function makeTreeProvider(
   const cache = new Map<string, Promise<string | null>>();
   return (source, opts) => {
     // A tarball has no history to give.
-    if (opts?.history === true) return Promise.resolve(null);
+    if (opts?.history === true) {
+      return Promise.resolve(null);
+    }
     const key = `${source.owner}/${source.repo}@${source.sha}`;
     const hit = cache.get(key);
-    if (hit !== undefined) return hit;
+    if (hit !== undefined) {
+      return hit;
+    }
     const p = materialize(source, download, runCommand);
     cache.set(key, p);
     return p;

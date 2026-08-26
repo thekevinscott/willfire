@@ -2,10 +2,14 @@ import { UNKNOWN, type Scope, type Val } from "./val.js";
 
 export function lookup(scope: Scope, path: string): Val {
   const dot = path.indexOf(".");
-  if (dot < 0) return UNKNOWN;
+  if (dot < 0) {
+    return UNKNOWN;
+  }
   const head = path.slice(0, dot);
   const rest = path.slice(dot + 1);
-  if (head === "inputs") return scope.inputs?.[rest] ?? UNKNOWN;
+  if (head === "inputs") {
+    return scope.inputs?.[rest] ?? UNKNOWN;
+  }
   if (head === "github") {
     const v = scope.github?.[rest];
     return v === undefined ? UNKNOWN : { kind: "value", v };
@@ -15,9 +19,13 @@ export function lookup(scope: Scope, path: string): Val {
     // is a verdict on a run that has not happened; anything else is not a
     // shape the context has.
     const parts = rest.split(".");
-    if (parts.length !== 3 || parts[1] !== "outputs") return UNKNOWN;
+    if (parts.length !== 3 || parts[1] !== "outputs") {
+      return UNKNOWN;
+    }
     const job = scope.needs?.[parts[0]];
-    if (job == null) return UNKNOWN;
+    if (job == null) {
+      return UNKNOWN;
+    }
     // A known job's missing output is the empty string, not a hole: the
     // caller promised the set is complete, and that is what the runner
     // substitutes for an output no step wrote.
@@ -29,9 +37,13 @@ export function lookup(scope: Scope, path: string): Val {
     // `.conclusion` are verdicts on how a step ran, which the executor does
     // not track — a failed step fails the whole execution instead.
     const parts = rest.split(".");
-    if (parts.length !== 3 || parts[1] !== "outputs") return UNKNOWN;
+    if (parts.length !== 3 || parts[1] !== "outputs") {
+      return UNKNOWN;
+    }
     const step = scope.steps?.[parts[0]];
-    if (step == null) return UNKNOWN;
+    if (step == null) {
+      return UNKNOWN;
+    }
     return { kind: "value", v: step.outputs[parts[2]] ?? "" };
   }
   // `matrix.*`, `env.*`, `vars.*`, `secrets.*`: all require something that

@@ -19,7 +19,9 @@ export function makeCloneProvider(
   return (source) => {
     const key = `${source.owner}/${source.repo}@${source.sha}`;
     const hit = cache.get(key);
-    if (hit !== undefined) return hit;
+    if (hit !== undefined) {
+      return hit;
+    }
     const p = cloneAt(source, remoteUrl(source), token, runCommand);
     cache.set(key, p);
     return p;

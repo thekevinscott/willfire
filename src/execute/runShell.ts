@@ -19,7 +19,9 @@ export const runShell: RunCommand = (spec) =>
     let stderr = "";
     child.stderr.on("data", (d: Buffer) => {
       stderr += String(d);
-      if (stderr.length > 4096) stderr = stderr.slice(-4096);
+      if (stderr.length > 4096) {
+        stderr = stderr.slice(-4096);
+      }
     });
     child.on("error", () => resolvePromise({ code: 127, stderr }));
     child.on("close", (code) => resolvePromise({ code: code ?? 1, stderr }));

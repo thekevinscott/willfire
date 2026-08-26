@@ -20,7 +20,9 @@ export async function runRun(
     return err(`${label}: shell '${shell}' is not modelled`);
   }
   const script = renderTemplate(String(step.run), scope);
-  if (script == null) return err(`${label}: cannot resolve \${{ }} in run`);
+  if (script == null) {
+    return err(`${label}: cannot resolve \${{ }} in run`);
+  }
   const env: Record<string, string> = {
     // Everything else a step sees, it declared. A sandboxed runner swaps PATH
     // and HOME for its own.
@@ -28,18 +30,28 @@ export async function runRun(
     HOME: process.env.HOME ?? "",
     GITHUB_WORKSPACE: ctx.tree,
   };
-  if (scope.github?.repository != null) env.GITHUB_REPOSITORY = scope.github.repository;
-  if (scope.github?.event_name != null) env.GITHUB_EVENT_NAME = scope.github.event_name;
-  if (ctx.actionPath != null) env.GITHUB_ACTION_PATH = ctx.actionPath;
+  if (scope.github?.repository != null) {
+    env.GITHUB_REPOSITORY = scope.github.repository;
+  }
+  if (scope.github?.event_name != null) {
+    env.GITHUB_EVENT_NAME = scope.github.event_name;
+  }
+  if (ctx.actionPath != null) {
+    env.GITHUB_ACTION_PATH = ctx.actionPath;
+  }
   for (const layer of [...ctx.envLayers, step.env]) {
     const rendered = renderEnvLayer(layer, scope);
-    if (!rendered.ok) return err(`${label}: ${rendered.reason}`);
+    if (!rendered.ok) {
+      return err(`${label}: ${rendered.reason}`);
+    }
     Object.assign(env, rendered.v);
   }
   let cwd = ctx.tree;
   if (step["working-directory"] != null) {
     const wd = renderTemplate(String(step["working-directory"]), scope);
-    if (wd == null) return err(`${label}: cannot resolve working-directory`);
+    if (wd == null) {
+      return err(`${label}: cannot resolve working-directory`);
+    }
     cwd = resolve(ctx.tree, wd);
   }
   const outDir = await mkdtemp(join(tmpdir(), "willfire-out-"));
@@ -64,6 +76,8 @@ export async function runRun(
     return err(`${label}: exited ${r.code}${tail === "" ? "" : ` (${tail})`}`);
   }
   const outputs = parseGithubOutput(await readFile(outFile, "utf8"));
-  if (outputs == null) return err(`${label}: malformed GITHUB_OUTPUT`);
+  if (outputs == null) {
+    return err(`${label}: malformed GITHUB_OUTPUT`);
+  }
   return { ok: true, v: outputs };
 }

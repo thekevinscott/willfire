@@ -9,13 +9,17 @@ export function parseGithubOutput(text: string): Record<string, string> | null {
   while (i < lines.length) {
     const line = lines[i];
     i++;
-    if (line === "") continue;
+    if (line === "") {
+      continue;
+    }
     const heredoc = /^([^=<]+)<<(.+)$/.exec(line);
     if (heredoc != null) {
       const [, name, delim] = heredoc;
       const buf: string[] = [];
       for (;;) {
-        if (i >= lines.length) return null; // unterminated heredoc
+        if (i >= lines.length) {
+          return null; // unterminated heredoc
+        }
         if (lines[i] === delim) {
           i++;
           break;
@@ -27,7 +31,9 @@ export function parseGithubOutput(text: string): Record<string, string> | null {
       continue;
     }
     const eq = line.indexOf("=");
-    if (eq <= 0) return null;
+    if (eq <= 0) {
+      return null;
+    }
     out[line.slice(0, eq)] = line.slice(eq + 1);
   }
   return out;

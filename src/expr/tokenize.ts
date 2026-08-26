@@ -27,7 +27,9 @@ export function tokenize(src: string): Tok[] | null {
       let j = i + 1;
       let s = "";
       for (;;) {
-        if (j >= src.length) return null; // unterminated
+        if (j >= src.length) {
+          return null; // unterminated
+        }
         if (src[j] === "'") {
           if (src[j + 1] === "'") {
             s += "'";
@@ -55,10 +57,15 @@ export function tokenize(src: string): Tok[] | null {
       const w = word[0];
       i += w.length;
       const lower = w.toLowerCase();
-      if (lower === "true") out.push({ t: "bool", v: true });
-      else if (lower === "false") out.push({ t: "bool", v: false });
-      else if (lower === "null") out.push({ t: "null" });
-      else out.push({ t: "path", v: w });
+      if (lower === "true") {
+        out.push({ t: "bool", v: true });
+      } else if (lower === "false") {
+        out.push({ t: "bool", v: false });
+      } else if (lower === "null") {
+        out.push({ t: "null" });
+      } else {
+        out.push({ t: "path", v: w });
+      }
       continue;
     }
     const num = /^-?\d+(\.\d+)?/.exec(src.slice(i));

@@ -17,12 +17,16 @@ const fakeOctokit = (opts: {
       repos: {
         getCommit: async () => {
           calls.commits++;
-          if (opts.sha == null) throw new Error("boom");
+          if (opts.sha == null) {
+            throw new Error("boom");
+          }
           return { data: { sha: opts.sha } };
         },
         getContent: async () => {
           calls.contents++;
-          if (opts.content == null) throw new Error("boom");
+          if (opts.content == null) {
+            throw new Error("boom");
+          }
           return { data: opts.content };
         },
       },

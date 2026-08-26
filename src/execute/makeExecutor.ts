@@ -21,11 +21,15 @@ export function makeExecutor(opts: {
   const fail = (reason: string): ExecOutcome => ({ ok: false, reason });
   return {
     async executeJob(jobId, job, wf, scope) {
-      if (job.strategy != null) return fail(`job '${jobId}' has a strategy; not modelled`);
+      if (job.strategy != null) {
+        return fail(`job '${jobId}' has a strategy; not modelled`);
+      }
       if (job.container != null || job.services != null) {
         return fail(`job '${jobId}' uses a container or services; not modelled`);
       }
-      if (!Array.isArray(job.steps)) return fail(`job '${jobId}' has no steps`);
+      if (!Array.isArray(job.steps)) {
+        return fail(`job '${jobId}' has no steps`);
+      }
       // Any checkout input might be the `fetch-depth: 0` form. Over-asking for
       // one the walk will refuse anyway costs a clone, never correctness.
       const needsHistory = job.steps.some(
@@ -50,13 +54,17 @@ export function makeExecutor(opts: {
         deps,
         depth: 0,
       });
-      if (!walked.ok) return fail(walked.reason);
+      if (!walked.ok) {
+        return fail(walked.reason);
+      }
       // Every declared output must land; a partial map would be a lie.
       const outScope: Scope = { ...jobScope, steps: walked.v };
       const outputs: Record<string, string> = {};
       for (const [name, raw] of Object.entries(job.outputs ?? {})) {
         const rendered = renderTemplate(String(raw), outScope);
-        if (rendered == null) return fail(`cannot resolve job output '${name}'`);
+        if (rendered == null) {
+          return fail(`cannot resolve job output '${name}'`);
+        }
         outputs[name] = rendered;
       }
       return { ok: true, outputs };

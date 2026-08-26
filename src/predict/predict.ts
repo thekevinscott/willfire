@@ -96,7 +96,9 @@ export async function predict(
 
   const entries: DraftEntry[] = [];
   for (const w of workflows) {
-    if (!w.path.startsWith(".github/workflows/")) continue;
+    if (!w.path.startsWith(".github/workflows/")) {
+      continue;
+    }
     entries.push(...(await workflowEntries(w, ctx, reader, headSource, prFacts, executor)));
   }
   return finalizePrediction(entries, null, sources);

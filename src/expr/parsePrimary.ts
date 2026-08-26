@@ -9,7 +9,9 @@ export function parsePrimary(cur: Cursor, scope: Scope): Val {
   let v = parseAtom(cur, scope);
   while (cur.eatOp("[")) {
     const idx = parseOr(cur, scope);
-    if (!cur.eatOp("]")) return UNKNOWN;
+    if (!cur.eatOp("]")) {
+      return UNKNOWN;
+    }
     v = indexVal(v, idx);
   }
   return v;

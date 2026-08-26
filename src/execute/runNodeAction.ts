@@ -34,17 +34,25 @@ export async function runNodeAction(
   }
   // `post:` runs after the job's own steps, so no job output can depend on it.
   const main = action?.runs?.main;
-  if (typeof main !== "string") return err(`${label}: action ${uses} has no runs.main`);
+  if (typeof main !== "string") {
+    return err(`${label}: action ${uses} has no runs.main`);
+  }
   const env: Record<string, string> = {
     PATH: process.env.PATH ?? "",
     HOME: process.env.HOME ?? "",
     GITHUB_WORKSPACE: ctx.tree,
   };
-  if (scope.github?.repository != null) env.GITHUB_REPOSITORY = scope.github.repository;
-  if (scope.github?.event_name != null) env.GITHUB_EVENT_NAME = scope.github.event_name;
+  if (scope.github?.repository != null) {
+    env.GITHUB_REPOSITORY = scope.github.repository;
+  }
+  if (scope.github?.event_name != null) {
+    env.GITHUB_EVENT_NAME = scope.github.event_name;
+  }
   for (const layer of [...ctx.envLayers, step.env]) {
     const rendered = renderEnvLayer(layer, scope);
-    if (!rendered.ok) return err(`${label}: ${rendered.reason}`);
+    if (!rendered.ok) {
+      return err(`${label}: ${rendered.reason}`);
+    }
     Object.assign(env, rendered.v);
   }
   // Unlike a composite's, a node action's input reads are opaque, so every
@@ -78,6 +86,8 @@ export async function runNodeAction(
     return err(`${label}: exited ${r.code}${tail === "" ? "" : ` (${tail})`}`);
   }
   const outputs = parseGithubOutput(await readFile(outFile, "utf8"));
-  if (outputs == null) return err(`${label}: malformed GITHUB_OUTPUT`);
+  if (outputs == null) {
+    return err(`${label}: malformed GITHUB_OUTPUT`);
+  }
   return { ok: true, v: outputs };
 }

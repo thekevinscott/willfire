@@ -14,8 +14,12 @@ export function parseCall(cur: Cursor, scope: Scope, name: string): Val {
   if (!cur.eatOp(")")) {
     for (;;) {
       args.push(parseOr(cur, scope));
-      if (cur.eatOp(",")) continue;
-      if (cur.eatOp(")")) break;
+      if (cur.eatOp(",")) {
+        continue;
+      }
+      if (cur.eatOp(")")) {
+        break;
+      }
       return UNKNOWN; // malformed argument list
     }
   }

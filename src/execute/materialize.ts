@@ -10,7 +10,9 @@ export async function materialize(
   runCommand: RunCommand,
 ): Promise<string | null> {
   const bytes = await download(source);
-  if (bytes == null) return null;
+  if (bytes == null) {
+    return null;
+  }
   const dir = await mkdtemp(join(tmpdir(), "willfire-tree-"));
   const archive = join(dir, "tree.tar.gz");
   await writeFile(archive, bytes);
@@ -26,11 +28,15 @@ export async function materialize(
       WILLFIRE_DEST: dest,
     },
   });
-  if (r.code !== 0) return null;
+  if (r.code !== 0) {
+    return null;
+  }
   const entries = await readdir(dest);
   if (entries.length === 1) {
     const sub = join(dest, entries[0]);
-    if ((await stat(sub)).isDirectory()) return sub;
+    if ((await stat(sub)).isDirectory()) {
+      return sub;
+    }
   }
   return dest;
 }

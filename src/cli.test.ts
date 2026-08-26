@@ -65,14 +65,18 @@ function fakeOctokit(f: Fixture): Octokit {
           data: { sha: HEAD_SHA, commit: { message: f.message ?? "chore: routine" } },
         }),
         getContent: async ({ path }: { path: string }) => {
-          if (!(path in contents)) throw new Error(`404 ${path}`);
+          if (!(path in contents)) {
+            throw new Error(`404 ${path}`);
+          }
           return { data: contents[path] };
         },
       },
       actions: { listRepoWorkflows: LIST_WORKFLOWS },
     },
     paginate: async (route: symbol) => {
-      if (route === LIST_FILES) return [{ filename: "src/app.ts" }];
+      if (route === LIST_FILES) {
+        return [{ filename: "src/app.ts" }];
+      }
       return [{ path: WF, state: "active" }];
     },
   };

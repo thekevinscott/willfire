@@ -9,10 +9,18 @@ import { prScope } from "./prScope.js";
  * string, all or nothing; anything unresolvable stays unknown.
  */
 export function inputValue(raw: unknown, scope: Scope): Val {
-  if (raw == null) return { kind: "value", v: "" };
-  if (typeof raw === "boolean" || typeof raw === "number") return { kind: "value", v: raw };
-  if (typeof raw !== "string") return UNKNOWN;
-  if (!raw.includes("${{")) return { kind: "value", v: raw };
+  if (raw == null) {
+    return { kind: "value", v: "" };
+  }
+  if (typeof raw === "boolean" || typeof raw === "number") {
+    return { kind: "value", v: raw };
+  }
+  if (typeof raw !== "string") {
+    return UNKNOWN;
+  }
+  if (!raw.includes("${{")) {
+    return { kind: "value", v: raw };
+  }
   const t = raw.trim();
   // `${{a}} x ${{b}}` fails this test and takes the render path instead.
   if (t.startsWith("${{") && t.indexOf("}}") === t.length - 2) {

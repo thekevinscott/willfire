@@ -24,8 +24,9 @@ if (isMain) {
       console.log(`# ${skip} -> nothing dispatches`);
     } else {
       for (const e of entries) {
-        if (isWorkflowEntry(e)) console.log(`# ${e.workflow} :: ${e.status} (${e.reason})`);
-        else {
+        if (isWorkflowEntry(e)) {
+          console.log(`# ${e.workflow} :: ${e.status} (${e.reason})`);
+        } else {
           const name = e.checkName ?? `${e.job} (name unresolved)`;
           console.log(`${e.workflow} :: ${name} :: ${e.status}`);
         }
@@ -33,6 +34,8 @@ if (isMain) {
     }
     // Last, and on the skip path too, so a red gate's first question — which
     // commits was this read from? — is answered wherever the reader lands.
-    for (const s of sources) console.log(`# read ${s.owner}/${s.repo}@${s.ref} -> ${s.sha}`);
+    for (const s of sources) {
+      console.log(`# read ${s.owner}/${s.repo}@${s.ref} -> ${s.sha}`);
+    }
   }
 }

@@ -17,14 +17,22 @@ import { UNKNOWN, type Scope, type Val } from "./val.js";
  */
 export function evaluateValue(expr: string, scope: Scope = {}): Val {
   const stripped = expr.trim().replace(/^\$\{\{(.*)\}\}$/s, "$1").trim();
-  if (stripped === "") return UNKNOWN;
-  if (stripped.includes("${{")) return UNKNOWN;
+  if (stripped === "") {
+    return UNKNOWN;
+  }
+  if (stripped.includes("${{")) {
+    return UNKNOWN;
+  }
   const toks = tokenize(stripped);
-  if (toks == null || toks.length === 0) return UNKNOWN;
+  if (toks == null || toks.length === 0) {
+    return UNKNOWN;
+  }
   const cur = new Cursor(toks);
   const val = parseOr(cur, scope);
   // Trailing tokens mean the grammar did not cover this expression; whatever
   // was parsed describes only a prefix of it, so it decides nothing.
-  if (!cur.done()) return UNKNOWN;
+  if (!cur.done()) {
+    return UNKNOWN;
+  }
   return val;
 }

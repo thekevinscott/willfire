@@ -19,11 +19,17 @@ export async function executeNeeded(
   const execFailures: Record<string, string> = {};
   const needed = neededJobIds(jobs);
   for (const [jobId, jobRaw] of Object.entries(jobs)) {
-    if (!needed.has(jobId)) continue;
+    if (!needed.has(jobId)) {
+      continue;
+    }
     const job = jobRaw ?? {};
     // A reusable-call job has no steps of its own to run.
-    if ("uses" in job) continue;
-    if (evalIf(job.if, scoped) !== "run") continue;
+    if ("uses" in job) {
+      continue;
+    }
+    if (evalIf(job.if, scoped) !== "run") {
+      continue;
+    }
     const res = await executor.executeJob(jobId, job, wf, scoped);
     if (res.ok) {
       scoped = { ...scoped, needs: { ...scoped.needs, [jobId]: { outputs: res.outputs } } };

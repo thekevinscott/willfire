@@ -7,7 +7,9 @@ vi.mock("node:fs/promises", async () => {
   const actual = await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises");
   const readFile = vi.fn(async (path: string) => {
     const hit = h.files[path];
-    if (hit === undefined) throw new Error("ENOENT");
+    if (hit === undefined) {
+      throw new Error("ENOENT");
+    }
     return hit;
   });
   return { ...actual, readFile: readFile as unknown as typeof actual.readFile };
