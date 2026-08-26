@@ -8,7 +8,7 @@
 
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import type { RunCommand, RunSpec } from "./execute.js";
+import type { RunCommand, RunSpec } from "./execute/types.js";
 
 /**
  * The node major the image ships — also the refusal boundary for `setup-node`

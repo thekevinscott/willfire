@@ -1,0 +1,56 @@
+import type { Scope } from "../expr.js";
+import type { ResolveRef, WorkflowSource } from "../types.js";
+
+/** A host path a sandboxed runner must expose inside, at the same path. */
+export interface Mount {
+  path: string;
+  writable: boolean;
+}
+
+/** One shell invocation, fully specified — nothing is inherited implicitly. */
+export interface RunSpec {
+  script: string;
+  shell: "bash" | "sh";
+  cwd: string;
+  env: Record<string, string>;
+  /** For runners that isolate: what of the host this run may see. A direct
+   * shell ignores this — it already sees everything. */
+  mounts?: Mount[];
+}
+
+export interface RunResult {
+  code: number;
+  stderr: string;
+}
+
+export type RunCommand = (spec: RunSpec) => Promise<RunResult>;
+
+/**
+ * Materialize a repo tree at a commit, or null when it cannot be had. Must not
+ * throw. `history: true` demands full git history (the `fetch-depth: 0`
+ * postcondition); a provider that cannot supply it answers null.
+ */
+export type ProvideTree = (
+  source: WorkflowSource,
+  opts?: { history?: boolean },
+) => Promise<string | null>;
+
+export interface ExecDeps {
+  provideTree: ProvideTree;
+  runCommand: RunCommand;
+  resolveRef: ResolveRef;
+  /** The node major `runCommand`'s world provides; asking for another is refused. */
+  nodeMajor: number;
+}
+
+export type ExecOutcome =
+  | { ok: true; outputs: Record<string, string> }
+  | { ok: false; reason: string };
+
+/**
+ * The caller decides *whether* a job runs; the executor only decides what
+ * running it yields.
+ */
+export interface JobExecutor {
+  executeJob(jobId: string, job: any, wf: any, scope: Scope): Promise<ExecOutcome>;
+}

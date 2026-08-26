@@ -1,5 +1,5 @@
 import type { Scope } from "../expr.js";
-import type { JobExecutor } from "../execute.js";
+import type { JobExecutor } from "../execute/types.js";
 import { expandJobs } from "./expandJobs.js";
 import type { Ctx, ExpandedJob, Workflow, WorkflowReader, WorkflowSource } from "../types.js";
 

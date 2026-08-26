@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { expandJobs } from "./expandJobs.js";
-import type { JobExecutor } from "../execute.js";
+import type { JobExecutor } from "../execute/types.js";
 import type {
   Ctx,
   FetchWorkflow,

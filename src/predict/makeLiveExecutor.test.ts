@@ -3,7 +3,7 @@
 
 import type { Octokit } from "@octokit/rest";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { runShell } from "../execute.js";
+import { runShell } from "../execute/runShell.js";
 import { makeLiveExecutor } from "./makeLiveExecutor.js";
 import type { WorkflowSource } from "../types.js";
 
@@ -12,10 +12,19 @@ const hoisted = vi.hoisted(() => ({
 }));
 
 // The real module, with a spy on `makeCloneProvider` to observe the token.
-vi.mock("../execute.js", async () => {
-  const actual = await vi.importActual<typeof import("../execute.js")>("../execute.js");
+vi.mock("../execute/makeCloneProvider.js", async () => {
+  const actual = await vi.importActual<typeof import("../execute/makeCloneProvider.js")>(
+    "../execute/makeCloneProvider.js",
+  );
   hoisted.makeCloneProvider.mockImplementation(actual.makeCloneProvider);
-  return { ...actual, makeCloneProvider: hoisted.makeCloneProvider };
+  return { makeCloneProvider: hoisted.makeCloneProvider };
+});
+
+vi.mock("../execute/runShell.js", async () => {
+  const actual = await vi.importActual<typeof import("../execute/runShell.js")>(
+    "../execute/runShell.js",
+  );
+  return { ...actual };
 });
 
 const SHA = "c".repeat(40);

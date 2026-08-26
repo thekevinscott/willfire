@@ -1,6 +1,7 @@
 import { parse as parseYaml } from "yaml";
 import { evaluateValue, UNKNOWN, type Scope, type Val } from "../expr.js";
-import { renderTemplate, type JobExecutor } from "../execute.js";
+import { renderTemplate } from "../execute/renderTemplate.js";
+import type { JobExecutor } from "../execute/types.js";
 import { expandMatrixDetailed } from "../matrix/expandMatrixDetailed.js";
 import { jobDisplayName } from "../names/jobDisplayName.js";
 import { skippedDisplayName } from "../names/skippedDisplayName.js";

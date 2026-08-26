@@ -1,13 +1,9 @@
 import type { Octokit } from "@octokit/rest";
-import {
-  makeCloneProvider,
-  makeExecutor,
-  makeTreeProvider,
-  runShell,
-  type JobExecutor,
-  type ProvideTree,
-  type RunCommand,
-} from "../execute.js";
+import { makeCloneProvider } from "../execute/makeCloneProvider.js";
+import { makeExecutor } from "../execute/makeExecutor.js";
+import { makeTreeProvider } from "../execute/makeTreeProvider.js";
+import { runShell } from "../execute/runShell.js";
+import type { JobExecutor, ProvideTree, RunCommand } from "../execute/types.js";
 import { makeSandboxRunner, SANDBOX_NODE_MAJOR } from "../sandbox.js";
 import type { ResolveRef, WorkflowSource } from "../types.js";
 
