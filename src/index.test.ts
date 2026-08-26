@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { JobExecutor as ExecuteJobExecutor } from "./execute/index.js";
 import * as barrel from "./index.js";
 import type { ExecOutcome, JobExecutor } from "./index.js";
 
@@ -27,6 +28,8 @@ describe("root barrel", () => {
     // show them. Compiling these assignments is the assertion.
     const outcome: ExecOutcome = { ok: false, reason: "r" };
     const executor: JobExecutor = { executeJob: async () => outcome };
-    expect(typeof executor.executeJob).toBe("function");
+    // Re-exports of the execute module's own types, not structural copies.
+    const same: ExecuteJobExecutor = executor;
+    expect(typeof same.executeJob).toBe("function");
   });
 });
