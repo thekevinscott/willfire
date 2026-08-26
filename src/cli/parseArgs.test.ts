@@ -19,34 +19,17 @@ describe("parseArgs", () => {
       pr: 1,
       json: false,
       action: undefined,
-      execute: [],
     });
   });
 
   it("parses every flag", () => {
     expect(
-      parseArgs([
-        "--repo",
-        "o/r",
-        "--pr",
-        "2",
-        "--json",
-        "--action",
-        "synchronize",
-        "--execute",
-        "o/r:detect,cover",
-        "--execute",
-        "x/y:plan",
-      ]),
+      parseArgs(["--repo", "o/r", "--pr", "2", "--json", "--action", "synchronize"]),
     ).toEqual({
       repo: "o/r",
       pr: 2,
       json: true,
       action: "synchronize",
-      execute: [
-        { repo: "o/r", jobs: ["detect", "cover"] },
-        { repo: "x/y", jobs: ["plan"] },
-      ],
     });
   });
 
@@ -70,20 +53,4 @@ describe("parseArgs", () => {
     expect(vi.mocked(console.error).mock.calls[1][0]).toMatch(/^usage: predict /);
   });
 
-  it("exits 2 on an --execute it cannot parse", () => {
-    expect(() => parseArgs(["--repo", "o/r", "--pr", "1", "--execute", "nope"])).toThrow(
-      "exited",
-    );
-    expect(process.exit).toHaveBeenCalledWith(2);
-    expect(vi.mocked(console.error).mock.calls[0][0]).toBe("bad --execute: nope");
-    expect(vi.mocked(console.error).mock.calls[1][0]).toMatch(
-      /--execute owner\/repo:job1,job2/,
-    );
-  });
-
-  it("exits 2 on a trailing --execute with no grant", () => {
-    expect(() => parseArgs(["--repo", "o/r", "--pr", "1", "--execute"])).toThrow("exited");
-    expect(process.exit).toHaveBeenCalledWith(2);
-    expect(vi.mocked(console.error).mock.calls[0][0]).toBe("bad --execute: undefined");
-  });
 });

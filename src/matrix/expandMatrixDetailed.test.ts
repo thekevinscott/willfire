@@ -23,4 +23,60 @@ describe("expandMatrixDetailed", () => {
   it("gives up on a matrix that is an expression", () => {
     expect(expandMatrixDetailed({ matrix: "${{ fromJSON(x) }}" })).toBeNull();
   });
+
+  it("resolves an include: written as an expression through the scope", () => {
+    // The plan-job shape: `include: ${{ fromJSON(needs.plan.outputs.matrix) }}`.
+    const scope = {
+      needs: { plan: { outputs: { matrix: '[{"os":"linux"},{"os":"mac"}]' } } },
+    };
+    expect(
+      expandMatrixDetailed(
+        { matrix: { include: "${{ fromJSON(needs.plan.outputs.matrix) }}" } },
+        scope,
+      ),
+    ).toEqual([
+      { values: { os: "linux" }, displayKeys: ["os"] },
+      { values: { os: "mac" }, displayKeys: ["os"] },
+    ]);
+  });
+
+  it("resolves an exclude: written as an expression and filters with it", () => {
+    const scope = { needs: { plan: { outputs: { drop: '[{"os":"mac"}]' } } } };
+    expect(
+      expandMatrixDetailed(
+        { matrix: { os: ["linux", "mac"], exclude: "${{ fromJSON(needs.plan.outputs.drop) }}" } },
+        scope,
+      ),
+    ).toEqual([{ values: { os: "linux" }, displayKeys: ["os"] }]);
+  });
+
+  it("gives up on an include: expression the scope cannot resolve", () => {
+    expect(
+      expandMatrixDetailed({ matrix: { include: "${{ fromJSON(needs.plan.outputs.matrix) }}" } }),
+    ).toBeNull();
+  });
+
+  it("gives up on an include: that is neither a list nor a string", () => {
+    expect(expandMatrixDetailed({ matrix: { include: 5 } })).toBeNull();
+  });
+
+  it("gives up on an include: expression that resolves to a non-list", () => {
+    const scope = { needs: { plan: { outputs: { matrix: '{"os":"linux"}' } } } };
+    expect(
+      expandMatrixDetailed(
+        { matrix: { include: "${{ fromJSON(needs.plan.outputs.matrix) }}" } },
+        scope,
+      ),
+    ).toBeNull();
+  });
+
+  it("gives up on an axis that is neither a list nor an expression", () => {
+    expect(expandMatrixDetailed({ matrix: { os: 5 } })).toBeNull();
+  });
+
+  it("gives up on an axis expression the scope cannot resolve", () => {
+    expect(
+      expandMatrixDetailed({ matrix: { os: "${{ fromJSON(needs.plan.outputs.os) }}" } }),
+    ).toBeNull();
+  });
 });
