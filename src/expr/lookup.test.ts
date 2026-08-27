@@ -34,6 +34,8 @@ describe("lookup", () => {
     expect(lookup(SCOPE, "needs.other.outputs.x")).toEqual({ kind: "unknown" });
     expect(lookup(SCOPE, "needs.detect.result")).toEqual({ kind: "unknown" });
     expect(lookup({}, "needs.detect.outputs.x")).toEqual({ kind: "unknown" });
+    // An empty needs map behaves like an absent one.
+    expect(lookup({ needs: {} }, "needs.detect.outputs.x")).toEqual({ kind: "unknown" });
   });
 
   it("models steps the same way", () => {
@@ -42,6 +44,7 @@ describe("lookup", () => {
     expect(lookup(SCOPE, "steps.other.outputs.x")).toEqual({ kind: "unknown" });
     expect(lookup(SCOPE, "steps.scan.outcome")).toEqual({ kind: "unknown" });
     expect(lookup({}, "steps.scan.outputs.x")).toEqual({ kind: "unknown" });
+    expect(lookup({ steps: {} }, "steps.scan.outputs.x")).toEqual({ kind: "unknown" });
   });
 
   it("leaves every runtime context unknown", () => {

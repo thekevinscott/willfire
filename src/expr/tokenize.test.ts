@@ -40,5 +40,8 @@ describe("tokenize", () => {
 
   it("refuses a character it has no token for", () => {
     expect(tokenize("true @")).toBe(null);
+    // A bare `=` starts no operator (only `==` is one), no word, and no
+    // number, so every matcher misses.
+    expect(tokenize("=")).toBe(null);
   });
 });
