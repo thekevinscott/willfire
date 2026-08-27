@@ -189,72 +189,48 @@ export async function predict(
     github: { repository: `${headSource.owner}/${headSource.repo}` },
   };
 
+  const workflowEntries = async (path: string, state: string): Promise<DraftEntry[]> => {
+    if (state !== "active") {
+      return [
+        { workflow: path, job: "*", status: "no-dispatch", reason: `workflow state: ${state}` },
+      ];
+    }
+    const content = await fetchWorkflow(path, headSource);
+    if (content === null) {
+      // The Actions API keeps listing a workflow as `active` after its file is
+      // deleted. There is no file at head, so there is nothing to dispatch —
+      // the same verdict as the disabled case above, reached a different way.
+      return [
+        { workflow: path, job: "*", status: "no-dispatch", reason: "no workflow file at head" },
+      ];
+    }
+    let wf: Workflow;
+    try {
+      wf = parseYaml(content);
+    } catch (e) {
+      // GitHub creates a run for an unparseable workflow file and concludes it
+      // `startup_failure`. The run exists but has no jobs, so this is a
+      // workflow-level "it dispatches" with nothing to expand.
+      return [{ workflow: path, job: "*", status: "run", reason: `YAML parse error: ${e}` }];
+    }
+    const [dispatches, reason] = workflowDispatches(wf, ctx);
+    if (!dispatches) {
+      return [{ workflow: path, job: "*", status: "no-dispatch", reason }];
+    }
+    const jobs = await expandJobs(wf, ctx, reader, headSource, 0, "", true, prFacts, executor);
+    return jobs.map((j) => ({
+      workflow: path,
+      job: jobName(j.job),
+      checkName: j.checkName,
+      status: j.status,
+      reason: j.reason || reason,
+    }));
+  };
+
   const entries: DraftEntry[] = [];
   for (const w of workflows) {
-    const path = w.path;
-    if (path.startsWith(".github/workflows/")) {
-      if (w.state !== "active") {
-        entries.push({
-          workflow: path,
-          job: "*",
-          status: "no-dispatch",
-          reason: `workflow state: ${w.state}`,
-        });
-      } else {
-        const content = await fetchWorkflow(path, headSource);
-        if (content === null) {
-          // The Actions API keeps listing a workflow as `active` after its file is
-          // deleted. There is no file at head, so there is nothing to dispatch —
-          // the same verdict as the disabled case above, reached a different way.
-          entries.push({
-            workflow: path,
-            job: "*",
-            status: "no-dispatch",
-            reason: "no workflow file at head",
-          });
-        } else {
-          let wf: Workflow | undefined;
-          try {
-            wf = parseYaml(content);
-          } catch (e) {
-            // GitHub creates a run for an unparseable workflow file and concludes it
-            // `startup_failure`. The run exists but has no jobs, so this is a
-            // workflow-level "it dispatches" with nothing to expand.
-            entries.push({
-              workflow: path,
-              job: "*",
-              status: "run",
-              reason: `YAML parse error: ${e}`,
-            });
-          }
-          if (wf !== undefined) {
-            const [dispatches, reason] = workflowDispatches(wf, ctx);
-            if (!dispatches) {
-              entries.push({ workflow: path, job: "*", status: "no-dispatch", reason });
-            } else {
-              for (const j of await expandJobs(
-                wf,
-                ctx,
-                reader,
-                headSource,
-                0,
-                "",
-                true,
-                prFacts,
-                executor,
-              )) {
-                entries.push({
-                  workflow: path,
-                  job: jobName(j.job),
-                  checkName: j.checkName,
-                  status: j.status,
-                  reason: j.reason || reason,
-                });
-              }
-            }
-          }
-        }
-      }
+    if (w.path.startsWith(".github/workflows/")) {
+      entries.push(...(await workflowEntries(w.path, w.state)));
     }
   }
   return finalizePrediction(entries, null, sources);
