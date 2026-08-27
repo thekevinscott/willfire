@@ -6,7 +6,9 @@ export function matchFilters(value: string, patterns: string[]): boolean {
   for (const pat of patterns) {
     const neg = pat.startsWith("!");
     const p = neg ? pat.slice(1) : pat;
-    if (patternToRegex(p).test(value)) matched = !neg;
+    if (patternToRegex(p).test(value)) {
+      matched = !neg;
+    }
   }
   return matched;
 }

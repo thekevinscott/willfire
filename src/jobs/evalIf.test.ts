@@ -22,6 +22,10 @@ describe("evalIf", () => {
     expect(evalIf(cond)).toBe(expected);
   });
 
+  it("coerces a non-string condition before evaluating", () => {
+    expect(evalIf(false)).toBe("skipped");
+  });
+
   it("resolves against the scope the caller handed in", () => {
     // The scope param is the expr module's own Scope, not a structural copy.
     const hit: Scope = { inputs: { x: { kind: "value", v: "v" } } };

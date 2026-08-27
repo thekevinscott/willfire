@@ -25,18 +25,28 @@ import type {
  * existed; nothing regresses.
  */
 function inputLiteral(raw: unknown): Val {
-  if (raw == null) return { kind: "value", v: "" };
-  if (typeof raw === "boolean" || typeof raw === "number") return { kind: "value", v: raw };
-  if (typeof raw === "string") return raw.includes("${{") ? UNKNOWN : { kind: "value", v: raw };
+  if (raw == null) {
+    return { kind: "value", v: "" };
+  }
+  if (typeof raw === "boolean" || typeof raw === "number") {
+    return { kind: "value", v: raw };
+  }
+  if (typeof raw === "string") {
+    return raw.includes("${{") ? UNKNOWN : { kind: "value", v: raw };
+  }
   return UNKNOWN;
 }
 
 /** The `on.workflow_call.inputs` block, tolerating the YAML 1.1 `on` -> true key. */
 function workflowCallInputs(wf: Workflow): Record<string, any> {
   const on = wf?.["on"] ?? wf?.["true"];
-  if (on == null || typeof on !== "object") return {};
+  if (on == null || typeof on !== "object") {
+    return {};
+  }
   const call = (on as Record<string, any>)["workflow_call"];
-  if (call == null || typeof call !== "object") return {};
+  if (call == null || typeof call !== "object") {
+    return {};
+  }
   const inputs = call["inputs"];
   return inputs != null && typeof inputs === "object" ? inputs : {};
 }
@@ -108,9 +118,13 @@ export async function expandJobs(
   const execFailures: Record<string, string> = {};
   if (executor != null) {
     for (const [jobId, jobRaw] of Object.entries(jobs)) {
-      if (!executor.granted(source, jobId)) continue;
+      if (!executor.granted(source, jobId)) {
+        continue;
+      }
       const job = jobRaw ?? {};
-      if (evalIf(job.if, scoped) !== "run") continue;
+      if (evalIf(job.if, scoped) !== "run") {
+        continue;
+      }
       const res = await executor.executeJob(jobId, job, wf, scoped);
       if (res.ok) {
         scoped = { ...scoped, needs: { ...scoped.needs, [jobId]: { outputs: res.outputs } } };
@@ -129,7 +143,9 @@ export async function expandJobs(
     let status = evalIf(job.if, scoped);
     let reason = job.if != null ? `if: ${JSON.stringify(job.if)}` : "";
     let needs: string[] = job.needs ?? [];
-    if (typeof needs === "string") needs = [needs];
+    if (typeof needs === "string") {
+      needs = [needs];
+    }
     const cond = String(job.if ?? "");
     if (status !== "skipped" && !cond.includes("always()")) {
       for (const n of needs) {

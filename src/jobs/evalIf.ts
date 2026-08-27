@@ -11,8 +11,12 @@ import { prScope } from "./prScope.js";
  * `needs.*`.
  */
 export function evalIf(cond: any, scope: Scope = {}): "run" | "skipped" | "unknown" {
-  if (cond == null) return "run";
+  if (cond == null) {
+    return "run";
+  }
   const verdict = evaluate(String(cond), prScope(scope));
-  if (verdict === null) return "unknown";
+  if (verdict === null) {
+    return "unknown";
+  }
   return verdict ? "run" : "skipped";
 }
