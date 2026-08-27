@@ -51,6 +51,15 @@ prediction that is wrong in the over-predicting direction hangs a gate; one that
 is wrong in the under-predicting direction opens a silent hole. Treat a change to
 verdict logic as a change to every gated repo.
 
+## Conventions
+
+- Strict equality only: `===`/`!==`, including null checks (`x !== null`),
+  never `==`/`!=`. An eslint `eqeqeq` gate will enforce this once the open
+  slice PRs merge.
+- No `continue` statements; restructure the loop instead. `no-continue` joins
+  the same eslint gate.
+- Smallest reviewable PRs. One concern per PR; split by default.
+
 ## Out of scope
 
 - Don't add unsolicited refactors or hypothetical-future abstractions.
