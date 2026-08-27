@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
+import type { GithubClient } from "./makeGithubClient.js";
 import { stackTargetRef } from "./stackTargetRef.js";
-import type { Octokit } from "@octokit/rest";
 import type { StackNode } from "../types.js";
 
 interface Fake {
@@ -12,7 +12,7 @@ interface Fake {
   openPrs?: { headRef: string; baseRef: string; mergeSha: string | null }[];
 }
 
-const fakeOctokit = (f: Fake) =>
+const fakeGithub = (f: Fake) =>
   ({
     rest: {
       repos: {
@@ -33,9 +33,9 @@ const fakeOctokit = (f: Fake) =>
         }),
       },
     },
-  }) as unknown as Octokit;
+  }) as unknown as GithubClient;
 
-const walk = (pr: StackNode, f: Fake) => stackTargetRef(fakeOctokit(f), "o", "r", pr);
+const walk = (pr: StackNode, f: Fake) => stackTargetRef(fakeGithub(f), "o", "r", pr);
 
 describe("stackTargetRef", () => {
   it("is null for a PR with no test merge", async () => {

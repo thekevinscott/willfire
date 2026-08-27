@@ -3,7 +3,8 @@ export { patternToRegex, matchFilters } from "./filters/index.js";
 export { expandMatrix } from "./matrix/index.js";
 export { evalIf, expandWorkflowJobs } from "./jobs/index.js";
 export { parseUses } from "./uses/index.js";
-export { makeOctokit, predict } from "./predict/index.js";
+export { makeGithubClient, predict } from "./predict/index.js";
+export type { GithubClient } from "./predict/index.js";
 export type { ExecOutcome, JobExecutor } from "./execute.js";
 export type {
   JobName,

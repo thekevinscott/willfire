@@ -2,27 +2,20 @@
 // registry, import. The dynamic import is the seam — a static import would run
 // the main block once, before any test staged its fixture.
 
-import type { Octokit } from "@octokit/rest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { GithubClient } from "./predict/makeGithubClient.js";
 
-// The real `Octokit` constructor is the one third-party edge the entrypoint
-// reaches for through `makeOctokit`. Replacing the class lets it be driven
-// without a network. `hoisted` is the handoff: `vi.mock` factories are lifted
-// above the imports, so they cannot close over ordinary module scope.
-const hoisted = vi.hoisted(() => ({ octokit: undefined as unknown }));
+// `makeGithubClient` is the seam the entrypoint reaches the network through.
+// Replacing the module lets the CLI be driven without a token or a network.
+// `hoisted` is the handoff: `vi.mock` factories are lifted above the imports,
+// so they cannot close over ordinary module scope.
+const hoisted = vi.hoisted(() => ({ github: undefined as unknown }));
 
-vi.mock("@octokit/rest", async () => {
-  const actual = await vi.importActual<typeof import("@octokit/rest")>("@octokit/rest");
-  return {
-    ...actual,
-    // Returning an object from a constructor overrides `this`, so `new Octokit()`
-    // hands back whatever the case under test staged.
-    Octokit: class {
-      constructor(_options: { auth?: string }) {
-        return (hoisted.octokit ?? {}) as object;
-      }
-    },
-  };
+vi.mock("./predict/makeGithubClient.js", async () => {
+  const actual = await vi.importActual<typeof import("./predict/makeGithubClient.js")>(
+    "./predict/makeGithubClient.js",
+  );
+  return { ...actual, makeGithubClient: () => hoisted.github as GithubClient };
 });
 
 const WF = ".github/workflows/w.yml";
@@ -40,12 +33,12 @@ const HEAD_SHA = "deadbeef";
 const HEAD_SOURCE = { owner: "o", repo: "r", ref: HEAD_SHA, sha: HEAD_SHA };
 
 // Sentinels standing in for the paginating route methods. `predict` passes the
-// method itself to `octokit.paginate`, never calls it, so identity is all the
+// method itself to `github.paginate`, never calls it, so identity is all the
 // stub needs to tell the two routes apart.
 const LIST_FILES = Symbol("pulls.listFiles");
 const LIST_WORKFLOWS = Symbol("actions.listRepoWorkflows");
 
-function fakeOctokit(f: Fixture): Octokit {
+function fakeGithub(f: Fixture): GithubClient {
   const contents = f.contents ?? {};
   const api = {
     rest: {
@@ -80,7 +73,7 @@ function fakeOctokit(f: Fixture): Octokit {
       return [{ path: WF, state: "active" }];
     },
   };
-  return api as unknown as Octokit;
+  return api as unknown as GithubClient;
 }
 
 describe("the CLI entrypoint", () => {
@@ -91,19 +84,17 @@ describe("the CLI entrypoint", () => {
     out = [];
     vi.spyOn(console, "log").mockImplementation((line: string) => void out.push(line));
     vi.spyOn(console, "error").mockImplementation(() => undefined);
-    vi.stubEnv("GH_TOKEN", "gh");
   });
 
   afterEach(() => {
     process.argv = argv;
-    hoisted.octokit = undefined;
+    hoisted.github = undefined;
     vi.restoreAllMocks();
-    vi.unstubAllEnvs();
   });
 
   /** Re-import the module as if node had been pointed at it directly. */
   async function invoke(args: string[], f: Fixture = {}): Promise<void> {
-    hoisted.octokit = fakeOctokit(f);
+    hoisted.github = fakeGithub(f);
     process.argv = ["node", "/somewhere/cli.ts", ...args];
     vi.resetModules();
     await import("./cli.js");

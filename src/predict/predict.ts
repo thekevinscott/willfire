@@ -6,13 +6,13 @@
 // workflow calls on probe PR 9; the rules they turned up are pinned in
 // src/names.test.ts.
 
-import type { Octokit } from "@octokit/rest";
 import { parse as parseYaml } from "yaml";
 import { jobName } from "../entries/jobName.js";
 import type { Scope } from "../expr/val.js";
 import { expandJobs } from "../jobs/expandJobs.js";
 import { workflowDispatches } from "../triggers/workflowDispatches.js";
 import { finalizePrediction } from "./finalizePrediction.js";
+import type { GithubClient } from "./makeGithubClient.js";
 import { makeLiveExecutor } from "./makeLiveExecutor.js";
 import { sourceKey } from "./sourceKey.js";
 import { stackTargetRef } from "./stackTargetRef.js";
@@ -32,7 +32,7 @@ const SKIP_RE = /\[(skip ci|ci skip|no ci|skip actions|actions skip)\]/i;
 const SKIP_TRAILER_RE = /^skip-checks:\s*true/im;
 
 export async function predict(
-  octokit: Octokit,
+  github: GithubClient,
   repo: string,
   prNumber: number,
   opts: PredictOptions = {},
@@ -40,13 +40,13 @@ export async function predict(
   const [owner, name] = repo.split("/");
   const base = { owner, repo: name };
 
-  const { data: pr } = await octokit.rest.pulls.get({ ...base, pull_number: prNumber });
-  const files = await octokit.paginate(octokit.rest.pulls.listFiles, {
+  const { data: pr } = await github.rest.pulls.get({ ...base, pull_number: prNumber });
+  const files = await github.paginate(github.rest.pulls.listFiles, {
     ...base,
     pull_number: prNumber,
     per_page: 100,
   });
-  const stackTarget = await stackTargetRef(octokit, owner, name, pr);
+  const stackTarget = await stackTargetRef(github, owner, name, pr);
   const ctx: Ctx = {
     // The caller's answer wins whenever it has one. The commit-count fallback
     // is a guess kept only so existing callers keep working.
@@ -68,7 +68,7 @@ export async function predict(
   // message is what decides the verdict.
   const sources = new Map<string, WorkflowSource>([[sourceKey(headSource), headSource]]);
 
-  const { data: headCommit } = await octokit.rest.repos.getCommit({
+  const { data: headCommit } = await github.rest.repos.getCommit({
     ...base,
     ref: headSha,
   });
@@ -94,7 +94,7 @@ export async function predict(
     }
     let sha: string | null;
     try {
-      const { data } = await octokit.rest.repos.getCommit({
+      const { data } = await github.rest.repos.getCommit({
         owner: src.owner,
         repo: src.repo,
         ref: src.ref,
@@ -127,14 +127,13 @@ export async function predict(
     }
     let content: string | null;
     try {
-      const { data } = await octokit.rest.repos.getContent({
+      const { data } = await github.rest.repos.getContent({
         owner: src.owner,
         repo: src.repo,
         path,
         ref: src.sha,
-        mediaType: { format: "raw" },
       });
-      content = data as unknown as string;
+      content = data;
     } catch {
       // Private, deleted, bad ref, rate limit, network: all one answer here.
       // The caller turns it into an `unknown` entry rather than throwing.
@@ -149,10 +148,10 @@ export async function predict(
   // Execution is on by default and costs nothing until a workflow needs it.
   const executor =
     opts.executor === undefined
-      ? makeLiveExecutor(octokit, headSource, resolveRef)
+      ? makeLiveExecutor(github, headSource, resolveRef)
       : (opts.executor ?? undefined);
 
-  const workflows = await octokit.paginate(octokit.rest.actions.listRepoWorkflows, {
+  const workflows = await github.paginate(github.rest.actions.listRepoWorkflows, {
     ...base,
     per_page: 100,
   });

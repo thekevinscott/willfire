@@ -1,4 +1,4 @@
-// End-to-end suite for `predict()`, driven against a hand-built Octokit
+// End-to-end suite for `predict()`, driven against a hand-built GitHub client
 // stand-in.
 //
 // The expectations are not opinions about how GitHub *ought* to behave. The
@@ -7,7 +7,7 @@
 // `tests/fixtures/willrun-probe/` are the record. Changing one of these
 // assertions means claiming GitHub changed.
 
-import type { Octokit } from "@octokit/rest";
+import type { GithubClient } from "./makeGithubClient.js";
 import { describe, expect, it, vi } from "vitest";
 import { predict } from "./predict.js";
 import type { Entry, Prediction } from "../types.js";
@@ -61,12 +61,12 @@ const HEAD_SOURCE = { owner: "o", repo: "r", ref: HEAD_SHA, sha: HEAD_SHA };
 const REMOTE_SHA = "b".repeat(40);
 
 // Sentinels standing in for the paginating route methods. `predict` passes the
-// method itself to `octokit.paginate`, never calls it, so identity is all the
+// method itself to `github.paginate`, never calls it, so identity is all the
 // stub needs to tell the two routes apart.
 const LIST_FILES = Symbol("pulls.listFiles");
 const LIST_WORKFLOWS = Symbol("actions.listRepoWorkflows");
 
-function fakeOctokit(f: Fixture): Octokit {
+function fakeGithub(f: Fixture): GithubClient {
   const contents = f.contents ?? {};
   const api = {
     rest: {
@@ -123,12 +123,12 @@ function fakeOctokit(f: Fixture): Octokit {
       return f.workflows ?? [{ path: WF, state: "active" }];
     },
   };
-  return api as unknown as Octokit;
+  return api as unknown as GithubClient;
 }
 
 /** Predict against a repo whose only workflow is `body` at `.github/workflows/w.yml`. */
 function run(body: string, f: Fixture = {}): Promise<Prediction> {
-  return predict(fakeOctokit({ contents: { [WF]: body }, ...f }), "o/r", 1);
+  return predict(fakeGithub({ contents: { [WF]: body }, ...f }), "o/r", 1);
 }
 
 /** The single entry `run()` produced, asserting there is exactly one. */
@@ -252,7 +252,7 @@ describe("workflow-level verdicts", () => {
     // The Actions API keeps listing a workflow as `active` after its file is
     // deleted on the branch. Nothing can dispatch from a file that is not there.
     const { entries } = await predict(
-      fakeOctokit({ contents: {} }),
+      fakeGithub({ contents: {} }),
       "o/r",
       1,
     );
@@ -453,11 +453,11 @@ describe("workflow-level verdicts", () => {
 
 describe("predict", () => {
   it("reports a disabled workflow as no-dispatch without reading the file", async () => {
-    const octokit = fakeOctokit({
+    const github = fakeGithub({
       workflows: [{ path: WF, state: "disabled_manually" }],
       contents: {},
     });
-    const { entries } = await predict(octokit, "o/r", 1);
+    const { entries } = await predict(github, "o/r", 1);
     expect(entries).toEqual([
       {
         workflow: WF,
@@ -470,10 +470,10 @@ describe("predict", () => {
   });
 
   it("ignores anything the Actions API lists outside .github/workflows", async () => {
-    const octokit = fakeOctokit({
+    const github = fakeGithub({
       workflows: [{ path: "dynamic/pages/pages-build-deployment", state: "active" }],
     });
-    expect(await predict(octokit, "o/r", 1)).toEqual({
+    expect(await predict(github, "o/r", 1)).toEqual({
       entries: [],
       checkNames: [],
       skip: null,
@@ -590,12 +590,12 @@ describe("the commits a prediction was read from", () => {
     // The whole point of resolving. Fetching at `v1` would leave a prediction
     // naming a commit it did not actually read.
     const body = caller("octo/repo/.github/workflows/x.yml@v1");
-    const octokit = fakeOctokit({
+    const github = fakeGithub({
       contents: { [WF]: body, ".github/workflows/x.yml": CALLEE },
       refs: { "octo/repo@v1": REMOTE_SHA },
     });
-    const getContent = vi.spyOn(octokit.rest.repos, "getContent");
-    await predict(octokit, "o/r", 1);
+    const getContent = vi.spyOn(github.rest.repos, "getContent");
+    await predict(github, "o/r", 1);
     expect(getContent).toHaveBeenCalledWith(
       expect.objectContaining({ owner: "octo", repo: "repo", ref: REMOTE_SHA }),
     );
@@ -606,12 +606,12 @@ describe("the commits a prediction was read from", () => {
       "on: pull_request\njobs:\n" +
       "  a:\n    uses: octo/repo/.github/workflows/x.yml@v1\n" +
       "  b:\n    uses: octo/repo/.github/workflows/x.yml@v1\n";
-    const octokit = fakeOctokit({
+    const github = fakeGithub({
       contents: { [WF]: body, ".github/workflows/x.yml": CALLEE },
       refs: { "octo/repo@v1": REMOTE_SHA },
     });
-    const getCommit = vi.spyOn(octokit.rest.repos, "getCommit");
-    const { sources } = await predict(octokit, "o/r", 1);
+    const getCommit = vi.spyOn(github.rest.repos, "getCommit");
+    const { sources } = await predict(github, "o/r", 1);
     // One for the head commit's message, one for `v1`. The second `v1` is the
     // cache, not a request.
     expect(getCommit).toHaveBeenCalledTimes(2);
@@ -623,9 +623,9 @@ describe("the commits a prediction was read from", () => {
       "on: pull_request\njobs:\n" +
       "  a:\n    uses: octo/repo/.github/workflows/x.yml@v1\n" +
       "  b:\n    uses: octo/repo/.github/workflows/x.yml@v1\n";
-    const octokit = fakeOctokit({ contents: { [WF]: body } });
-    const getCommit = vi.spyOn(octokit.rest.repos, "getCommit");
-    const { entries } = await predict(octokit, "o/r", 1);
+    const github = fakeGithub({ contents: { [WF]: body } });
+    const getCommit = vi.spyOn(github.rest.repos, "getCommit");
+    const { entries } = await predict(github, "o/r", 1);
     expect(getCommit).toHaveBeenCalledTimes(2);
     expect(entries.map((e) => e.status)).toEqual(["unknown", "unknown"]);
   });
@@ -637,12 +637,12 @@ describe("the commits a prediction was read from", () => {
       "on: pull_request\njobs:\n" +
       "  a:\n    uses: octo/repo/.github/workflows/x.yml@v1\n" +
       `  b:\n    uses: octo/repo/.github/workflows/x.yml@${REMOTE_SHA}\n`;
-    const octokit = fakeOctokit({
+    const github = fakeGithub({
       contents: { [WF]: body, ".github/workflows/x.yml": CALLEE },
       refs: { "octo/repo@v1": REMOTE_SHA },
     });
-    const getContent = vi.spyOn(octokit.rest.repos, "getContent");
-    await predict(octokit, "o/r", 1);
+    const getContent = vi.spyOn(github.rest.repos, "getContent");
+    await predict(github, "o/r", 1);
     // The caller's own workflow, then the callee once for both jobs.
     expect(getContent).toHaveBeenCalledTimes(2);
   });
@@ -652,14 +652,14 @@ describe("the commits a prediction was read from", () => {
       "on: pull_request\njobs:\n" +
       "  a:\n    uses: ./.github/workflows/sub.yml\n" +
       "  b:\n    uses: ./.github/workflows/sub.yml\n";
-    const octokit = fakeOctokit({
+    const github = fakeGithub({
       contents: {
         [WF]: body,
         [SUB]: "on:\n  workflow_call:\njobs:\n  inner:\n    name: Inner\n",
       },
     });
-    const spy = vi.spyOn(octokit.rest.repos, "getContent");
-    const { entries } = await predict(octokit, "o/r", 1);
+    const spy = vi.spyOn(github.rest.repos, "getContent");
+    const { entries } = await predict(github, "o/r", 1);
     expect(entries.map((e) => e.job)).toEqual(["a / Inner", "b / Inner"]);
     const subFetches = spy.mock.calls.filter((c) => c[0]?.path === SUB);
     expect(subFetches).toHaveLength(1);
@@ -670,7 +670,7 @@ describe("the commits a prediction was read from", () => {
 
 describe("a caller-supplied event action", () => {
   const runWith = (body: string, f: Fixture, opts: Parameters<typeof predict>[3]) =>
-    predict(fakeOctokit({ contents: { [WF]: body }, ...f }), "o/r", 1, opts);
+    predict(fakeGithub({ contents: { [WF]: body }, ...f }), "o/r", 1, opts);
 
   const onTypes = (types: string) =>
     `on:\n  pull_request:\n    types: [${types}]\njobs:\n  a: {}\n`;
@@ -729,7 +729,7 @@ describe("github.repository as a prediction-wide fact", () => {
         hermetic: { if: "github.repository == 'o/r'" },
       },
     });
-    const { checkNames } = await predict(fakeOctokit({ contents: { [WF]: wf } }), "o/r", 1);
+    const { checkNames } = await predict(fakeGithub({ contents: { [WF]: wf } }), "o/r", 1);
     expect(checkNames).toEqual(["hermetic"]);
   });
 
@@ -742,10 +742,10 @@ describe("github.repository as a prediction-wide fact", () => {
       on: "pull_request",
       jobs: { call: { uses: "./.github/workflows/sub.yml" } },
     });
-    const octokit = fakeOctokit({
+    const github = fakeGithub({
       contents: { [WF]: wf, ".github/workflows/sub.yml": sub },
     });
-    const { checkNames } = await predict(octokit, "o/r", 1);
+    const { checkNames } = await predict(github, "o/r", 1);
     expect(checkNames).toEqual(["call / inner"]);
   });
 });
@@ -765,7 +765,7 @@ describe("the executor seam through predict", () => {
 
   const coverEntry = async (f: Fixture, opts: Parameters<typeof predict>[3] = {}) => {
     const { entries } = await predict(
-      fakeOctokit({ contents: { [WF]: DYNAMIC }, ...f }),
+      fakeGithub({ contents: { [WF]: DYNAMIC }, ...f }),
       "o/r",
       1,
       opts,
@@ -801,7 +801,7 @@ describe("the executor seam through predict", () => {
   it("resolves the dynamic matrix through an injected executor", async () => {
     const executed: string[] = [];
     const { checkNames } = await predict(
-      fakeOctokit({ contents: { [WF]: DYNAMIC } }),
+      fakeGithub({ contents: { [WF]: DYNAMIC } }),
       "o/r",
       1,
       {

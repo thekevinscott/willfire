@@ -1,4 +1,4 @@
-import type { Octokit } from "@octokit/rest";
+import type { GithubClient } from "./makeGithubClient.js";
 import type { StackNode } from "../types.js";
 
 /** Past this the walk stops at the last proven hop, which only narrows reach. */
@@ -16,7 +16,7 @@ const MAX_STACK_DEPTH = 10;
  * walk at the last proven hop; never throws.
  */
 export async function stackTargetRef(
-  octokit: Octokit,
+  github: GithubClient,
   owner: string,
   repo: string,
   pr: StackNode,
@@ -29,7 +29,7 @@ export async function stackTargetRef(
       if (mergeSha === null) {
         break;
       }
-      const { data: preview } = await octokit.rest.repos.getCommit({
+      const { data: preview } = await github.rest.repos.getCommit({
         owner,
         repo,
         ref: mergeSha,
@@ -38,7 +38,7 @@ export async function stackTargetRef(
       if (previewParent === undefined) {
         break;
       }
-      const { data: baseTip } = await octokit.rest.repos.getCommit({
+      const { data: baseTip } = await github.rest.repos.getCommit({
         owner,
         repo,
         ref: cur.base.ref,
@@ -49,7 +49,7 @@ export async function stackTargetRef(
       }
       // Otherwise only an exact match against an open PR whose head is the
       // base branch proves stacked mode; a stale preview matches nothing.
-      const { data: candidates } = await octokit.rest.pulls.list({
+      const { data: candidates } = await github.rest.pulls.list({
         owner,
         repo,
         state: "open",

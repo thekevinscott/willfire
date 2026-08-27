@@ -5,7 +5,7 @@ describe("predict barrel", () => {
   it("exposes exactly the prediction pipeline", () => {
     expect(Object.keys(barrel).sort()).toEqual([
       "finalizePrediction",
-      "makeOctokit",
+      "makeGithubClient",
       "predict",
       "sourceKey",
       "stackTargetRef",

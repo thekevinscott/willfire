@@ -46,7 +46,6 @@
     "verify": "tsx src/verify.ts"
   },
   "dependencies": {
-    "@octokit/rest": "^22.0.0",
     "yaml": "^2.6.0"
   },
   "devDependencies": {

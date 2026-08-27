@@ -1,7 +1,7 @@
 // The live executor is wiring; these tests pin the wiring — which provider a
 // request routes to, where clone auth comes from — not the pieces themselves.
 
-import type { Octokit } from "@octokit/rest";
+import type { GithubClient } from "./makeGithubClient.js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { runShell } from "../execute.js";
 import { makeLiveExecutor } from "./makeLiveExecutor.js";
@@ -36,8 +36,8 @@ const resolveRef = async (): Promise<string | null> => null;
 /** A real gzipped tarball, `o-r-ccccccc/file.txt` = "content". */
 const WRAPPED_TB = "H4sIAAAAAAAAA+3S0QrCIBSA4fMovsCcw6nPE2ODICaYQY/fqqvGWAQzqP3fzRH0QvnVtRRnJiG4x5zM58I6eNeKcuWvJnI550NSSlKMee3cu/0fpetYpap7KvQXPu7fNKGx9P+G1/7D8dTrfN34ofeo3rcr/cOsv7XBiDLbXmPZzvt3ccz9+I8vAwAAAAAAAAAAAAAA2IcbvGawBgAoAAA=";
 
-/** An Octokit whose only implemented route is the tarball download. */
-function octokitOf(tarballs: Record<string, string>): Octokit {
+/** A GitHub client whose only implemented route is the tarball download. */
+function githubOf(tarballs: Record<string, string>): GithubClient {
   const api = {
     rest: {
       repos: {
@@ -51,7 +51,7 @@ function octokitOf(tarballs: Record<string, string>): Octokit {
       },
     },
   };
-  return api as unknown as Octokit;
+  return api as unknown as GithubClient;
 }
 
 afterEach(() => {
@@ -60,7 +60,7 @@ afterEach(() => {
 
 describe("makeLiveExecutor", () => {
   it("serves a plain job from the tarball endpoint, end to end", async () => {
-    const ex = makeLiveExecutor(octokitOf({ [`o/r@${SHA}`]: WRAPPED_TB }), WORKSPACE, resolveRef, {
+    const ex = makeLiveExecutor(githubOf({ [`o/r@${SHA}`]: WRAPPED_TB }), WORKSPACE, resolveRef, {
       // The host shell stands in for the sandbox, which has its own suite.
       runCommand: runShell,
       token: null,
@@ -78,7 +78,7 @@ describe("makeLiveExecutor", () => {
   });
 
   it("fails the job when the tarball is not served", async () => {
-    const ex = makeLiveExecutor(octokitOf({}), WORKSPACE, resolveRef, {
+    const ex = makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef, {
       runCommand: runShell,
       token: null,
     });
@@ -88,7 +88,7 @@ describe("makeLiveExecutor", () => {
 
   it("routes a history request to the clone provider, not the tarball", async () => {
     // The tarball exists but the clone remote does not: failing proves routing.
-    const ex = makeLiveExecutor(octokitOf({ [`o/r@${SHA}`]: WRAPPED_TB }), WORKSPACE, resolveRef, {
+    const ex = makeLiveExecutor(githubOf({ [`o/r@${SHA}`]: WRAPPED_TB }), WORKSPACE, resolveRef, {
       runCommand: runShell,
       token: null,
       remoteUrl: () => "file:///nonexistent-willfire-remote",
@@ -104,9 +104,9 @@ describe("makeLiveExecutor", () => {
 
   it("defaults the run command to the docker sandbox", () => {
     hoisted.makeSandboxRunner.mockClear();
-    makeLiveExecutor(octokitOf({}), WORKSPACE, resolveRef, { token: null });
+    makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef, { token: null });
     expect(hoisted.makeSandboxRunner).toHaveBeenCalledTimes(1);
-    makeLiveExecutor(octokitOf({}), WORKSPACE, resolveRef, { token: null, runCommand: runShell });
+    makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef, { token: null, runCommand: runShell });
     expect(hoisted.makeSandboxRunner).toHaveBeenCalledTimes(1);
   });
 
@@ -115,12 +115,12 @@ describe("makeLiveExecutor", () => {
     hoisted.makeCloneProvider.mockClear();
     vi.stubEnv("GH_TOKEN", "from-gh-token");
     vi.stubEnv("GITHUB_TOKEN", "from-github-token");
-    makeLiveExecutor(octokitOf({}), WORKSPACE, resolveRef);
+    makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef);
     vi.stubEnv("GH_TOKEN", undefined);
-    makeLiveExecutor(octokitOf({}), WORKSPACE, resolveRef);
+    makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef);
     vi.stubEnv("GITHUB_TOKEN", undefined);
-    makeLiveExecutor(octokitOf({}), WORKSPACE, resolveRef);
-    makeLiveExecutor(octokitOf({}), WORKSPACE, resolveRef, { token: "explicit" });
+    makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef);
+    makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef, { token: "explicit" });
     expect(hoisted.makeCloneProvider.mock.calls.map((c) => c[1])).toEqual([
       "from-gh-token",
       "from-github-token",

@@ -17,11 +17,12 @@ pnpm add willfire
 ## Library
 
 ```ts
-import { predict } from "willfire";
-import { getOctokit } from "@actions/github"; // or new Octokit({ auth: token })
+import { makeGithubClient, predict } from "willfire";
 
+// makeGithubClient reads GH_TOKEN or GITHUB_TOKEN from the environment; any
+// object satisfying the exported GithubClient interface works in its place.
 const { entries, checkNames, skip, sources } = await predict(
-  getOctokit(token),
+  makeGithubClient(),
   "owner/repo",
   123,
   { action: context.payload.action }, // "opened" | "synchronize" | "reopened"
