@@ -21,7 +21,9 @@ async function actualEntries(octokit: Octokit, repo: string, prNumber: number) {
   const entries = new Map<string, "run" | "skipped">();
   const incomplete: string[] = [];
   for (const run of runs) {
-    if (run.status !== "completed") incomplete.push(run.path);
+    if (run.status !== "completed") {
+      incomplete.push(run.path);
+    }
     const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
       ...base,
       run_id: run.id,

@@ -199,7 +199,7 @@ describe("verify", () => {
   });
 
   it("warns when a run is still in flight", async () => {
-    await invoke({
+    const code = await invoke({
       predicted: [entry("w.yml", "a", "run")],
       runs: [
         {
@@ -211,6 +211,7 @@ describe("verify", () => {
       ],
     });
     expect(out[0]).toBe("WARNING: runs still in progress: w.yml");
+    expect(code).toBe(0);
   });
 
   // #11 closed the workflow-level variant so it cannot carry `unknown`, and

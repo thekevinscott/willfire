@@ -39,7 +39,9 @@ export function parseArgs(argv: string[]): {
   // execution the caller thought they asked for.
   const execute: ExecutionGrant[] = [];
   for (let i = 0; i < argv.length; i++) {
-    if (argv[i] !== "--execute") continue;
+    if (argv[i] !== "--execute") {
+      continue;
+    }
     const spec = argv[i + 1];
     const grant = spec == null ? null : parseGrant(spec);
     if (grant == null) {
