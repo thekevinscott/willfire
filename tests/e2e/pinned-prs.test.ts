@@ -9,15 +9,7 @@ const exec = promisify(execFile);
 const root = fileURLToPath(new URL("../..", import.meta.url));
 
 const tsx = (args: string[]) =>
-  exec(join(root, "node_modules/.bin/tsx"), args, {
-    cwd: root,
-    maxBuffer: 16 * 1024 * 1024,
-  });
-
-const predict = async (repo: string, pr: number): Promise<Prediction> => {
-  const { stdout } = await tsx(["src/cli.ts", "--repo", repo, "--pr", String(pr), "--json"]);
-  return JSON.parse(stdout) as Prediction;
-};
+  exec(join(root, "node_modules/.bin/tsx"), args, { cwd: root });
 
 const PROBE_PR8_CHECKS = [
   "Caller Label / Inner Label",
@@ -105,7 +97,8 @@ const PROBE_PR8_CHECKS = [
 ];
 
 test("probe PR #8 predicts exactly the checks GitHub dispatched", async () => {
-  const prediction = await predict("thekevinbot/willrun-probe", 8);
+  const { stdout } = await tsx(["src/cli.ts", "--repo", "thekevinbot/willrun-probe", "--pr", "8", "--json"]);
+  const prediction = JSON.parse(stdout) as Prediction;
   expect(prediction.checkNames).toEqual(PROBE_PR8_CHECKS);
   expect(prediction.skip).toBeNull();
   const undecided = prediction.entries
