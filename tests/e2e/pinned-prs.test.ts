@@ -94,6 +94,8 @@ const PROBE_PR8_CHECKS = [
   "test (1.0, slow)",
   "test (2.0, fast)",
   "test (3.0)",
+  "use (p)",
+  "use (q)",
 ];
 
 test("probe PR #8 predicts exactly the checks GitHub dispatched", async () => {
@@ -104,9 +106,9 @@ test("probe PR #8 predicts exactly the checks GitHub dispatched", async () => {
   const undecided = prediction.entries
     .filter(isJobEntry)
     .filter((e) => e.status === "unknown" || e.checkName === null);
-  expect(undecided.map((e) => `${e.workflow} :: ${e.job}`)).toEqual([
-    ".github/workflows/dynamic-matrix.yml :: use",
-  ]);
+  // The executor (#46) resolves dynamic-matrix.yml's `use` matrix by running
+  // `gen`, so nothing on this PR is undecided any more.
+  expect(undecided.map((e) => `${e.workflow} :: ${e.job}`)).toEqual([]);
 });
 
 for (const [repo, pr] of [
