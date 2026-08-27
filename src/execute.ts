@@ -59,16 +59,22 @@ export interface ExecutionGrant {
 /** `owner/repo:job1,job2` as the CLI spells a grant. */
 export function parseGrant(spec: string): ExecutionGrant | null {
   const colon = spec.indexOf(":");
-  if (colon <= 0) return null;
+  if (colon <= 0) {
+    return null;
+  }
   const repo = spec.slice(0, colon);
   const parts = repo.split("/");
-  if (parts.length !== 2 || parts.some((p) => p === "")) return null;
+  if (parts.length !== 2 || parts.some((p) => p === "")) {
+    return null;
+  }
   const jobs = spec
     .slice(colon + 1)
     .split(",")
     .map((s) => s.trim())
     .filter((s) => s !== "");
-  if (jobs.length === 0) return null;
+  if (jobs.length === 0) {
+    return null;
+  }
   return { repo, jobs };
 }
 
@@ -147,12 +153,18 @@ function renderTemplate(text: string, scope: Scope): string | null {
 
 /** An `env:` block rendered to concrete strings, every key or nothing. */
 function renderEnvLayer(layer: unknown, scope: Scope): Res<Record<string, string>> {
-  if (layer == null) return { ok: true, v: {} };
-  if (typeof layer !== "object" || Array.isArray(layer)) return err("env block is not a map");
+  if (layer == null) {
+    return { ok: true, v: {} };
+  }
+  if (typeof layer !== "object" || Array.isArray(layer)) {
+    return err("env block is not a map");
+  }
   const out: Record<string, string> = {};
   for (const [k, raw] of Object.entries(layer as Record<string, unknown>)) {
     const rendered = renderTemplate(String(raw ?? ""), scope);
-    if (rendered == null) return err(`cannot resolve env '${k}'`);
+    if (rendered == null) {
+      return err(`cannot resolve env '${k}'`);
+    }
     out[k] = rendered;
   }
   return { ok: true, v: out };
@@ -171,13 +183,17 @@ export function parseGithubOutput(text: string): Record<string, string> | null {
   while (i < lines.length) {
     const line = lines[i];
     i++;
-    if (line === "") continue;
+    if (line === "") {
+      continue;
+    }
     const heredoc = /^([^=<]+)<<(.+)$/.exec(line);
     if (heredoc != null) {
       const [, name, delim] = heredoc;
       const buf: string[] = [];
       for (;;) {
-        if (i >= lines.length) return null; // unterminated heredoc
+        if (i >= lines.length) {
+          return null; // unterminated heredoc
+        }
         if (lines[i] === delim) {
           i++;
           break;
@@ -189,7 +205,9 @@ export function parseGithubOutput(text: string): Record<string, string> | null {
       continue;
     }
     const eq = line.indexOf("=");
-    if (eq <= 0) return null;
+    if (eq <= 0) {
+      return null;
+    }
     out[line.slice(0, eq)] = line.slice(eq + 1);
   }
   return out;
@@ -203,13 +221,21 @@ export function parseGithubOutput(text: string): Record<string, string> | null {
  * lives at the repo root. Expressions and `docker://` images return null.
  */
 function parseActionUses(uses: string): { path: string; source: SourceRef } | null {
-  if (uses.includes("${{") || uses.startsWith("docker://")) return null;
+  if (uses.includes("${{") || uses.startsWith("docker://")) {
+    return null;
+  }
   const at = uses.lastIndexOf("@");
-  if (at <= 0) return null;
+  if (at <= 0) {
+    return null;
+  }
   const ref = uses.slice(at + 1);
-  if (ref === "") return null;
+  if (ref === "") {
+    return null;
+  }
   const [owner, repo, ...rest] = uses.slice(0, at).split("/");
-  if (!owner || !repo) return null;
+  if (!owner || !repo) {
+    return null;
+  }
   return { path: rest.join("/"), source: { owner, repo, ref } };
 }
 
@@ -235,7 +261,9 @@ async function readActionManifest(dir: string): Promise<string | null> {
  */
 function bindActionInputs(action: any, withBlock: unknown, scope: Scope): Record<string, Val> {
   const bind = (raw: unknown): Val => {
-    if (raw == null) return { kind: "value", v: "" };
+    if (raw == null) {
+      return { kind: "value", v: "" };
+    }
     if (typeof raw === "boolean" || typeof raw === "number") {
       return { kind: "value", v: String(raw) };
     }
@@ -296,11 +324,15 @@ async function runSteps(
     const stepScope: Scope = { ...scope, steps: stepsCtx };
     if (step.if != null) {
       const verdict = evaluate(String(step.if), stepScope);
-      if (verdict == null) return err(`cannot decide if: for ${label}`);
+      if (verdict == null) {
+        return err(`cannot decide if: for ${label}`);
+      }
       if (!verdict) {
         // A skipped step still occupies its id, with no outputs — that is the
         // empty string every later read gets, and what `||` coalesces past.
-        if (typeof step.id === "string") stepsCtx[step.id] = { outputs: {} };
+        if (typeof step.id === "string") {
+          stepsCtx[step.id] = { outputs: {} };
+        }
         continue;
       }
     }
@@ -312,8 +344,12 @@ async function runSteps(
     } else {
       return err(`${label} has neither uses nor run`);
     }
-    if (!res.ok) return res;
-    if (typeof step.id === "string") stepsCtx[step.id] = { outputs: res.v };
+    if (!res.ok) {
+      return res;
+    }
+    if (typeof step.id === "string") {
+      stepsCtx[step.id] = { outputs: res.v };
+    }
   }
   return { ok: true, v: stepsCtx };
 }
@@ -345,10 +381,14 @@ async function runUses(
     actionDir = join(ctx.tree, uses.slice(2));
   } else {
     const target = parseActionUses(uses);
-    if (target == null) return err(`${label}: unresolvable uses: ${uses}`);
+    if (target == null) {
+      return err(`${label}: unresolvable uses: ${uses}`);
+    }
     const { ref } = target.source;
     const sha = SHA_RE.test(ref) ? ref : await ctx.deps.resolveRef(target.source);
-    if (sha == null) return err(`${label}: cannot resolve ref for ${uses}`);
+    if (sha == null) {
+      return err(`${label}: cannot resolve ref for ${uses}`);
+    }
     const source: WorkflowSource = { ...target.source, sha };
     const root = await ctx.deps.provideTree(source);
     if (root == null) {
@@ -357,7 +397,9 @@ async function runUses(
     actionDir = target.path === "" ? root : join(root, target.path);
   }
   const manifest = await readActionManifest(actionDir);
-  if (manifest == null) return err(`${label}: no action.yml under ${uses}`);
+  if (manifest == null) {
+    return err(`${label}: no action.yml under ${uses}`);
+  }
   let action: any;
   try {
     action = parseYaml(manifest);
@@ -380,16 +422,22 @@ async function runUses(
     actionPath: actionDir,
     depth: ctx.depth + 1,
   });
-  if (!walked.ok) return err(`${label} (${uses}): ${walked.reason}`);
+  if (!walked.ok) {
+    return err(`${label} (${uses}): ${walked.reason}`);
+  }
   // The action's declared outputs are its whole surface: each `value:` is
   // evaluated against the child's own steps, and every one must land.
   const outScope: Scope = { ...childScope, steps: walked.v };
   const outputs: Record<string, string> = {};
   for (const [name, decl] of Object.entries(action.outputs ?? {})) {
     const raw = (decl as Record<string, unknown> | null)?.["value"];
-    if (raw == null) return err(`${label}: output '${name}' of ${uses} has no value`);
+    if (raw == null) {
+      return err(`${label}: output '${name}' of ${uses} has no value`);
+    }
     const rendered = renderTemplate(String(raw), outScope);
-    if (rendered == null) return err(`${label}: cannot resolve output '${name}' of ${uses}`);
+    if (rendered == null) {
+      return err(`${label}: cannot resolve output '${name}' of ${uses}`);
+    }
     outputs[name] = rendered;
   }
   return { ok: true, v: outputs };
@@ -407,7 +455,9 @@ async function runRun(
     return err(`${label}: shell '${shell}' is not modelled`);
   }
   const script = renderTemplate(String(step.run), scope);
-  if (script == null) return err(`${label}: cannot resolve \${{ }} in run`);
+  if (script == null) {
+    return err(`${label}: cannot resolve \${{ }} in run`);
+  }
   const env: Record<string, string> = {
     // The two the runner always provides and scripts assume. Everything else
     // a step sees, it declared.
@@ -415,16 +465,22 @@ async function runRun(
     HOME: process.env.HOME ?? "",
     GITHUB_WORKSPACE: ctx.tree,
   };
-  if (ctx.actionPath != null) env.GITHUB_ACTION_PATH = ctx.actionPath;
+  if (ctx.actionPath != null) {
+    env.GITHUB_ACTION_PATH = ctx.actionPath;
+  }
   for (const layer of [...ctx.envLayers, step.env]) {
     const rendered = renderEnvLayer(layer, scope);
-    if (!rendered.ok) return err(`${label}: ${rendered.reason}`);
+    if (!rendered.ok) {
+      return err(`${label}: ${rendered.reason}`);
+    }
     Object.assign(env, rendered.v);
   }
   let cwd = ctx.tree;
   if (step["working-directory"] != null) {
     const wd = renderTemplate(String(step["working-directory"]), scope);
-    if (wd == null) return err(`${label}: cannot resolve working-directory`);
+    if (wd == null) {
+      return err(`${label}: cannot resolve working-directory`);
+    }
     cwd = resolve(ctx.tree, wd);
   }
   const outDir = await mkdtemp(join(tmpdir(), "willfire-out-"));
@@ -439,7 +495,9 @@ async function runRun(
     return err(`${label}: exited ${r.code}${tail === "" ? "" : ` (${tail})`}`);
   }
   const outputs = parseGithubOutput(await readFile(outFile, "utf8"));
-  if (outputs == null) return err(`${label}: malformed GITHUB_OUTPUT`);
+  if (outputs == null) {
+    return err(`${label}: malformed GITHUB_OUTPUT`);
+  }
   return { ok: true, v: outputs };
 }
 
@@ -472,11 +530,15 @@ export function makeExecutor(opts: {
       // The shapes execution does not model, refused by name rather than run
       // wrong: a matrix'd job is several executions, and a container changes
       // what every step means.
-      if (job.strategy != null) return fail(`job '${jobId}' has a strategy; not modelled`);
+      if (job.strategy != null) {
+        return fail(`job '${jobId}' has a strategy; not modelled`);
+      }
       if (job.container != null || job.services != null) {
         return fail(`job '${jobId}' uses a container or services; not modelled`);
       }
-      if (!Array.isArray(job.steps)) return fail(`job '${jobId}' has no steps`);
+      if (!Array.isArray(job.steps)) {
+        return fail(`job '${jobId}' has no steps`);
+      }
       const tree = await deps.provideTree(workspace);
       if (tree == null) {
         return fail(
@@ -490,7 +552,9 @@ export function makeExecutor(opts: {
         deps,
         depth: 0,
       });
-      if (!walked.ok) return fail(walked.reason);
+      if (!walked.ok) {
+        return fail(walked.reason);
+      }
       // The job's `outputs:` map is the whole point of having run anything.
       // Every declared entry must land; a hole here would hand consumers a
       // partial map, which the Scope contract calls a lie.
@@ -498,7 +562,9 @@ export function makeExecutor(opts: {
       const outputs: Record<string, string> = {};
       for (const [name, raw] of Object.entries(job.outputs ?? {})) {
         const rendered = renderTemplate(String(raw), outScope);
-        if (rendered == null) return fail(`cannot resolve job output '${name}'`);
+        if (rendered == null) {
+          return fail(`cannot resolve job output '${name}'`);
+        }
         outputs[name] = rendered;
       }
       return { ok: true, outputs };
@@ -528,7 +594,9 @@ export const runShell: RunCommand = (spec) =>
     child.stderr.on("data", (d: Buffer) => {
       stderr += String(d);
       // Keep the tail; a failure reason wants the last line, not a transcript.
-      if (stderr.length > 4096) stderr = stderr.slice(-4096);
+      if (stderr.length > 4096) {
+        stderr = stderr.slice(-4096);
+      }
     });
     child.on("error", () => resolvePromise({ code: 127, stderr }));
     child.on("close", (code) => resolvePromise({ code: code ?? 1, stderr }));
@@ -549,7 +617,9 @@ export function makeTreeProvider(
   return (source) => {
     const key = `${source.owner}/${source.repo}@${source.sha}`;
     const hit = cache.get(key);
-    if (hit !== undefined) return hit;
+    if (hit !== undefined) {
+      return hit;
+    }
     const p = materialize(source, download, runCommand);
     cache.set(key, p);
     return p;
@@ -562,7 +632,9 @@ async function materialize(
   runCommand: RunCommand,
 ): Promise<string | null> {
   const bytes = await download(source);
-  if (bytes == null) return null;
+  if (bytes == null) {
+    return null;
+  }
   const dir = await mkdtemp(join(tmpdir(), "willfire-tree-"));
   const archive = join(dir, "tree.tar.gz");
   await writeFile(archive, bytes);
@@ -578,11 +650,15 @@ async function materialize(
       WILLFIRE_DEST: dest,
     },
   });
-  if (r.code !== 0) return null;
+  if (r.code !== 0) {
+    return null;
+  }
   const entries = await readdir(dest);
   if (entries.length === 1) {
     const sub = join(dest, entries[0]);
-    if ((await stat(sub)).isDirectory()) return sub;
+    if ((await stat(sub)).isDirectory()) {
+      return sub;
+    }
   }
   return dest;
 }
