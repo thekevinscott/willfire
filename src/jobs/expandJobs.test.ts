@@ -13,7 +13,7 @@ vi.mock(
   "./neededJobIds.js",
   async () => await vi.importActual<typeof import("./neededJobIds.js")>("./neededJobIds.js"),
 );
-import type { JobExecutor } from "../execute.js";
+import type { JobExecutor } from "../execute/types.js";
 import type {
   Ctx,
   FetchWorkflow,

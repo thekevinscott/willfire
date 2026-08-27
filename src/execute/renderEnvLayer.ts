@@ -1,0 +1,23 @@
+import type { Scope } from "../expr/val.js";
+import { err } from "./err.js";
+import { renderTemplate } from "./renderTemplate.js";
+import type { Res } from "./types.js";
+
+/** An `env:` block rendered to concrete strings, every key or nothing. */
+export function renderEnvLayer(layer: unknown, scope: Scope): Res<Record<string, string>> {
+  if (layer == null) {
+    return { ok: true, v: {} };
+  }
+  if (typeof layer !== "object" || Array.isArray(layer)) {
+    return err("env block is not a map");
+  }
+  const out: Record<string, string> = {};
+  for (const [k, raw] of Object.entries(layer as Record<string, unknown>)) {
+    const rendered = renderTemplate(String(raw ?? ""), scope);
+    if (rendered == null) {
+      return err(`cannot resolve env '${k}'`);
+    }
+    out[k] = rendered;
+  }
+  return { ok: true, v: out };
+}
