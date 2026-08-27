@@ -44,17 +44,17 @@ function inputValue(raw: unknown, scope: Scope): Val {
 }
 
 /** The `on.workflow_call.inputs` block, tolerating the YAML 1.1 `on` -> true key. */
-function workflowCallInputs(wf: Workflow): Record<string, any> {
+function workflowCallInputs(wf: Workflow): Record<string, unknown> {
   const on = wf?.["on"] ?? wf?.["true"];
   if (on === null || typeof on !== "object") {
     return {};
   }
-  const call = (on as Record<string, any>)["workflow_call"];
+  const call = (on as Record<string, unknown>)["workflow_call"];
   if (call === null || typeof call !== "object") {
     return {};
   }
-  const inputs = call["inputs"];
-  return inputs !== null && typeof inputs === "object" ? inputs : {};
+  const inputs = (call as Record<string, unknown>)["inputs"];
+  return inputs !== null && typeof inputs === "object" ? (inputs as Record<string, unknown>) : {};
 }
 
 /**
@@ -109,7 +109,7 @@ const NEEDS_OUTPUTS_RE = /needs\s*\.\s*([A-Za-z_][A-Za-z0-9_-]*)\s*\.\s*outputs\
  * Matching over the serialized job catches every read site without modelling
  * any; a false positive costs one wasted run, never a verdict.
  */
-function neededJobIds(jobs: Record<string, Workflow>): Set<string> {
+function neededJobIds(jobs: Record<string, Workflow | null>): Set<string> {
   const needed = new Set<string>();
   for (const job of Object.values(jobs)) {
     for (const m of JSON.stringify(job ?? {}).matchAll(NEEDS_OUTPUTS_RE)) {
@@ -131,7 +131,9 @@ export async function expandJobs(
   executor?: JobExecutor,
 ): Promise<ExpandedJob[]> {
   const entries: ExpandedJob[] = [];
-  const jobs: Record<string, Workflow> = wf.jobs ?? {};
+  const jobsRaw = wf.jobs;
+  const jobs: Record<string, Workflow | null> =
+    jobsRaw !== null && typeof jobsRaw === "object" ? (jobsRaw as Record<string, Workflow | null>) : {};
   const statuses: Record<string, string> = {};
 
   // Selection is derived, never configured: execute exactly the jobs some
@@ -165,9 +167,12 @@ export async function expandJobs(
     const job = jobRaw ?? {};
     let status = evalIf(job.if, scoped);
     let reason = job.if !== undefined && job.if !== null ? `if: ${JSON.stringify(job.if)}` : "";
-    let needs: string[] = job.needs ?? [];
-    if (typeof needs === "string") {
-      needs = [needs];
+    const needsRaw: unknown = job.needs;
+    let needs: string[] = [];
+    if (typeof needsRaw === "string") {
+      needs = [needsRaw];
+    } else if (Array.isArray(needsRaw)) {
+      needs = needsRaw.map(String);
     }
     const cond = String(job.if ?? "");
     if (status !== "skipped" && !cond.includes("always()")) {
@@ -201,7 +206,7 @@ export async function expandJobs(
       // call names its checks exactly the same way a local one does — probe
       // PR #9, `call-remote-tag / r-inner` alongside `call-plain / inner`.
       const combos = expandMatrixDetailed(job.strategy, prScope(scoped));
-      const uses: string = job.uses;
+      const uses = String(job.uses);
       if (combos === null) {
         entries.push({
           job: prefix + jobId,
