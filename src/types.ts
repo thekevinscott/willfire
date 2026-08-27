@@ -1,4 +1,4 @@
-import type { ExecutionGrant } from "./execute.js";
+import type { ExecutionGrant } from "./execute/types.js";
 
 export interface EntryBase {
   workflow: string;

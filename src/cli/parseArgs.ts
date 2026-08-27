@@ -1,4 +1,5 @@
-import { parseGrant, type ExecutionGrant } from "../execute.js";
+import { parseGrant } from "../execute/parseGrant.js";
+import type { ExecutionGrant } from "../execute/types.js";
 import type { PrEventAction } from "../types.js";
 
 const USAGE =

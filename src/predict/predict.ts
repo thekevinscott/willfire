@@ -9,7 +9,10 @@
 import type { Octokit } from "@octokit/rest";
 import { parse as parseYaml } from "yaml";
 import { jobName } from "../entries/jobName.js";
-import { makeExecutor, makeTreeProvider, runShell, type JobExecutor } from "../execute.js";
+import { makeExecutor } from "../execute/makeExecutor.js";
+import { makeTreeProvider } from "../execute/makeTreeProvider.js";
+import { runShell } from "../execute/runShell.js";
+import type { JobExecutor } from "../execute/types.js";
 import type { Scope } from "../expr/val.js";
 import { expandJobs } from "../jobs/expandJobs.js";
 import { workflowDispatches } from "../triggers/workflowDispatches.js";

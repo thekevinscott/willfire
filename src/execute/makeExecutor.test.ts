@@ -1,25 +1,27 @@
-// Unit suite for the executor.
-//
-// The subprocess seam is exercised for real: `run:` steps go through
-// `runShell` and an actual bash, because "run it, never interpret it" is the
-// module's whole claim and a faked shell would test the interpretation this
-// module promises not to do. Everything network-shaped — trees, refs — is
-// injected, and the unit under test is the suite's only collaborator: fixture
-// trees are built through `runShell` itself, tarballs are embedded bytes, and
-// `action.yml` files are written as JSON, which is valid YAML, so the suite
-// never imports a parser, a filesystem, or a path library of its own.
+// The executor suite runs its subprocess seam for real: `run:` steps go
+// through `runShell` and an actual bash, because "run it, never interpret it"
+// is the module's whole claim and a faked shell would test the interpretation
+// this module promises not to do. Everything network-shaped — trees, refs —
+// is injected: fixture trees are built through `runShell` itself, tarballs
+// are embedded bytes, and `action.yml` files are written as JSON, which is
+// valid YAML.
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-  makeExecutor,
-  makeTreeProvider,
-  parseGithubOutput,
-  parseGrant,
-  runShell,
-  type ExecDeps,
-  type ExecOutcome,
-} from "./execute.js";
-import type { WorkflowSource } from "./types.js";
+import { makeExecutor } from "./makeExecutor.js";
+import { makeTreeProvider } from "./makeTreeProvider.js";
+import { runShell } from "./runShell.js";
+import type { ExecDeps, ExecOutcome } from "./types.js";
+import type { WorkflowSource } from "../types.js";
+
+vi.mock("./makeTreeProvider.js", async () => {
+  const actual = await vi.importActual<typeof import("./makeTreeProvider.js")>("./makeTreeProvider.js");
+  return { ...actual };
+});
+
+vi.mock("./runShell.js", async () => {
+  const actual = await vi.importActual<typeof import("./runShell.js")>("./runShell.js");
+  return { ...actual };
+});
 
 const SHA = "c".repeat(40);
 const REMOTE_SHA = "d".repeat(40);
@@ -55,17 +57,6 @@ async function tempTree(files: Record<string, string>): Promise<string> {
     expect(r.code).toBe(0);
   }
   return root;
-}
-
-/** True when `path` holds exactly `want` — read through `runShell`, again. */
-async function fileIs(path: string, want: string): Promise<boolean> {
-  const r = await runShell({
-    script: '[ "$(cat "$F")" = "$W" ]',
-    shell: "bash",
-    cwd: TMP,
-    env: { ...SH_ENV, F: path, W: want },
-  });
-  return r.code === 0;
 }
 
 /**
@@ -120,54 +111,6 @@ const success = (o: ExecOutcome): Record<string, string> => {
 
 afterEach(() => {
   vi.unstubAllEnvs();
-});
-
-// ---------------------------------------------------------------- parseGrant
-
-describe("parseGrant", () => {
-  it("parses owner/repo:job1,job2, trimming around the commas", () => {
-    expect(parseGrant("o/r:detect, scan")).toEqual({ repo: "o/r", jobs: ["detect", "scan"] });
-  });
-
-  it("rejects everything that is not exactly owner/repo:jobs", () => {
-    expect(parseGrant("o/r")).toBe(null); // no colon
-    expect(parseGrant(":detect")).toBe(null); // no repo
-    expect(parseGrant("or:detect")).toBe(null); // no slash
-    expect(parseGrant("o/r/x:detect")).toBe(null); // too many segments
-    expect(parseGrant("o/:detect")).toBe(null); // empty half
-    expect(parseGrant("o/r:")).toBe(null); // no jobs
-    expect(parseGrant("o/r: , ")).toBe(null); // only empty jobs
-  });
-});
-
-// -------------------------------------------------------- parseGithubOutput
-
-describe("parseGithubOutput", () => {
-  it("reads name=value lines, last write winning", () => {
-    expect(parseGithubOutput("a=1\nb=\na=2\n")).toEqual({ a: "2", b: "" });
-  });
-
-  it("reads a heredoc as one multi-line value", () => {
-    expect(parseGithubOutput("k<<EOF\nline1\nline2\nEOF\na=1\n")).toEqual({
-      k: "line1\nline2",
-      a: "1",
-    });
-  });
-
-  it("skips blank lines between assignments", () => {
-    expect(parseGithubOutput("a=1\n\nb=2\n")).toEqual({ a: "1", b: "2" });
-  });
-
-  it("refuses an unterminated heredoc", () => {
-    // The runner fails the step on one; tolerating it here would invent
-    // outputs a real run never had.
-    expect(parseGithubOutput("k<<EOF\nline1\n")).toBe(null);
-  });
-
-  it("refuses a line that assigns nothing", () => {
-    expect(parseGithubOutput("garbage\n")).toBe(null);
-    expect(parseGithubOutput("=value\n")).toBe(null);
-  });
 });
 
 // ------------------------------------------------------------------- grants
@@ -390,6 +333,14 @@ describe("executing run steps", () => {
     const ex = executorOf({}); // no trees at all
     const o = await ex.executeJob("detect", { steps: [] }, {}, {});
     expect(failure(o)).toBe(`cannot materialize workspace o/r@${SHA}`);
+  });
+
+  it("falls back to empty PATH and HOME when the parent has neither", async () => {
+    vi.stubEnv("PATH", undefined as never);
+    vi.stubEnv("HOME", undefined as never);
+    const o = await execute({ steps: [{ run: "true" }] });
+    // With no PATH there is no bash: the step fails rather than guessing one.
+    expect(failure(o)).toMatch(/exited 127/);
   });
 });
 
@@ -679,111 +630,9 @@ describe("composite actions", () => {
   });
 });
 
-// ------------------------------------------------------------------ runShell
-
-describe("runShell", () => {
-  it("reports a spawn that never starts as exit 127", async () => {
-    const r = await runShell({ script: "true", shell: "bash", cwd: "/nonexistent-dir", env: SH_ENV });
-    expect(r.code).toBe(127);
-  });
-
-  it("keeps only the stderr tail", async () => {
-    const r = await runShell({
-      script: 'for i in $(seq 1 200); do printf "%050d\\n" "$i" >&2; done; exit 1',
-      shell: "bash",
-      cwd: TMP,
-      env: SH_ENV,
-    });
-    expect(r.code).toBe(1);
-    expect(r.stderr.length).toBeLessThanOrEqual(4096);
-    // The tail survives truncation — the last line is the 200th.
-    expect(r.stderr.trimEnd().endsWith("200")).toBe(true);
-  });
-
-  it("reports a signal death as exit 1", async () => {
-    const r = await runShell({ script: 'kill -9 "$$"', shell: "bash", cwd: TMP, env: SH_ENV });
-    expect(r.code).toBe(1);
-  });
-
-  it("falls back to empty PATH and HOME when the parent has neither", async () => {
-    vi.stubEnv("PATH", undefined as never);
-    vi.stubEnv("HOME", undefined as never);
-    const o = await execute({ steps: [{ run: "true" }] });
-    // With no PATH there is no bash: the step fails rather than guessing one.
-    expect(failure(o)).toMatch(/exited 127/);
-  });
-});
-
-// ----------------------------------------------------------- makeTreeProvider
-
-/**
- * Real gzipped tarballs, embedded so the suite needs no filesystem of its
- * own to produce bytes. Each was made with
- * `tar --owner=0 --group=0 --mtime=@0 --sort=name -czf` over the tree its
- * name describes; extraction below runs the real `tar`.
- */
-const tarball = (base64: string): Uint8Array => new Uint8Array(Buffer.from(base64, "base64"));
-
-/** `o-r-ccccccc/file.txt` = "content" — the GitHub single-wrapper shape. */
-const WRAPPED_TB = "H4sIAAAAAAAAA+3S0QrCIBSA4fMovsCcw6nPE2ODICaYQY/fqqvGWAQzqP3fzRH0QvnVtRRnJiG4x5zM58I6eNeKcuWvJnI550NSSlKMee3cu/0fpetYpap7KvQXPu7fNKGx9P+G1/7D8dTrfN34ofeo3rcr/cOsv7XBiDLbXmPZzvt3ccz9+I8vAwAAAAAAAAAAAAAA2IcbvGawBgAoAAA=";
-/** `a.txt` = "1", `b.txt` = "2" — two top-level entries. */
-const TWO_TB = "H4sIAAAAAAAAA+3TSwqDMBSF4buUrCAPyWM9dgOCRnD5xtKJUuygxLT4f5MbSAYnHK42Up0tUgrPWRznm3OKwYsK9aOJzFPuR6VkHIZ89u7T/Z/Sptd5qfuzrdQY/Un/bt+/s7Er/duqqV5u3r9rHQBNafP4zf0P7P8VutYBAAAAAAAAAAAAAADA11aiM229ACgAAA==";
-/** `only.txt` = "1" — a single top-level *file*, not a directory. */
-const ONE_TB = "H4sIAAAAAAAAA+3RTQqAIBCG4TmKJ7Ck1PO0j4QyqNv3s4kiCgKJ6H02M6CLb/h0JsnlM+/tOmfHebJ7Z0tRNn00kb6LVauUtCHEq3937x+ls9DUo45DwuOWUp0rL/o3+/6NKZwVlaeLtPl5/+btAAAAAAAAAAAAAAAAAAAemwDJjzcgACgAAA==";
-
-describe("makeTreeProvider", () => {
-  it("downloads once per commit and unwraps the single wrapping directory", async () => {
-    // GitHub tarballs wrap the tree in one `owner-repo-shortsha/` directory.
-    let downloads = 0;
-    const provide = makeTreeProvider(async () => {
-      downloads++;
-      return tarball(WRAPPED_TB);
-    }, runShell);
-    const first = await provide(WORKSPACE);
-    const second = await provide(WORKSPACE);
-    expect(second).toBe(first);
-    expect(downloads).toBe(1);
-    expect(await fileIs(`${first}/file.txt`, "content")).toBe(true);
-  });
-
-  it("returns the extraction root when there is no single wrapping directory", async () => {
-    const provide = makeTreeProvider(async () => tarball(TWO_TB), runShell);
-    const tree = await provide(WORKSPACE);
-    expect(await fileIs(`${tree}/a.txt`, "1")).toBe(true);
-  });
-
-  it("does not unwrap a single top-level file", async () => {
-    const provide = makeTreeProvider(async () => tarball(ONE_TB), runShell);
-    const tree = await provide(WORKSPACE);
-    expect(await fileIs(`${tree}/only.txt`, "1")).toBe(true);
-  });
-
-  it("hands a failed download through as null", async () => {
-    const provide = makeTreeProvider(async () => null, runShell);
-    expect(await provide(WORKSPACE)).toBe(null);
-  });
-
-  it("hands the extraction an empty PATH when the parent has none", async () => {
-    vi.stubEnv("PATH", undefined);
-    const seen: string[] = [];
-    const provide = makeTreeProvider(
-      async () => new Uint8Array([0]),
-      async (spec) => {
-        seen.push(spec.env.PATH);
-        return { code: 1, stderr: "" };
-      },
-    );
-    expect(await provide(WORKSPACE)).toBe(null);
-    expect(seen).toEqual([""]);
-  });
-
-  it("hands a failed extraction through as null", async () => {
-    const provide = makeTreeProvider(async () => new Uint8Array([1, 2, 3]), runShell);
-    expect(await provide(WORKSPACE)).toBe(null);
-  });
-});
-
 // ------------------------------------------------- the fleet's detect, whole
+
+const tarball = (base64: string): Uint8Array => new Uint8Array(Buffer.from(base64, "base64"));
 
 describe("the whole path, tarball to job outputs", () => {
   // The workspace: `o-r-cccc/package.json` = "{}". The callee:
