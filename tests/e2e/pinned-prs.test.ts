@@ -109,10 +109,22 @@ test("probe PR #8 predicts exactly the checks GitHub dispatched", async () => {
   ]);
 });
 
+// Live verify pins: each PR's predicted run set must match what GitHub
+// actually dispatched (verify.ts tolerates `unknown` entries — only
+// MISS/OVER/DIFF fail). Probe PRs pin exact rules; the fleet PRs below pin
+// real-world workflow shapes the probe repo does not exercise (release
+// matrices, reusable-workflow e2e fixtures, testing-conventions dispatch).
+// Every entry was read off a live dispatch, not invented — see AGENTS.md.
 for (const [repo, pr] of [
   ["thekevinbot/willrun-probe", 8],
   ["thekevinbot/willrun-probe", 9],
   ["thekevinscott/willfire", 34],
+  ["thekevinscott/dirsql", 1000],
+  ["thekevinscott/dirsql", 1014],
+  ["thekevinscott/putitoutthere", 647],
+  ["thekevinscott/putitoutthere", 649],
+  ["thekevinscott/pr-monitor", 24],
+  ["thekevinscott/pr-monitor", 26],
 ] as const) {
   test(`${repo}#${pr}: predicted set matches what GitHub dispatched`, async () => {
     const { stdout } = await tsx(["src/verify.ts", "--repo", repo, "--pr", String(pr)]);
