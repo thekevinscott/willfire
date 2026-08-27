@@ -514,6 +514,17 @@ describe("predict", () => {
     expect(skip).toBe("head commit message contains a skip instruction");
   });
 
+  it("does not suppress on a skip-checks mention that is not a trailer", async () => {
+    const message = "feat: thing\n\nsee the docs on skip-checks: true handling\n";
+    expect(await only("on: pull_request\njobs:\n  a: {}\n", { message })).toEqual({
+      workflow: WF,
+      job: "a",
+      checkName: "a",
+      status: "run",
+      reason: "trigger matched",
+    });
+  });
+
   it("keeps a workflow with no jobs as a run with no entries", async () => {
     expect(await run("on: pull_request\n")).toEqual({
       entries: [],
