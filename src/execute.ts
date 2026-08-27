@@ -125,32 +125,31 @@ export function parseGithubOutput(text: string): Record<string, string> | null {
   while (i < lines.length) {
     const line = lines[i];
     i++;
-    if (line === "") {
-      continue;
-    }
-    const heredoc = /^([^=<]+)<<(.+)$/.exec(line);
-    if (heredoc !== null) {
-      const [, name, delim] = heredoc;
-      const buf: string[] = [];
-      for (;;) {
-        if (i >= lines.length) {
-          return null; // unterminated heredoc
-        }
-        if (lines[i] === delim) {
+    if (line !== "") {
+      const heredoc = /^([^=<]+)<<(.+)$/.exec(line);
+      if (heredoc !== null) {
+        const [, name, delim] = heredoc;
+        const buf: string[] = [];
+        for (;;) {
+          if (i >= lines.length) {
+            return null; // unterminated heredoc
+          }
+          if (lines[i] === delim) {
+            i++;
+            break;
+          }
+          buf.push(lines[i]);
           i++;
-          break;
         }
-        buf.push(lines[i]);
-        i++;
+        out[name] = buf.join("\n");
+      } else {
+        const eq = line.indexOf("=");
+        if (eq <= 0) {
+          return null;
+        }
+        out[line.slice(0, eq)] = line.slice(eq + 1);
       }
-      out[name] = buf.join("\n");
-      continue;
     }
-    const eq = line.indexOf("=");
-    if (eq <= 0) {
-      return null;
-    }
-    out[line.slice(0, eq)] = line.slice(eq + 1);
   }
   return out;
 }
@@ -260,32 +259,34 @@ async function runSteps(
     const step = steps[i] ?? {};
     const label = `step '${step.id ?? step.name ?? `#${i + 1}`}'`;
     const stepScope: Scope = { ...scope, steps: stepsCtx };
+    let skipped = false;
     if (step.if !== undefined && step.if !== null) {
       const verdict = evaluate(String(step.if), stepScope);
       if (verdict === null) {
         return err(`cannot decide if: for ${label}`);
       }
-      if (!verdict) {
-        // A skipped step still occupies its id, with no outputs.
-        if (typeof step.id === "string") {
-          stepsCtx[step.id] = { outputs: {} };
-        }
-        continue;
+      skipped = !verdict;
+    }
+    if (skipped) {
+      // A skipped step still occupies its id, with no outputs.
+      if (typeof step.id === "string") {
+        stepsCtx[step.id] = { outputs: {} };
       }
-    }
-    let res: Res<Record<string, string>>;
-    if (typeof step.uses === "string") {
-      res = await runUses(step, label, stepScope, ctx);
-    } else if (step.run !== undefined && step.run !== null) {
-      res = await runRun(step, label, stepScope, ctx);
     } else {
-      return err(`${label} has neither uses nor run`);
-    }
-    if (!res.ok) {
-      return res;
-    }
-    if (typeof step.id === "string") {
-      stepsCtx[step.id] = { outputs: res.v };
+      let res: Res<Record<string, string>>;
+      if (typeof step.uses === "string") {
+        res = await runUses(step, label, stepScope, ctx);
+      } else if (step.run !== undefined && step.run !== null) {
+        res = await runRun(step, label, stepScope, ctx);
+      } else {
+        return err(`${label} has neither uses nor run`);
+      }
+      if (!res.ok) {
+        return res;
+      }
+      if (typeof step.id === "string") {
+        stepsCtx[step.id] = { outputs: res.v };
+      }
     }
   }
   return { ok: true, v: stepsCtx };
