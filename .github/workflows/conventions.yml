@@ -3,11 +3,9 @@ name: Testing Conventions
 # Runs the upstream testing-conventions gates over this repo, pinned to the
 # rolling `v0` tag (the same convention as check.yml).
 #
-# There is no config file: every gate takes its default, which for TypeScript is
-# a 100% floor on all four coverage metrics and nothing exempt.
-#
-# `mutation` and `e2e-verify` are left out — mutation needs Stryker in this
-# package's own deps, and there is no e2e attestation to keep fresh.
+# Every gate runs (`gates` left at its empty default): mutation's Stryker deps
+# are in devDependencies, and `e2e-attestations/` holds the receipt the
+# e2e-verify gate checks.
 
 on:
   pull_request:
@@ -23,4 +21,3 @@ jobs:
     with:
       languages: '["typescript"]'
       source: src
-      gates: '["colocated-test", "unit-lint", "unit-coverage", "integration-lint", "packaging"]'
