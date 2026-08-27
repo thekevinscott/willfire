@@ -58,9 +58,16 @@ prediction that is wrong in the over-predicting direction hangs a gate; one that
 is wrong in the under-predicting direction opens a silent hole. Treat a change to
 verdict logic as a change to every gated repo.
 
+## Conventions
+
+- Smallest reviewable PRs. One concern per PR; split by default.
+
 ## Out of scope
 
 - Don't add unsolicited refactors or hypothetical-future abstractions.
 - Don't bypass a CI gate without an explicit reason in the PR body.
 - Don't merge PRs. Open the PR, get CI green, and stop — merging is Kevin's
   call, and that includes arming auto-merge.
+- No attribution boilerplate. No "Generated with Claude Code" footers, no
+  claude.ai links, no session trailers — not in commit messages, PR bodies,
+  issues, or docs.
