@@ -18,7 +18,7 @@ export function makeFetchWorkflow(octokit: Octokit): FetchWorkflow {
         ref: src.sha,
         mediaType: { format: "raw" },
       });
-      content = data as unknown as string;
+      content = typeof data === "string" ? data : null;
     } catch {
       content = null;
     }

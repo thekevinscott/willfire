@@ -7,7 +7,7 @@ const SHA_A = "a".repeat(40);
 const SHA_B = "b".repeat(40);
 const srcAt = (sha: string): WorkflowSource => ({ owner: "o", repo: "r", ref: "main", sha });
 
-function fake(content: string | null, calls: string[]): Octokit {
+function fake(content: unknown, calls: string[]): Octokit {
   return {
     rest: {
       repos: {
@@ -31,6 +31,12 @@ describe("makeFetchWorkflow", () => {
     expect(await fetch("wf.yml", srcAt(SHA_A))).toBe("on: push\n");
     expect(await fetch("wf.yml", srcAt(SHA_B))).toBe("on: push\n");
     expect(calls).toEqual([`o/r/wf.yml@${SHA_A}`, `o/r/wf.yml@${SHA_B}`]);
+  });
+
+  it("treats a non-string payload as missing", async () => {
+    const calls: string[] = [];
+    const fetch = makeFetchWorkflow(fake({ content: "base64" }, calls));
+    expect(await fetch("wf.yml", srcAt(SHA_A))).toBe(null);
   });
 
   it("caches a failed read as null", async () => {
