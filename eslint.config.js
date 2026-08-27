@@ -80,6 +80,7 @@ export default [
     rules: {
       curly: ['error', 'all'],
       eqeqeq: ['error', 'always'],
+      'no-continue': 'error',
       semi: ['error', 'always'],
     },
   },

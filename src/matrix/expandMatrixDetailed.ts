@@ -64,14 +64,13 @@ export function expandMatrixDetailed(strategy: any, scope: Scope = {}): Detailed
   }
   const axes: Record<string, any[]> = {};
   for (const [k, v] of Object.entries(matrix)) {
-    if (k === "include" || k === "exclude") {
-      continue;
+    if (k !== "include" && k !== "exclude") {
+      const vals = axisValues(v, scope);
+      if (vals === null) {
+        return null;
+      }
+      axes[k] = vals;
     }
-    const vals = axisValues(v, scope);
-    if (vals === null) {
-      return null;
-    }
-    axes[k] = vals;
   }
   const axisKeys = Object.keys(axes);
   let combos: DetailedCombo[] = [{ values: {}, displayKeys: axisKeys }];
