@@ -1,50 +1,7 @@
-import { evaluateValue } from "../expr/evaluateValue.js";
 import type { Scope } from "../expr/val.js";
 import type { DetailedCombo, DetailedCombos } from "../types.js";
-
-/**
- * The values of one matrix axis, or null when they cannot be known.
- *
- * A plain list is itself. An axis written as an expression —
- * `language: ${{ fromJSON(needs.detect.outputs.coverage_languages) }}` — is
- * the values another job computed, and is knowable exactly when the scope
- * carries that job's outputs. Anything else stays null, which is what makes
- * the whole job `unknown` rather than a guess at how many checks it creates.
- */
-function axisValues(v: unknown, scope: Scope): unknown[] | null {
-  if (Array.isArray(v)) {
-    return v;
-  }
-  if (typeof v !== "string") {
-    return null;
-  }
-  const val = evaluateValue(v, scope);
-  if (val.kind !== "json" || !Array.isArray(val.v)) {
-    return null;
-  }
-  return val.v;
-}
-
-/**
- * An `include:`/`exclude:` block: a literal list or an expression evaluating
- * to one. Absent means empty; anything unresolvable fails the expansion.
- */
-function comboList(v: unknown, scope: Scope): any[] | null {
-  if (v === null || v === undefined) {
-    return [];
-  }
-  if (Array.isArray(v)) {
-    return v;
-  }
-  if (typeof v !== "string") {
-    return null;
-  }
-  const val = evaluateValue(v, scope);
-  if (val.kind !== "json" || !Array.isArray(val.v)) {
-    return null;
-  }
-  return val.v;
-}
+import { axisValues } from "./axisValues.js";
+import { comboList } from "./comboList.js";
 
 export function expandMatrixDetailed(strategy: any, scope: Scope = {}): DetailedCombos {
   const matrix = strategy?.matrix;

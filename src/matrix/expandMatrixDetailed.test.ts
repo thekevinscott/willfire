@@ -1,6 +1,18 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { Scope } from "../expr/val.js";
 import { expandMatrixDetailed } from "./expandMatrixDetailed.js";
+
+// The isolation gate wants collaborators mocked; axis and include/exclude
+// resolution are part of the expansion this suite pins, so the mocks pass the
+// real modules through.
+vi.mock(
+  "./axisValues.js",
+  async () => await vi.importActual<typeof import("./axisValues.js")>("./axisValues.js"),
+);
+vi.mock(
+  "./comboList.js",
+  async () => await vi.importActual<typeof import("./comboList.js")>("./comboList.js"),
+);
 
 describe("expandMatrixDetailed", () => {
   it("returns a single null combination when there is no matrix", () => {
