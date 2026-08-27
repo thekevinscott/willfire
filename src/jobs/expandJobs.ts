@@ -1,12 +1,13 @@
 import { parse as parseYaml } from "yaml";
-import { evaluateValue } from "../expr/evaluateValue.js";
-import { UNKNOWN, type Scope, type Val } from "../expr/val.js";
-import { renderTemplate, type JobExecutor } from "../execute.js";
+import type { Scope } from "../expr/val.js";
+import type { JobExecutor } from "../execute.js";
 import { expandMatrixDetailed } from "../matrix/expandMatrixDetailed.js";
 import { jobDisplayName } from "../names/jobDisplayName.js";
 import { skippedDisplayName } from "../names/skippedDisplayName.js";
 import { parseUses } from "../uses/parseUses.js";
+import { calleeInputs } from "./calleeInputs.js";
 import { evalIf } from "./evalIf.js";
+import { neededJobIds } from "./neededJobIds.js";
 import { prScope } from "./prScope.js";
 import type {
   Ctx,
@@ -15,77 +16,6 @@ import type {
   WorkflowReader,
   WorkflowSource,
 } from "../types.js";
-
-/**
- * A `with:` value as the callee will see it, evaluated in the caller's scope.
- * A whole-expression value keeps its evaluated type; mixed text renders to a
- * string, all or nothing; anything unresolvable stays unknown.
- */
-function inputValue(raw: unknown, scope: Scope): Val {
-  if (raw === null || raw === undefined) {
-    return { kind: "value", v: "" };
-  }
-  if (typeof raw === "boolean" || typeof raw === "number") {
-    return { kind: "value", v: raw };
-  }
-  if (typeof raw !== "string") {
-    return UNKNOWN;
-  }
-  if (!raw.includes("${{")) {
-    return { kind: "value", v: raw };
-  }
-  const t = raw.trim();
-  // `${{a}} x ${{b}}` fails this test and takes the render path instead.
-  if (t.startsWith("${{") && t.indexOf("}}") === t.length - 2) {
-    return evaluateValue(t.slice(3, -2), prScope(scope));
-  }
-  const rendered = renderTemplate(raw, prScope(scope));
-  return rendered === null ? UNKNOWN : { kind: "value", v: rendered };
-}
-
-/** The `on.workflow_call.inputs` block, tolerating the YAML 1.1 `on` -> true key. */
-function workflowCallInputs(wf: Workflow): Record<string, any> {
-  const on = wf?.["on"] ?? wf?.["true"];
-  if (on == null || typeof on !== "object") {
-    return {};
-  }
-  const call = (on as Record<string, any>)["workflow_call"];
-  if (call == null || typeof call !== "object") {
-    return {};
-  }
-  const inputs = call["inputs"];
-  return inputs != null && typeof inputs === "object" ? inputs : {};
-}
-
-/**
- * What `inputs.*` resolves to inside a called workflow: what the caller passed,
- * over the defaults the callee declares.
- *
- * A declared input the caller omits falls back to its `default`. A declared
- * input with no default and no caller value is unknown rather than empty — the
- * workflow would be invalid if it were required, and guessing empty would
- * silently decide guards that are not decided.
- */
-function calleeInputs(
-  withBlock: unknown,
-  subWf: Workflow,
-  scope: Scope,
-): Record<string, Val> {
-  const out: Record<string, Val> = {};
-  for (const [name, decl] of Object.entries(workflowCallInputs(subWf))) {
-    out[name] =
-      decl != null && typeof decl === "object" && "default" in decl
-        ? // Defaults live in the callee, out of the caller's context's reach.
-          inputValue((decl as Record<string, unknown>)["default"], {})
-        : UNKNOWN;
-  }
-  if (withBlock != null && typeof withBlock === "object") {
-    for (const [name, raw] of Object.entries(withBlock as Record<string, unknown>)) {
-      out[name] = inputValue(raw, scope);
-    }
-  }
-  return out;
-}
 
 /**
  * GitHub allows a reusable-workflow call chain four levels deep. Past that the
@@ -101,23 +31,6 @@ const MAX_REUSABLE_DEPTH = 4;
 const SHA_RE = /^[0-9a-f]{40}$/i;
 
 const isSha = (ref: string): boolean => SHA_RE.test(ref);
-
-const NEEDS_OUTPUTS_RE = /needs\s*\.\s*([A-Za-z_][A-Za-z0-9_-]*)\s*\.\s*outputs\b/g;
-
-/**
- * The jobs some sibling reads outputs from — the only jobs worth executing.
- * Matching over the serialized job catches every read site without modelling
- * any; a false positive costs one wasted run, never a verdict.
- */
-function neededJobIds(jobs: Record<string, Workflow>): Set<string> {
-  const needed = new Set<string>();
-  for (const job of Object.values(jobs)) {
-    for (const m of JSON.stringify(job ?? {}).matchAll(NEEDS_OUTPUTS_RE)) {
-      needed.add(m[1]);
-    }
-  }
-  return needed;
-}
 
 export async function expandJobs(
   wf: Workflow,
