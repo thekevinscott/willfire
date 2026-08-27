@@ -33,7 +33,9 @@ function octokitOf(tarballs: Record<string, string>): Octokit {
       repos: {
         downloadTarballArchive: async ({ owner, repo, ref }: Record<string, string>) => {
           const b64 = tarballs[`${owner}/${repo}@${ref}`];
-          if (b64 == null) throw new Error(`404 tarball ${owner}/${repo}@${ref}`);
+          if (b64 === undefined) {
+            throw new Error(`404 tarball ${owner}/${repo}@${ref}`);
+          }
           return { data: new Uint8Array(Buffer.from(b64, "base64")).buffer };
         },
       },

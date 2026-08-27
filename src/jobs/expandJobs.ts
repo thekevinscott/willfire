@@ -22,17 +22,25 @@ import type {
  * string, all or nothing; anything unresolvable stays unknown.
  */
 function inputValue(raw: unknown, scope: Scope): Val {
-  if (raw == null) return { kind: "value", v: "" };
-  if (typeof raw === "boolean" || typeof raw === "number") return { kind: "value", v: raw };
-  if (typeof raw !== "string") return UNKNOWN;
-  if (!raw.includes("${{")) return { kind: "value", v: raw };
+  if (raw === null || raw === undefined) {
+    return { kind: "value", v: "" };
+  }
+  if (typeof raw === "boolean" || typeof raw === "number") {
+    return { kind: "value", v: raw };
+  }
+  if (typeof raw !== "string") {
+    return UNKNOWN;
+  }
+  if (!raw.includes("${{")) {
+    return { kind: "value", v: raw };
+  }
   const t = raw.trim();
   // `${{a}} x ${{b}}` fails this test and takes the render path instead.
   if (t.startsWith("${{") && t.indexOf("}}") === t.length - 2) {
     return evaluateValue(t.slice(3, -2), prScope(scope));
   }
   const rendered = renderTemplate(raw, prScope(scope));
-  return rendered == null ? UNKNOWN : { kind: "value", v: rendered };
+  return rendered === null ? UNKNOWN : { kind: "value", v: rendered };
 }
 
 /** The `on.workflow_call.inputs` block, tolerating the YAML 1.1 `on` -> true key. */
@@ -134,16 +142,17 @@ export async function expandJobs(
   if (executor != null) {
     const needed = neededJobIds(jobs);
     for (const [jobId, jobRaw] of Object.entries(jobs)) {
-      if (!needed.has(jobId)) continue;
       const job = jobRaw ?? {};
       // A reusable-call job has no steps of its own to run.
-      if ("uses" in job) continue;
-      if (evalIf(job.if, scoped) !== "run") continue;
-      const res = await executor.executeJob(jobId, job, wf, scoped);
-      if (res.ok) {
-        scoped = { ...scoped, needs: { ...scoped.needs, [jobId]: { outputs: res.outputs } } };
-      } else {
-        execFailures[jobId] = res.reason;
+      const runnable =
+        needed.has(jobId) && !("uses" in job) && evalIf(job.if, scoped) === "run";
+      if (runnable) {
+        const res = await executor.executeJob(jobId, job, wf, scoped);
+        if (res.ok) {
+          scoped = { ...scoped, needs: { ...scoped.needs, [jobId]: { outputs: res.outputs } } };
+        } else {
+          execFailures[jobId] = res.reason;
+        }
       }
     }
   }

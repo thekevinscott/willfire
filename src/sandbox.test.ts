@@ -55,7 +55,9 @@ vi.mock("node:child_process", async () => {
         return;
       }
       handlers.get("spawn")?.();
-      for (const chunk of behavior.stderr ?? []) handlers.get("stderr:data")?.(chunk);
+      for (const chunk of behavior.stderr ?? []) {
+        handlers.get("stderr:data")?.(chunk);
+      }
       handlers.get("close")?.(behavior.close === undefined ? 0 : behavior.close);
     });
     return child as unknown as ReturnType<typeof actual.spawn>;

@@ -30,11 +30,19 @@ function axisValues(v: unknown, scope: Scope): unknown[] | null {
  * to one. Absent means empty; anything unresolvable fails the expansion.
  */
 function comboList(v: unknown, scope: Scope): any[] | null {
-  if (v == null) return [];
-  if (Array.isArray(v)) return v;
-  if (typeof v !== "string") return null;
+  if (v === null || v === undefined) {
+    return [];
+  }
+  if (Array.isArray(v)) {
+    return v;
+  }
+  if (typeof v !== "string") {
+    return null;
+  }
   const val = evaluateValue(v, scope);
-  if (val.kind !== "json" || !Array.isArray(val.v)) return null;
+  if (val.kind !== "json" || !Array.isArray(val.v)) {
+    return null;
+  }
   return val.v;
 }
 
@@ -46,10 +54,14 @@ export function expandMatrixDetailed(strategy: any, scope: Scope = {}): Detailed
   // `matrix: ${{ ... }}` — the whole matrix as one expression, rather than the
   // per-axis form below. It yields include-style entries, not axes, so it is a
   // separate expansion and is not modelled.
-  if (typeof matrix === "string") return null;
+  if (typeof matrix === "string") {
+    return null;
+  }
   const include = comboList(matrix.include, scope);
   const exclude = comboList(matrix.exclude, scope);
-  if (include == null || exclude == null) return null;
+  if (include === null || exclude === null) {
+    return null;
+  }
   const axes: Record<string, any[]> = {};
   for (const [k, v] of Object.entries(matrix)) {
     if (k === "include" || k === "exclude") {

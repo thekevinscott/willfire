@@ -55,7 +55,7 @@ export function makeLiveExecutor(
   const clones = makeCloneProvider(
     runShell,
     token,
-    opts.remoteUrl == null ? {} : { remoteUrl: opts.remoteUrl },
+    opts.remoteUrl === undefined ? {} : { remoteUrl: opts.remoteUrl },
   );
   const provideTree: ProvideTree = (src, o) =>
     o?.history === true ? clones(src, o) : tarballs(src, o);

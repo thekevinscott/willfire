@@ -267,7 +267,9 @@ async function runSteps(
       }
       if (!verdict) {
         // A skipped step still occupies its id, with no outputs.
-        if (typeof step.id === "string") stepsCtx[step.id] = { outputs: {} };
+        if (typeof step.id === "string") {
+          stepsCtx[step.id] = { outputs: {} };
+        }
         continue;
       }
     }
@@ -301,8 +303,10 @@ async function runUses(
     // Runner-provided, and its postcondition — the head tree at the workspace
     // path — is already true. Any input beyond `fetch-depth: 0` asks for a
     // different tree than the one provided.
-    const withKeys = step.with == null ? [] : Object.keys(step.with);
-    if (withKeys.length === 0) return { ok: true, v: {} };
+    const withKeys = Object.keys(step.with ?? {});
+    if (withKeys.length === 0) {
+      return { ok: true, v: {} };
+    }
     if (withKeys.length === 1 && String(step.with["fetch-depth"]) === "0") {
       // Unmet inside a composite: the pre-scan that picks the tree provider
       // only reads the job's own steps.
@@ -316,13 +320,19 @@ async function runUses(
   if (SETUP_NODE_RE.test(uses)) {
     // The execution world ships exactly one node: asking for it is already
     // satisfied, asking for anything else cannot be.
-    const withKeys = step.with == null ? [] : Object.keys(step.with);
-    if (withKeys.length === 0) return { ok: true, v: {} };
+    const withKeys = Object.keys(step.with ?? {});
+    if (withKeys.length === 0) {
+      return { ok: true, v: {} };
+    }
     if (withKeys.length === 1 && withKeys[0] === "node-version") {
       const wanted = renderTemplate(String(step.with["node-version"]), scope);
-      if (wanted == null) return err(`${label}: cannot resolve node-version`);
+      if (wanted === null) {
+        return err(`${label}: cannot resolve node-version`);
+      }
       const m = /^v?(\d+)(\..*)?$/.exec(wanted.trim());
-      if (m != null && Number(m[1]) === ctx.deps.nodeMajor) return { ok: true, v: {} };
+      if (m !== null && Number(m[1]) === ctx.deps.nodeMajor) {
+        return { ok: true, v: {} };
+      }
       return err(
         `${label}: setup-node wants node ${wanted}; the sandbox has node ${ctx.deps.nodeMajor}`,
       );
@@ -366,7 +376,7 @@ async function runUses(
   }
   const using = action?.runs?.using;
   const nodeUsing = /^node(\d+)$/.exec(String(using));
-  if (nodeUsing != null) {
+  if (nodeUsing !== null) {
     return runNodeAction(
       step,
       label,
@@ -394,7 +404,9 @@ async function runUses(
     actionRoot,
     depth: ctx.depth + 1,
   });
-  if (!walked.ok) return err(`${label} (${uses}): ${walked.reason}`);
+  if (!walked.ok) {
+    return err(`${label} (${uses}): ${walked.reason}`);
+  }
   // Every declared output must land; a partial map would be a lie.
   const outScope: Scope = { ...childScope, steps: walked.v };
   const outputs: Record<string, string> = {};
@@ -433,22 +445,30 @@ async function runNodeAction(
       `${label}: action ${uses} wants node ${usingMajor}; the sandbox has node ${ctx.deps.nodeMajor}`,
     );
   }
-  if (action?.runs?.pre != null) {
+  if (action?.runs?.pre !== undefined && action.runs.pre !== null) {
     return err(`${label}: action ${uses} declares a pre: step; not modelled`);
   }
   // `post:` runs after the job's own steps, so no job output can depend on it.
   const main = action?.runs?.main;
-  if (typeof main !== "string") return err(`${label}: action ${uses} has no runs.main`);
+  if (typeof main !== "string") {
+    return err(`${label}: action ${uses} has no runs.main`);
+  }
   const env: Record<string, string> = {
     PATH: process.env.PATH ?? "",
     HOME: process.env.HOME ?? "",
     GITHUB_WORKSPACE: ctx.tree,
   };
-  if (scope.github?.repository != null) env.GITHUB_REPOSITORY = scope.github.repository;
-  if (scope.github?.event_name != null) env.GITHUB_EVENT_NAME = scope.github.event_name;
+  if (scope.github?.repository !== undefined) {
+    env.GITHUB_REPOSITORY = scope.github.repository;
+  }
+  if (scope.github?.event_name !== undefined) {
+    env.GITHUB_EVENT_NAME = scope.github.event_name;
+  }
   for (const layer of [...ctx.envLayers, step.env]) {
     const rendered = renderEnvLayer(layer, scope);
-    if (!rendered.ok) return err(`${label}: ${rendered.reason}`);
+    if (!rendered.ok) {
+      return err(`${label}: ${rendered.reason}`);
+    }
     Object.assign(env, rendered.v);
   }
   // Unlike a composite's, a node action's input reads are opaque, so every
@@ -472,7 +492,7 @@ async function runNodeAction(
     env,
     mounts: [
       { path: ctx.tree, writable: true },
-      ...(actionRoot != null ? [{ path: actionRoot, writable: false }] : []),
+      ...(actionRoot !== undefined ? [{ path: actionRoot, writable: false }] : []),
       { path: outDir, writable: true },
     ],
   });
@@ -482,7 +502,9 @@ async function runNodeAction(
     return err(`${label}: exited ${r.code}${tail === "" ? "" : ` (${tail})`}`);
   }
   const outputs = parseGithubOutput(await readFile(outFile, "utf8"));
-  if (outputs == null) return err(`${label}: malformed GITHUB_OUTPUT`);
+  if (outputs === null) {
+    return err(`${label}: malformed GITHUB_OUTPUT`);
+  }
   return { ok: true, v: outputs };
 }
 
@@ -508,9 +530,15 @@ async function runRun(
     HOME: process.env.HOME ?? "",
     GITHUB_WORKSPACE: ctx.tree,
   };
-  if (scope.github?.repository != null) env.GITHUB_REPOSITORY = scope.github.repository;
-  if (scope.github?.event_name != null) env.GITHUB_EVENT_NAME = scope.github.event_name;
-  if (ctx.actionPath != null) env.GITHUB_ACTION_PATH = ctx.actionPath;
+  if (scope.github?.repository !== undefined) {
+    env.GITHUB_REPOSITORY = scope.github.repository;
+  }
+  if (scope.github?.event_name !== undefined) {
+    env.GITHUB_EVENT_NAME = scope.github.event_name;
+  }
+  if (ctx.actionPath !== undefined) {
+    env.GITHUB_ACTION_PATH = ctx.actionPath;
+  }
   for (const layer of [...ctx.envLayers, step.env]) {
     const rendered = renderEnvLayer(layer, scope);
     if (!rendered.ok) {
@@ -538,7 +566,7 @@ async function runRun(
     env,
     mounts: [
       { path: ctx.tree, writable: true },
-      ...(ctx.actionRoot != null ? [{ path: ctx.actionRoot, writable: false }] : []),
+      ...(ctx.actionRoot !== undefined ? [{ path: ctx.actionRoot, writable: false }] : []),
       { path: outDir, writable: true },
     ],
   });
@@ -572,20 +600,24 @@ export function makeExecutor(opts: {
   const fail = (reason: string): ExecOutcome => ({ ok: false, reason });
   return {
     async executeJob(jobId, job, wf, scope) {
-      if (job.strategy != null) return fail(`job '${jobId}' has a strategy; not modelled`);
+      if (job.strategy !== undefined && job.strategy !== null) {
+        return fail(`job '${jobId}' has a strategy; not modelled`);
+      }
       if (job.container != null || job.services != null) {
         return fail(`job '${jobId}' uses a container or services; not modelled`);
       }
-      if (!Array.isArray(job.steps)) return fail(`job '${jobId}' has no steps`);
+      if (!Array.isArray(job.steps)) {
+        return fail(`job '${jobId}' has no steps`);
+      }
       // Any checkout input might be the `fetch-depth: 0` form. Over-asking for
       // one the walk will refuse anyway costs a clone, never correctness.
       const needsHistory = job.steps.some(
         (s: any) =>
-          s != null &&
+          s !== null &&
+          s !== undefined &&
           typeof s.uses === "string" &&
           CHECKOUT_RE.test(s.uses) &&
-          s.with != null &&
-          Object.keys(s.with).length > 0,
+          Object.keys(s.with ?? {}).length > 0,
       );
       const tree = await deps.provideTree(workspace, { history: needsHistory });
       if (tree == null) {
@@ -601,7 +633,9 @@ export function makeExecutor(opts: {
         deps,
         depth: 0,
       });
-      if (!walked.ok) return fail(walked.reason);
+      if (!walked.ok) {
+        return fail(walked.reason);
+      }
       // Every declared output must land; a partial map would be a lie.
       const outScope: Scope = { ...jobScope, steps: walked.v };
       const outputs: Record<string, string> = {};
@@ -637,7 +671,9 @@ export const runShell: RunCommand = (spec) =>
     let stderr = "";
     child.stderr.on("data", (d: Buffer) => {
       stderr += String(d);
-      if (stderr.length > 4096) stderr = stderr.slice(-4096);
+      if (stderr.length > 4096) {
+        stderr = stderr.slice(-4096);
+      }
     });
     child.on("error", () => resolvePromise({ code: 127, stderr }));
     child.on("close", (code) => resolvePromise({ code: code ?? 1, stderr }));
@@ -654,7 +690,9 @@ export function makeTreeProvider(
   const cache = new Map<string, Promise<string | null>>();
   return (source, opts) => {
     // A tarball has no history to give.
-    if (opts?.history === true) return Promise.resolve(null);
+    if (opts?.history === true) {
+      return Promise.resolve(null);
+    }
     const key = `${source.owner}/${source.repo}@${source.sha}`;
     const hit = cache.get(key);
     if (hit !== undefined) {
@@ -683,7 +721,9 @@ export function makeCloneProvider(
   return (source) => {
     const key = `${source.owner}/${source.repo}@${source.sha}`;
     const hit = cache.get(key);
-    if (hit !== undefined) return hit;
+    if (hit !== undefined) {
+      return hit;
+    }
     const p = cloneAt(source, remoteUrl(source), token, runCommand);
     cache.set(key, p);
     return p;
@@ -710,7 +750,7 @@ async function cloneAt(
     WILLFIRE_SHA: source.sha,
   };
   let auth = "";
-  if (token != null) {
+  if (token !== null) {
     const basic = Buffer.from(`x-access-token:${token}`).toString("base64");
     env.WILLFIRE_AUTH = `http.extraheader=AUTHORIZATION: basic ${basic}`;
     auth = ' -c "$WILLFIRE_AUTH"';

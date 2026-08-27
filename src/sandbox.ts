@@ -70,8 +70,9 @@ export function sandboxArgv(spec: RunSpec, cfg: SandboxConfig): string[] {
   }
   argv.push("-w", spec.cwd);
   for (const [k, v] of Object.entries(spec.env)) {
-    if (k === "PATH" || k === "HOME") continue;
-    argv.push("-e", `${k}=${v}`);
+    if (k !== "PATH" && k !== "HOME") {
+      argv.push("-e", `${k}=${v}`);
+    }
   }
   argv.push("-e", "HOME=/tmp");
   argv.push(imageTag(cfg.dockerfile));
@@ -93,15 +94,17 @@ function runDocker(
   return new Promise((resolvePromise) => {
     const child = spawn(bin, argv, {
       env: process.env,
-      stdio: [stdin == null ? "ignore" : "pipe", "ignore", "pipe"],
+      stdio: [stdin === undefined ? "ignore" : "pipe", "ignore", "pipe"],
     });
     let stderr = "";
     child.stderr!.on("data", (d: Buffer) => {
       stderr += String(d);
-      if (stderr.length > 4096) stderr = stderr.slice(-4096);
+      if (stderr.length > 4096) {
+        stderr = stderr.slice(-4096);
+      }
     });
     child.on("spawn", () => {
-      if (stdin != null) {
+      if (stdin !== undefined) {
         child.stdin!.write(stdin);
         child.stdin!.end();
       }
@@ -123,9 +126,13 @@ export function makeSandboxRunner(opts: Partial<SandboxConfig> = {}): RunCommand
   const ensureImage = (): Promise<string | null> => {
     ensured ??= (async () => {
       const inspect = await runDocker(cfg.dockerBin, ["image", "inspect", tag]);
-      if (inspect.code === 0) return null;
+      if (inspect.code === 0) {
+        return null;
+      }
       const build = await runDocker(cfg.dockerBin, ["build", "-t", tag, "-"], cfg.dockerfile);
-      if (build.code === 0) return null;
+      if (build.code === 0) {
+        return null;
+      }
       const trimmed = build.stderr.trim();
       const tail = trimmed.slice(trimmed.lastIndexOf("\n") + 1);
       return `cannot build sandbox image ${tag}${tail === "" ? "" : ` (${tail})`}`;
@@ -134,7 +141,9 @@ export function makeSandboxRunner(opts: Partial<SandboxConfig> = {}): RunCommand
   };
   return async (spec) => {
     const failure = await ensureImage();
-    if (failure != null) return { code: 125, stderr: failure };
+    if (failure !== null) {
+      return { code: 125, stderr: failure };
+    }
     return runDocker(cfg.dockerBin, sandboxArgv(spec, cfg));
   };
 }
