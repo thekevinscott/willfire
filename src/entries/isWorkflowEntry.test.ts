@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { isWorkflowEntry } from "./isWorkflowEntry.js";
+import { jobName } from "./jobName.js";
 import type { Entry } from "../types.js";
 
 describe("isWorkflowEntry", () => {
@@ -15,13 +16,13 @@ describe("isWorkflowEntry", () => {
   });
 
   it("is false for a job entry", () => {
-    const e = {
+    const e: Entry = {
       workflow: "w.yml",
-      job: "a",
+      job: jobName("a"),
       checkName: "a",
       status: "run",
       reason: "",
-    } as unknown as Entry;
+    };
     expect(isWorkflowEntry(e)).toBe(false);
   });
 });

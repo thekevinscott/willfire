@@ -1,16 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { isJobEntry } from "./isJobEntry.js";
+import { jobName } from "./jobName.js";
 import type { Entry } from "../types.js";
 
 describe("isJobEntry", () => {
   it("is true for a job entry", () => {
-    const e = {
+    const e: Entry = {
       workflow: "w.yml",
-      job: "a",
+      job: jobName("a"),
       checkName: "a",
       status: "run",
       reason: "",
-    } as unknown as Entry;
+    };
     expect(isJobEntry(e)).toBe(true);
   });
 
