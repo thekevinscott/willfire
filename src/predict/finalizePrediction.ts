@@ -1,18 +1,6 @@
+import { finalize } from "./finalize.js";
 import { sourceKey } from "./sourceKey.js";
-import type {
-  DraftEntry,
-  DraftWorkflowEntry,
-  Entry,
-  Prediction,
-  WorkflowSource,
-} from "../types.js";
-
-const isWorkflowDraft = (e: DraftEntry): e is DraftWorkflowEntry => e.job === "*";
-
-const finalize = (e: DraftEntry): Entry =>
-  isWorkflowDraft(e)
-    ? { ...e, checkName: null }
-    : { ...e, checkName: e.checkName ?? null };
+import type { DraftEntry, Prediction, WorkflowSource } from "../types.js";
 
 export function finalizePrediction(
   entries: DraftEntry[],
