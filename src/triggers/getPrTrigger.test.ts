@@ -19,6 +19,12 @@ describe("getPrTrigger", () => {
     expect(getPrTrigger({ true: { pull_request: null } } as Workflow)).toEqual({});
   });
 
+  it("prefers the on key over the boolean-key spelling when both exist", () => {
+    expect(
+      getPrTrigger({ on: { pull_request: null }, true: { push: null } } as Workflow),
+    ).toEqual({});
+  });
+
   it("accepts a string on naming pull_request", () => {
     expect(getPrTrigger({ on: "pull_request" } as Workflow)).toEqual({});
   });

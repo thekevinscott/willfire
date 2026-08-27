@@ -30,6 +30,13 @@ describe("renderName", () => {
     });
   });
 
+  it("still substitutes what it can when another expression stays unresolved", () => {
+    expect(renderName("b ${{ matrix.os }} ${{ inputs.x }}", { os: "linux" })).toEqual({
+      text: "b linux ${{ inputs.x }}",
+      resolved: false,
+    });
+  });
+
   it("stays unresolved on any other expression", () => {
     expect(renderName("x ${{ inputs.flavour }}", { os: "linux" })).toEqual({
       text: "x ${{ inputs.flavour }}",

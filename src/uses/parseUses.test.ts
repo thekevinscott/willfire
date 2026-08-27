@@ -19,6 +19,13 @@ describe("parseUses", () => {
     });
   });
 
+  it("keeps an earlier @ inside the path and splits at the last one", () => {
+    expect(parseUses("o/r/x@y.yml@v1")).toEqual({
+      path: "x@y.yml",
+      source: { owner: "o", repo: "r", ref: "v1" },
+    });
+  });
+
   it.each([
     ["${{ env.CALLEE }}/.github/workflows/x.yml@v1", "built from an expression"],
     ["./", "a local path with nothing after it"],
