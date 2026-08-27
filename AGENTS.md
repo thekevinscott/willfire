@@ -1,10 +1,11 @@
 # Agent contract
 
 willfire is one TypeScript package: `src/predict.ts` (the prediction engine and
-its CLI), `src/expr/` (a tri-state evaluator for the slice of the GitHub
-expression language that job `if:` conditions use), and `src/verify.ts` (a
-script that diffs a prediction against what GitHub actually dispatched). `README.md` describes the model; this file is the
-operating contract for working in the repo.
+its CLI) and `src/expr/` (a tri-state evaluator for the slice of the GitHub
+expression language that job `if:` conditions use). `tests/e2e/verify.ts` is a
+script outside the package that diffs a prediction against what GitHub actually
+dispatched; the e2e suite is its only consumer. `README.md` describes the model;
+this file is the operating contract for working in the repo.
 
 ## Goals
 
@@ -14,7 +15,7 @@ operating contract for working in the repo.
 
 | | |
 |---|---|
-| `pnpm typecheck` | `tsc` over `src/`, tests included |
+| `pnpm typecheck` | `tsc` over `src/` and `tests/e2e/`, tests included |
 | `pnpm test` | Vitest, once |
 | `pnpm test:coverage` | Vitest at the 100% floor CI enforces |
 | `pnpm build` | emit `dist/` (tests excluded) |
@@ -26,7 +27,10 @@ operating contract for working in the repo.
 Unit tests are **colocated** with their source (`foo.ts` ↔ `foo.test.ts`) at
 100% coverage, per the
 [testing-conventions](https://github.com/thekevinscott/testing-conventions)
-standard, enforced by `.github/workflows/conventions.yml`.
+standard, enforced by `.github/workflows/conventions.yml`. `tests/e2e/verify.ts`
+sits outside that gate's `src` scope, so `vitest.config.mts` holds it to the
+same 100% floor through its colocated `verify.test.ts`, which runs in the
+default vitest pass rather than the live e2e suite.
 
 The expectations in `src/predict.test.ts` are **not** opinions about how GitHub
 ought to behave. Every workflow-level verdict was read off a live dispatch on

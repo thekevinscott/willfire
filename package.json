@@ -43,7 +43,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "vitest run --config tests/e2e/vitest.config.mts",
     "typecheck": "tsc -p tsconfig.json",
-    "verify": "tsx src/verify.ts"
+    "verify": "tsx tests/e2e/verify.ts"
   },
   "dependencies": {
     "yaml": "^2.6.0"

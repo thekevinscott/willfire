@@ -5,8 +5,8 @@
 // Ground truth: workflow runs for the PR head SHA with a pull_request event,
 // and the job entries inside each run (skipped jobs included).
 
-import { isJobEntry, makeGithubClient, predict } from "./index.js";
-import type { GithubClient } from "./index.js";
+import { isJobEntry, makeGithubClient, predict } from "../../src/index.js";
+import type { GithubClient } from "../../src/index.js";
 
 async function actualEntries(octokit: GithubClient, repo: string, prNumber: number) {
   const [owner, name] = repo.split("/");
