@@ -78,7 +78,6 @@ export default [
     // that predate the rule; remove each entry as #14 decomposes its file.
     ignores: [
       'src/**/*.test.ts',
-      'src/execute.ts',
       'src/verify.ts',
     ],
     languageOptions: {

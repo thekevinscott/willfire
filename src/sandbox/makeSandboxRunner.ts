@@ -6,7 +6,7 @@
  * default instead of configured.
  */
 
-import type { RunCommand } from "../execute.js";
+import type { RunCommand } from "../execute/types.js";
 import { imageTag } from "./imageTag.js";
 import { runDocker } from "./runDocker.js";
 import { sandboxArgv } from "./sandboxArgv.js";

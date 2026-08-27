@@ -1,5 +1,15 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { inputValue } from "./inputValue.js";
+
+// The isolation gate wants collaborators mocked; rendering through the real
+// template engine is what this suite pins, so the mock passes it through.
+vi.mock(
+  "../execute/renderTemplate.js",
+  async () =>
+    await vi.importActual<typeof import("../execute/renderTemplate.js")>(
+      "../execute/renderTemplate.js",
+    ),
+);
 
 describe("inputValue", () => {
   it("settles an absent value to the empty string", () => {

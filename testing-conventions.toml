@@ -5,3 +5,8 @@
 path = "types.ts"
 rules = ["colocated-test", "co-change"]
 reason = "types-only module with no runtime behavior; nothing executes at runtime to test"
+
+[[typescript.exempt]]
+path = "execute/types.ts"
+rules = ["colocated-test", "co-change"]
+reason = "types-only module with no runtime behavior; nothing executes at runtime to test"

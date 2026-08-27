@@ -1,4 +1,4 @@
-import type { JobExecutor } from "./execute.js";
+import type { JobExecutor } from "./execute/types.js";
 
 export interface EntryBase {
   workflow: string;

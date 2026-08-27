@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { RunSpec } from "../execute.js";
+import type { RunSpec } from "../execute/types.js";
 import { imageTag } from "./imageTag.js";
 import { sandboxArgv } from "./sandboxArgv.js";
 import type { SandboxConfig } from "./sandboxConfig.js";

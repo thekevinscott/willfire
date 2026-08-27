@@ -1,6 +1,6 @@
 import { evaluateValue } from "../expr/evaluateValue.js";
 import { UNKNOWN, type Scope, type Val } from "../expr/val.js";
-import { renderTemplate } from "../execute.js";
+import { renderTemplate } from "../execute/renderTemplate.js";
 import { prScope } from "./prScope.js";
 
 /**
