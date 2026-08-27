@@ -79,6 +79,7 @@ export default [
     },
     rules: {
       curly: ['error', 'all'],
+      eqeqeq: ['error', 'always'],
       semi: ['error', 'always'],
     },
   },

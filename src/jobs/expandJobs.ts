@@ -46,15 +46,15 @@ function inputValue(raw: unknown, scope: Scope): Val {
 /** The `on.workflow_call.inputs` block, tolerating the YAML 1.1 `on` -> true key. */
 function workflowCallInputs(wf: Workflow): Record<string, any> {
   const on = wf?.["on"] ?? wf?.["true"];
-  if (on == null || typeof on !== "object") {
+  if (on === null || typeof on !== "object") {
     return {};
   }
   const call = (on as Record<string, any>)["workflow_call"];
-  if (call == null || typeof call !== "object") {
+  if (call === null || typeof call !== "object") {
     return {};
   }
   const inputs = call["inputs"];
-  return inputs != null && typeof inputs === "object" ? inputs : {};
+  return inputs !== null && typeof inputs === "object" ? inputs : {};
 }
 
 /**
@@ -74,12 +74,12 @@ function calleeInputs(
   const out: Record<string, Val> = {};
   for (const [name, decl] of Object.entries(workflowCallInputs(subWf))) {
     out[name] =
-      decl != null && typeof decl === "object" && "default" in decl
+      decl !== null && typeof decl === "object" && "default" in decl
         ? // Defaults live in the callee, out of the caller's context's reach.
           inputValue((decl as Record<string, unknown>)["default"], {})
         : UNKNOWN;
   }
-  if (withBlock != null && typeof withBlock === "object") {
+  if (withBlock !== null && typeof withBlock === "object") {
     for (const [name, raw] of Object.entries(withBlock as Record<string, unknown>)) {
       out[name] = inputValue(raw, scope);
     }
@@ -139,7 +139,7 @@ export async function expandJobs(
   // verdict the main loop applies.
   let scoped = scope;
   const execFailures: Record<string, string> = {};
-  if (executor != null) {
+  if (executor !== undefined) {
     const needed = neededJobIds(jobs);
     for (const [jobId, jobRaw] of Object.entries(jobs)) {
       const job = jobRaw ?? {};
@@ -158,13 +158,13 @@ export async function expandJobs(
   }
   const execNote = (needs: string[]): string => {
     const failed = needs.find((n) => n in execFailures);
-    return failed == null ? "" : `; executing '${failed}' failed: ${execFailures[failed]}`;
+    return failed === undefined ? "" : `; executing '${failed}' failed: ${execFailures[failed]}`;
   };
 
   for (const [jobId, jobRaw] of Object.entries(jobs)) {
     const job = jobRaw ?? {};
     let status = evalIf(job.if, scoped);
-    let reason = job.if != null ? `if: ${JSON.stringify(job.if)}` : "";
+    let reason = job.if !== undefined && job.if !== null ? `if: ${JSON.stringify(job.if)}` : "";
     let needs: string[] = job.needs ?? [];
     if (typeof needs === "string") {
       needs = [needs];
@@ -206,7 +206,7 @@ export async function expandJobs(
       // call names its checks exactly the same way a local one does — probe
       // PR #9, `call-remote-tag / r-inner` alongside `call-plain / inner`.
       const uses: string = job.uses;
-      if (combos == null) {
+      if (combos === null) {
         entries.push({
           job: prefix + jobId,
           checkName: null,
@@ -227,7 +227,7 @@ export async function expandJobs(
       const target = parseUses(uses);
       if (depth + 1 > MAX_REUSABLE_DEPTH) {
         failure = `reusable workflow nested deeper than ${MAX_REUSABLE_DEPTH} levels`;
-      } else if (target == null) {
+      } else if (target === null) {
         failure = `unresolvable reusable reference: ${uses}`;
       } else {
         // A local `./` call stays on the caller's source, which is already
@@ -236,17 +236,17 @@ export async function expandJobs(
         // read from it, so the file that gets read and the commit the
         // prediction names are the same one.
         let resolved: WorkflowSource | null = source;
-        if (target.source != null) {
+        if (target.source !== null) {
           const { ref } = target.source;
           const sha = isSha(ref) ? ref : await reader.resolveRef(target.source);
-          resolved = sha == null ? null : { ...target.source, sha };
+          resolved = sha === null ? null : { ...target.source, sha };
         }
-        if (resolved == null) {
+        if (resolved === null) {
           failure = `cannot resolve ref for ${uses}`;
         } else {
           subSource = resolved;
           const content = await reader.fetchWorkflow(target.path, subSource);
-          if (content == null) {
+          if (content === null) {
             failure = `cannot fetch ${uses}`;
           } else {
             try {
@@ -269,7 +269,7 @@ export async function expandJobs(
         const disp = jobDisplayName(jobId, job, combo);
         const baseName = prefix + disp.name;
         const nameResolved = prefixResolved && disp.resolved;
-        if (failure != null || subWf == null) {
+        if (failure !== null || subWf === null) {
           entries.push({
             job: baseName,
             checkName: null,
@@ -295,7 +295,7 @@ export async function expandJobs(
       continue;
     }
 
-    if (combos == null) {
+    if (combos === null) {
       entries.push({
         job: prefix + jobId,
         checkName: null,

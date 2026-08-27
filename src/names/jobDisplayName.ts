@@ -23,7 +23,10 @@ export function jobDisplayName(
   job: Workflow,
   combo: DetailedCombo | null,
 ): DisplayName {
-  const raw = job != null && job.name != null ? String(job.name) : null;
+  const raw =
+    job !== undefined && job !== null && job.name !== undefined && job.name !== null
+      ? String(job.name)
+      : null;
   if (raw === null) {
     return { name: capDisplayName(jobId + (combo ? matrixSuffix(combo) : "")), resolved: true };
   }

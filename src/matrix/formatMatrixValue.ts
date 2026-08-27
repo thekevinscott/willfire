@@ -6,7 +6,7 @@
  * `m-object (linux, x64)`.
  */
 export function formatMatrixValue(v: unknown): string {
-  if (v == null) {
+  if (v === null || v === undefined) {
     return "";
   }
   if (Array.isArray(v)) {
