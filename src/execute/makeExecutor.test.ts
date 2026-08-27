@@ -1,11 +1,3 @@
-// The executor suite runs its subprocess seam for real: `run:` steps go
-// through `runShell` and an actual bash, because "run it, never interpret it"
-// is the module's whole claim and a faked shell would test the interpretation
-// this module promises not to do. Everything network-shaped — trees, refs —
-// is injected: fixture trees are built through `runShell` itself, tarballs
-// are embedded bytes, and `action.yml` files are written as JSON, which is
-// valid YAML.
-
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { makeExecutor } from "./makeExecutor.js";
 import { makeTreeProvider } from "./makeTreeProvider.js";
@@ -26,18 +18,12 @@ vi.mock("./runShell.js", async () => {
 const SHA = "c".repeat(40);
 const REMOTE_SHA = "d".repeat(40);
 
-/** The PR head every execution here materializes as its workspace. */
 const WORKSPACE: WorkflowSource = { owner: "o", repo: "r", ref: SHA, sha: SHA };
 
 const TMP = (process.env.TMPDIR ?? "/tmp").replace(/\/$/, "");
 const SH_ENV = { PATH: process.env.PATH ?? "" };
 let treeSeq = 0;
 
-/**
- * Write a file tree under a fresh temp dir and return its root — through
- * `runShell`, so the module under test is the only thing the suite touches
- * the filesystem with.
- */
 async function tempTree(files: Record<string, string>): Promise<string> {
   const root = `${TMP}/wf-exec-test-${process.pid}-${treeSeq++}`;
   const r0 = await runShell({
@@ -59,11 +45,6 @@ async function tempTree(files: Record<string, string>): Promise<string> {
   return root;
 }
 
-/**
- * Deps over a map of already-materialized trees, keyed `owner/repo@sha`.
- * The resolver is the identity, as in predict's suite: refs are their own
- * commits unless a test says otherwise.
- */
 function depsOf(trees: Record<string, string>, overrides: Partial<ExecDeps> = {}): ExecDeps {
   return {
     provideTree: async (src) => trees[`${src.owner}/${src.repo}@${src.sha}`] ?? null,
@@ -73,7 +54,6 @@ function depsOf(trees: Record<string, string>, overrides: Partial<ExecDeps> = {}
   };
 }
 
-/** An executor granted `detect` in the workspace repo, over real subprocesses. */
 function executorOf(trees: Record<string, string>, overrides: Partial<ExecDeps> = {}) {
   return makeExecutor({
     grants: [{ repo: "o/r", jobs: ["detect"] }],
@@ -82,7 +62,6 @@ function executorOf(trees: Record<string, string>, overrides: Partial<ExecDeps> 
   });
 }
 
-/** Execute one job body against a workspace containing `files`. */
 async function execute(
   job: Record<string, unknown>,
   files: Record<string, string> = {},
@@ -113,8 +92,6 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
-// ------------------------------------------------------------------- grants
-
 describe("granted", () => {
   const ex = executorOf({});
 
@@ -124,8 +101,6 @@ describe("granted", () => {
     expect(ex.granted({ owner: "other", repo: "r", ref: SHA, sha: SHA }, "detect")).toBe(false);
   });
 });
-
-// ------------------------------------------------------------ run: execution
 
 describe("executing run steps", () => {
   it("runs the steps and assembles the job outputs from what they wrote", async () => {
@@ -137,7 +112,6 @@ describe("executing run steps", () => {
         outputs: { languages: "${{ steps.scan.outputs.languages }}" },
       }),
     );
-    // Raw string, exactly as written to $GITHUB_OUTPUT — never parsed.
     expect(out).toEqual({ languages: '["ts"]' });
   });
 
@@ -154,7 +128,6 @@ describe("executing run steps", () => {
         { "file.txt": "tree-content" },
       ),
     );
-    // The postcondition is real: the workspace tree is there to read.
     expect(out).toEqual({ f: "tree-content" });
   });
 
@@ -164,8 +137,6 @@ describe("executing run steps", () => {
   });
 
   it("skips a step whose if is false and coalesces past its empty outputs", async () => {
-    // The exact shape of the fleet's detect job: hermetic step skipped for an
-    // external consumer, published step runs, outputs coalesce with ||.
     const out = success(
       await execute({
         steps: [
@@ -330,7 +301,7 @@ describe("executing run steps", () => {
   });
 
   it("fails when the workspace cannot be materialized", async () => {
-    const ex = executorOf({}); // no trees at all
+    const ex = executorOf({});
     const o = await ex.executeJob("detect", { steps: [] }, {}, {});
     expect(failure(o)).toBe(`cannot materialize workspace o/r@${SHA}`);
   });
@@ -339,14 +310,10 @@ describe("executing run steps", () => {
     vi.stubEnv("PATH", undefined as never);
     vi.stubEnv("HOME", undefined as never);
     const o = await execute({ steps: [{ run: "true" }] });
-    // With no PATH there is no bash: the step fails rather than guessing one.
     expect(failure(o)).toMatch(/exited 127/);
   });
 });
 
-// ---------------------------------------------------------- composite actions
-
-/** A composite action manifest, JSON-spelled. */
 const compositeAction = (
   steps: unknown[],
   extra: Record<string, unknown> = {},
@@ -386,7 +353,6 @@ describe("composite actions", () => {
       ),
     );
     expect(out.got).toBe("caller-who");
-    // $GITHUB_ACTION_PATH points into the materialized tree.
     expect(out.ap).toBe(`${tree}/action`);
   });
 
@@ -408,7 +374,6 @@ describe("composite actions", () => {
         {},
       ),
     );
-    // Declared-without-default is the empty string, as action inputs are.
     expect(out.got).toBe("default-who-");
   });
 
@@ -501,8 +466,6 @@ describe("composite actions", () => {
       { outputs: { v: { value: "${{ steps.s.outputs.v }}" } } },
     );
     const workspace = await tempTree({});
-    // Only the .yaml spelling, at the repo root, reached through the identity
-    // resolver — so the tree is keyed by the ref it resolves to.
     const actTree = await tempTree({ "action.yaml": manifest });
     const ex = executorOf({
       [`o/r@${SHA}`]: workspace,
@@ -630,24 +593,13 @@ describe("composite actions", () => {
   });
 });
 
-// ------------------------------------------------- the fleet's detect, whole
-
 const tarball = (base64: string): Uint8Array => new Uint8Array(Buffer.from(base64, "base64"));
 
 describe("the whole path, tarball to job outputs", () => {
-  // The workspace: `o-r-cccc/package.json` = "{}". The callee:
-  // `tk-tc-dddd/actions/detect/action.yml`, a composite whose one step runs
-  // `"$GITHUB_ACTION_PATH/../scan.sh" >> "$GITHUB_OUTPUT"`, next to
-  // `actions/scan.sh` (mode 755, preserved by tar) which echoes
-  // `languages=["typescript"]` when `$GITHUB_WORKSPACE/package.json` exists
-  // — reading the workspace to decide, the way detect.py does.
   const WORKSPACE_TB = "H4sIAAAAAAAAA+3S3QrCIBiAYS/FG5hz5s/1yIigIMOto+jeWzuKUYtoFtH7nCgo+MGrqkVxehCCG9fBdL2zD95ZIV350YQ4dn3MUoqcUj9379n5j1J1qnLVDsp9hJf7N42xhv6fcNP/ENtd3KzVtkv7Rd+4RvXezvQ3k/4rZ7SQetEpHvjz/qfztycAAAAAAAAAAAAAAADAOy7gGhoPACgAAA==";
   const CALLEE_TB = "H4sIAAAAAAAAA+2UXWvbMBSGfZ1fcaYVerPYzocd2FghK6MtHU1YHXaRhKI6SqzVlY0lFYrxf5/ldhnLkowwJ2XbeW5k6RzrlfTqyHasveOW9Hpe1Zastmu+e77XtcDb/9IsS0tFMwArSxK1Le938b8U21F3TRU2ZyX7ugo7+99qeb0O+n8IfvKfhoonQtZ9D3b3v9PuoP8HYa3/M6ZYqGq7Brv73/Vc9P8gbPP/qWs/3sd/pmFM9f3uRv+7fnvFf99zPQvcera4nf/c/5xkWkjyFnKiJReL8ouEyX2aSK4YeQNEKpaa+DgnfGaiMqSiCkQsjs3ALZWRGWDioZrnU//q7NoEjvIcuEi1knZMxULTBZNQFKQok0tVkzIhR2cXwfnow03/NLgYXN0M+8G5Y9uOUbFlNCFwcgI/sgajYDgKJoQUUzPL0+yV6lKh6s3YnOpYGQlSmMxEqw2pDzTW7Ptyq93alfjzHytLL4qXdqxe1tb/8+HXpVG9/97m97/ter+8/60W1v8heP3K0TJzbrlwyvoFU8sNPocxNOewrLovg8+X18P+6UcnpeFdWQv2V5kIAtN3oCImGgAsjBI4XpbK+zFRjymTYcZTRabHDRZLti6tDM1546UPAUEQBEEQBEEQBEEQBEEQBEEQ5B/iG0SKYN8AKAAA";
 
   it("executes a detect-shaped job from a real tarball through real steps", async () => {
-    // The fleet's actual shape, miniaturized: checkout, a skipped hermetic
-    // step, a published step running a script from the *callee's* tree over
-    // the *caller's* workspace, outputs coalescing past the skipped step.
     const download = async (src: WorkflowSource) =>
       tarball(src.repo === "r" ? WORKSPACE_TB : CALLEE_TB);
     const provide = makeTreeProvider(download, runShell);

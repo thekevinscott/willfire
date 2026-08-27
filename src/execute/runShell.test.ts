@@ -26,7 +26,6 @@ describe("runShell", () => {
     });
     expect(r.code).toBe(1);
     expect(r.stderr.length).toBeLessThanOrEqual(4096);
-    // The tail survives truncation — the last line is the 200th.
     expect(r.stderr.trimEnd().endsWith("200")).toBe(true);
   });
 

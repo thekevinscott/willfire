@@ -1,6 +1,5 @@
 import type { ExecutionGrant } from "./types.js";
 
-/** `owner/repo:job1,job2` as the CLI spells a grant. */
 export function parseGrant(spec: string): ExecutionGrant | null {
   const colon = spec.indexOf(":");
   if (colon <= 0) {

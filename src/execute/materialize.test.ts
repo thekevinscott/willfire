@@ -13,7 +13,6 @@ const SRC: WorkflowSource = { owner: "o", repo: "r", ref: SHA, sha: SHA };
 const TMP = (process.env.TMPDIR ?? "/tmp").replace(/\/$/, "");
 const SH_ENV = { PATH: process.env.PATH ?? "" };
 
-/** True when `path` holds exactly `want` — read through `runShell`. */
 async function fileIs(path: string, want: string): Promise<boolean> {
   const r = await runShell({
     script: '[ "$(cat "$F")" = "$W" ]',
@@ -26,11 +25,8 @@ async function fileIs(path: string, want: string): Promise<boolean> {
 
 const tarball = (base64: string): Uint8Array => new Uint8Array(Buffer.from(base64, "base64"));
 
-/** `o-r-ccccccc/file.txt` = "content" — the GitHub single-wrapper shape. */
 const WRAPPED_TB = "H4sIAAAAAAAAA+3S0QrCIBSA4fMovsCcw6nPE2ODICaYQY/fqqvGWAQzqP3fzRH0QvnVtRRnJiG4x5zM58I6eNeKcuWvJnI550NSSlKMee3cu/0fpetYpap7KvQXPu7fNKGx9P+G1/7D8dTrfN34ofeo3rcr/cOsv7XBiDLbXmPZzvt3ccz9+I8vAwAAAAAAAAAAAAAA2IcbvGawBgAoAAA=";
-/** `a.txt` = "1", `b.txt` = "2" — two top-level entries. */
 const TWO_TB = "H4sIAAAAAAAAA+3TSwqDMBSF4buUrCAPyWM9dgOCRnD5xtKJUuygxLT4f5MbSAYnHK42Up0tUgrPWRznm3OKwYsK9aOJzFPuR6VkHIZ89u7T/Z/Sptd5qfuzrdQY/Un/bt+/s7Er/duqqV5u3r9rHQBNafP4zf0P7P8VutYBAAAAAAAAAAAAAADA11aiM229ACgAAA==";
-/** `only.txt` = "1" — a single top-level *file*, not a directory. */
 const ONE_TB = "H4sIAAAAAAAAA+3RTQqAIBCG4TmKJ7Ck1PO0j4QyqNv3s4kiCgKJ6H02M6CLb/h0JsnlM+/tOmfHebJ7Z0tRNn00kb6LVauUtCHEq3937x+ls9DUo45DwuOWUp0rL/o3+/6NKZwVlaeLtPl5/+btAAAAAAAAAAAAAAAAAAAemwDJjzcgACgAAA==";
 
 afterEach(() => {

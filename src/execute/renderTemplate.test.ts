@@ -16,8 +16,6 @@ describe("renderTemplate", () => {
   });
 
   it("returns null when any expression cannot be settled", () => {
-    // Null rather than a partial render — a script with a hole in it is a
-    // different program.
     expect(renderTemplate("a ${{ inputs.who }} ${{ env.nope }}", scope)).toBe(null);
   });
 });

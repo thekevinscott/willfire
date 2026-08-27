@@ -36,8 +36,6 @@ describe("bindActionInputs", () => {
   });
 
   it("leaves an unrenderable value unknown rather than failing", () => {
-    // It only matters if a step actually reads it; the read is where the
-    // failure is honest.
     expect(bindActionInputs({}, { who: "${{ env.nope }}" }, {})).toEqual({
       who: { kind: "unknown" },
     });

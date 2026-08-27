@@ -3,7 +3,6 @@ import { err } from "./err.js";
 import { renderTemplate } from "./renderTemplate.js";
 import type { Res } from "./types.js";
 
-/** An `env:` block rendered to concrete strings, every key or nothing. */
 export function renderEnvLayer(layer: unknown, scope: Scope): Res<Record<string, string>> {
   if (layer == null) {
     return { ok: true, v: {} };

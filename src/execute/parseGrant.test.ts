@@ -7,12 +7,12 @@ describe("parseGrant", () => {
   });
 
   it("rejects everything that is not exactly owner/repo:jobs", () => {
-    expect(parseGrant("o/r")).toBe(null); // no colon
-    expect(parseGrant(":detect")).toBe(null); // no repo
-    expect(parseGrant("or:detect")).toBe(null); // no slash
-    expect(parseGrant("o/r/x:detect")).toBe(null); // too many segments
-    expect(parseGrant("o/:detect")).toBe(null); // empty half
-    expect(parseGrant("o/r:")).toBe(null); // no jobs
-    expect(parseGrant("o/r: , ")).toBe(null); // only empty jobs
+    expect(parseGrant("o/r")).toBe(null);
+    expect(parseGrant(":detect")).toBe(null);
+    expect(parseGrant("or:detect")).toBe(null);
+    expect(parseGrant("o/r/x:detect")).toBe(null);
+    expect(parseGrant("o/:detect")).toBe(null);
+    expect(parseGrant("o/r:")).toBe(null);
+    expect(parseGrant("o/r: , ")).toBe(null);
   });
 });

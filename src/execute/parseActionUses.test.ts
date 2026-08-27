@@ -22,9 +22,9 @@ describe("parseActionUses", () => {
   });
 
   it("returns null for anything without owner, repo, and ref", () => {
-    expect(parseActionUses("actions/setup-node")).toBe(null); // no @
-    expect(parseActionUses("@v1")).toBe(null); // @ first
-    expect(parseActionUses("single@v1")).toBe(null); // no repo
-    expect(parseActionUses("o/a@")).toBe(null); // empty ref
+    expect(parseActionUses("actions/setup-node")).toBe(null);
+    expect(parseActionUses("@v1")).toBe(null);
+    expect(parseActionUses("single@v1")).toBe(null);
+    expect(parseActionUses("o/a@")).toBe(null);
   });
 });

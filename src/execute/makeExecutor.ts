@@ -6,19 +6,12 @@ import type { ExecDeps, ExecOutcome, ExecutionGrant, JobExecutor } from "./types
 
 export function makeExecutor(opts: {
   grants: ExecutionGrant[];
-  /**
-   * The PR's own repo at the head commit — what `actions/checkout` provides
-   * on a real runner, wherever the workflow file itself lives. A reusable
-   * workflow's jobs run in the caller's workspace; this is that fact.
-   */
   workspace: WorkflowSource;
   deps: ExecDeps;
 }): JobExecutor {
   const { grants, workspace, deps } = opts;
   const github: Record<string, string> = {
     event_name: "pull_request",
-    // Fixed for the run being predicted, and the fact the fleet's
-    // hermetic-vs-published guards branch on.
     repository: `${workspace.owner}/${workspace.repo}`,
   };
   const fail = (reason: string): ExecOutcome => ({ ok: false, reason });
@@ -28,9 +21,6 @@ export function makeExecutor(opts: {
         (g) => g.repo === `${source.owner}/${source.repo}` && g.jobs.includes(jobId),
       ),
     async executeJob(jobId, job, wf, scope) {
-      // The shapes execution does not model, refused by name rather than run
-      // wrong: a matrix'd job is several executions, and a container changes
-      // what every step means.
       if (job.strategy != null) {
         return fail(`job '${jobId}' has a strategy; not modelled`);
       }
@@ -56,9 +46,6 @@ export function makeExecutor(opts: {
       if (!walked.ok) {
         return fail(walked.reason);
       }
-      // The job's `outputs:` map is the whole point of having run anything.
-      // Every declared entry must land; a hole here would hand consumers a
-      // partial map, which the Scope contract calls a lie.
       const outScope: Scope = { ...jobScope, steps: walked.v };
       const outputs: Record<string, string> = {};
       for (const [name, raw] of Object.entries(job.outputs ?? {})) {

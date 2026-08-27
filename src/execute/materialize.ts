@@ -4,7 +4,6 @@ import { join } from "node:path";
 import type { WorkflowSource } from "../types.js";
 import type { RunCommand } from "./types.js";
 
-/** Download one commit's tarball and extract it, unwrapping GitHub's wrapper. */
 export async function materialize(
   source: WorkflowSource,
   download: (source: WorkflowSource) => Promise<Uint8Array | null>,

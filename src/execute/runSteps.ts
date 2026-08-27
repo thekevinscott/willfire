@@ -5,10 +5,6 @@ import { runRun } from "./runRun.js";
 import { runUses } from "./runUses.js";
 import type { Res, WalkCtx } from "./types.js";
 
-/**
- * Walk steps in order, growing the `steps` context as each one completes.
- * Returns the finished context, or the reason the walk stopped.
- */
 export async function runSteps(
   steps: any[],
   scope: Scope,
@@ -25,8 +21,6 @@ export async function runSteps(
         return err(`cannot decide if: for ${label}`);
       }
       if (!verdict) {
-        // A skipped step still occupies its id, with no outputs — that is the
-        // empty string every later read gets, and what `||` coalesces past.
         if (typeof step.id === "string") {
           stepsCtx[step.id] = { outputs: {} };
         }

@@ -13,7 +13,6 @@ const WORKSPACE: WorkflowSource = { owner: "o", repo: "r", ref: SHA, sha: SHA };
 const TMP = (process.env.TMPDIR ?? "/tmp").replace(/\/$/, "");
 const SH_ENV = { PATH: process.env.PATH ?? "" };
 
-/** True when `path` holds exactly `want` — read through `runShell`. */
 async function fileIs(path: string, want: string): Promise<boolean> {
   const r = await runShell({
     script: '[ "$(cat "$F")" = "$W" ]',
@@ -26,7 +25,6 @@ async function fileIs(path: string, want: string): Promise<boolean> {
 
 const tarball = (base64: string): Uint8Array => new Uint8Array(Buffer.from(base64, "base64"));
 
-/** `o-r-ccccccc/file.txt` = "content" — the GitHub single-wrapper shape. */
 const WRAPPED_TB = "H4sIAAAAAAAAA+3S0QrCIBSA4fMovsCcw6nPE2ODICaYQY/fqqvGWAQzqP3fzRH0QvnVtRRnJiG4x5zM58I6eNeKcuWvJnI550NSSlKMee3cu/0fpetYpap7KvQXPu7fNKGx9P+G1/7D8dTrfN34ofeo3rcr/cOsv7XBiDLbXmPZzvt3ccz9+I8vAwAAAAAAAAAAAAAA2IcbvGawBgAoAAA=";
 
 describe("makeTreeProvider", () => {

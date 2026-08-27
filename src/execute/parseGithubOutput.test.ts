@@ -18,8 +18,6 @@ describe("parseGithubOutput", () => {
   });
 
   it("refuses an unterminated heredoc", () => {
-    // The runner fails the step on one; tolerating it here would invent
-    // outputs a real run never had.
     expect(parseGithubOutput("k<<EOF\nline1\n")).toBe(null);
   });
 

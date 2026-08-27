@@ -8,7 +8,6 @@ import { renderEnvLayer } from "./renderEnvLayer.js";
 import { renderTemplate } from "./renderTemplate.js";
 import type { Res, WalkCtx } from "./types.js";
 
-/** A `run:` step, executed under its declared shell with its declared env. */
 export async function runRun(
   step: any,
   label: string,
@@ -24,8 +23,6 @@ export async function runRun(
     return err(`${label}: cannot resolve \${{ }} in run`);
   }
   const env: Record<string, string> = {
-    // The two the runner always provides and scripts assume. Everything else
-    // a step sees, it declared.
     PATH: process.env.PATH ?? "",
     HOME: process.env.HOME ?? "",
     GITHUB_WORKSPACE: ctx.tree,
@@ -51,7 +48,6 @@ export async function runRun(
   const outDir = await mkdtemp(join(tmpdir(), "willfire-out-"));
   const outFile = join(outDir, "output");
   await writeFile(outFile, "");
-  // After the layers, so no `env:` block can redirect where outputs land.
   env.GITHUB_OUTPUT = outFile;
   const r = await ctx.deps.runCommand({ script, shell, cwd, env });
   if (r.code !== 0) {

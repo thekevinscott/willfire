@@ -1,14 +1,6 @@
 import { UNKNOWN, type Scope, type Val } from "../expr/val.js";
 import { renderTemplate } from "./renderTemplate.js";
 
-/**
- * What `inputs.*` means inside a composite action: the caller's `with:`
- * values over the action's declared defaults, everything a string — action
- * inputs are untyped, and an input nobody set is the empty string, not a
- * hole. A value whose `${{ }}` cannot be rendered stays unknown rather than
- * failing here: it only matters if a step actually reads it, and the read is
- * where that failure is honest.
- */
 export function bindActionInputs(
   action: any,
   withBlock: unknown,
