@@ -44,6 +44,12 @@ describe("makeOctokit", () => {
     expect(hoisted.authSeen).toEqual(["gh"]);
   });
 
+  it("throws on an empty GH_TOKEN even with GITHUB_TOKEN set", () => {
+    vi.stubEnv("GH_TOKEN", "");
+    vi.stubEnv("GITHUB_TOKEN", "gha");
+    expect(() => makeOctokit()).toThrow("GH_TOKEN or GITHUB_TOKEN must be set");
+  });
+
   it("falls back to GITHUB_TOKEN", () => {
     vi.stubEnv("GH_TOKEN", undefined);
     vi.stubEnv("GITHUB_TOKEN", "gha");

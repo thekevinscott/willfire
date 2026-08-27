@@ -508,6 +508,12 @@ describe("predict", () => {
     });
   });
 
+  it("reads the skip-checks trailer case-insensitively", async () => {
+    const message = "feat: thing\n\nSKIP-CHECKS: TRUE\n";
+    const { skip } = await run("on: pull_request\njobs:\n  a: {}\n", { message });
+    expect(skip).toBe("head commit message contains a skip instruction");
+  });
+
   it("keeps a workflow with no jobs as a run with no entries", async () => {
     expect(await run("on: pull_request\n")).toEqual({
       entries: [],
