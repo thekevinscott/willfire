@@ -50,3 +50,27 @@ reason = "eqeqeq conversion only; the base-branch and stack-target reason labels
 path = "verify.ts"
 rules = ["co-change"]
 reason = "eqeqeq conversion only; the null-checkName entry is pinned by the 'name unresolved' line of the e2e drive"
+
+# Same stack scope, no-explicit-any slice (#95): type-level any->unknown
+# conversions with no runtime change; the value paths are already driven by
+# the colocated tests. Remove with the block above.
+
+[[typescript.exempt]]
+path = "entries/jobName.ts"
+rules = ["co-change"]
+reason = "cast restructure only, no runtime change; the tagging behavior is fully driven by the colocated test"
+
+[[typescript.exempt]]
+path = "names/lookupPath.ts"
+rules = ["co-change"]
+reason = "any->unknown signature change only; the null/non-object walk stops are pinned by 'is undefined when the walk hits null'"
+
+[[typescript.exempt]]
+path = "predict/predict.ts"
+rules = ["co-change"]
+reason = "double-cast replaced by String() on the raw-format body, which is already a string; the fetch path is driven by the colocated test"
+
+[[typescript.exempt]]
+path = "triggers/getPrTrigger.ts"
+rules = ["co-change"]
+reason = "any->unknown conversion; the bare pull_request:-null trigger is pinned by the colocated test's {} expectations"
