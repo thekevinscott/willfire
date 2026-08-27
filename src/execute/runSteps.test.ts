@@ -1,7 +1,12 @@
 import { writeFile } from "node:fs/promises";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { runSteps } from "./runSteps.js";
 import type { ExecDeps, WalkCtx } from "./types.js";
+
+vi.mock("node:fs/promises", async () => {
+  const actual = await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises");
+  return { ...actual };
+});
 
 function ctxOf(runCommand?: ExecDeps["runCommand"]): WalkCtx {
   return {

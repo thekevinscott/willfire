@@ -3,6 +3,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { runRun } from "./runRun.js";
 import type { ExecDeps, RunSpec, WalkCtx } from "./types.js";
 
+vi.mock("node:fs/promises", async () => {
+  const actual = await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises");
+  return { ...actual };
+});
+
 const ok = async (): Promise<{ code: number; stderr: string }> => ({ code: 0, stderr: "" });
 
 function ctxOf(runCommand: ExecDeps["runCommand"], extra: Partial<WalkCtx> = {}): WalkCtx {
