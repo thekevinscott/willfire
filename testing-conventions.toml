@@ -1,0 +1,40 @@
+# Co-change exemptions for the expr/ decomposition (#43). Each lifts only the
+# co-change rule — colocated-test presence and the 100% coverage floor still
+# apply. These files changed by import path alone when `src/expr.ts` became
+# `src/expr/`; there is nothing genuine to add to their tests. Delete the
+# entries once the split lands on main.
+
+[[typescript.exempt]]
+path = "execute.ts"
+rules = ["co-change"]
+reason = "import path update for the expr/ split (#43); no behavior change"
+
+[[typescript.exempt]]
+path = "jobs/evalIf.ts"
+rules = ["co-change"]
+reason = "import path update for the expr/ split (#43); no behavior change"
+
+[[typescript.exempt]]
+path = "jobs/expandJobs.ts"
+rules = ["co-change"]
+reason = "import path update for the expr/ split (#43); no behavior change"
+
+[[typescript.exempt]]
+path = "jobs/prScope.ts"
+rules = ["co-change"]
+reason = "import path update for the expr/ split (#43); no behavior change"
+
+[[typescript.exempt]]
+path = "matrix/expandMatrix.ts"
+rules = ["co-change"]
+reason = "import path update for the expr/ split (#43); no behavior change"
+
+[[typescript.exempt]]
+path = "matrix/expandMatrixDetailed.ts"
+rules = ["co-change"]
+reason = "import path update for the expr/ split (#43); no behavior change"
+
+[[typescript.exempt]]
+path = "predict/predict.ts"
+rules = ["co-change"]
+reason = "import path update for the expr/ split (#43); no behavior change"

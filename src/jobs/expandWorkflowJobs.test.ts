@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { expandWorkflowJobs } from "./expandWorkflowJobs.js";
 import type { ExecOutcome } from "../execute.js";
-import type { Scope } from "../expr.js";
+import type { Scope } from "../expr/val.js";
 import type { FetchWorkflow, ResolveRef, WorkflowReader, WorkflowSource } from "../types.js";
 
 /** A 40-hex commit id, so anything pinned to it is already resolved. */

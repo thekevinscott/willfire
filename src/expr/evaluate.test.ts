@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { evaluate, evaluateValue, UNKNOWN, type Scope } from "./expr.js";
+import { evaluate } from "./evaluate.js";
+import type { Scope } from "./val.js";
 
 /**
  * `evaluate` is the whole public surface, so everything below drives it rather
@@ -81,7 +82,7 @@ describe("&& short-circuits from either side", () => {
   });
 
   it("is false when the right is false and the left is unknown", () => {
-    // The point of the whole file: an undecided operand does not make the
+    // The point of the whole module: an undecided operand does not make the
     // expression undecided when the other operand settles it.
     expect(evaluate("needs.detect.outputs.x && false")).toBe(false);
   });
@@ -197,7 +198,7 @@ describe("context lookups", () => {
   });
 
   it("honours an input that is present but unresolvable", () => {
-    expect(evaluate("inputs.mode == 'fast'", { inputs: { mode: UNKNOWN } })).toBe(null);
+    expect(evaluate("inputs.mode == 'fast'", { inputs: { mode: { kind: "unknown" } } })).toBe(null);
   });
 
   it("resolves a supplied github value", () => {
@@ -228,7 +229,7 @@ describe("context lookups", () => {
 });
 
 // `needs.*` is the one runtime context that can be supplied: the outputs are
-// computed before the jobs that read them expand. Nothing in this file works
+// computed before the jobs that read them expand. Nothing in this module works
 // out what they are — they are handed in.
 describe("needs outputs", () => {
   const NEEDS: Scope = {
@@ -369,9 +370,9 @@ describe("functions", () => {
   });
 });
 
-// `fromJSON` is what a dynamic matrix axis is built out of, so unlike the other
-// functions its *value* is the point, not its truthiness. `evaluateValue` is
-// the entry point that hands it back.
+// `fromJSON` is what a dynamic matrix axis is built out of; the value side of
+// it lives in evaluateValue's tests. What belongs here is how its results
+// behave under truthiness and comparison.
 describe("fromJSON", () => {
   const NEEDS: Scope = {
     needs: {
@@ -380,21 +381,6 @@ describe("fromJSON", () => {
       },
     },
   };
-
-  it("parses an array out of an output", () => {
-    expect(evaluateValue("fromJSON(needs.detect.outputs.langs)", NEEDS)).toEqual({
-      kind: "json",
-      v: ["typescript", "rust"],
-    });
-    expect(evaluateValue("fromJSON(needs.detect.outputs.empty)", NEEDS)).toEqual({
-      kind: "json",
-      v: [],
-    });
-  });
-
-  it("parses an object", () => {
-    expect(evaluateValue("fromJSON('{\"a\":1}')")).toEqual({ kind: "json", v: { a: 1 } });
-  });
 
   it("hands back a scalar as an ordinary value, so it stays comparable", () => {
     expect(evaluate("fromJSON(needs.detect.outputs.flag)", NEEDS)).toBe(true);
@@ -416,32 +402,6 @@ describe("fromJSON", () => {
 
   it("compares a structure by instance, so it equals nothing written beside it", () => {
     expect(evaluate("fromJSON('[1]') == '[1]'")).toBe(false);
-  });
-
-  it("is unknown on a string it cannot parse", () => {
-    // A workflow that reaches this at runtime fails; predicting the failure is
-    // not this function's job.
-    expect(evaluateValue("fromJSON('not json')")).toEqual(UNKNOWN);
-  });
-
-  it("is unknown when its argument is not a known string", () => {
-    expect(evaluateValue("fromJSON(needs.other.outputs.x)", NEEDS)).toEqual(UNKNOWN);
-    expect(evaluateValue("fromJSON(3)")).toEqual(UNKNOWN);
-    expect(evaluateValue("fromJSON('[]', 'x')")).toEqual(UNKNOWN);
-  });
-});
-
-describe("evaluateValue", () => {
-  it("refuses the same shapes evaluate refuses", () => {
-    expect(evaluateValue("")).toEqual(UNKNOWN);
-    expect(evaluateValue("${{ }}")).toEqual(UNKNOWN);
-    expect(evaluateValue("a ${{ b }} c")).toEqual(UNKNOWN);
-    expect(evaluateValue("'a' 'b'")).toEqual(UNKNOWN);
-    expect(evaluateValue("@")).toEqual(UNKNOWN);
-  });
-
-  it("strips the wrapper the way an if: does", () => {
-    expect(evaluateValue("${{ 'a' }}")).toEqual({ kind: "value", v: "a" });
   });
 });
 

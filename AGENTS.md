@@ -1,7 +1,7 @@
 # Agent contract
 
 willfire is one TypeScript package: `src/predict.ts` (the prediction engine and
-its CLI), `src/expr.ts` (a tri-state evaluator for the slice of the GitHub
+its CLI), `src/expr/` (a tri-state evaluator for the slice of the GitHub
 expression language that job `if:` conditions use), and `src/verify.ts` (a
 script that diffs a prediction against what GitHub actually dispatched). `README.md` describes the model; this file is the
 operating contract for working in the repo.

@@ -1,5 +1,5 @@
 import { parse as parseYaml } from "yaml";
-import { UNKNOWN, type Scope, type Val } from "../expr.js";
+import { UNKNOWN, type Scope, type Val } from "../expr/val.js";
 import type { JobExecutor } from "../execute.js";
 import { expandMatrixDetailed } from "../matrix/expandMatrixDetailed.js";
 import { jobDisplayName } from "../names/jobDisplayName.js";
