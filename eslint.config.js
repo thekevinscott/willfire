@@ -77,11 +77,22 @@ export default [
     languageOptions: {
       parser: tseslint.parser,
     },
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+    },
     rules: {
       curly: ['error', 'all'],
       eqeqeq: ['error', 'always'],
       'no-continue': 'error',
       semi: ['error', 'always'],
+      '@typescript-eslint/no-explicit-any': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'TSAsExpression > TSAsExpression',
+          message: 'Casting through unknown hides type errors; fix the types instead.',
+        },
+      ],
     },
   },
   {

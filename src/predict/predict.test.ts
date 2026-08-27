@@ -123,6 +123,7 @@ function fakeOctokit(f: Fixture): Octokit {
       return f.workflows ?? [{ path: WF, state: "active" }];
     },
   };
+  // eslint-disable-next-line no-restricted-syntax -- test fake covering only the routes this unit calls; Octokit's full surface cannot be faked honestly until #88 drops it
   return api as unknown as Octokit;
 }
 
