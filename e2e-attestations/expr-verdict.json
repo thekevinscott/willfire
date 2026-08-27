@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e -t 'predicted set matches what GitHub dispatched'",
+  "ran_at": 1787854804,
+  "exit_code": 0,
+  "commit": "ce4b4cc3edcff04dc8ccc59d8417e6829e8ae4ef",
+  "branch": "expr-verdict"
+}
