@@ -1,12 +1,8 @@
-import {
-  makeCloneProvider,
-  makeExecutor,
-  makeTreeProvider,
-  runShell,
-  type JobExecutor,
-  type ProvideTree,
-  type RunCommand,
-} from "../execute.js";
+import { makeCloneProvider } from "../execute/makeCloneProvider.js";
+import { makeExecutor } from "../execute/makeExecutor.js";
+import { makeTreeProvider } from "../execute/makeTreeProvider.js";
+import { runShell } from "../execute/runShell.js";
+import type { JobExecutor, ProvideTree, RunCommand } from "../execute/types.js";
 import type { GithubClient } from "./makeGithubClient.js";
 import { makeSandboxRunner } from "../sandbox/makeSandboxRunner.js";
 import { SANDBOX_NODE_MAJOR } from "../sandbox/sandboxConfig.js";

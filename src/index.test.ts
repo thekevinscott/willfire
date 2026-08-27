@@ -27,8 +27,11 @@ describe("root barrel", () => {
   it("re-exports the executor seam types", () => {
     // Type-only, erased at runtime — which is why the key list above cannot
     // show them. Compiling these assignments is the assertion.
-    const outcome: ExecOutcome = { ok: false, reason: "r" };
-    const executor: JobExecutor = { executeJob: async () => outcome };
+    const outcomes: ExecOutcome[] = [
+      { ok: true, outputs: {} },
+      { ok: false, reason: "r" },
+    ];
+    const executor: JobExecutor = { executeJob: async () => outcomes[0] };
     expect(typeof executor.executeJob).toBe("function");
   });
 });
