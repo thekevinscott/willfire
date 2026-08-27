@@ -19,6 +19,7 @@ describe("indexVal", () => {
   it("reads a missing or null element as the empty string", () => {
     expect(indexVal(ARR, { kind: "value", v: 9 })).toEqual({ kind: "value", v: "" });
     expect(indexVal(ARR, { kind: "value", v: 2 })).toEqual({ kind: "value", v: "" });
+    expect(indexVal(OBJ, { kind: "value", v: "missing" })).toEqual({ kind: "value", v: "" });
   });
 
   it("refuses a base that is not json", () => {

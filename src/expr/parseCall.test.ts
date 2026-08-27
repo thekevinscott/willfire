@@ -32,4 +32,9 @@ describe("parseCall", () => {
     ]);
     expect(parseCall(cur, {}, "contains")).toEqual({ kind: "unknown" });
   });
+
+  it("refuses a call the tokens end before closing", () => {
+    const cur = new Cursor([{ t: "str", v: "a" }]);
+    expect(parseCall(cur, {}, "contains")).toEqual({ kind: "unknown" });
+  });
 });

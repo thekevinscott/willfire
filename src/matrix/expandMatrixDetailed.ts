@@ -48,7 +48,7 @@ function comboList(v: unknown, scope: Scope): any[] | null {
 
 export function expandMatrixDetailed(strategy: any, scope: Scope = {}): DetailedCombos {
   const matrix = strategy?.matrix;
-  if (matrix == null) {
+  if (matrix === null || matrix === undefined) {
     return [null];
   }
   // `matrix: ${{ ... }}` — the whole matrix as one expression, rather than the
@@ -64,14 +64,13 @@ export function expandMatrixDetailed(strategy: any, scope: Scope = {}): Detailed
   }
   const axes: Record<string, any[]> = {};
   for (const [k, v] of Object.entries(matrix)) {
-    if (k === "include" || k === "exclude") {
-      continue;
+    if (k !== "include" && k !== "exclude") {
+      const vals = axisValues(v, scope);
+      if (vals === null) {
+        return null;
+      }
+      axes[k] = vals;
     }
-    const vals = axisValues(v, scope);
-    if (vals == null) {
-      return null;
-    }
-    axes[k] = vals;
   }
   const axisKeys = Object.keys(axes);
   let combos: DetailedCombo[] = [{ values: {}, displayKeys: axisKeys }];

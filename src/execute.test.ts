@@ -375,6 +375,18 @@ describe("executing run steps", () => {
     expect(failure(o)).toBe("step '#1': env block is not a map");
   });
 
+  it("treats an env block left empty as absent", async () => {
+    // YAML `env:` with no value parses to null, not an empty map.
+    const out = success(
+      await execute({
+        env: null,
+        steps: [{ id: "s", run: 'echo "v=1" >> "$GITHUB_OUTPUT"' }],
+        outputs: { v: "${{ steps.s.outputs.v }}" },
+      }),
+    );
+    expect(out).toEqual({ v: "1" });
+  });
+
   it("stops on a run whose ${{ }} it cannot render", async () => {
     const o = await execute({ steps: [{ name: "n", run: "echo ${{ env.nope }}" }] });
     expect(failure(o)).toBe("step 'n': cannot resolve ${{ }} in run");

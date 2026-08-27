@@ -23,7 +23,7 @@ export function lookup(scope: Scope, path: string): Val {
       return UNKNOWN;
     }
     const job = scope.needs?.[parts[0]];
-    if (job == null) {
+    if (job === undefined) {
       return UNKNOWN;
     }
     // A known job's missing output is the empty string, not a hole: the
@@ -41,7 +41,7 @@ export function lookup(scope: Scope, path: string): Val {
       return UNKNOWN;
     }
     const step = scope.steps?.[parts[0]];
-    if (step == null) {
+    if (step === undefined) {
       return UNKNOWN;
     }
     return { kind: "value", v: step.outputs[parts[2]] ?? "" };

@@ -6,6 +6,8 @@ describe("expandMatrixDetailed", () => {
   it("returns a single null combination when there is no matrix", () => {
     expect(expandMatrixDetailed(undefined)).toEqual([null]);
     expect(expandMatrixDetailed({})).toEqual([null]);
+    // YAML `matrix:` with no value parses to null, not an absent key.
+    expect(expandMatrixDetailed({ matrix: null })).toEqual([null]);
   });
 
   it("expands two static axes to their full cross product in order", () => {

@@ -30,13 +30,13 @@ export function workflowDispatches(
   }
   const branchRef = ctx.stackTarget ?? ctx.baseRef;
   if ("branches" in trig && !matchFilters(branchRef, trig["branches"])) {
-    const label = ctx.stackTarget == null ? "base branch" : "stack target";
+    const label = ctx.stackTarget === undefined ? "base branch" : "stack target";
     return [false, `${label} '${branchRef}' not in branches`];
   }
   if ("branches-ignore" in trig && matchFilters(branchRef, trig["branches-ignore"])) {
     return [
       false,
-      ctx.stackTarget == null
+      ctx.stackTarget === undefined
         ? "base branch in branches-ignore"
         : `stack target '${branchRef}' in branches-ignore`,
     ];

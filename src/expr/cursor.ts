@@ -15,7 +15,7 @@ export class Cursor {
 
   eatOp(v: string): boolean {
     const t = this.peek();
-    if (t != null && t.t === "op" && t.v === v) {
+    if (t !== undefined && t.t === "op" && t.v === v) {
       this.pos++;
       return true;
     }

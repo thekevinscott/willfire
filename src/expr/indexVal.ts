@@ -24,7 +24,7 @@ export function indexVal(base: Val, idx: Val): Val {
     }
     el = base.v[idx.v];
   }
-  if (el == null) {
+  if (el === null || el === undefined) {
     return { kind: "value", v: "" };
   }
   if (typeof el === "object") {
