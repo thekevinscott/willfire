@@ -22,7 +22,7 @@ export function finalizePrediction(
   const final = entries.map(finalize);
   const names = new Set<string>();
   for (const e of final) {
-    if (e.status === "run" && e.checkName != null) {
+    if (e.status === "run" && e.checkName !== null) {
       names.add(e.checkName);
     }
   }

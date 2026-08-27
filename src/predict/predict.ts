@@ -52,7 +52,7 @@ export async function predict(
     // is a guess kept only so existing callers keep working.
     action: opts.action ?? (pr.commits > 1 ? "synchronize" : "opened"),
     baseRef: pr.base.ref,
-    ...(stackTarget != null ? { stackTarget } : {}),
+    ...(stackTarget !== null ? { stackTarget } : {}),
     files: files.map((f) => f.filename),
   };
   const headSha = pr.head.sha;
@@ -106,7 +106,7 @@ export async function predict(
       sha = null;
     }
     refCache.set(key, sha);
-    if (sha != null) {
+    if (sha !== null) {
       sources.set(key, { ...src, sha });
     }
     return sha;
@@ -150,7 +150,7 @@ export async function predict(
   // from the tarball endpoint at the resolved commit, and every subprocess —
   // `tar` included — goes through the one `runShell` seam.
   let executor: JobExecutor | undefined;
-  if (opts.execute != null && opts.execute.length > 0) {
+  if (opts.execute !== undefined && opts.execute.length > 0) {
     const download = async (src: WorkflowSource): Promise<Uint8Array | null> => {
       try {
         const { data } = await octokit.rest.repos.downloadTarballArchive({
@@ -192,59 +192,69 @@ export async function predict(
   const entries: DraftEntry[] = [];
   for (const w of workflows) {
     const path = w.path;
-    if (!path.startsWith(".github/workflows/")) {
-      continue;
-    }
-    if (w.state !== "active") {
-      entries.push({
-        workflow: path,
-        job: "*",
-        status: "no-dispatch",
-        reason: `workflow state: ${w.state}`,
-      });
-      continue;
-    }
-    const content = await fetchWorkflow(path, headSource);
-    if (content == null) {
-      // The Actions API keeps listing a workflow as `active` after its file is
-      // deleted. There is no file at head, so there is nothing to dispatch —
-      // the same verdict as the disabled case above, reached a different way.
-      entries.push({
-        workflow: path,
-        job: "*",
-        status: "no-dispatch",
-        reason: "no workflow file at head",
-      });
-      continue;
-    }
-    let wf: Workflow;
-    try {
-      wf = parseYaml(content);
-    } catch (e) {
-      // GitHub creates a run for an unparseable workflow file and concludes it
-      // `startup_failure`. The run exists but has no jobs, so this is a
-      // workflow-level "it dispatches" with nothing to expand.
-      entries.push({
-        workflow: path,
-        job: "*",
-        status: "run",
-        reason: `YAML parse error: ${e}`,
-      });
-      continue;
-    }
-    const [dispatches, reason] = workflowDispatches(wf, ctx);
-    if (!dispatches) {
-      entries.push({ workflow: path, job: "*", status: "no-dispatch", reason });
-      continue;
-    }
-    for (const j of await expandJobs(wf, ctx, reader, headSource, 0, "", true, prFacts, executor)) {
-      entries.push({
-        workflow: path,
-        job: jobName(j.job),
-        checkName: j.checkName,
-        status: j.status,
-        reason: j.reason || reason,
-      });
+    if (path.startsWith(".github/workflows/")) {
+      if (w.state !== "active") {
+        entries.push({
+          workflow: path,
+          job: "*",
+          status: "no-dispatch",
+          reason: `workflow state: ${w.state}`,
+        });
+      } else {
+        const content = await fetchWorkflow(path, headSource);
+        if (content === null) {
+          // The Actions API keeps listing a workflow as `active` after its file is
+          // deleted. There is no file at head, so there is nothing to dispatch —
+          // the same verdict as the disabled case above, reached a different way.
+          entries.push({
+            workflow: path,
+            job: "*",
+            status: "no-dispatch",
+            reason: "no workflow file at head",
+          });
+        } else {
+          let wf: Workflow | undefined;
+          try {
+            wf = parseYaml(content);
+          } catch (e) {
+            // GitHub creates a run for an unparseable workflow file and concludes it
+            // `startup_failure`. The run exists but has no jobs, so this is a
+            // workflow-level "it dispatches" with nothing to expand.
+            entries.push({
+              workflow: path,
+              job: "*",
+              status: "run",
+              reason: `YAML parse error: ${e}`,
+            });
+          }
+          if (wf !== undefined) {
+            const [dispatches, reason] = workflowDispatches(wf, ctx);
+            if (!dispatches) {
+              entries.push({ workflow: path, job: "*", status: "no-dispatch", reason });
+            } else {
+              for (const j of await expandJobs(
+                wf,
+                ctx,
+                reader,
+                headSource,
+                0,
+                "",
+                true,
+                prFacts,
+                executor,
+              )) {
+                entries.push({
+                  workflow: path,
+                  job: jobName(j.job),
+                  checkName: j.checkName,
+                  status: j.status,
+                  reason: j.reason || reason,
+                });
+              }
+            }
+          }
+        }
+      }
     }
   }
   return finalizePrediction(entries, null, sources);

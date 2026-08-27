@@ -26,7 +26,7 @@ export async function stackTargetRef(
   try {
     for (let hop = 0; hop < MAX_STACK_DEPTH; hop++) {
       const mergeSha = cur.merge_commit_sha;
-      if (mergeSha == null) {
+      if (mergeSha === null) {
         break;
       }
       const { data: preview } = await octokit.rest.repos.getCommit({
@@ -35,7 +35,7 @@ export async function stackTargetRef(
         ref: mergeSha,
       });
       const previewParent = preview.parents[0]?.sha;
-      if (previewParent == null) {
+      if (previewParent === undefined) {
         break;
       }
       const { data: baseTip } = await octokit.rest.repos.getCommit({
@@ -57,7 +57,7 @@ export async function stackTargetRef(
         per_page: 100,
       });
       const parent = candidates.find((p) => p.merge_commit_sha === previewParent);
-      if (parent == null) {
+      if (parent === undefined) {
         break;
       }
       target = parent.base.ref;

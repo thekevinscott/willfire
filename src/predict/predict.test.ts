@@ -94,7 +94,7 @@ function fakeOctokit(f: Fixture): Octokit {
             return { data: { sha: ref, commit: { message: f.message ?? "chore: routine" } } };
           }
           const sha = (f.refs ?? {})[`${owner}/${repo}@${ref}`];
-          if (sha == null) {
+          if (sha === undefined) {
             throw new Error(`404 ${owner}/${repo}@${ref}`);
           }
           const parents = ((f.parents ?? {})[sha] ?? []).map((p) => ({ sha: p }));
@@ -108,7 +108,7 @@ function fakeOctokit(f: Fixture): Octokit {
         },
         downloadTarballArchive: async ({ owner, repo, ref }: Record<string, string>) => {
           const bytes = (f.tarballs ?? {})[`${owner}/${repo}@${ref}`];
-          if (bytes == null) {
+          if (bytes === undefined) {
             throw new Error(`404 tarball ${owner}/${repo}@${ref}`);
           }
           return { data: bytes.buffer };
