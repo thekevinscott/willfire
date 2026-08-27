@@ -1,4 +1,5 @@
 import { matrixSuffix } from "../matrix/matrixSuffix.js";
+import { capDisplayName } from "./capDisplayName.js";
 import { renderName } from "./renderName.js";
 import type { DetailedCombo, DisplayName, Workflow } from "../types.js";
 
@@ -24,9 +25,9 @@ export function jobDisplayName(
 ): DisplayName {
   const raw = job != null && job.name != null ? String(job.name) : null;
   if (raw === null) {
-    return { name: jobId + (combo ? matrixSuffix(combo) : ""), resolved: true };
+    return { name: capDisplayName(jobId + (combo ? matrixSuffix(combo) : "")), resolved: true };
   }
   const { text, resolved } = renderName(raw, combo?.values ?? null);
   const suffix = combo && !EXPRESSION_RE.test(raw) ? matrixSuffix(combo) : "";
-  return { name: text + suffix, resolved };
+  return { name: capDisplayName(text + suffix), resolved };
 }
