@@ -1,6 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { parseArgs } from "./parseArgs.js";
 
+// The isolation gate wants collaborators mocked; --action validation is part
+// of parseArgs's contract, so the mock passes the real guard through.
+vi.mock(
+  "./isPrEventAction.js",
+  async () => await vi.importActual<typeof import("./isPrEventAction.js")>("./isPrEventAction.js"),
+);
+
 describe("parseArgs", () => {
   beforeEach(() => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
