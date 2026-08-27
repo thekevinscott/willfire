@@ -21,6 +21,18 @@ describe("the value lattice", () => {
     expect(vals).toHaveLength(8);
   });
 
+  it("carries an array at the json point alone, so `v` alone decides the kind", () => {
+    const vals: Val[] = [
+      { kind: "value", v: "s" },
+      { kind: "json", v: {} },
+      { kind: "json", v: ["a"] },
+      { kind: "truthy" },
+      { kind: "falsy" },
+      UNKNOWN,
+    ];
+    expect(vals.filter((val) => Array.isArray(val.v))).toEqual([{ kind: "json", v: ["a"] }]);
+  });
+
   it("reads into a json point as a document value, not `unknown`", () => {
     const v: Val = { kind: "json", v: { cfg: { os: "linux", tags: [1, null] } } };
     const read: YamlValue | undefined =
