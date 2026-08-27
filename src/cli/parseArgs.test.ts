@@ -50,6 +50,12 @@ describe("parseArgs", () => {
     });
   });
 
+  it("accepts --action reopened", () => {
+    expect(parseArgs(["--repo", "o/r", "--pr", "3", "--action", "reopened"]).action).toBe(
+      "reopened",
+    );
+  });
+
   it("exits 2 with a usage line when --repo or --pr is missing", () => {
     expect(() => parseArgs(["--pr", "1"])).toThrow("exited");
     expect(process.exit).toHaveBeenCalledWith(2);
