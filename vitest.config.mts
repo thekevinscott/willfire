@@ -1,4 +1,4 @@
-import { defineConfig, mergeConfig } from 'vitest/config';
+import { defaultExclude, defineConfig, mergeConfig } from 'vitest/config';
 import { vitestConfig } from 'testing-conventions';
 
 // Extends testing-conventions' published vitest base — v8 coverage over
@@ -13,6 +13,7 @@ export default mergeConfig(
       // `pnpm test`, but `src/` when the testing-conventions CLI invokes Vitest
       // there. This root-relative pattern finds the suite under either root.
       include: ['**/*.test.ts'],
+      exclude: [...defaultExclude, 'tests/e2e/**'],
       coverage: {
         // The CLI measures the whole `src/` tree and ignores these excludes; they
         // only scope the local `pnpm test:coverage` report. mergeConfig concatenates,
