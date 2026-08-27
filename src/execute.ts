@@ -14,7 +14,7 @@ import { parse as parseYaml } from "yaml";
 import { evaluate } from "./expr/evaluate.js";
 import { evaluateValue } from "./expr/evaluateValue.js";
 import { UNKNOWN, type Scope, type Val } from "./expr/val.js";
-import type { ResolveRef, SourceRef, WorkflowSource } from "./types.js";
+import type { ResolveRef, SourceRef, Workflow, WorkflowSource } from "./types.js";
 
 /** A host path a sandboxed runner must expose inside, at the same path. */
 export interface Mount {
@@ -67,7 +67,7 @@ export type ExecOutcome =
  * running it yields.
  */
 export interface JobExecutor {
-  executeJob(jobId: string, job: any, wf: any, scope: Scope): Promise<ExecOutcome>;
+  executeJob(jobId: string, job: Workflow, wf: Workflow, scope: Scope): Promise<ExecOutcome>;
 }
 
 // ------------------------------------------------------------------ plumbing
@@ -190,12 +190,36 @@ async function readActionManifest(dir: string): Promise<string | null> {
   return null;
 }
 
+/** The step keys the walker reads. Values stay unknown — YAML promises
+ * nothing — until a runtime guard narrows them. */
+interface StepModel {
+  id?: unknown;
+  name?: unknown;
+  if?: unknown;
+  uses?: unknown;
+  run?: unknown;
+  shell?: unknown;
+  with?: Record<string, unknown> | null;
+  env?: unknown;
+  "working-directory"?: unknown;
+}
+
+interface ActionModel {
+  inputs?: Record<string, unknown> | null;
+  outputs?: Record<string, unknown> | null;
+  runs?: { using?: unknown; pre?: unknown; main?: unknown; steps?: StepModel[] | null } | null;
+}
+
 /**
  * Caller's `with:` over declared defaults, everything a string — action inputs
  * are untyped, and an unset input is the empty string. An unrenderable value
  * stays unknown; it only fails if a step reads it.
  */
-function bindActionInputs(action: any, withBlock: unknown, scope: Scope): Record<string, Val> {
+function bindActionInputs(
+  action: ActionModel,
+  withBlock: unknown,
+  scope: Scope,
+): Record<string, Val> {
   const bind = (raw: unknown): Val => {
     if (raw === null || raw === undefined) {
       return { kind: "value", v: "" };
@@ -250,7 +274,7 @@ interface WalkCtx {
 }
 
 async function runSteps(
-  steps: any[],
+  steps: StepModel[],
   scope: Scope,
   ctx: WalkCtx,
 ): Promise<Res<Record<string, { outputs: Record<string, string> }>>> {
@@ -294,12 +318,12 @@ async function runSteps(
 
 /** A `uses:` step: a runner-provided postcondition, an action to run, or a stop. */
 async function runUses(
-  step: any,
+  step: StepModel,
   label: string,
   scope: Scope,
   ctx: WalkCtx,
 ): Promise<Res<Record<string, string>>> {
-  const uses: string = step.uses;
+  const uses = String(step.uses);
   if (CHECKOUT_RE.test(uses)) {
     // Runner-provided, and its postcondition — the head tree at the workspace
     // path — is already true. Any input beyond `fetch-depth: 0` asks for a
@@ -308,7 +332,7 @@ async function runUses(
     if (withKeys.length === 0) {
       return { ok: true, v: {} };
     }
-    if (withKeys.length === 1 && String(step.with["fetch-depth"]) === "0") {
+    if (withKeys.length === 1 && String(step.with?.["fetch-depth"]) === "0") {
       // Unmet inside a composite: the pre-scan that picks the tree provider
       // only reads the job's own steps.
       if (!ctx.hasHistory) {
@@ -326,7 +350,7 @@ async function runUses(
       return { ok: true, v: {} };
     }
     if (withKeys.length === 1 && withKeys[0] === "node-version") {
-      const wanted = renderTemplate(String(step.with["node-version"]), scope);
+      const wanted = renderTemplate(String(step.with?.["node-version"]), scope);
       if (wanted === null) {
         return err(`${label}: cannot resolve node-version`);
       }
@@ -369,7 +393,7 @@ async function runUses(
   if (manifest === null) {
     return err(`${label}: no action.yml under ${uses}`);
   }
-  let action: any;
+  let action: ActionModel;
   try {
     action = parseYaml(manifest);
   } catch (e) {
@@ -431,10 +455,10 @@ async function runUses(
  * `outputs:` block is documentation, not a mapping.
  */
 async function runNodeAction(
-  step: any,
+  step: StepModel,
   label: string,
   uses: string,
-  action: any,
+  action: ActionModel,
   actionDir: string,
   actionRoot: string | undefined,
   usingMajor: number,
@@ -446,7 +470,8 @@ async function runNodeAction(
       `${label}: action ${uses} wants node ${usingMajor}; the sandbox has node ${ctx.deps.nodeMajor}`,
     );
   }
-  if (action?.runs?.pre !== undefined && action.runs.pre !== null) {
+  const pre = action.runs?.pre;
+  if (pre !== undefined && pre !== null) {
     return err(`${label}: action ${uses} declares a pre: step; not modelled`);
   }
   // `post:` runs after the job's own steps, so no job output can depend on it.
@@ -511,7 +536,7 @@ async function runNodeAction(
 
 /** A `run:` step, executed under its declared shell with its declared env. */
 async function runRun(
-  step: any,
+  step: StepModel,
   label: string,
   scope: Scope,
   ctx: WalkCtx,
@@ -616,7 +641,7 @@ export function makeExecutor(opts: {
       // Any checkout input might be the `fetch-depth: 0` form. Over-asking for
       // one the walk will refuse anyway costs a clone, never correctness.
       const needsHistory = job.steps.some(
-        (s: any) =>
+        (s: StepModel) =>
           s !== null &&
           s !== undefined &&
           typeof s.uses === "string" &&
