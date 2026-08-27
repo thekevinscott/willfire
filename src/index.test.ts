@@ -13,7 +13,7 @@ describe("root barrel", () => {
       "isJobEntry",
       "isWorkflowEntry",
       "jobName",
-      "makeOctokit",
+      "makeGithubClient",
       "matchFilters",
       "parseUses",
       "patternToRegex",

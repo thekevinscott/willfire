@@ -1,4 +1,3 @@
-import type { Octokit } from "@octokit/rest";
 import {
   makeCloneProvider,
   makeExecutor,
@@ -8,6 +7,7 @@ import {
   type ProvideTree,
   type RunCommand,
 } from "../execute.js";
+import type { GithubClient } from "./makeGithubClient.js";
 import { makeSandboxRunner } from "../sandbox/makeSandboxRunner.js";
 import { SANDBOX_NODE_MAJOR } from "../sandbox/sandboxConfig.js";
 import type { ResolveRef, WorkflowSource } from "../types.js";
@@ -30,19 +30,19 @@ export interface LiveExecutorOpts {
  * since the clone needs the network the sandbox denies.
  */
 export function makeLiveExecutor(
-  octokit: Octokit,
+  github: GithubClient,
   workspace: WorkflowSource,
   resolveRef: ResolveRef,
   opts: LiveExecutorOpts = {},
 ): JobExecutor {
   const download = async (src: WorkflowSource): Promise<Uint8Array | null> => {
     try {
-      const { data } = await octokit.rest.repos.downloadTarballArchive({
+      const { data } = await github.rest.repos.downloadTarballArchive({
         owner: src.owner,
         repo: src.repo,
         ref: src.sha,
       });
-      return new Uint8Array(data as ArrayBuffer);
+      return new Uint8Array(data);
     } catch {
       // Private, deleted, rate limit, network: one answer.
       return null;

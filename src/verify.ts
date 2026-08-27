@@ -5,10 +5,10 @@
 // Ground truth: workflow runs for the PR head SHA with a pull_request event,
 // and the job entries inside each run (skipped jobs included).
 
-import { Octokit } from "@octokit/rest";
-import { isJobEntry, makeOctokit, predict } from "./index.js";
+import { isJobEntry, makeGithubClient, predict } from "./index.js";
+import type { GithubClient } from "./index.js";
 
-async function actualEntries(octokit: Octokit, repo: string, prNumber: number) {
+async function actualEntries(octokit: GithubClient, repo: string, prNumber: number) {
   const [owner, name] = repo.split("/");
   const base = { owner, repo: name };
   const { data: pr } = await octokit.rest.pulls.get({ ...base, pull_number: prNumber });
@@ -51,7 +51,7 @@ if (!repo || !prArg) {
 }
 const pr = Number(prArg);
 
-const octokit = makeOctokit();
+const octokit = makeGithubClient();
 const { entries: predictedRaw } = await predict(octokit, repo, pr);
 // Compare on the resolved check name — that is the string GitHub actually
 // puts on the job. Entries whose name could not be resolved statically have

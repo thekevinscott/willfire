@@ -1,7 +1,7 @@
 // Unit suite for the prediction/reality comparison script.
 //
 // `verify.ts` is a top-level script: importing it *is* running it. So each case
-// stands up the world it wants — argv, a stubbed `predict()`, and an Octokit
+// stands up the world it wants — argv, a stubbed `predict()`, and a GitHub client
 // stand-in for the workflow-run queries — then re-imports the module and reads
 // back what it printed and the code it exited with.
 //
@@ -13,19 +13,19 @@ import { jobName } from "./index.js";
 import type { Entry, JobEntry, WorkflowEntry } from "./index.js";
 
 const hoisted = vi.hoisted(() => ({
-  makeOctokit: vi.fn(),
+  makeGithubClient: vi.fn(),
   predict: vi.fn(),
 }));
 
 vi.mock("./index.js", async () => {
   const actual = await vi.importActual<typeof import("./index.js")>("./index.js");
-  return { ...actual, makeOctokit: hoisted.makeOctokit, predict: hoisted.predict };
+  return { ...actual, makeGithubClient: hoisted.makeGithubClient, predict: hoisted.predict };
 });
 
 // ------------------------------------------------------------------ fixtures
 
 // Sentinels standing in for the paginating route methods; the script passes the
-// method itself to `octokit.paginate` and never calls it.
+// method itself to `github.paginate` and never calls it.
 const LIST_RUNS = Symbol("actions.listWorkflowRunsForRepo");
 const LIST_JOBS = Symbol("actions.listJobsForWorkflowRun");
 
@@ -37,7 +37,7 @@ interface RunFixture {
   jobs: { name: string; conclusion: string }[];
 }
 
-function fakeOctokit(runs: RunFixture[]): unknown {
+function fakeGithub(runs: RunFixture[]): unknown {
   return {
     rest: {
       pulls: { get: async () => ({ data: { head: { sha: "deadbeef" } } }) },
@@ -113,7 +113,7 @@ describe("verify", () => {
       throw stop;
     }) as () => never);
 
-    hoisted.makeOctokit.mockReturnValue(fakeOctokit(runs));
+    hoisted.makeGithubClient.mockReturnValue(fakeGithub(runs));
     hoisted.predict.mockResolvedValue({ entries: predicted, skip: null });
     process.argv = ["node", "/somewhere/verify.ts", ...args];
     vi.resetModules();
