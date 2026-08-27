@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1788054567,
+  "exit_code": 0,
+  "commit": "c91fa2132db4c3eff9e74b17d64106bd16cf473d",
+  "branch": "eslint-curly-semi"
+}
