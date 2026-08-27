@@ -72,8 +72,10 @@ vi.mock("node:child_process", async () => {
       }
       handlers.get("close")?.(behavior.close === undefined ? 0 : behavior.close);
     });
+    // eslint-disable-next-line no-restricted-syntax -- test fake modeling only the ChildProcess events the runner wires
     return child as unknown as ReturnType<typeof actual.spawn>;
   });
+  // eslint-disable-next-line no-restricted-syntax -- test fake modeling only the spawn call the runner makes
   return { ...actual, spawn: fakeSpawn as unknown as typeof actual.spawn };
 });
 
