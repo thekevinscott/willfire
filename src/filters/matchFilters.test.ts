@@ -18,4 +18,8 @@ describe("matchFilters", () => {
   it("ignores a negation that does not match", () => {
     expect(matchFilters("main", ["**", "!dev"])).toBe(true);
   });
+
+  it("stays false when the only pattern is a matching negation", () => {
+    expect(matchFilters("dev", ["!dev"])).toBe(false);
+  });
 });

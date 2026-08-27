@@ -59,6 +59,16 @@ describe("job expansion", () => {
     expect(entries).toEqual([{ job: "a", checkName: "a", status: "run", reason: `if: "inputs.x == 'v'"` }]);
   });
 
+  it("expands a workflow with no jobs block to no entries", async () => {
+    const entries = await expandJobs(
+      { on: { pull_request: null } } as Workflow,
+      CTX,
+      readerFor({}),
+      SOURCE,
+    );
+    expect(entries).toEqual([]);
+  });
+
   it("tolerates a job whose body is empty", async () => {
     const entries = await expand({ a: null });
     expect(entries).toEqual([{ job: "a", checkName: "a", status: "run", reason: "" }]);
