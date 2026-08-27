@@ -8,7 +8,8 @@ import {
   type ProvideTree,
   type RunCommand,
 } from "../execute.js";
-import { makeSandboxRunner, SANDBOX_NODE_MAJOR } from "../sandbox.js";
+import { makeSandboxRunner } from "../sandbox/makeSandboxRunner.js";
+import { SANDBOX_NODE_MAJOR } from "../sandbox/sandboxConfig.js";
 import type { ResolveRef, WorkflowSource } from "../types.js";
 
 export interface LiveExecutorOpts {

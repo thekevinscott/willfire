@@ -78,7 +78,6 @@ export default [
     // that predate the rule; remove each entry as #14 decomposes its file.
     ignores: [
       'src/**/*.test.ts',
-      'src/cli/parseArgs.ts',
       'src/execute.ts',
       'src/jobs/expandJobs.ts',
       'src/matrix/expandMatrixDetailed.ts',

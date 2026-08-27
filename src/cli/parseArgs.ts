@@ -1,10 +1,8 @@
 import type { PrEventAction } from "../types.js";
+import { isPrEventAction } from "./isPrEventAction.js";
 
 const USAGE =
   "usage: predict --repo owner/name --pr N [--action opened|synchronize|reopened] [--json]";
-
-const isPrEventAction = (v: string): v is PrEventAction =>
-  v === "opened" || v === "synchronize" || v === "reopened";
 
 export function parseArgs(argv: string[]): {
   repo: string;
