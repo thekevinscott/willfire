@@ -8,6 +8,16 @@ import type { Scope } from "./val.js";
  * `false` are claims that a job's fate is settled, and `null` is the refusal to
  * claim. A test that turns a `null` into a `true` is widening what willfire
  * asserts about a repo's CI, not tidying a return value.
+ *
+ * The evaluator under this suite stays hand-rolled (#74). GitHub's own
+ * `@actions/expressions` cannot satisfy it: that evaluator has no
+ * partial-context mode, so it answers where these tests demand refusal — with
+ * an empty `inputs` dictionary it decides `inputs.mode == ''` as true
+ * (verified against 0.3.61), where the pinned verdict is `null` — and its
+ * lexer reads `True` as an identifier where GitHub's runner reads a boolean.
+ * Nor is there unused grammar to shrink away: every construct the parser
+ * accepts is pinned below to a decided verdict, so cutting one would turn a
+ * decided check unknown — a hole in a fleet gate.
  */
 
 /** The scope the fleet's `testing-conventions` callers actually produce. */
