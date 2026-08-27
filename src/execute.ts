@@ -35,7 +35,9 @@ import { mkdir, mkdtemp, readdir, readFile, stat, writeFile } from "node:fs/prom
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { parse as parseYaml } from "yaml";
-import { evaluate, evaluateValue, UNKNOWN, type Scope, type Val } from "./expr.js";
+import { evaluate } from "./expr/evaluate.js";
+import { evaluateValue } from "./expr/evaluateValue.js";
+import { UNKNOWN, type Scope, type Val } from "./expr/val.js";
 import type { ResolveRef, SourceRef, WorkflowSource } from "./types.js";
 
 /**

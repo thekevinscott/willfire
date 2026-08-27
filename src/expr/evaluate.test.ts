@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { evaluate, evaluateValue, UNKNOWN, type Scope } from "./expr.js";
+import { evaluate } from "./evaluate.js";
+import type { Scope } from "./val.js";
 
 /**
  * `evaluate` is the whole public surface, so everything below drives it rather
@@ -81,7 +82,7 @@ describe("&& short-circuits from either side", () => {
   });
 
   it("is false when the right is false and the left is unknown", () => {
-    // The point of the whole file: an undecided operand does not make the
+    // The point of the whole module: an undecided operand does not make the
     // expression undecided when the other operand settles it.
     expect(evaluate("needs.detect.outputs.x && false")).toBe(false);
   });
@@ -197,7 +198,7 @@ describe("context lookups", () => {
   });
 
   it("honours an input that is present but unresolvable", () => {
-    expect(evaluate("inputs.mode == 'fast'", { inputs: { mode: UNKNOWN } })).toBe(null);
+    expect(evaluate("inputs.mode == 'fast'", { inputs: { mode: { kind: "unknown" } } })).toBe(null);
   });
 
   it("resolves a supplied github value", () => {
@@ -228,7 +229,7 @@ describe("context lookups", () => {
 });
 
 // `needs.*` is the one runtime context that can be supplied: the outputs are
-// computed before the jobs that read them expand. Nothing in this file works
+// computed before the jobs that read them expand. Nothing in this module works
 // out what they are — they are handed in.
 describe("needs outputs", () => {
   const NEEDS: Scope = {
@@ -369,9 +370,9 @@ describe("functions", () => {
   });
 });
 
-// `fromJSON` is what a dynamic matrix axis is built out of, so unlike the other
-// functions its *value* is the point, not its truthiness. `evaluateValue` is
-// the entry point that hands it back.
+// `fromJSON` is what a dynamic matrix axis is built out of; the value side of
+// it lives in evaluateValue's tests. What belongs here is how its results
+// behave under truthiness and comparison.
 describe("fromJSON", () => {
   const NEEDS: Scope = {
     needs: {
@@ -380,21 +381,6 @@ describe("fromJSON", () => {
       },
     },
   };
-
-  it("parses an array out of an output", () => {
-    expect(evaluateValue("fromJSON(needs.detect.outputs.langs)", NEEDS)).toEqual({
-      kind: "json",
-      v: ["typescript", "rust"],
-    });
-    expect(evaluateValue("fromJSON(needs.detect.outputs.empty)", NEEDS)).toEqual({
-      kind: "json",
-      v: [],
-    });
-  });
-
-  it("parses an object", () => {
-    expect(evaluateValue("fromJSON('{\"a\":1}')")).toEqual({ kind: "json", v: { a: 1 } });
-  });
 
   it("hands back a scalar as an ordinary value, so it stays comparable", () => {
     expect(evaluate("fromJSON(needs.detect.outputs.flag)", NEEDS)).toBe(true);
@@ -414,34 +400,8 @@ describe("fromJSON", () => {
     expect(evaluate("fromJSON('{}')")).toBe(null);
   });
 
-  it("refuses to compare a structure against anything", () => {
-    expect(evaluate("fromJSON('[1]') == '[1]'")).toBe(null);
-  });
-
-  it("is unknown on a string it cannot parse", () => {
-    // A workflow that reaches this at runtime fails; predicting the failure is
-    // not this function's job.
-    expect(evaluateValue("fromJSON('not json')")).toEqual(UNKNOWN);
-  });
-
-  it("is unknown when its argument is not a known string", () => {
-    expect(evaluateValue("fromJSON(needs.other.outputs.x)", NEEDS)).toEqual(UNKNOWN);
-    expect(evaluateValue("fromJSON(3)")).toEqual(UNKNOWN);
-    expect(evaluateValue("fromJSON('[]', 'x')")).toEqual(UNKNOWN);
-  });
-});
-
-describe("evaluateValue", () => {
-  it("refuses the same shapes evaluate refuses", () => {
-    expect(evaluateValue("")).toEqual(UNKNOWN);
-    expect(evaluateValue("${{ }}")).toEqual(UNKNOWN);
-    expect(evaluateValue("a ${{ b }} c")).toEqual(UNKNOWN);
-    expect(evaluateValue("'a' 'b'")).toEqual(UNKNOWN);
-    expect(evaluateValue("@")).toEqual(UNKNOWN);
-  });
-
-  it("strips the wrapper the way an if: does", () => {
-    expect(evaluateValue("${{ 'a' }}")).toEqual({ kind: "value", v: "a" });
+  it("compares a structure by instance, so it equals nothing written beside it", () => {
+    expect(evaluate("fromJSON('[1]') == '[1]'")).toBe(false);
   });
 });
 
@@ -528,5 +488,64 @@ describe("tokenizer details", () => {
 
   it("keeps dots and dashes inside one path", () => {
     expect(evaluate("needs.detect-languages.outputs.x == 'y'")).toBe(null);
+  });
+});
+
+describe("index access on fromJSON results", () => {
+  /** The gate putitoutthere's build job actually writes. */
+  const GATE = "fromJSON(needs.plan.outputs.matrix || '[]')[0] != null";
+  const planScope = (matrix: string): Scope => ({
+    needs: { plan: { outputs: { matrix } } },
+  });
+
+  it("decides the fleet's did-the-plan-schedule-anything gate, both ways", () => {
+    expect(evaluate(GATE, planScope('[{"kind":"npm"}]'))).toBe(true);
+    expect(evaluate(GATE, planScope(""))).toBe(false);
+    expect(evaluate(GATE, planScope("[]"))).toBe(false);
+  });
+
+  it("leaves the gate unknown when the plan output is unknown", () => {
+    expect(evaluate(GATE)).toBe(null);
+  });
+
+  it("reads a scalar element as an ordinary comparable value", () => {
+    expect(evaluate("fromJSON('[5]')[0] == 5")).toBe(true);
+    expect(evaluate("fromJSON('{\"k\":\"v\"}')['k'] == 'v'")).toBe(true);
+  });
+
+  it("keeps a structured element structured, one level per bracket", () => {
+    expect(evaluate("fromJSON('[[7]]')[0][0] == 7")).toBe(true);
+  });
+
+  it("reads a missing element as the empty string, the way null reads", () => {
+    // GitHub yields null past the end; null coerces equal to ''.
+    expect(evaluate("fromJSON('[]')[0] == ''")).toBe(true);
+    expect(evaluate("fromJSON('[null]')[0] == null")).toBe(true);
+    expect(evaluate("fromJSON('[]')[0]")).toBe(false);
+  });
+
+  it.each([
+    ["'abc'[0]", "an index into a non-json"],
+    ["fromJSON('[1]')['k']", "a string index into an array"],
+    ["fromJSON('{\"k\":1}')[0]", "a number index into an object"],
+    ["fromJSON('[1]')[needs.x.outputs.y]", "an index that is itself unknown"],
+    ["fromJSON('[1]')[0", "an unclosed bracket"],
+  ] as const)("refuses %s (%s)", (src, _why) => {
+    expect(evaluate(src)).toBe(null);
+  });
+});
+
+describe("comparison against a fromJSON structure", () => {
+  it("decides equality by instance: a structure equals nothing written beside it", () => {
+    // GitHub compares arrays and objects by instance, and two sides of one
+    // comparison are never the same instance.
+    expect(evaluate("fromJSON('[1]') == fromJSON('[1]')")).toBe(false);
+    expect(evaluate("fromJSON('[1]') != null")).toBe(true);
+    expect(evaluate("fromJSON('{}') == ''")).toBe(false);
+    expect(evaluate("'' != fromJSON('{}')")).toBe(true);
+  });
+
+  it("does not order a structure", () => {
+    expect(evaluate("fromJSON('[1]') < 'x'")).toBe(null);
   });
 });

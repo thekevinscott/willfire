@@ -1,4 +1,4 @@
-import type { Scope } from "../expr.js";
+import type { Scope } from "../expr/val.js";
 
 /**
  * The `github.*` values that are fixed for everything this module predicts.

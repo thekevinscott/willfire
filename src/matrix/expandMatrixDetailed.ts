@@ -1,4 +1,5 @@
-import { evaluateValue, type Scope } from "../expr.js";
+import { evaluateValue } from "../expr/evaluateValue.js";
+import type { Scope } from "../expr/val.js";
 import type { DetailedCombo, DetailedCombos } from "../types.js";
 
 /**

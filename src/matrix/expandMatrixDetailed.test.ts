@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { Scope } from "../expr/val.js";
 import { expandMatrixDetailed } from "./expandMatrixDetailed.js";
 
 describe("expandMatrixDetailed", () => {
@@ -22,5 +23,16 @@ describe("expandMatrixDetailed", () => {
 
   it("gives up on a matrix that is an expression", () => {
     expect(expandMatrixDetailed({ matrix: "${{ fromJSON(x) }}" })).toBeNull();
+  });
+
+  it("resolves an axis written as an expression through the scope", () => {
+    // Typed as the expr module's own Scope — the seam this function takes.
+    const scope: Scope = { needs: { d: { outputs: { langs: '["ts","rust"]' } } } };
+    expect(
+      expandMatrixDetailed({ matrix: { language: "${{ fromJSON(needs.d.outputs.langs) }}" } }, scope),
+    ).toEqual([
+      { values: { language: "ts" }, displayKeys: ["language"] },
+      { values: { language: "rust" }, displayKeys: ["language"] },
+    ]);
   });
 });

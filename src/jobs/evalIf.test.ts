@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { Scope } from "../expr/val.js";
 import { evalIf } from "./evalIf.js";
 
 describe("evalIf", () => {
@@ -22,9 +23,10 @@ describe("evalIf", () => {
   });
 
   it("resolves against the scope the caller handed in", () => {
-    expect(evalIf("inputs.x == 'v'", { inputs: { x: { kind: "value", v: "v" } } })).toBe("run");
-    expect(evalIf("inputs.x == 'v'", { inputs: { x: { kind: "value", v: "w" } } })).toBe(
-      "skipped",
-    );
+    // The scope param is the expr module's own Scope, not a structural copy.
+    const hit: Scope = { inputs: { x: { kind: "value", v: "v" } } };
+    const miss: Scope = { inputs: { x: { kind: "value", v: "w" } } };
+    expect(evalIf("inputs.x == 'v'", hit)).toBe("run");
+    expect(evalIf("inputs.x == 'v'", miss)).toBe("skipped");
   });
 });
