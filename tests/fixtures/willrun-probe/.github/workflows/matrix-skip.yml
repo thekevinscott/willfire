@@ -1,0 +1,48 @@
+name: matrix-skip
+# Probe: does GitHub expand a STATIC matrix when the job's if: is false —
+# statically (if: false) and at runtime (needs-gated)? Scoped to
+# src/matrix-skip.txt to stay out of the other probes' predictions.
+on:
+  pull_request:
+    paths:
+      - src/matrix-skip.txt
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.s.outputs.go }}
+    steps:
+      - id: s
+        run: echo "go=no" >> "$GITHUB_OUTPUT"
+
+  static-false:
+    if: ${{ false }}
+    strategy:
+      matrix:
+        lang: [go, rust]
+    name: static-false (${{ matrix.lang }})
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${{ matrix.lang }}"
+
+  runtime-false:
+    needs: gate
+    if: ${{ needs.gate.outputs.go == 'yes' }}
+    strategy:
+      matrix:
+        lang: [go, rust]
+    name: runtime-false (${{ matrix.lang }})
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${{ matrix.lang }}"
+
+  runtime-true:
+    needs: gate
+    if: ${{ needs.gate.outputs.go == 'no' }}
+    strategy:
+      matrix:
+        lang: [go, rust]
+    name: runtime-true (${{ matrix.lang }})
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${{ matrix.lang }}"
