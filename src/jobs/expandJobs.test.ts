@@ -1,6 +1,18 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { expandJobs } from "./expandJobs.js";
 import type { Scope } from "../expr/val.js";
+
+// The isolation gate wants collaborators mocked; input resolution and job
+// selection are part of the expansion this suite pins, so the mocks pass the
+// real modules through.
+vi.mock(
+  "./calleeInputs.js",
+  async () => await vi.importActual<typeof import("./calleeInputs.js")>("./calleeInputs.js"),
+);
+vi.mock(
+  "./neededJobIds.js",
+  async () => await vi.importActual<typeof import("./neededJobIds.js")>("./neededJobIds.js"),
+);
 import type { JobExecutor } from "../execute.js";
 import type {
   Ctx,
