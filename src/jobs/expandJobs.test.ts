@@ -108,6 +108,12 @@ describe("job expansion", () => {
     expect(entries[0]).toMatchObject({ job: "a", status: "skipped", reason: "if: false" });
   });
 
+  it("treats an `if:` left empty as absent", async () => {
+    // YAML `if:` with no value parses to null; the guard is absent, not false.
+    const entries = await expand({ a: { if: null } });
+    expect(entries[0]).toMatchObject({ job: "a", status: "run", reason: "" });
+  });
+
   describe("needs", () => {
     it("skips a job that needs a skipped job", async () => {
       const entries = await expand({ a: { if: false }, b: { needs: ["a"] } });
