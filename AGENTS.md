@@ -57,5 +57,6 @@ verdict logic as a change to every gated repo.
 - Don't bypass a CI gate without an explicit reason in the PR body.
 - Don't merge PRs. Open the PR, get CI green, and stop — merging is Kevin's
   call, and that includes arming auto-merge.
-- Never include a link to a claude.ai chat — not in commit messages, PR
-  bodies, issues, or docs.
+- No attribution boilerplate. No "Generated with Claude Code" footers, no
+  claude.ai links, no session trailers — not in commit messages, PR bodies,
+  issues, or docs.
