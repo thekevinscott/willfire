@@ -13,7 +13,9 @@ export function workflowDispatches(
   ctx: Ctx,
 ): [dispatches: boolean, reason: string] {
   const trig = getPrTrigger(wf);
-  if (trig === MISSING) return [false, "no pull_request trigger"];
+  if (trig === MISSING) {
+    return [false, "no pull_request trigger"];
+  }
 
   const types: string[] = trig["types"] ?? DEFAULT_TYPES;
   if (!types.includes(ctx.action)) {

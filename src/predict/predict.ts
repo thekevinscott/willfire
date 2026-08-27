@@ -89,7 +89,9 @@ export async function predict(
   const resolveRef: ResolveRef = async (src) => {
     const key = sourceKey(src);
     const hit = refCache.get(key);
-    if (hit !== undefined) return hit;
+    if (hit !== undefined) {
+      return hit;
+    }
     let sha: string | null;
     try {
       const { data } = await octokit.rest.repos.getCommit({
@@ -104,7 +106,9 @@ export async function predict(
       sha = null;
     }
     refCache.set(key, sha);
-    if (sha != null) sources.set(key, { ...src, sha });
+    if (sha != null) {
+      sources.set(key, { ...src, sha });
+    }
     return sha;
   };
 
@@ -118,7 +122,9 @@ export async function predict(
     // that moves mid-prediction cannot hand back two different files.
     const key = `${src.owner}/${src.repo}/${path}@${src.sha}`;
     const hit = cache.get(key);
-    if (hit !== undefined) return hit;
+    if (hit !== undefined) {
+      return hit;
+    }
     let content: string | null;
     try {
       const { data } = await octokit.rest.repos.getContent({
@@ -186,7 +192,9 @@ export async function predict(
   const entries: DraftEntry[] = [];
   for (const w of workflows) {
     const path = w.path;
-    if (!path.startsWith(".github/workflows/")) continue;
+    if (!path.startsWith(".github/workflows/")) {
+      continue;
+    }
     if (w.state !== "active") {
       entries.push({
         workflow: path,

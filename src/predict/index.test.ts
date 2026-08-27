@@ -10,6 +10,8 @@ describe("predict barrel", () => {
       "sourceKey",
       "stackTargetRef",
     ]);
-    for (const fn of Object.values(barrel)) expect(typeof fn).toBe("function");
+    for (const fn of Object.values(barrel)) {
+      expect(typeof fn).toBe("function");
+    }
   });
 });

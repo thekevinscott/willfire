@@ -19,7 +19,9 @@ export function renderName(template: string, combo: Combo): Rendered {
       return formatMatrixValue(val);
     }
     // We only predict pull_request dispatch, so this one is knowable.
-    if (expr === "github.event_name") return "pull_request";
+    if (expr === "github.event_name") {
+      return "pull_request";
+    }
     resolved = false;
     return whole;
   });
