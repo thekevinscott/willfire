@@ -6,11 +6,17 @@ export interface ExecutionGrant {
   jobs: string[];
 }
 
+export interface Mount {
+  path: string;
+  writable: boolean;
+}
+
 export interface RunSpec {
   script: string;
   shell: "bash" | "sh";
   cwd: string;
   env: Record<string, string>;
+  mounts?: Mount[];
 }
 
 export interface RunResult {

@@ -12,6 +12,17 @@ describe("runShell", () => {
     expect(s.code).toBe(0);
   });
 
+  it("ignores mounts, since the host has nothing to bind", async () => {
+    const r = await runShell({
+      script: "true",
+      shell: "bash",
+      cwd: TMP,
+      env: SH_ENV,
+      mounts: [{ path: "/nonexistent-mount-path", writable: false }],
+    });
+    expect(r.code).toBe(0);
+  });
+
   it("reports a spawn that never starts as exit 127", async () => {
     const r = await runShell({ script: "true", shell: "bash", cwd: "/nonexistent-dir", env: SH_ENV });
     expect(r.code).toBe(127);
