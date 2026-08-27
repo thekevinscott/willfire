@@ -1,16 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { isJobEntry } from "./isJobEntry.js";
-import type { Entry } from "../types.js";
+import type { Entry, JobName } from "../types.js";
+
+// Branded by hand: importing jobName() would be an unmocked collaborator.
+const plain: string = "a";
 
 describe("isJobEntry", () => {
   it("is true for a job entry", () => {
-    const e = {
+    const e: Entry = {
       workflow: "w.yml",
-      job: "a",
+      job: plain as JobName,
       checkName: "a",
       status: "run",
       reason: "",
-    } as unknown as Entry;
+    };
     expect(isJobEntry(e)).toBe(true);
   });
 

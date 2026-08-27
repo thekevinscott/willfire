@@ -134,7 +134,9 @@ export async function predict(
         ref: src.sha,
         mediaType: { format: "raw" },
       });
-      content = data as unknown as string;
+      // `mediaType: { format: "raw" }` makes `data` the file body as a string;
+      // the SDK's type does not model the raw format.
+      content = String(data);
     } catch {
       // Private, deleted, bad ref, rate limit, network: all one answer here.
       // The caller turns it into an `unknown` entry rather than throwing.
