@@ -83,6 +83,13 @@ describe("workflowDispatches", () => {
     ]);
   });
 
+  it("declines paths when the PR changes no files at all", () => {
+    expect(workflowDispatches(onPr({ paths: ["docs/**"] }), { ...CTX, files: [] })).toEqual([
+      false,
+      "no changed file matches paths",
+    ]);
+  });
+
   it("accepts when one changed file matches paths", () => {
     const ctx: Ctx = { ...CTX, files: ["src/app.ts", "docs/a.md"] };
     expect(workflowDispatches(onPr({ paths: ["docs/**"] }), ctx)[0]).toBe(true);

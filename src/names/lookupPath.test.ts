@@ -10,6 +10,10 @@ describe("lookupPath", () => {
     expect(lookupPath({ a: {} }, "a.b")).toBeUndefined();
   });
 
+  it("stops at a missing middle segment", () => {
+    expect(lookupPath({ a: { b: 1 } }, "a.c.d")).toBeUndefined();
+  });
+
   it("is undefined when the walk hits a non-object", () => {
     expect(lookupPath({ a: "scalar" }, "a.b")).toBeUndefined();
   });
