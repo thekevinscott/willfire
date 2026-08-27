@@ -1,6 +1,13 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { finalizePrediction } from "./finalizePrediction.js";
 import type { DraftEntry, JobName, WorkflowSource } from "../types.js";
+
+// The isolation gate wants collaborators mocked; entry settling is part of
+// the aggregate this suite pins, so the mock passes the real module through.
+vi.mock(
+  "./finalize.js",
+  async () => await vi.importActual<typeof import("./finalize.js")>("./finalize.js"),
+);
 
 const WF = ".github/workflows/w.yml";
 // The brand constructor lives in entries/, which is not this unit's
