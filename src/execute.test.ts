@@ -258,6 +258,22 @@ describe("executing run steps", () => {
     expect(out).toEqual({ x: "ran" });
   });
 
+  it("pins github.event_name to pull_request for step guards", async () => {
+    const out = success(
+      await execute({
+        steps: [
+          {
+            id: "s",
+            if: "github.event_name == 'pull_request'",
+            run: 'echo "x=pr" >> "$GITHUB_OUTPUT"',
+          },
+        ],
+        outputs: { x: "${{ steps.s.outputs.x }}" },
+      }),
+    );
+    expect(out).toEqual({ x: "pr" });
+  });
+
   it("stops on an if it cannot decide", async () => {
     const o = await execute({ steps: [{ id: "s", if: "env.FOO", run: "true" }] });
     expect(failure(o)).toBe("cannot decide if: for step 's'");
