@@ -1,68 +1,31 @@
-// End-to-end suite for `predict()`, driven against a hand-built Octokit
-// stand-in.
-//
-// The expectations are not opinions about how GitHub *ought* to behave. The
-// workflow-level verdicts were settled in #7 against live dispatches on
-// thekevinbot/willrun-probe, and the probe workflows under
-// `tests/fixtures/willrun-probe/` are the record. Changing one of these
-// assertions means claiming GitHub changed.
-
 import type { Octokit } from "@octokit/rest";
 import { describe, expect, it, vi } from "vitest";
 import { predict } from "./predict.js";
 import type { Entry, Prediction } from "../types.js";
 
-// ------------------------------------------------------------------ fixtures
-
 const WF = ".github/workflows/w.yml";
 const SUB = ".github/workflows/sub.yml";
 
 interface Fixture {
-  /** >1 makes the inferred event action `synchronize` rather than `opened`. */
   commits?: number;
   baseRef?: string;
   files?: string[];
-  /** Head commit message — the surface the skip instructions are read from. */
   message?: string;
   workflows?: { path: string; state: string }[];
-  /** Repo contents at head, keyed by path. A missing key is a 404. */
   contents?: Record<string, string>;
-  /**
-   * What a cross-repo ref resolves to, keyed `owner/repo@ref`. A ref that is
-   * not listed 404s, which is the answer a deleted tag or a private repo gives.
-   */
   refs?: Record<string, string>;
-  /**
-   * Tarball bytes by `owner/repo@ref`, for the executor's tree downloads. A
-   * missing key throws, which is what the tarball endpoint does for anything
-   * it will not serve.
-   */
   tarballs?: Record<string, Uint8Array>;
-  /** The PR's `merge_commit_sha` — its test merge. Absent means null. */
   mergeSha?: string | null;
-  /** Parent shas by commit sha, via `repos.getCommit`. Unlisted: no parents. */
   parents?: Record<string, string[]>;
-  /** Open PRs, for the stack walk's `pulls.list` lookup by head branch. */
   openPrs?: { headRef: string; baseRef: string; mergeSha: string | null }[];
 }
 
-/** The head commit of the PR every fixture describes. */
 const HEAD_SHA = "deadbeef";
 
-/** The one source every prediction reads, whatever else it reaches. */
 const HEAD_SOURCE = { owner: "o", repo: "r", ref: HEAD_SHA, sha: HEAD_SHA };
 
-/**
- * A commit in some other repo, spelled the full 40 hex digits.
- *
- * The length is the point: whether a ref needs resolving is decided by its
- * shape, so a short stand-in would take the other branch.
- */
 const REMOTE_SHA = "b".repeat(40);
 
-// Sentinels standing in for the paginating route methods. `predict` passes the
-// method itself to `octokit.paginate`, never calls it, so identity is all the
-// stub needs to tell the two routes apart.
 const LIST_FILES = Symbol("pulls.listFiles");
 const LIST_WORKFLOWS = Symbol("actions.listRepoWorkflows");
 
@@ -88,8 +51,6 @@ function fakeOctokit(f: Fixture): Octokit {
       },
       repos: {
         getCommit: async ({ owner, repo, ref }: { owner: string; repo: string; ref: string }) => {
-          // Two callers share this route: the head-commit read that looks for a
-          // skip instruction, and ref resolution. Only the first has a message.
           if (ref === HEAD_SHA) {
             return { data: { sha: ref, commit: { message: f.message ?? "chore: routine" } } };
           }
@@ -126,19 +87,15 @@ function fakeOctokit(f: Fixture): Octokit {
   return api as unknown as Octokit;
 }
 
-/** Predict against a repo whose only workflow is `body` at `.github/workflows/w.yml`. */
 function run(body: string, f: Fixture = {}): Promise<Prediction> {
   return predict(fakeOctokit({ contents: { [WF]: body }, ...f }), "o/r", 1);
 }
 
-/** The single entry `run()` produced, asserting there is exactly one. */
 async function only(body: string, f: Fixture = {}): Promise<Entry> {
   const { entries } = await run(body, f);
   expect(entries).toHaveLength(1);
   return entries[0];
 }
-
-// ------------------------------------------------------- workflow-level verdicts
 
 describe("workflow-level verdicts", () => {
   it("declines a workflow with no `on` key", async () => {
@@ -150,8 +107,6 @@ describe("workflow-level verdicts", () => {
   });
 
   it("declines a workflow whose `on` is an unusable scalar", async () => {
-    // `on: true` — YAML 1.2 keeps the key a string and the value a boolean, so
-    // there is no trigger map to read.
     expect(await only("on: true\njobs:\n  a: {}\n")).toMatchObject({
       status: "no-dispatch",
       reason: "no pull_request trigger",
@@ -159,8 +114,6 @@ describe("workflow-level verdicts", () => {
   });
 
   it("reads the YAML 1.1 boolean-key spelling of `on`", async () => {
-    // A parser that folds `on:` to boolean `true` leaves the trigger under the
-    // key `true`. The fallback keeps such a file readable.
     const wf = "? true\n: pull_request:\njobs:\n  a:\n    runs-on: ubuntu-latest\n";
     expect(await only(wf)).toMatchObject({ job: "a", status: "run" });
   });
@@ -208,17 +161,6 @@ describe("workflow-level verdicts", () => {
     });
   });
 
-  // ---- the four verdicts settled in #7 ----
-
-  // Both-filters is invalid config. GitHub does not fall back to "no filter"
-  // and does not skip the workflow: it creates the run and concludes
-  // `startup_failure`. The run exists, so the workflow dispatches — and #7
-  // deliberately lets job expansion proceed from there rather than emit a bare
-  // `job: "*"` entry. The startup-failed run really has no job checks, so these
-  // entries over-predict at job granularity; at workflow-run granularity (what
-  // pr-monitor compares on) it collapses to the same answer, and the shape
-  // appears in zero fleet repos. Asserted here so the tradeoff stays visible.
-
   it("dispatches when both `branches` and `branches-ignore` are set (#7)", async () => {
     const wf =
       "on:\n  pull_request:\n    branches: [main]\n    branches-ignore: [main]\njobs:\n  a: {}\n";
@@ -240,17 +182,12 @@ describe("workflow-level verdicts", () => {
   });
 
   it("checks the conflicting filters before evaluating either one", async () => {
-    // `branches: [dev]` alone would decline on a `main` base, and
-    // `paths: [docs/**]` alone would decline on a `src/` diff. The
-    // startup-failure verdict has to win over both.
     const wf =
       "on:\n  pull_request:\n    branches: [dev]\n    branches-ignore: [dev]\njobs:\n  a: {}\n";
     expect(await only(wf, { baseRef: "main" })).toMatchObject({ status: "run" });
   });
 
   it("reports a workflow with no file at head as no-dispatch (#7)", async () => {
-    // The Actions API keeps listing a workflow as `active` after its file is
-    // deleted on the branch. Nothing can dispatch from a file that is not there.
     const { entries } = await predict(
       fakeOctokit({ contents: {} }),
       "o/r",
@@ -268,15 +205,11 @@ describe("workflow-level verdicts", () => {
   });
 
   it("reports an unparseable workflow as a workflow-level run (#7)", async () => {
-    // GitHub creates the run and concludes it `startup_failure`. The run exists
-    // but has no jobs, so there is a workflow-level entry and nothing to expand.
     const entry = await only("on: pull_request\njobs:\n  a: [\n");
     expect(entry.job).toBe("*");
     expect(entry.status).toBe("run");
     expect(entry.reason).toMatch(/^YAML parse error: /);
   });
-
-  // ---- branch and path filters ----
 
   it("declines a base branch outside `branches`", async () => {
     const wf = "on:\n  pull_request:\n    branches: [releases/*]\njobs:\n  a: {}\n";
@@ -334,13 +267,6 @@ describe("workflow-level verdicts", () => {
     });
   });
 
-  // ---- stacked PRs (#30) ----
-
-  // GitHub's stack-aware dispatch (a per-repo rollout, read off dirsql#1002)
-  // evaluates `branches:` against the stack's terminal target; the mode shows
-  // in `merge_commit_sha`'s first parent.
-
-  /** A child PR based on `feature-1`, whose parent PR targets `main`. */
   const STACKED: Fixture = {
     baseRef: "feature-1",
     mergeSha: "m-child",
@@ -393,7 +319,6 @@ describe("workflow-level verdicts", () => {
   });
 
   it("keeps literal semantics when no open PR owns the preview parent", async () => {
-    // The preview parent is an old base tip, not any open PR's merge sha.
     const wf = "on:\n  pull_request:\n    branches: [dev]\njobs:\n  a: {}\n";
     const f: Fixture = {
       mergeSha: "m0",
@@ -411,7 +336,6 @@ describe("workflow-level verdicts", () => {
   });
 
   it("keeps literal semantics when the preview cannot be read", async () => {
-    // The merge sha 404s; the walk must not throw.
     const wf = "on:\n  pull_request:\n    branches: [dev]\njobs:\n  a: {}\n";
     expect(await only(wf, { mergeSha: "m0" })).toMatchObject({
       status: "no-dispatch",
@@ -429,7 +353,6 @@ describe("workflow-level verdicts", () => {
   });
 
   it("stops the stack walk at the depth cap", async () => {
-    // Ten hops in, the walk stops; filters run against the deepest proven target.
     const refs: Record<string, string> = {};
     const parents: Record<string, string[]> = {};
     const openPrs: NonNullable<Fixture["openPrs"]> = [];
@@ -448,8 +371,6 @@ describe("workflow-level verdicts", () => {
     });
   });
 });
-
-// ------------------------------------------------------------- repo-level pipeline
 
 describe("predict", () => {
   it("reports a disabled workflow as no-dispatch without reading the file", async () => {
@@ -492,7 +413,6 @@ describe("predict", () => {
       entries: [],
       checkNames: [],
       skip: "head commit message contains a skip instruction",
-      // Even a suppressed prediction names the commit it read to decide that.
       sources: [HEAD_SOURCE],
     });
   });
@@ -503,7 +423,6 @@ describe("predict", () => {
       entries: [],
       checkNames: [],
       skip: "head commit message contains a skip instruction",
-      // Even a suppressed prediction names the commit it read to decide that.
       sources: [HEAD_SOURCE],
     });
   });
@@ -528,8 +447,6 @@ describe("predict", () => {
   });
 });
 
-// ------------------------------------------------------------------ provenance
-
 describe("the commits a prediction was read from", () => {
   const caller = (uses: string) => `on: pull_request\njobs:\n  call:\n    uses: ${uses}\n`;
 
@@ -541,7 +458,6 @@ describe("the commits a prediction was read from", () => {
   });
 
   it("does not name a second source for a local `./` call", async () => {
-    // A local callee is the same commit as the caller, already named.
     const body = caller("./.github/workflows/sub.yml");
     const { sources } = await run(body, { contents: { [WF]: body, [SUB]: CALLEE } });
     expect(sources).toEqual([HEAD_SOURCE]);
@@ -555,23 +471,17 @@ describe("the commits a prediction was read from", () => {
     });
     expect(sources).toEqual([
       HEAD_SOURCE,
-      // The ref as written is kept alongside the commit: dropping it would lose
-      // what the workflow actually asked for.
       { owner: "octo", repo: "repo", ref: "v1", sha: REMOTE_SHA },
     ]);
   });
 
   it("does not name a source whose ref would not resolve", async () => {
-    // The entry behind it is unknown, which turns the gate red. Naming a source
-    // here would claim a commit was read when none was.
     const body = caller("octo/repo/.github/workflows/x.yml@v1");
     const { sources } = await run(body, { contents: { [WF]: body } });
     expect(sources).toEqual([HEAD_SOURCE]);
   });
 
   it("reads a callee at the resolved commit, never at the ref that named it", async () => {
-    // The whole point of resolving. Fetching at `v1` would leave a prediction
-    // naming a commit it did not actually read.
     const body = caller("octo/repo/.github/workflows/x.yml@v1");
     const octokit = fakeOctokit({
       contents: { [WF]: body, ".github/workflows/x.yml": CALLEE },
@@ -595,8 +505,6 @@ describe("the commits a prediction was read from", () => {
     });
     const getCommit = vi.spyOn(octokit.rest.repos, "getCommit");
     const { sources } = await predict(octokit, "o/r", 1);
-    // One for the head commit's message, one for `v1`. The second `v1` is the
-    // cache, not a request.
     expect(getCommit).toHaveBeenCalledTimes(2);
     expect(sources).toHaveLength(2);
   });
@@ -614,8 +522,6 @@ describe("the commits a prediction was read from", () => {
   });
 
   it("reads a callee once when two refs name the same commit", async () => {
-    // `@v1` and the commit it points at are one file. Keying the read on the
-    // ref would fetch it twice and, worse, allow two different answers.
     const body =
       "on: pull_request\njobs:\n" +
       "  a:\n    uses: octo/repo/.github/workflows/x.yml@v1\n" +
@@ -626,7 +532,6 @@ describe("the commits a prediction was read from", () => {
     });
     const getContent = vi.spyOn(octokit.rest.repos, "getContent");
     await predict(octokit, "o/r", 1);
-    // The caller's own workflow, then the callee once for both jobs.
     expect(getContent).toHaveBeenCalledTimes(2);
   });
 
@@ -649,8 +554,6 @@ describe("the commits a prediction was read from", () => {
   });
 });
 
-// ------------------------------------------------------- caller-supplied inputs
-
 describe("a caller-supplied event action", () => {
   const runWith = (body: string, f: Fixture, opts: Parameters<typeof predict>[3]) =>
     predict(fakeOctokit({ contents: { [WF]: body }, ...f }), "o/r", 1, opts);
@@ -659,13 +562,11 @@ describe("a caller-supplied event action", () => {
     `on:\n  pull_request:\n    types: [${types}]\njobs:\n  a: {}\n`;
 
   it("beats the heuristic when the PR has several commits but was just opened", async () => {
-    // Three commits infers `synchronize`, which `types: [opened]` refuses.
     const { entries } = await runWith(onTypes("opened"), { commits: 3 }, { action: "opened" });
     expect(entries).toMatchObject([{ job: "a", status: "run" }]);
   });
 
   it("beats the heuristic when a force-push left one commit", async () => {
-    // One commit infers `opened`, which `types: [synchronize]` refuses.
     const { entries } = await runWith(
       onTypes("synchronize"),
       { commits: 1 },
@@ -680,8 +581,6 @@ describe("a caller-supplied event action", () => {
   });
 
   it("still refuses an action the workflow does not declare", async () => {
-    // Passing the action explicitly is not permission to dispatch — it is the
-    // input the existing `types:` test runs against.
     const { entries } = await runWith(onTypes("opened"), {}, { action: "reopened" });
     expect(entries).toMatchObject([
       { status: "no-dispatch", reason: "action 'reopened' not in types [opened]" },

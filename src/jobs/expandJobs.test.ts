@@ -10,32 +10,18 @@ import type {
   WorkflowSource,
 } from "../types.js";
 
-/**
- * A 40-hex commit id, so anything pinned to it is already resolved.
- *
- * The literal matters: expansion decides whether to resolve a ref by its
- * *shape*, so a fixture ref has to look like the real thing or it takes the
- * other branch.
- */
 const SHA = "a".repeat(40);
 
-/** A commit in some other repo, spelled the full 40 hex digits. */
 const REMOTE_SHA = "b".repeat(40);
 
 const SOURCE: WorkflowSource = { owner: "o", repo: "r", ref: SHA, sha: SHA };
 const CTX: Ctx = { action: "opened", baseRef: "main", files: ["src/app.ts"] };
 
-/**
- * Bundle a bare fetch as the reader expansion takes. The default resolver is
- * the identity — every ref is its own commit — which is right for fixtures
- * that never call across repos. Tests about resolution pass their own.
- */
 const readerOf = (
   fetchWorkflow: FetchWorkflow,
   resolveRef: ResolveRef = async (src) => src.ref,
 ): WorkflowReader => ({ fetchWorkflow, resolveRef });
 
-/** A reader over callee documents keyed by repo path (no leading `./`). */
 const readerFor = (files: Record<string, string>) =>
   readerOf(async (path) => files[path] ?? null);
 
@@ -44,7 +30,6 @@ const expand = (jobs: Record<string, unknown>, reader: WorkflowReader = readerFo
 
 describe("job expansion", () => {
   it("decides job guards against the scope the caller handed in", async () => {
-    // The scope param is the expr module's own Scope, threaded into evalIf.
     const scope: Scope = { inputs: { x: { kind: "value", v: "v" } } };
     const entries = await expandJobs(
       { on: { pull_request: null }, jobs: { a: { if: "inputs.x == 'v'" } } } as Workflow,
@@ -149,10 +134,6 @@ describe("job expansion", () => {
     });
 
     it("leaves an unset matrix key in place rather than guessing at it", async () => {
-      // #9 stopped rendering an unevaluable expression as the empty string. It
-      // survives into the name verbatim and nulls `checkName` instead: a wrong
-      // name reads as a MISS against a check that really ran, whereas an absent
-      // one is something verify.ts can report as unresolved and move on.
       const entries = await expand({
         a: { name: "build ${{ matrix.nope }}", strategy: { matrix: { os: ["linux"] } } },
       });
@@ -163,8 +144,6 @@ describe("job expansion", () => {
     });
 
     it("evaluates github.event_name, the one expression this can decide", async () => {
-      // Expansion only ever answers for a pull_request dispatch, so this
-      // expression is knowable and the name stays resolved.
       const entries = await expand({ a: { name: "on ${{ github.event_name }}" } });
       expect(entries[0]).toMatchObject({
         job: "on pull_request",
@@ -173,23 +152,16 @@ describe("job expansion", () => {
     });
 
     it("renders a null matrix value as nothing and a list value as a joined run", async () => {
-      // The parenthetical is built from the raw value, whatever shape it has.
-      // A null renders as the empty string rather than "null", and a list
-      // flattens the same way an object does.
       const entries = await expand({ a: { strategy: { matrix: { v: [null, [1, 2]] } } } });
       expect(entries.map((e) => e.job)).toEqual(["a ()", "a (1, 2)"]);
     });
 
     it("omits the parenthetical when a combination has no keys to show", async () => {
-      // An empty `include:` entry with no axes to attach to becomes a
-      // combination of its own with nothing in it. One check, bare job id.
       const entries = await expand({ a: { strategy: { matrix: { include: [{}] } } } });
       expect(entries).toEqual([{ job: "a", checkName: "a", status: "run", reason: "" }]);
     });
 
     it("cannot resolve a matrix expression on a job that has no matrix", async () => {
-      // `${{ matrix.* }}` outside a matrix is nothing we can substitute, so the
-      // name stays unresolved rather than collapsing to an empty parenthetical.
       const entries = await expand({ a: { name: "build ${{ matrix.os }}" } });
       expect(entries[0]).toMatchObject({
         job: "build ${{ matrix.os }}",
@@ -252,9 +224,6 @@ describe("reusable workflows", () => {
   });
 
   it("gives up past the four-level call chain GitHub allows", async () => {
-    // Not a self-imposed budget: a fifth level fails the run outright, so
-    // there is no check name to predict. Level five is the first `uses:` we
-    // decline to follow, and the entry stops at the caller that made it.
     const link = (next: string) =>
       JSON.stringify({
         on: { workflow_call: null },
@@ -284,9 +253,6 @@ describe("reusable workflows", () => {
   });
 
   it("reports a dynamic matrix on the calling job as unknown", async () => {
-    // The caller's matrix multiplies the whole callee set, so an unknown
-    // multiplier makes the entire subtree unpredictable: one unknown entry
-    // for the calling job, and the callee is never fetched at all.
     const fetched: string[] = [];
     const entries = await expand(
       {
@@ -323,9 +289,6 @@ describe("reusable workflows", () => {
   });
 
   it("reports a callee that parses to nothing as unresolvable", async () => {
-    // An empty file is not a fetch failure and not a parse error: it parses
-    // cleanly to null. There is still no workflow to expand, so the call has
-    // to land somewhere rather than fall through as a resolved zero-job set.
     const entries = await expand(
       { call: { uses: "./.github/workflows/sub.yml" } },
       readerFor({ [SUB]: "" }),
@@ -341,9 +304,6 @@ describe("reusable workflows", () => {
   });
 
   it("nulls the name of a skipped job inside an unresolvable caller", async () => {
-    // A skipped job's own name is always resolved — nothing about it is
-    // evaluated. The prefix is what is missing here, and an unresolved prefix
-    // has to poison the whole subtree, skipped entries included.
     const entries = await expand(
       { call: { name: "${{ inputs.flavour }}", uses: "./.github/workflows/sub.yml" } },
       readerFor({
@@ -357,14 +317,7 @@ describe("reusable workflows", () => {
     });
   });
 
-  // A cross-repo callee is reached in two steps: resolve the ref to a commit,
-  // then read the file at it. Either step can fail, and they fail differently,
-  // so each has its own case. The path where both succeed is pinned against
-  // live dispatches in tests/integration/names.test.ts.
   it("reports a cross-repo reusable whose ref will not resolve", async () => {
-    // The resolver answers null the way a deleted tag or a private repo does.
-    // Falling back to reading the mutable ref is exactly what must not happen:
-    // the answer would be unnameable afterwards.
     const uses = "octo/repo/.github/workflows/x.yml@v1";
     const entries = await expand(
       { call: { uses } },
@@ -397,8 +350,6 @@ describe("reusable workflows", () => {
   });
 
   it("skips resolution for a `uses:` already pinned to a commit", async () => {
-    // Nothing to look up: the ref is the commit. Asking anyway would spend a
-    // request per call site on an answer already written down.
     const uses = `octo/repo/.github/workflows/x.yml@${REMOTE_SHA}`;
     const entries = await expand(
       { call: { uses } },
@@ -412,8 +363,6 @@ describe("reusable workflows", () => {
     expect(entries[0]).toMatchObject({
       job: "call",
       status: "unknown",
-      // `cannot fetch`, not `cannot resolve`: resolution never ran, and this
-      // fixture serves no file that would have let the fetch succeed.
       reason: `cannot fetch ${uses}`,
     });
   });
