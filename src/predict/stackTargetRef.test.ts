@@ -18,7 +18,9 @@ const fakeOctokit = (f: Fake) =>
       repos: {
         getCommit: async ({ owner, repo, ref }: Record<string, string>) => {
           const sha = (f.refs ?? {})[`${owner}/${repo}@${ref}`];
-          if (sha == null) throw new Error(`404 ${owner}/${repo}@${ref}`);
+          if (sha === undefined) {
+            throw new Error(`404 ${owner}/${repo}@${ref}`);
+          }
           const parents = ((f.parents ?? {})[sha] ?? []).map((p) => ({ sha: p }));
           return { data: { sha, parents } };
         },

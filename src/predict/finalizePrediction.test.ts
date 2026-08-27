@@ -34,6 +34,13 @@ describe("finalizePrediction", () => {
     expect(finalizePrediction(drafts, null, new Map()).checkNames).toEqual(["A", "B"]);
   });
 
+  it("excludes an unknown entry's checkName from checkNames", () => {
+    const drafts: DraftEntry[] = [
+      { workflow: WF, job: j("a"), checkName: "A", status: "unknown", reason: "dynamic matrix" },
+    ];
+    expect(finalizePrediction(drafts, null, new Map()).checkNames).toEqual([]);
+  });
+
   it("sorts sources by owner/repo@ref", () => {
     const sources = new Map<string, WorkflowSource>([
       ["z/r@v1", src("z", "r", "v1")],
