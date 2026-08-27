@@ -6,7 +6,7 @@ import { UNKNOWN, type Scope, type Val } from "./val.js";
 
 export function parseAtom(cur: Cursor, scope: Scope): Val {
   const t = cur.peek();
-  if (t == null) {
+  if (t === undefined) {
     return UNKNOWN;
   }
   if (t.t === "op" && t.v === "(") {

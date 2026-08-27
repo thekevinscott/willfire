@@ -47,13 +47,13 @@ export function tokenize(src: string): Tok[] | null {
       continue;
     }
     const op = OPS.find((o) => src.startsWith(o, i));
-    if (op != null) {
+    if (op !== undefined) {
       out.push({ t: "op", v: op });
       i += op.length;
       continue;
     }
     const word = /^[A-Za-z_][A-Za-z0-9_.\-]*/.exec(src.slice(i));
-    if (word != null) {
+    if (word !== null) {
       const w = word[0];
       i += w.length;
       const lower = w.toLowerCase();
@@ -69,7 +69,7 @@ export function tokenize(src: string): Tok[] | null {
       continue;
     }
     const num = /^-?\d+(\.\d+)?/.exec(src.slice(i));
-    if (num != null) {
+    if (num !== null) {
       out.push({ t: "num", v: Number(num[0]) });
       i += num[0].length;
       continue;

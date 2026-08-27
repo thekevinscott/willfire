@@ -24,7 +24,7 @@ export function evaluateValue(expr: string, scope: Scope = {}): Val {
     return UNKNOWN;
   }
   const toks = tokenize(stripped);
-  if (toks == null || toks.length === 0) {
+  if (toks === null || toks.length === 0) {
     return UNKNOWN;
   }
   const cur = new Cursor(toks);
