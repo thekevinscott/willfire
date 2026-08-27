@@ -9,6 +9,7 @@ import type { WorkflowSource } from "../types.js";
 
 const hoisted = vi.hoisted(() => ({
   makeCloneProvider: vi.fn(),
+  makeSandboxRunner: vi.fn(),
 }));
 
 // The real module, with a spy on `makeCloneProvider` to observe the token.
@@ -16,6 +17,15 @@ vi.mock("../execute.js", async () => {
   const actual = await vi.importActual<typeof import("../execute.js")>("../execute.js");
   hoisted.makeCloneProvider.mockImplementation(actual.makeCloneProvider);
   return { ...actual, makeCloneProvider: hoisted.makeCloneProvider };
+});
+
+// Likewise, a spy on `makeSandboxRunner` to observe the default run command.
+vi.mock("../sandbox/makeSandboxRunner.js", async () => {
+  const actual = await vi.importActual<typeof import("../sandbox/makeSandboxRunner.js")>(
+    "../sandbox/makeSandboxRunner.js",
+  );
+  hoisted.makeSandboxRunner.mockImplementation(actual.makeSandboxRunner);
+  return { makeSandboxRunner: hoisted.makeSandboxRunner };
 });
 
 const SHA = "c".repeat(40);
@@ -90,6 +100,14 @@ describe("makeLiveExecutor", () => {
       {},
     );
     expect(o).toEqual({ ok: false, reason: `cannot materialize workspace o/r@${SHA}` });
+  });
+
+  it("defaults the run command to the docker sandbox", () => {
+    hoisted.makeSandboxRunner.mockClear();
+    makeLiveExecutor(octokitOf({}), WORKSPACE, resolveRef, { token: null });
+    expect(hoisted.makeSandboxRunner).toHaveBeenCalledTimes(1);
+    makeLiveExecutor(octokitOf({}), WORKSPACE, resolveRef, { token: null, runCommand: runShell });
+    expect(hoisted.makeSandboxRunner).toHaveBeenCalledTimes(1);
   });
 
   it("reads clone auth from the environment only when no token is given", () => {

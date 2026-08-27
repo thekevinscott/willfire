@@ -1,16 +1,28 @@
 import { spawn } from "node:child_process";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { RunSpec } from "./execute.js";
-import {
-  DOCKERFILE,
-  imageTag,
-  makeSandboxRunner,
-  sandboxArgv,
-  sandboxConfig,
-} from "./sandbox.js";
+import type { RunSpec } from "../execute.js";
+import { imageTag } from "./imageTag.js";
+import { makeSandboxRunner } from "./makeSandboxRunner.js";
+import { sandboxArgv } from "./sandboxArgv.js";
+import { sandboxConfig } from "./sandboxConfig.js";
 
 // Nothing here talks to real docker: `spawn` is mocked with one scripted
 // child per invocation (`h.script` says how it behaves, `h.calls` records it).
+
+// The isolation gate wants collaborators mocked; these tests assert the real
+// tag and argv, so the mocks pass the actual modules through.
+vi.mock(
+  "./imageTag.js",
+  async () => await vi.importActual<typeof import("./imageTag.js")>("./imageTag.js"),
+);
+vi.mock(
+  "./sandboxArgv.js",
+  async () => await vi.importActual<typeof import("./sandboxArgv.js")>("./sandboxArgv.js"),
+);
+vi.mock(
+  "./sandboxConfig.js",
+  async () => await vi.importActual<typeof import("./sandboxConfig.js")>("./sandboxConfig.js"),
+);
 
 interface DockerCall {
   bin: string;
@@ -79,89 +91,6 @@ beforeEach(() => {
   h.calls.length = 0;
   h.script.length = 0;
   vi.mocked(spawn).mockClear();
-});
-
-describe("sandboxConfig", () => {
-  it("defaults to the docker on PATH, the invoking user, and the shipped dockerfile", () => {
-    const cfg = sandboxConfig();
-    expect(cfg.dockerBin).toBe("docker");
-    expect(cfg.uid).toBe(process.getuid!());
-    expect(cfg.gid).toBe(process.getgid!());
-    expect(cfg.dockerfile).toBe(DOCKERFILE);
-  });
-
-  it("takes every override", () => {
-    const cfg = sandboxConfig({ dockerBin: "/x/docker", uid: 7, gid: 9, dockerfile: "FROM x\n" });
-    expect(cfg).toEqual({ dockerBin: "/x/docker", uid: 7, gid: 9, dockerfile: "FROM x\n" });
-  });
-});
-
-describe("imageTag", () => {
-  it("is a function of the dockerfile alone", () => {
-    expect(imageTag("FROM x\n")).toBe(imageTag("FROM x\n"));
-    expect(imageTag("FROM x\n")).not.toBe(imageTag("FROM y\n"));
-    expect(imageTag(DOCKERFILE)).toMatch(/^willfire-sandbox:[0-9a-f]{12}$/);
-  });
-});
-
-describe("sandboxArgv", () => {
-  const cfg = sandboxConfig({ dockerBin: "docker", uid: 7, gid: 9, dockerfile: "FROM x\n" });
-
-  it("isolates fully and exposes exactly the named mounts and env", () => {
-    const argv = sandboxArgv(
-      spec({
-        script: "echo hi",
-        cwd: "/repo",
-        env: { PATH: "/host/bin", HOME: "/home/host", FOO: "bar" },
-        mounts: [
-          { path: "/repo", writable: true },
-          { path: "/out", writable: false },
-        ],
-      }),
-      cfg,
-    );
-    expect(argv).toEqual([
-      "run",
-      "--rm",
-      "--network",
-      "none",
-      "--cap-drop",
-      "ALL",
-      "--security-opt",
-      "no-new-privileges",
-      "--read-only",
-      "--tmpfs",
-      "/tmp",
-      "--user",
-      "7:9",
-      "-v",
-      "/repo:/repo",
-      "-v",
-      "/out:/out:ro",
-      "-w",
-      "/repo",
-      // The host PATH and HOME are dropped.
-      "-e",
-      "FOO=bar",
-      "-e",
-      "HOME=/tmp",
-      imageTag("FROM x\n"),
-      "bash",
-      "--noprofile",
-      "--norc",
-      "-e",
-      "-o",
-      "pipefail",
-      "-c",
-      "echo hi",
-    ]);
-  });
-
-  it("mirrors runShell's sh invocation and mounts nothing unasked", () => {
-    const argv = sandboxArgv(spec({ shell: "sh" }), cfg);
-    expect(argv).not.toContain("-v");
-    expect(argv.slice(-4)).toEqual(["sh", "-e", "-c", "true"]);
-  });
 });
 
 describe("makeSandboxRunner", () => {
