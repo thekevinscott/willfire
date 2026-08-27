@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { workflowDispatches } from "./workflowDispatches.js";
 import type { Ctx, Workflow } from "../types.js";
 import type { YamlValue } from "../yamlValue.js";
@@ -8,6 +8,11 @@ const CTX: Ctx = { action: "opened", baseRef: "main", files: ["src/app.ts"] };
 const onPr = (trigger: YamlValue): Workflow => ({ on: { pull_request: trigger } });
 
 describe("workflowDispatches", () => {
+  it("reads the trigger off a document, not off `any`", () => {
+    const wf = onPr({ types: ["labeled"] });
+    expectTypeOf(wf["on"]).not.toBeAny();
+  });
+
   it("declines a workflow with no pull_request trigger", () => {
     expect(workflowDispatches({ on: { push: null } }, CTX)).toEqual([
       false,

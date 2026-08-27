@@ -1,6 +1,7 @@
 import { evaluateValue } from "../expr/evaluateValue.js";
 import type { Scope } from "../expr/val.js";
 import type { DetailedCombo, DetailedCombos } from "../types.js";
+import type { YamlMap, YamlValue } from "../yamlValue.js";
 
 /**
  * The values of one matrix axis, or null when they cannot be known.
@@ -11,7 +12,7 @@ import type { DetailedCombo, DetailedCombos } from "../types.js";
  * carries that job's outputs. Anything else stays null, which is what makes
  * the whole job `unknown` rather than a guess at how many checks it creates.
  */
-function axisValues(v: unknown, scope: Scope): unknown[] | null {
+function axisValues(v: unknown, scope: Scope): YamlValue[] | null {
   if (Array.isArray(v)) {
     return v;
   }
@@ -29,7 +30,7 @@ function axisValues(v: unknown, scope: Scope): unknown[] | null {
  * An `include:`/`exclude:` block: a literal list or an expression evaluating
  * to one. Absent means empty; anything unresolvable fails the expansion.
  */
-function comboList(v: unknown, scope: Scope): any[] | null {
+function comboList(v: unknown, scope: Scope): YamlMap[] | null {
   if (v === null || v === undefined) {
     return [];
   }
@@ -43,11 +44,14 @@ function comboList(v: unknown, scope: Scope): any[] | null {
   if (val.kind !== "json" || !Array.isArray(val.v)) {
     return null;
   }
-  return val.v;
+  return val.v as YamlMap[];
 }
 
-export function expandMatrixDetailed(strategy: any, scope: Scope = {}): DetailedCombos {
-  const matrix = strategy?.matrix;
+export function expandMatrixDetailed(strategy: unknown, scope: Scope = {}): DetailedCombos {
+  const matrix =
+    strategy !== null && typeof strategy === "object"
+      ? (strategy as YamlMap)["matrix"]
+      : undefined;
   if (matrix === null || matrix === undefined) {
     return [null];
   }
@@ -57,13 +61,14 @@ export function expandMatrixDetailed(strategy: any, scope: Scope = {}): Detailed
   if (typeof matrix === "string") {
     return null;
   }
-  const include = comboList(matrix.include, scope);
-  const exclude = comboList(matrix.exclude, scope);
+  const m = matrix as YamlMap;
+  const include = comboList(m["include"], scope);
+  const exclude = comboList(m["exclude"], scope);
   if (include === null || exclude === null) {
     return null;
   }
-  const axes: Record<string, any[]> = {};
-  for (const [k, v] of Object.entries(matrix)) {
+  const axes: Record<string, YamlValue[]> = {};
+  for (const [k, v] of Object.entries(m)) {
     if (k !== "include" && k !== "exclude") {
       const vals = axisValues(v, scope);
       if (vals === null) {

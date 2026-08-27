@@ -1,4 +1,5 @@
 import type { JobExecutor } from "./execute.js";
+import type { YamlMap } from "./yamlValue.js";
 
 export interface EntryBase {
   workflow: string;
@@ -141,9 +142,9 @@ export interface Ctx {
   files: string[];
 }
 
-export type Workflow = Record<string, any>;
+export type Workflow = YamlMap;
 
-export type Combo = Record<string, any> | null;
+export type Combo = YamlMap | null;
 
 /**
  * A matrix combination plus the keys that appear in its check-name
@@ -157,7 +158,7 @@ export type Combo = Record<string, any> | null;
  * created from scratch shows all of its own keys.
  */
 export interface DetailedCombo {
-  values: Record<string, any>;
+  values: YamlMap;
   displayKeys: string[];
 }
 

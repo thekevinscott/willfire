@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { calleeInputs } from "./calleeInputs.js";
+import type { YamlMap } from "../yamlValue.js";
 
 // The isolation gate wants collaborators mocked; the caller-over-defaults
 // contract is what this suite pins, so the mocks pass the real modules
@@ -14,7 +15,7 @@ vi.mock(
     await vi.importActual<typeof import("./workflowCallInputs.js")>("./workflowCallInputs.js"),
 );
 
-const callee = (inputs: Record<string, unknown>) => ({ on: { workflow_call: { inputs } } });
+const callee = (inputs: YamlMap) => ({ on: { workflow_call: { inputs } } });
 
 describe("calleeInputs", () => {
   it("takes what the caller passed over the callee's default", () => {

@@ -1,8 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import type { Scope } from "../expr/val.js";
 import { evalIf } from "./evalIf.js";
 
 describe("evalIf", () => {
+  it("takes an undecided condition, not `any`", () => {
+    expectTypeOf(evalIf).parameter(0).not.toBeAny();
+  });
+
   it.each([
     [undefined, "run"],
     [null, "run"],

@@ -1,13 +1,20 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import type { Scope } from "../expr/val.js";
 import { expandMatrixDetailed } from "./expandMatrixDetailed.js";
 
 describe("expandMatrixDetailed", () => {
+  it("takes an undecided strategy, not `any`", () => {
+    expectTypeOf(expandMatrixDetailed).parameter(0).not.toBeAny();
+  });
+
   it("returns a single null combination when there is no matrix", () => {
     expect(expandMatrixDetailed(undefined)).toEqual([null]);
     expect(expandMatrixDetailed({})).toEqual([null]);
     // YAML `matrix:` with no value parses to null, not an absent key.
     expect(expandMatrixDetailed({ matrix: null })).toEqual([null]);
+    // A strategy that is not a block holds no matrix to read.
+    expect(expandMatrixDetailed(null)).toEqual([null]);
+    expect(expandMatrixDetailed("${{ toJSON(x) }}")).toEqual([null]);
   });
 
   it("expands two static axes to their full cross product in order", () => {

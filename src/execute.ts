@@ -14,7 +14,7 @@ import { parse as parseYaml } from "yaml";
 import { evaluate } from "./expr/evaluate.js";
 import { evaluateValue } from "./expr/evaluateValue.js";
 import { UNKNOWN, type Scope, type Val } from "./expr/val.js";
-import type { ResolveRef, SourceRef, WorkflowSource } from "./types.js";
+import type { ResolveRef, SourceRef, Workflow, WorkflowSource } from "./types.js";
 import type { YamlMap, YamlValue } from "./yamlValue.js";
 
 /** A host path a sandboxed runner must expose inside, at the same path. */
@@ -68,7 +68,7 @@ export type ExecOutcome =
  * running it yields.
  */
 export interface JobExecutor {
-  executeJob(jobId: string, job: any, wf: any, scope: Scope): Promise<ExecOutcome>;
+  executeJob(jobId: string, job: Workflow, wf: Workflow, scope: Scope): Promise<ExecOutcome>;
 }
 
 // ------------------------------------------------------------------ plumbing
@@ -184,13 +184,33 @@ async function readActionManifest(dir: string): Promise<string | null> {
   return null;
 }
 
+/** The step keys the walker reads. Values stay YAML-shaped until a runtime
+ * guard narrows them. */
+interface StepModel {
+  id?: YamlValue;
+  name?: YamlValue;
+  if?: YamlValue;
+  uses?: YamlValue;
+  run?: YamlValue;
+  shell?: YamlValue;
+  with?: YamlMap | null;
+  env?: YamlValue;
+  "working-directory"?: YamlValue;
+}
+
+interface ActionModel {
+  inputs?: YamlMap | null;
+  outputs?: YamlMap | null;
+  runs?: { using?: YamlValue; pre?: YamlValue; main?: YamlValue; steps?: StepModel[] | null } | null;
+}
+
 /**
  * Caller's `with:` over declared defaults, everything a string — action inputs
  * are untyped, and an unset input is the empty string. An unrenderable value
  * stays unknown; it only fails if a step reads it.
  */
 function bindActionInputs(
-  action: any,
+  action: ActionModel,
   withBlock: YamlValue | undefined,
   scope: Scope,
 ): Record<string, Val> {
@@ -247,7 +267,7 @@ interface WalkCtx {
 }
 
 async function runSteps(
-  steps: any[],
+  steps: StepModel[],
   scope: Scope,
   ctx: WalkCtx,
 ): Promise<Res<Record<string, { outputs: Record<string, string> }>>> {
@@ -291,21 +311,22 @@ async function runSteps(
 
 /** A `uses:` step: a runner-provided postcondition, an action to run, or a stop. */
 async function runUses(
-  step: any,
+  step: StepModel,
   label: string,
   scope: Scope,
   ctx: WalkCtx,
 ): Promise<Res<Record<string, string>>> {
-  const uses: string = step.uses;
+  const uses = step.uses as string;
+  const withBlock: YamlMap = step.with ?? {};
   if (CHECKOUT_RE.test(uses)) {
     // Runner-provided, and its postcondition — the head tree at the workspace
     // path — is already true. Any input beyond `fetch-depth: 0` asks for a
     // different tree than the one provided.
-    const withKeys = Object.keys(step.with ?? {});
+    const withKeys = Object.keys(withBlock);
     if (withKeys.length === 0) {
       return { ok: true, v: {} };
     }
-    if (withKeys.length === 1 && String(step.with["fetch-depth"]) === "0") {
+    if (withKeys.length === 1 && String(withBlock["fetch-depth"]) === "0") {
       // Unmet inside a composite: the pre-scan that picks the tree provider
       // only reads the job's own steps.
       if (!ctx.hasHistory) {
@@ -318,12 +339,12 @@ async function runUses(
   if (SETUP_NODE_RE.test(uses)) {
     // The execution world ships exactly one node: asking for it is already
     // satisfied, asking for anything else cannot be.
-    const withKeys = Object.keys(step.with ?? {});
+    const withKeys = Object.keys(withBlock);
     if (withKeys.length === 0) {
       return { ok: true, v: {} };
     }
     if (withKeys.length === 1 && withKeys[0] === "node-version") {
-      const wanted = renderTemplate(String(step.with["node-version"]), scope);
+      const wanted = renderTemplate(String(withBlock["node-version"]), scope);
       if (wanted === null) {
         return err(`${label}: cannot resolve node-version`);
       }
@@ -366,7 +387,7 @@ async function runUses(
   if (manifest === null) {
     return err(`${label}: no action.yml under ${uses}`);
   }
-  let action: any;
+  let action: ActionModel;
   try {
     action = parseYaml(manifest);
   } catch (e) {
@@ -428,10 +449,10 @@ async function runUses(
  * `outputs:` block is documentation, not a mapping.
  */
 async function runNodeAction(
-  step: any,
+  step: StepModel,
   label: string,
   uses: string,
-  action: any,
+  action: ActionModel,
   actionDir: string,
   actionRoot: string | undefined,
   usingMajor: number,
@@ -508,7 +529,7 @@ async function runNodeAction(
 
 /** A `run:` step, executed under its declared shell with its declared env. */
 async function runRun(
-  step: any,
+  step: StepModel,
   label: string,
   scope: Scope,
   ctx: WalkCtx,
@@ -610,10 +631,11 @@ export function makeExecutor(opts: {
       if (!Array.isArray(job.steps)) {
         return fail(`job '${jobId}' has no steps`);
       }
+      const steps = job.steps as StepModel[];
       // Any checkout input might be the `fetch-depth: 0` form. Over-asking for
       // one the walk will refuse anyway costs a clone, never correctness.
-      const needsHistory = job.steps.some(
-        (s: any) =>
+      const needsHistory = steps.some(
+        (s) =>
           s !== null &&
           s !== undefined &&
           typeof s.uses === "string" &&
@@ -627,7 +649,7 @@ export function makeExecutor(opts: {
         );
       }
       const jobScope: Scope = { ...scope, github: { ...github, ...scope.github } };
-      const walked = await runSteps(job.steps, jobScope, {
+      const walked = await runSteps(steps, jobScope, {
         tree,
         hasHistory: needsHistory,
         envLayers: [wf?.env, job.env],

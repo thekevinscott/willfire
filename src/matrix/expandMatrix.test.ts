@@ -1,8 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import type { Scope } from "../expr/val.js";
 import { expandMatrix } from "./expandMatrix.js";
 
 describe("expandMatrix", () => {
+  it("takes an undecided strategy, not `any`", () => {
+    expectTypeOf(expandMatrix).parameter(0).not.toBeAny();
+  });
+
   it("returns a single null combination when there is no strategy", () => {
     expect(expandMatrix(undefined)).toEqual([null]);
     expect(expandMatrix({})).toEqual([null]);

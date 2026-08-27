@@ -1,8 +1,17 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { getPrTrigger, MISSING } from "./getPrTrigger.js";
 import type { Workflow } from "../types.js";
 
 describe("getPrTrigger", () => {
+  it("hands back a document map, so a read off it is not `any`", () => {
+    const trig = getPrTrigger({ on: { pull_request: { types: ["labeled"] } } } as Workflow);
+    if (trig === MISSING) {
+      throw new Error("expected a trigger map");
+    }
+    expectTypeOf(trig["types"]).not.toBeAny();
+    expect(trig["types"]).toEqual(["labeled"]);
+  });
+
   it("is MISSING when there is no on key at all", () => {
     expect(getPrTrigger({} as Workflow)).toBe(MISSING);
   });
