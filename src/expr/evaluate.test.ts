@@ -2,15 +2,6 @@ import { describe, expect, it } from "vitest";
 import { evaluate } from "./evaluate.js";
 import type { Scope } from "./val.js";
 
-/**
- * `evaluate` is the whole public surface, so everything below drives it rather
- * than the parser internals. The tri-state is the thing under test: `true` and
- * `false` are claims that a job's fate is settled, and `null` is the refusal to
- * claim. A test that turns a `null` into a `true` is widening what willfire
- * asserts about a repo's CI, not tidying a return value.
- */
-
-/** The scope the fleet's `testing-conventions` callers actually produce. */
 const FLEET: Scope = {
   inputs: {
     gates: {
@@ -37,8 +28,6 @@ describe("literals and truthiness", () => {
     ["0", false],
     ["-1", true],
     ["1.5", true],
-    // A non-empty string is truthy whatever it spells — the JavaScript trap,
-    // kept deliberately, because GitHub has it too.
     ["'false'", true],
     ["'0'", true],
     ["null", false],
@@ -57,8 +46,6 @@ describe("the ${{ }} wrapper", () => {
   });
 
   it("refuses a partially interpolated string", () => {
-    // `foo ${{ bar }}` is a template, not an expression. Evaluating the inner
-    // part would answer a question nobody asked.
     expect(evaluate("'a' == 'a ${{ inputs.x }}'")).toBe(null);
   });
 
@@ -82,8 +69,6 @@ describe("&& short-circuits from either side", () => {
   });
 
   it("is false when the right is false and the left is unknown", () => {
-    // The point of the whole module: an undecided operand does not make the
-    // expression undecided when the other operand settles it.
     expect(evaluate("needs.detect.outputs.x && false")).toBe(false);
   });
 
@@ -113,8 +98,6 @@ describe("|| short-circuits from either side", () => {
   });
 
   it("coalesces to a value rather than a boolean", () => {
-    // `a || b` yields the first truthy operand, so a comparison against the
-    // result compares the *value*, not the truthiness.
     expect(evaluate("('' || 'b') == 'b'")).toBe(true);
     expect(evaluate("('a' || 'b') == 'a'")).toBe(true);
   });
@@ -160,8 +143,6 @@ describe("comparison", () => {
   });
 
   it("refuses to compare across types", () => {
-    // GitHub coerces here and the corner cases are surprising (`'' == 0` is
-    // true). Not modelling the table is the honest option, not a gap.
     expect(evaluate("'1' == 1")).toBe(null);
     expect(evaluate("'' == 0")).toBe(null);
     expect(evaluate("true == 'true'")).toBe(null);
@@ -178,7 +159,6 @@ describe("comparison", () => {
   });
 
   it("cannot compare a value known only by its truthiness", () => {
-    // `(unknown && false)` is known-falsy but has no value to compare.
     expect(evaluate("(needs.x && false) == ''")).toBe(null);
   });
 });
@@ -191,8 +171,6 @@ describe("context lookups", () => {
   });
 
   it("leaves an absent input unknown rather than empty", () => {
-    // Treating a missing input as `''` would silently decide guards that are
-    // not decided.
     expect(evaluate("inputs.mode == ''", { inputs: {} })).toBe(null);
     expect(evaluate("inputs.mode == ''")).toBe(null);
   });
@@ -228,9 +206,6 @@ describe("context lookups", () => {
   });
 });
 
-// `needs.*` is the one runtime context that can be supplied: the outputs are
-// computed before the jobs that read them expand. Nothing in this module works
-// out what they are — they are handed in.
 describe("needs outputs", () => {
   const NEEDS: Scope = {
     needs: { detect: { outputs: { coverage_languages: '["typescript"]', e2e: "true" } } },
@@ -241,9 +216,6 @@ describe("needs outputs", () => {
   });
 
   it("keeps the output a raw string", () => {
-    // The runner substitutes what a step wrote, and the guards compare against
-    // strings. Parsing here would make `!= '[]'` a mixed-type comparison, which
-    // is unknown — turning a decidable guard undecidable.
     expect(evaluate("needs.detect.outputs.coverage_languages == '[\"typescript\"]'", NEEDS)).toBe(
       true,
     );
@@ -251,8 +223,6 @@ describe("needs outputs", () => {
   });
 
   it("reads an output the supplied job does not list as the empty string", () => {
-    // The caller promised the set is complete, so an absent key is an output no
-    // step wrote — which the runner substitutes as `''`.
     expect(evaluate("needs.detect.outputs.missing == ''", NEEDS)).toBe(true);
   });
 
@@ -262,8 +232,6 @@ describe("needs outputs", () => {
   });
 
   it("leaves anything but an outputs lookup unknown", () => {
-    // `result` is a verdict on a run that has not happened; the rest are not
-    // shapes the context has.
     expect(evaluate("needs.detect.result == 'success'", NEEDS)).toBe(null);
     expect(evaluate("needs.detect.outputs.a.b == ''", NEEDS)).toBe(null);
     expect(evaluate("needs.detect == ''", NEEDS)).toBe(null);
@@ -275,14 +243,10 @@ describe("needs outputs", () => {
     };
     const cond =
       "(needs.detect.outputs.mutation_languages || needs.detect.outputs.coverage_languages) != '[]'";
-    // `'[]'` is a non-empty string, so it is truthy, so `||` yields it and the
-    // comparison is false. This is the GitHub trap the evaluator keeps.
     expect(evaluate(cond, scope)).toBe(false);
   });
 });
 
-// `steps.*` mirrors `needs.*`: the executor's step walk is the one caller
-// that can supply it honestly, and the completeness contract is the same.
 describe("steps outputs", () => {
   const STEPS: Scope = {
     steps: {
@@ -296,9 +260,6 @@ describe("steps outputs", () => {
   });
 
   it("coalesces past a skipped step the way the fleet's detect outputs do", () => {
-    // A skipped step is present with no outputs, so every read against it is
-    // '', which is falsy, so `||` yields the step that ran. This is the exact
-    // shape of every one of detect's ~25 `outputs:` entries.
     const cond =
       "(steps.scan_hermetic.outputs.static_languages || steps.scan_published.outputs.static_languages)" +
       " == '[\"typescript\"]'";
@@ -315,8 +276,6 @@ describe("steps outputs", () => {
   });
 
   it("leaves anything but an outputs lookup unknown", () => {
-    // `outcome` and `conclusion` are verdicts the executor does not track — a
-    // failed step fails the whole execution instead.
     expect(evaluate("steps.scan_published.outcome == 'success'", STEPS)).toBe(null);
     expect(evaluate("steps.scan_published.outputs.a.b == ''", STEPS)).toBe(null);
   });
@@ -351,16 +310,12 @@ describe("functions", () => {
   });
 
   it("leaves the job-status functions unknown", () => {
-    // These depend on jobs that have not run.
     expect(evaluate("success()")).toBe(null);
     expect(evaluate("failure()")).toBe(null);
     expect(evaluate("cancelled()")).toBe(null);
   });
 
   it("leaves an unmodelled function unknown but still consumes its arguments", () => {
-    // If the argument list were not parsed, the tokens after it would parse
-    // against the wrong position and the result would be arbitrary rather
-    // than unknown.
     expect(evaluate("toJSON('a') == 'b'")).toBe(null);
     expect(evaluate("format('{0}', 'a', 'b') == 'x' || true")).toBe(true);
   });
@@ -370,9 +325,6 @@ describe("functions", () => {
   });
 });
 
-// `fromJSON` is what a dynamic matrix axis is built out of; the value side of
-// it lives in evaluateValue's tests. What belongs here is how its results
-// behave under truthiness and comparison.
 describe("fromJSON", () => {
   const NEEDS: Scope = {
     needs: {
@@ -393,8 +345,6 @@ describe("fromJSON", () => {
   });
 
   it("does not model the truthiness of an array or an object", () => {
-    // GitHub casts them, but no workflow asks it to, and the answer is not
-    // worth guessing at to find out.
     expect(evaluate("fromJSON('[]')")).toBe(null);
     expect(evaluate("fromJSON('[1]')")).toBe(null);
     expect(evaluate("fromJSON('{}')")).toBe(null);
@@ -406,11 +356,6 @@ describe("fromJSON", () => {
 });
 
 describe("the shapes that appear in testing-conventions", () => {
-  // Every condition below is copied from
-  // `thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0`.
-  // They are the reason this evaluator exists; if one of them regresses to
-  // `null`, a fleet gate loses a check name.
-
   it("skips mutation, because the caller's gates list decides it", () => {
     const cond =
       "github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"mutation\"')) && (needs.detect.outputs.mutation_languages || needs.detect.outputs.coverage_languages) != '[]'";
@@ -430,11 +375,6 @@ describe("the shapes that appear in testing-conventions", () => {
   });
 
   it("leaves unit-coverage unknown, because only detect's outputs decide it", () => {
-    // The gate is requested, so the only remaining clause reads an output of a
-    // job that has not run. Short-circuiting cannot settle that, and guessing
-    // would be a claim about which languages the repo has sources for. If
-    // those outputs ever arrive in the scope, this becomes decidable there —
-    // not here.
     const cond =
       "(inputs.gates == '' || contains(inputs.gates, '\"unit-coverage\"')) && needs.detect.outputs.coverage_languages != '[]'";
     expect(evaluate(cond, FLEET)).toBe(null);
@@ -492,7 +432,6 @@ describe("tokenizer details", () => {
 });
 
 describe("index access on fromJSON results", () => {
-  /** The gate putitoutthere's build job actually writes. */
   const GATE = "fromJSON(needs.plan.outputs.matrix || '[]')[0] != null";
   const planScope = (matrix: string): Scope => ({
     needs: { plan: { outputs: { matrix } } },
@@ -518,7 +457,6 @@ describe("index access on fromJSON results", () => {
   });
 
   it("reads a missing element as the empty string, the way null reads", () => {
-    // GitHub yields null past the end; null coerces equal to ''.
     expect(evaluate("fromJSON('[]')[0] == ''")).toBe(true);
     expect(evaluate("fromJSON('[null]')[0] == null")).toBe(true);
     expect(evaluate("fromJSON('[]')[0]")).toBe(false);
@@ -537,8 +475,6 @@ describe("index access on fromJSON results", () => {
 
 describe("comparison against a fromJSON structure", () => {
   it("decides equality by instance: a structure equals nothing written beside it", () => {
-    // GitHub compares arrays and objects by instance, and two sides of one
-    // comparison are never the same instance.
     expect(evaluate("fromJSON('[1]') == fromJSON('[1]')")).toBe(false);
     expect(evaluate("fromJSON('[1]') != null")).toBe(true);
     expect(evaluate("fromJSON('{}') == ''")).toBe(false);

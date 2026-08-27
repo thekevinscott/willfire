@@ -7,7 +7,6 @@ vi.mock("./cursor.js", async () => {
   return { ...actual };
 });
 
-// Tokens for `fromJSON('[5]')`, the one producer of an indexable value.
 const CALL = [
   { t: "path", v: "fromJSON" },
   { t: "op", v: "(" },

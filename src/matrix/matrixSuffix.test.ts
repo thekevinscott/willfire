@@ -4,6 +4,7 @@ import { matrixSuffix } from "./matrixSuffix.js";
 describe("matrixSuffix", () => {
   it("is empty when the combination has no keys to show", () => {
     expect(matrixSuffix({ values: {}, displayKeys: [] })).toBe("");
+    expect(matrixSuffix({ values: {}, displayKeys: ["gone"] })).toBe("");
   });
 
   it("skips a display key the combination does not carry", () => {

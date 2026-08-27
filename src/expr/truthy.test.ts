@@ -14,6 +14,7 @@ describe("truthy", () => {
     [{ kind: "value", v: 2 }, true],
     [{ kind: "value", v: "" }, false],
     [{ kind: "value", v: "0" }, true],
+    [{ kind: "value", v: "false" }, true],
   ])("reads %j as %j", (val, want) => {
     expect(truthy(val)).toBe(want);
   });

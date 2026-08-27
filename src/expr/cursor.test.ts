@@ -28,7 +28,6 @@ describe("Cursor", () => {
     const cur = new Cursor(TOKS);
     expect(cur.eatOp(")")).toBe(false);
     expect(cur.eatOp("(")).toBe(true);
-    // A non-op token never matches, whatever its value.
     expect(cur.eatOp("(")).toBe(false);
   });
 });

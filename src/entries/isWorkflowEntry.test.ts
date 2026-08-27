@@ -12,6 +12,9 @@ describe("isWorkflowEntry", () => {
       reason: "r",
     };
     expect(isWorkflowEntry(e)).toBe(true);
+    expect(
+      isWorkflowEntry({ ...e, status: "run", reason: "YAML parse error: x" } as unknown as Entry),
+    ).toBe(true);
   });
 
   it("is false for a job entry", () => {

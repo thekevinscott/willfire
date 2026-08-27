@@ -24,5 +24,6 @@ describe("coalesceAnd", () => {
     expect(coalesceAnd({ kind: "unknown" }, { kind: "value", v: true })).toEqual({
       kind: "unknown",
     });
+    expect(coalesceAnd({ kind: "unknown" }, { kind: "unknown" })).toEqual({ kind: "unknown" });
   });
 });

@@ -16,6 +16,7 @@ describe("compare", () => {
 
   it("refuses mixed primitive types", () => {
     expect(compare("==", S("1"), S(1))).toEqual({ kind: "unknown" });
+    expect(compare("!=", S("1"), S(1))).toEqual({ kind: "unknown" });
   });
 
   it("refuses to order booleans", () => {

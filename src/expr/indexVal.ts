@@ -1,10 +1,5 @@
 import { UNKNOWN, type Val } from "./val.js";
 
-/**
- * `a[i]` on what `fromJSON` produced. GitHub yields `null` for a missing
- * index, which models as the empty string — the coercion GitHub applies.
- * Anything off that path is unknown, never a guess.
- */
 export function indexVal(base: Val, idx: Val): Val {
   if (base.kind !== "json") {
     return UNKNOWN;

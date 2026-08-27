@@ -1,7 +1,3 @@
-// GitHub filter pattern glob. Grammar per docs: * (any chars except /),
-// ** (any chars), ? (zero or one of preceding char), + (one or more of
-// preceding char), [ranges], leading ! negates.
-
 const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 export function patternToRegex(pat: string): RegExp {

@@ -22,5 +22,11 @@ describe("parseOr", () => {
       { t: "str", v: "c" },
     ]);
     expect(parseOr(cur, {})).toEqual({ kind: "value", v: "c" });
+    const first = new Cursor([
+      { t: "str", v: "a" },
+      { t: "op", v: "||" },
+      { t: "str", v: "b" },
+    ]);
+    expect(parseOr(first, {})).toEqual({ kind: "value", v: "a" });
   });
 });

@@ -35,7 +35,6 @@ export function parseAtom(cur: Cursor, scope: Scope): Val {
   }
   if (t.t === "path") {
     cur.advance();
-    // A `(` right after a name makes it a call, not a path.
     if (cur.eatOp("(")) {
       return parseCall(cur, scope, t.v);
     }

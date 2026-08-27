@@ -1,9 +1,4 @@
 #!/usr/bin/env node
-// Usage: pnpm predict --repo owner/name --pr N [--json]
-//
-// Auth: GH_TOKEN or GITHUB_TOKEN env var (any token with
-// contents/actions/pull-requests read). Inside an action, pass the workflow's
-// GITHUB_TOKEN.
 
 import { parseArgs } from "./cli/parseArgs.js";
 import { isWorkflowEntry } from "./entries/isWorkflowEntry.js";
@@ -33,8 +28,6 @@ if (isMain) {
         }
       }
     }
-    // Last, and on the skip path too, so a red gate's first question — which
-    // commits was this read from? — is answered wherever the reader lands.
     for (const s of sources) {
       console.log(`# read ${s.owner}/${s.repo}@${s.ref} -> ${s.sha}`);
     }

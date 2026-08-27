@@ -11,8 +11,6 @@ describe("parseUses", () => {
       path: ".github/workflows/x.yml",
       source: { owner: "o", repo: "r", ref: "v1" },
     });
-    // A branch name may contain a slash, so the ref is everything after the
-    // last `@` rather than the next path segment.
     expect(parseUses("o/r/w.yml@feature/foo")).toEqual({
       path: "w.yml",
       source: { owner: "o", repo: "r", ref: "feature/foo" },

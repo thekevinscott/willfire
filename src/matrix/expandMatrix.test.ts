@@ -23,10 +23,7 @@ describe("expandMatrix", () => {
   });
 
   it("expands an axis written as an expression over known outputs", () => {
-    // The fleet shape: the axis is the values another job computed, and they
-    // are knowable exactly when the scope carries that job's outputs.
     const strategy = { matrix: { language: "${{ fromJSON(needs.d.outputs.langs) }}" } };
-    // Typed as the expr module's own Scope — the seam expandMatrix takes.
     const scope: Scope = { needs: { d: { outputs: { langs: '["typescript","rust"]' } } } };
     expect(expandMatrix(strategy, scope)).toEqual([
       { language: "typescript" },
@@ -54,8 +51,6 @@ describe("expandMatrix", () => {
   });
 
   it("gives up on an axis expression that is not an array", () => {
-    // A scalar cannot be an axis, and neither can an object. Treating either
-    // as one combination would invent a check name.
     const scope = { needs: { d: { outputs: { s: '"ts"', o: "{}" } } } };
     expect(expandMatrix({ matrix: { l: "${{ fromJSON(needs.d.outputs.s) }}" } }, scope)).toBeNull();
     expect(expandMatrix({ matrix: { l: "${{ fromJSON(needs.d.outputs.o) }}" } }, scope)).toBeNull();
@@ -85,16 +80,12 @@ describe("expandMatrix", () => {
   });
 
   it("returns no combinations when any axis is empty", () => {
-    // The product with an empty axis is empty, however many values the other
-    // axes carry.
     expect(expandMatrix({ matrix: { a: [], b: ["x"] } })).toEqual([]);
     expect(expandMatrix({ matrix: { a: ["x"], b: [] } })).toEqual([]);
     expect(expandMatrix({ matrix: { a: [], b: [] } })).toEqual([]);
   });
 
   it("returns no combinations for a matrix with no keys", () => {
-    // Distinct from an absent `matrix:`, which is the single-unsuffixed-job
-    // case above.
     expect(expandMatrix({ matrix: {} })).toEqual([]);
   });
 

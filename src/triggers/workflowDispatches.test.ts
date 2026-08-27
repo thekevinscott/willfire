@@ -25,10 +25,6 @@ describe("workflowDispatches", () => {
     expect(workflowDispatches(onPr(null), CTX)).toEqual([true, "trigger matched"]);
   });
 
-  // Both-filters is invalid config. GitHub does not fall back to "no filter"
-  // and does not skip the workflow: it creates the run and concludes
-  // `startup_failure`. The run exists, so the workflow dispatches (#7).
-
   it("dispatches when both branches and branches-ignore are set", () => {
     expect(
       workflowDispatches(onPr({ branches: ["main"], "branches-ignore": ["main"] }), CTX),
@@ -42,8 +38,6 @@ describe("workflowDispatches", () => {
   });
 
   it("checks the conflicting filters before evaluating either one", () => {
-    // `branches: [dev]` alone would decline on a `main` base. The
-    // startup-failure verdict has to win.
     const [dispatches] = workflowDispatches(
       onPr({ branches: ["dev"], "branches-ignore": ["dev"] }),
       CTX,
@@ -100,9 +94,6 @@ describe("workflowDispatches", () => {
     const ctx: Ctx = { ...CTX, files: ["docs/a.md", "src/app.ts"] };
     expect(workflowDispatches(onPr({ "paths-ignore": ["docs/**"] }), ctx)[0]).toBe(true);
   });
-
-  // Stacked PRs (#30): `branches:` is evaluated against the stack's terminal
-  // target, and a declining reason names it.
 
   const STACKED: Ctx = { action: "opened", baseRef: "feature-1", stackTarget: "main", files: [] };
 

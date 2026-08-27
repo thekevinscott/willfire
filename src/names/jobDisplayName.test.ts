@@ -17,6 +17,13 @@ describe("jobDisplayName", () => {
     expect(jobDisplayName("a", { name: null }, null)).toEqual({ name: "a", resolved: true });
   });
 
+  it("keeps a literal name outside a matrix", () => {
+    expect(jobDisplayName("a", { name: "custom" }, null)).toEqual({
+      name: "custom",
+      resolved: true,
+    });
+  });
+
   it("suppresses the parenthetical when the name holds an expression", () => {
     const d = jobDisplayName(
       "a",

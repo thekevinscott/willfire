@@ -30,6 +30,7 @@ describe("indexVal", () => {
   it("refuses an index that is unknown or of the wrong type", () => {
     expect(indexVal(ARR, { kind: "unknown" })).toEqual({ kind: "unknown" });
     expect(indexVal(ARR, { kind: "value", v: "k" })).toEqual({ kind: "unknown" });
+    expect(indexVal(ARR, { kind: "value", v: true })).toEqual({ kind: "unknown" });
     expect(indexVal(OBJ, { kind: "value", v: 0 })).toEqual({ kind: "unknown" });
   });
 });

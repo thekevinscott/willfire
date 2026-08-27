@@ -18,6 +18,7 @@ describe("patternToRegex", () => {
   it("treats ** as any run of characters, separators included", () => {
     const re = patternToRegex("src/**");
     expect(re.test("src/nested/app.ts")).toBe(true);
+    expect(patternToRegex("**").test("a/b")).toBe(true);
   });
 
   it("passes ? through as zero-or-one of the preceding character", () => {

@@ -3,8 +3,6 @@ import { finalizePrediction } from "./finalizePrediction.js";
 import type { DraftEntry, JobName, WorkflowSource } from "../types.js";
 
 const WF = ".github/workflows/w.yml";
-// The brand constructor lives in entries/, which is not this unit's
-// collaborator; the cast is the same claim it would make.
 const j = (name: string) => name as JobName;
 const src = (owner: string, repo: string, ref: string): WorkflowSource => ({
   owner,

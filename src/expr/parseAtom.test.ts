@@ -50,5 +50,6 @@ describe("parseAtom", () => {
 
   it("is unknown on a stray operator", () => {
     expect(parseAtom(new Cursor([{ t: "op", v: "," }]), {})).toEqual({ kind: "unknown" });
+    expect(parseAtom(new Cursor([{ t: "op", v: ")" }]), {})).toEqual({ kind: "unknown" });
   });
 });

@@ -28,5 +28,6 @@ describe("the value lattice", () => {
       steps: { scan: { outputs: {} } },
     };
     expect(scope.inputs?.mode).toEqual({ kind: "value", v: "fast" });
+    expect(scope.needs?.detect.outputs.x).toBe("y");
   });
 });

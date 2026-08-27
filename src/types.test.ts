@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Ctx, DetailedCombo, DraftEntry, WorkflowSource } from "./types.js";
+import type { Ctx, DetailedCombo, DraftEntry, PredictOptions, WorkflowSource } from "./types.js";
 
 describe("prediction types", () => {
   it("shape a context, a source, a combo, and a draft entry", () => {
@@ -12,11 +12,16 @@ describe("prediction types", () => {
       status: "no-dispatch",
       reason: "no pull_request trigger",
     };
-    expect([ctx.action, source.sha.length, combo.displayKeys, entry.status]).toEqual([
+    const opts: PredictOptions = {
+      action: "synchronize",
+      execute: [{ repo: "o/r", jobs: ["a"] }],
+    };
+    expect([ctx.action, source.sha.length, combo.displayKeys, entry.status, opts.action]).toEqual([
       "opened",
       40,
       ["os"],
       "no-dispatch",
+      "synchronize",
     ]);
   });
 });

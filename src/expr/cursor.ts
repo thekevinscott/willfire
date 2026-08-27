@@ -1,6 +1,5 @@
 import type { Tok } from "./tokenize.js";
 
-/** A read position over a token stream, shared by the parse functions. */
 export class Cursor {
   private pos = 0;
   constructor(private readonly toks: Tok[]) {}

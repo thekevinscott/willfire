@@ -4,6 +4,7 @@ import { tokenize } from "./tokenize.js";
 describe("tokenize", () => {
   it("skips whitespace of every kind", () => {
     expect(tokenize(" \t\n\r")).toEqual([]);
+    expect(tokenize("")).toEqual([]);
   });
 
   it("reads a doubled quote inside a string as one literal quote", () => {

@@ -28,8 +28,6 @@ describe("lookup", () => {
 
   it("models only needs.<job>.outputs.<name>", () => {
     expect(lookup(SCOPE, "needs.detect.outputs.x")).toEqual({ kind: "value", v: "y" });
-    // A supplied job's missing output is the empty string, per the
-    // complete-set contract; an unsupplied job stays unknown.
     expect(lookup(SCOPE, "needs.detect.outputs.missing")).toEqual({ kind: "value", v: "" });
     expect(lookup(SCOPE, "needs.other.outputs.x")).toEqual({ kind: "unknown" });
     expect(lookup(SCOPE, "needs.detect.result")).toEqual({ kind: "unknown" });

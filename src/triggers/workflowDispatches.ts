@@ -4,10 +4,6 @@ import type { Ctx, Workflow } from "../types.js";
 
 const DEFAULT_TYPES = ["opened", "synchronize", "reopened"];
 
-// A predicate: does this workflow produce a run for the PR? Every workflow-level
-// verdict is decidable, so there is no third answer to express. Only job
-// expansion can be genuinely undecidable (dynamic matrix, an unreadable
-// reusable workflow, unresolvable `if`), and that is a per-entry status.
 export function workflowDispatches(
   wf: Workflow,
   ctx: Ctx,
@@ -22,9 +18,6 @@ export function workflowDispatches(
     return [false, `action '${ctx.action}' not in types [${types}]`];
   }
 
-  // Setting a filter and its -ignore twin on one trigger is invalid config.
-  // GitHub does not fall back to "no filter" or skip the workflow: it creates
-  // the run and concludes `startup_failure`. The run exists, so it dispatches.
   if ("branches" in trig && "branches-ignore" in trig) {
     return [true, "both branches and branches-ignore set: startup failure"];
   }

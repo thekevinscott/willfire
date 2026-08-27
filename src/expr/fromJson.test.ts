@@ -24,5 +24,6 @@ describe("fromJson", () => {
   it("is unknown when the argument is not a known string", () => {
     expect(fromJson({ kind: "value", v: 3 })).toEqual({ kind: "unknown" });
     expect(fromJson({ kind: "unknown" })).toEqual({ kind: "unknown" });
+    expect(fromJson({ kind: "json", v: [] })).toEqual({ kind: "unknown" });
   });
 });

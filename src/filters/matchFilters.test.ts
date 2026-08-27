@@ -4,6 +4,7 @@ import { matchFilters } from "./matchFilters.js";
 describe("matchFilters", () => {
   it("is false when nothing matches", () => {
     expect(matchFilters("main", ["releases/*"])).toBe(false);
+    expect(matchFilters("main", [])).toBe(false);
   });
 
   it("is true on a plain match", () => {

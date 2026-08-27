@@ -4,7 +4,6 @@ import type { ExecOutcome } from "../execute/types.js";
 import type { Scope } from "../expr/val.js";
 import type { FetchWorkflow, ResolveRef, WorkflowReader, WorkflowSource } from "../types.js";
 
-/** A 40-hex commit id, so anything pinned to it is already resolved. */
 const SHA = "a".repeat(40);
 
 const readerOf = (
@@ -12,13 +11,7 @@ const readerOf = (
   resolveRef: ResolveRef = async (src) => src.ref,
 ): WorkflowReader => ({ fetchWorkflow, resolveRef });
 
-// `expandWorkflowJobs` is the seam the recorded-behaviour suite drives
-// (tests/integration/names.test.ts). That suite pins check names against live
-// dispatches; this covers the wrapper itself — that it forwards to the job
-// expansion and hands back the entries unchanged.
 describe("expandWorkflowJobs", () => {
-  // Where expansion starts from. Nothing here calls out to another workflow, so
-  // the source is only carried, never followed.
   const SOURCE = { owner: "o", repo: "r", ref: "main", sha: SHA };
 
   it("expands a parsed workflow into its job entries", async () => {
@@ -65,9 +58,6 @@ describe("expandWorkflowJobs", () => {
     ]);
   });
 
-  // A skipped job is never set up, so `name:` is not interpolated: the check is
-  // named with the expression text intact. Probe-verified (see
-  // `skippedDisplayName`).
   it("leaves a skipped job's name: uninterpolated", async () => {
     const entries = await expand({
       m: { "runs-on": "ubuntu-latest", if: false, name: "sk ${{ github.event_name }}" },
@@ -76,10 +66,6 @@ describe("expandWorkflowJobs", () => {
   });
 });
 
-// The check-name readout for an empty matrix: it has to produce no entries,
-// not one. `[null]` inside the expander means "a job with no matrix", whose
-// check is the bare job name — and that is a name GitHub never creates for a
-// job that declares a matrix, so predicting it invents a check.
 describe("a job whose matrix expands to nothing", () => {
   const SOURCE = { owner: "o", repo: "r", ref: SHA, sha: SHA };
   const CTX = { action: "opened", baseRef: "main", files: ["src/app.txt"] };
@@ -123,22 +109,15 @@ describe("a job whose matrix expands to nothing", () => {
       SOURCE,
     );
     expect(entries).toEqual([]);
-    // The callee is still read once — resolution happens before the matrix is
-    // walked — but nothing it declares becomes a check.
     expect(fetched).toEqual([".github/workflows/callee.yml"]);
   });
 });
 
-// The fleet shape, end to end: a `detect` job writes JSON to `$GITHUB_OUTPUT`,
-// and the jobs downstream of it take both their `if:` and their matrix from
-// what it wrote. Nothing here works out what `detect` writes — the outputs are
-// handed in, which is the whole point of the seam.
 describe("a matrix taken from another job's outputs", () => {
   const SOURCE = { owner: "o", repo: "r", ref: SHA, sha: SHA };
   const CTX = { action: "opened", baseRef: "main", files: ["src/app.txt"] };
   const NO_FETCH = async () => null;
 
-  /** The fleet's `unit-coverage`, reduced to the two lines that matter. */
   const WORKFLOW = {
     on: { pull_request: null },
     jobs: {
@@ -170,9 +149,6 @@ describe("a matrix taken from another job's outputs", () => {
   });
 
   it("collapses to the uninterpolated name when the output is empty", async () => {
-    // The guard decides `skipped` first, and a skipped job never expands its
-    // matrix or interpolates its `name:` — so GitHub creates one check called
-    // exactly what the YAML says, expression text and all.
     const entries = await expand({ needs: { detect: { outputs: { langs: "[]" } } } });
     expect(entries.map((e) => e.checkName)).toEqual([
       "Detect",
@@ -192,8 +168,6 @@ describe("a matrix taken from another job's outputs", () => {
   });
 
   it("does not carry the outputs into a called workflow", async () => {
-    // `needs` is workflow-scoped: a callee's `needs.detect` is the callee's own
-    // job, not the caller's. Inheriting the map would answer for the wrong one.
     const entries = await expandWorkflowJobs(
       {
         on: { pull_request: null },
@@ -210,7 +184,6 @@ describe("a matrix taken from another job's outputs", () => {
       SOURCE,
       { needs: { detect: { outputs: { langs: '["typescript"]' } } } },
     );
-    // The name is still resolvable — it is the guard that is not.
     expect(entries).toEqual([
       {
         job: "call / inner",
@@ -222,19 +195,10 @@ describe("a matrix taken from another job's outputs", () => {
   });
 });
 
-// A called workflow's guards are written against `inputs.*`, so expansion has
-// to carry the caller's `with:` block across the call or every one of them is
-// unknown. The job status below is the readout: `run` means the guard resolved
-// true, `skipped` false, and `unknown` that the input never became a literal.
 describe("caller inputs reaching a called workflow", () => {
   const SOURCE = { owner: "o", repo: "r", ref: "main", sha: SHA };
   const CTX = { action: "opened", baseRef: "main", files: ["src/app.txt"] };
 
-  /**
-   * A called workflow, as the text `fetchWorkflow` hands back. JSON is valid
-   * YAML, so serializing the document is enough — and it keeps this suite from
-   * importing `yaml`, which a unit test has no business reaching for.
-   */
   const calleeDoc = (doc: Record<string, unknown>) => JSON.stringify(doc);
 
   const call = async (
@@ -277,15 +241,10 @@ describe("caller inputs reaching a called workflow", () => {
   });
 
   it("leaves a templated value unknown rather than guessing at it", async () => {
-    // Resolving `${{ }}` here would mean evaluating the caller's own context.
-    // Every caller in the fleet passes plain literals, so the unknown costs
-    // nothing and the guess would cost correctness.
     expect((await call({ x: "${{ github.ref }}" }, "inputs.x == 'v'")).status).toBe("unknown");
   });
 
   it("leaves a structured value unknown", async () => {
-    // `with:` takes scalars. A map or a sequence is not something the callee
-    // could compare against a string anyway.
     expect((await call({ x: { nested: true } }, "inputs.x == 'v'")).status).toBe("unknown");
     expect((await call({ x: ["a"] }, "inputs.x == 'v'")).status).toBe("unknown");
   });
@@ -293,12 +252,10 @@ describe("caller inputs reaching a called workflow", () => {
   it("falls back to the input's declared default when the caller omits it", async () => {
     const on = { workflow_call: { inputs: { x: { type: "string", default: "d" } } } };
     expect((await call({}, "inputs.x == 'd'", on)).status).toBe("run");
-    // The caller still wins where it does supply a value.
     expect((await call({ x: "v" }, "inputs.x == 'd'", on)).status).toBe("skipped");
   });
 
   it("leaves a declared input with no default unknown rather than empty", async () => {
-    // Guessing `''` here would silently decide a guard the workflow left open.
     expect((await call({}, "inputs.x == ''")).status).toBe("unknown");
   });
 
@@ -308,8 +265,6 @@ describe("caller inputs reaching a called workflow", () => {
   });
 
   it("reads the inputs block under a YAML 1.1 `on` parsed as true", async () => {
-    // A YAML 1.1 parser reads the `on:` key as boolean true. Expansion has to
-    // find the inputs under either spelling.
     const on = { workflow_call: { inputs: { x: { type: "string", default: "d" } } } };
     expect((await call({}, "inputs.x == 'd'", on, "true")).status).toBe("run");
   });
@@ -326,7 +281,6 @@ describe("caller inputs reaching a called workflow", () => {
   });
 
   it("does not leak the caller's inputs into a sibling job", async () => {
-    // Scope descends through a call; it does not spread sideways.
     const entries = await expandWorkflowJobs(
       {
         on: { pull_request: null },
@@ -348,16 +302,11 @@ describe("caller inputs reaching a called workflow", () => {
   });
 });
 
-// The executor seam: expansion asks it, before anything reads `needs`,
-// whether the caller granted a job — and folds what an execution yields into
-// the scope every later evaluation sees. The executor itself is faked here;
-// what it actually does when it runs things is execute.test.ts's subject.
 describe("granted execution during expansion", () => {
   const SOURCE: WorkflowSource = { owner: "o", repo: "r", ref: "main", sha: SHA };
   const CTX = { action: "opened", baseRef: "main", files: ["src/app.ts"] };
   const reader = readerOf(async () => null);
 
-  /** A detect-shaped workflow: one producer, one dynamic-matrix consumer. */
   const wfWith = (detect: Record<string, unknown> | null) => ({
     on: { pull_request: null },
     jobs: {
@@ -404,8 +353,6 @@ describe("granted execution during expansion", () => {
       {},
       executorReturning({ ok: true, outputs: { langs: "[]" } }),
     );
-    // Zero combinations is a real answer: the job creates no check at all,
-    // which is exactly what GitHub does with an empty axis.
     expect(entries).toEqual([{ job: "detect", checkName: "detect", status: "run", reason: "" }]);
   });
 
@@ -460,8 +407,6 @@ describe("granted execution during expansion", () => {
       executorReturning({ ok: true, outputs: { langs: '["ts"]' } }, log),
     );
     expect(log).toEqual([]);
-    // The consumer collapses the way a skipped dependency always does,
-    // keeping its unresolved name the way every skipped matrix job does.
     expect(entries[1]).toMatchObject({
       job: "Coverage (${{ matrix.language }})",
       status: "skipped",
@@ -511,8 +456,6 @@ describe("granted execution during expansion", () => {
   });
 
   it("reaches a granted job inside a called workflow", async () => {
-    // The grant names the repo the workflow *file* lives in; a local call
-    // keeps the caller's source, so the recursion is where it fires.
     const sub = JSON.stringify(wfWith({}));
     const entries = await expandWorkflowJobs(
       {

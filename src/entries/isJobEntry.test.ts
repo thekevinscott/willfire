@@ -12,6 +12,7 @@ describe("isJobEntry", () => {
       reason: "",
     } as unknown as Entry;
     expect(isJobEntry(e)).toBe(true);
+    expect(isJobEntry({ ...e, job: "a (linux)" } as unknown as Entry)).toBe(true);
   });
 
   it("is false for the workflow-level sentinel job", () => {

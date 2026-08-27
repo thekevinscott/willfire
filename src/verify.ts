@@ -1,10 +1,3 @@
-// Compare predict.ts output against what GitHub Actions actually dispatched.
-//
-// Usage: pnpm verify --repo owner/name --pr N
-//
-// Ground truth: workflow runs for the PR head SHA with a pull_request event,
-// and the job entries inside each run (skipped jobs included).
-
 import { Octokit } from "@octokit/rest";
 import { isJobEntry, makeOctokit, predict } from "./index.js";
 
@@ -53,9 +46,6 @@ const pr = Number(prArg);
 
 const octokit = makeOctokit();
 const { entries: predictedRaw } = await predict(octokit, repo, pr);
-// Compare on the resolved check name — that is the string GitHub actually
-// puts on the job. Entries whose name could not be resolved statically have
-// no key to compare and are reported separately below.
 const predicted = new Map(
   predictedRaw
     .filter(isJobEntry)
@@ -104,7 +94,6 @@ for (const key of keys) {
 for (const r of unresolved) {
   console.log(`  ?   ${r.workflow} :: ${r.job} :: name unresolved: ${r.reason}`);
 }
-
 
 console.log(ok ? "PASS" : "FAIL");
 process.exit(ok ? 0 : 1);

@@ -4,7 +4,6 @@ import type { Val } from "./val.js";
 
 const S = (v: string | number | boolean): Val => ({ kind: "value", v });
 
-// Names arrive already lowercased by the parser.
 describe("applyFunction", () => {
   it("treats always as true", () => {
     expect(applyFunction("always", [])).toEqual(S(true));

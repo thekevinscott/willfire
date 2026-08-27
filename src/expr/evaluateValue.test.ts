@@ -2,9 +2,6 @@ import { describe, expect, it } from "vitest";
 import { evaluateValue } from "./evaluateValue.js";
 import type { Scope } from "./val.js";
 
-// `fromJSON` is what a dynamic matrix axis is built out of, so unlike the
-// other functions its *value* is the point, not its truthiness. This is the
-// entry point that hands it back.
 describe("fromJSON values", () => {
   const NEEDS: Scope = {
     needs: { detect: { outputs: { langs: '["typescript","rust"]', empty: "[]" } } },
@@ -26,8 +23,6 @@ describe("fromJSON values", () => {
   });
 
   it("is unknown on a string it cannot parse", () => {
-    // A workflow that reaches this at runtime fails; predicting the failure is
-    // not this function's job.
     expect(evaluateValue("fromJSON('not json')")).toEqual({ kind: "unknown" });
   });
 

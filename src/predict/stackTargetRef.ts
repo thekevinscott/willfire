@@ -1,20 +1,8 @@
 import type { Octokit } from "@octokit/rest";
 import type { StackNode } from "../types.js";
 
-/** Past this the walk stops at the last proven hop, which only narrows reach. */
 const MAX_STACK_DEPTH = 10;
 
-/**
- * The branch this PR's stack ultimately targets, or null for a plain PR.
- *
- * GitHub's stacked-PR machinery (server-side, per-repo rollout — engaged on
- * dirsql, not on willrun-probe, so it cannot be inferred from PR structure)
- * builds a child PR's test merge on the parent PR's test merge and evaluates
- * `branches:` against the stack's terminal target (#30). The mode is read off
- * `merge_commit_sha`: its first parent is the base tip in normal mode and the
- * parent PR's own merge sha in stacked mode. Anything undecidable ends the
- * walk at the last proven hop; never throws.
- */
 export async function stackTargetRef(
   octokit: Octokit,
   owner: string,
@@ -43,12 +31,9 @@ export async function stackTargetRef(
         repo,
         ref: cur.base.ref,
       });
-      // Built on the base branch tip: normal mode, the walk is done.
       if (previewParent === baseTip.sha) {
         break;
       }
-      // Otherwise only an exact match against an open PR whose head is the
-      // base branch proves stacked mode; a stale preview matches nothing.
       const { data: candidates } = await octokit.rest.pulls.list({
         owner,
         repo,
@@ -64,7 +49,6 @@ export async function stackTargetRef(
       cur = parent;
     }
   } catch {
-    // Rate limit, permissions, network: stop at the last proven hop.
   }
   return target;
 }

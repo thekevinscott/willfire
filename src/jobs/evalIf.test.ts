@@ -23,7 +23,6 @@ describe("evalIf", () => {
   });
 
   it("resolves against the scope the caller handed in", () => {
-    // The scope param is the expr module's own Scope, not a structural copy.
     const hit: Scope = { inputs: { x: { kind: "value", v: "v" } } };
     const miss: Scope = { inputs: { x: { kind: "value", v: "w" } } };
     expect(evalIf("inputs.x == 'v'", hit)).toBe("run");

@@ -8,14 +8,10 @@ describe("getPrTrigger", () => {
   });
 
   it("is MISSING for an on that is an unusable scalar", () => {
-    // `on: true` — YAML 1.2 keeps the key a string and the value a boolean, so
-    // there is no trigger map to read.
     expect(getPrTrigger({ on: true } as Workflow)).toBe(MISSING);
   });
 
   it("reads the YAML 1.1 boolean-key spelling of on", () => {
-    // A parser that folds `on:` to boolean `true` leaves the trigger under the
-    // key `true`. The fallback keeps such a file readable.
     expect(getPrTrigger({ true: { pull_request: null } } as Workflow)).toEqual({});
   });
 

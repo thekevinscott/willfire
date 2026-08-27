@@ -7,6 +7,7 @@ describe("renderName", () => {
       text: "build linux",
       resolved: true,
     });
+    expect(renderName("plain", null)).toEqual({ text: "plain", resolved: true });
   });
 
   it("stays unresolved with no combination to read from", () => {

@@ -26,18 +26,12 @@ export function parseArgs(argv: string[]): {
     console.error(USAGE);
     process.exit(2);
   }
-  // An unrecognised action is refused rather than ignored. Silently falling
-  // back to the guess would turn a typo into a wrong prediction, which is the
-  // failure this flag exists to remove.
   const action = get("--action");
   if (action !== undefined && !isPrEventAction(action)) {
     console.error(`unknown --action: ${action}`);
     console.error(USAGE);
     process.exit(2);
   }
-  // Repeatable, one grant per flag. A malformed grant is refused for the same
-  // reason a bad --action is: silently dropping it would predict without the
-  // execution the caller thought they asked for.
   const execute: ExecutionGrant[] = [];
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] !== "--execute") {

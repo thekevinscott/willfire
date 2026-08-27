@@ -7,7 +7,6 @@ vi.mock("./cursor.js", async () => {
   return { ...actual };
 });
 
-// parseCall is entered after the call's `(` was already consumed.
 describe("parseCall", () => {
   it("accepts an empty argument list", () => {
     const cur = new Cursor([{ t: "op", v: ")" }]);

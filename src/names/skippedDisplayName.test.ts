@@ -7,6 +7,10 @@ describe("skippedDisplayName", () => {
       name: "sk ${{ github.event_name }}",
       resolved: true,
     });
+    expect(skippedDisplayName("a", { name: "custom" })).toEqual({
+      name: "custom",
+      resolved: true,
+    });
   });
 
   it("falls back to the job id when there is no name", () => {

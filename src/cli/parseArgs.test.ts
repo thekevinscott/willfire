@@ -13,14 +13,16 @@ describe("parseArgs", () => {
     vi.restoreAllMocks();
   });
 
-  it("parses the minimal invocation", () => {
-    expect(parseArgs(["--repo", "o/r", "--pr", "1"])).toEqual({
+  it("parses the minimal invocation in either flag order", () => {
+    const want = {
       repo: "o/r",
       pr: 1,
       json: false,
       action: undefined,
       execute: [],
-    });
+    };
+    expect(parseArgs(["--repo", "o/r", "--pr", "1"])).toEqual(want);
+    expect(parseArgs(["--pr", "1", "--repo", "o/r"])).toEqual(want);
   });
 
   it("parses every flag", () => {

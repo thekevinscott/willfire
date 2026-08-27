@@ -14,7 +14,6 @@ describe("prScope", () => {
   });
 
   it("keeps every other key the caller stated", () => {
-    // In and out are the expr module's own Scope, not structural copies.
     const caller: Scope = { inputs: { x: { kind: "value", v: "v" } } };
     expect(prScope(caller)).toEqual({
       inputs: { x: { kind: "value", v: "v" } },

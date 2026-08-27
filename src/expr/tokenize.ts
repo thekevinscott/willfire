@@ -8,11 +8,6 @@ export type Tok =
 
 const OPS = ["&&", "||", "==", "!=", "<=", ">=", "!", "<", ">", "(", ")", "[", "]", ","];
 
-/**
- * Split a condition into tokens, or return null if it contains something this
- * evaluator has no token for. Returning null rather than throwing keeps the
- * "unrecognized is unknown" rule in one place at the top of `evaluate`.
- */
 export function tokenize(src: string): Tok[] | null {
   const out: Tok[] = [];
   let i = 0;
@@ -22,13 +17,12 @@ export function tokenize(src: string): Tok[] | null {
       i++;
       continue;
     }
-    // Single-quoted string. GitHub escapes an inner quote by doubling it.
     if (c === "'") {
       let j = i + 1;
       let s = "";
       for (;;) {
         if (j >= src.length) {
-          return null; // unterminated
+          return null;
         }
         if (src[j] === "'") {
           if (src[j + 1] === "'") {
@@ -74,7 +68,7 @@ export function tokenize(src: string): Tok[] | null {
       i += num[0].length;
       continue;
     }
-    return null; // a character we have no token for
+    return null;
   }
   return out;
 }

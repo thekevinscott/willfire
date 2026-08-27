@@ -1,22 +1,12 @@
-// The entrypoint is exercised the way node runs it: set argv, reset the module
-// registry, import. The dynamic import is the seam — a static import would run
-// the main block once, before any test staged its fixture.
-
 import type { Octokit } from "@octokit/rest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// The real `Octokit` constructor is the one third-party edge the entrypoint
-// reaches for through `makeOctokit`. Replacing the class lets it be driven
-// without a network. `hoisted` is the handoff: `vi.mock` factories are lifted
-// above the imports, so they cannot close over ordinary module scope.
 const hoisted = vi.hoisted(() => ({ octokit: undefined as unknown }));
 
 vi.mock("@octokit/rest", async () => {
   const actual = await vi.importActual<typeof import("@octokit/rest")>("@octokit/rest");
   return {
     ...actual,
-    // Returning an object from a constructor overrides `this`, so `new Octokit()`
-    // hands back whatever the case under test staged.
     Octokit: class {
       constructor(_options: { auth?: string }) {
         return (hoisted.octokit ?? {}) as object;
@@ -28,9 +18,7 @@ vi.mock("@octokit/rest", async () => {
 const WF = ".github/workflows/w.yml";
 
 interface Fixture {
-  /** Repo contents at head, keyed by path. A missing key is a 404. */
   contents?: Record<string, string>;
-  /** Head commit message — the surface the skip instructions are read from. */
   message?: string;
   commits?: number;
 }
@@ -39,9 +27,6 @@ const HEAD_SHA = "deadbeef";
 
 const HEAD_SOURCE = { owner: "o", repo: "r", ref: HEAD_SHA, sha: HEAD_SHA };
 
-// Sentinels standing in for the paginating route methods. `predict` passes the
-// method itself to `octokit.paginate`, never calls it, so identity is all the
-// stub needs to tell the two routes apart.
 const LIST_FILES = Symbol("pulls.listFiles");
 const LIST_WORKFLOWS = Symbol("actions.listRepoWorkflows");
 
@@ -101,7 +86,6 @@ describe("the CLI entrypoint", () => {
     vi.unstubAllEnvs();
   });
 
-  /** Re-import the module as if node had been pointed at it directly. */
   async function invoke(args: string[], f: Fixture = {}): Promise<void> {
     hoisted.octokit = fakeOctokit(f);
     process.argv = ["node", "/somewhere/cli.ts", ...args];
@@ -111,7 +95,6 @@ describe("the CLI entrypoint", () => {
 
   const WORKFLOW = "on: pull_request\njobs:\n  a: {}\n";
 
-  /** Provenance trails every plain-text run: one line, the head commit. */
   const HEAD_READ = `# read o/r@${HEAD_SHA} -> ${HEAD_SHA}`;
 
   it("stays quiet when the module is imported rather than run", async () => {
@@ -162,8 +145,6 @@ describe("the CLI entrypoint", () => {
   });
 
   it("passes --action through instead of inferring one", async () => {
-    // `types: [synchronize]` with a single commit: the heuristic says `opened`
-    // and the workflow would not dispatch.
     await invoke(["--repo", "o/r", "--pr", "1", "--action", "synchronize"], {
       contents: { [WF]: "on:\n  pull_request:\n    types: [synchronize]\njobs:\n  a: {}\n" },
     });
@@ -171,8 +152,6 @@ describe("the CLI entrypoint", () => {
   });
 
   it("passes --execute grants through to prediction", async () => {
-    // The grant names a repo no workflow here comes from, so nothing executes
-    // and nothing downloads — but the flag parses and the prediction runs.
     await invoke(["--repo", "o/r", "--pr", "1", "--execute", "x/y:detect"], {
       contents: { [WF]: WORKFLOW },
     });

@@ -1,13 +1,3 @@
-// Unit suite for the prediction/reality comparison script.
-//
-// `verify.ts` is a top-level script: importing it *is* running it. So each case
-// stands up the world it wants — argv, a stubbed `predict()`, and an Octokit
-// stand-in for the workflow-run queries — then re-imports the module and reads
-// back what it printed and the code it exited with.
-//
-// `./index.js` is mocked because it is the collaborator this script is being
-// isolated from; its own behavior is covered in `predict/predict.test.ts`.
-
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { jobName } from "./index.js";
 import type { Entry, JobEntry, WorkflowEntry } from "./index.js";
@@ -22,17 +12,12 @@ vi.mock("./index.js", async () => {
   return { ...actual, makeOctokit: hoisted.makeOctokit, predict: hoisted.predict };
 });
 
-// ------------------------------------------------------------------ fixtures
-
-// Sentinels standing in for the paginating route methods; the script passes the
-// method itself to `octokit.paginate` and never calls it.
 const LIST_RUNS = Symbol("actions.listWorkflowRunsForRepo");
 const LIST_JOBS = Symbol("actions.listJobsForWorkflowRun");
 
 interface RunFixture {
   id: number;
   path: string;
-  /** Anything but "completed" makes the script warn that the run is in flight. */
   status?: string;
   jobs: { name: string; conclusion: string }[];
 }
@@ -65,9 +50,6 @@ interface Invocation {
   runs?: RunFixture[];
 }
 
-// #9 made the comparison key the resolved check name rather than the job id, so
-// `checkName` defaults to the job id here and is passed explicitly only when a
-// case is about the two diverging — or about the name being unresolvable.
 const entry = (
   workflow: string,
   job: string,
@@ -75,8 +57,6 @@ const entry = (
   checkName: string | null = job,
 ): JobEntry => ({ workflow, job: jobName(job), checkName, status, reason: "because" });
 
-// `jobName` refuses the workflow-level sentinel at the type level — that is what
-// #11 bought — so the other variant needs its own constructor.
 const wfEntry = (
   workflow: string,
   status: WorkflowEntry["status"],
@@ -100,7 +80,6 @@ describe("verify", () => {
     vi.resetAllMocks();
   });
 
-  /** Run the script end to end and return what it printed and how it exited. */
   async function invoke({
     argv: args = ["--repo", "o/r", "--pr", "1"],
     predicted = [],
@@ -155,8 +134,6 @@ describe("verify", () => {
   });
 
   it("does not judge an unpredicted entry from a workflow with an unknown in it", async () => {
-    // A dynamic matrix or a non-local reusable call makes the whole workflow's
-    // job list unknowable, so extra entries from it are not a miss.
     const code = await invoke({
       predicted: [entry("w.yml", "known", "unknown")],
       runs: [
@@ -213,11 +190,6 @@ describe("verify", () => {
     expect(out[0]).toBe("WARNING: runs still in progress: w.yml");
   });
 
-  // #11 closed the workflow-level variant so it cannot carry `unknown`, and
-  // deleted the trailing "workflow-level unknown" report that existed to
-  // surface one. What is left to pin down is that neither workflow-level
-  // status leaks into the job comparison: `run` says a run exists, not that any
-  // check entry does, so it must not read as a MISS.
   it("does not compare a dispatching workflow-level entry as a job", async () => {
     const code = await invoke({ predicted: [wfEntry("w.yml", "run")], runs: [] });
     expect(out).toEqual(["PASS"]);
@@ -225,10 +197,6 @@ describe("verify", () => {
   });
 
   it("reports an entry whose check name could not be resolved, and judges nothing", async () => {
-    // #9 made the comparison key the resolved name, so an entry without one has
-    // nothing to compare against. It is reported and its workflow is marked
-    // unknown, which also stops the real checks in that workflow reading as
-    // OVER — under-reporting beats a false failure.
     const code = await invoke({
       predicted: [entry("w.yml", "a", "run", null)],
       runs: [

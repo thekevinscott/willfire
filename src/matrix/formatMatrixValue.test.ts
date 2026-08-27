@@ -18,5 +18,6 @@ describe("formatMatrixValue", () => {
   it("stringifies a scalar", () => {
     expect(formatMatrixValue("linux")).toBe("linux");
     expect(formatMatrixValue(20)).toBe("20");
+    expect(formatMatrixValue(true)).toBe("true");
   });
 });

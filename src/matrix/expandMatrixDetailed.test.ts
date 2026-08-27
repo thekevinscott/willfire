@@ -9,9 +9,6 @@ describe("expandMatrixDetailed", () => {
   });
 
   it("shows only the axis keys for a combination an include merged into", () => {
-    // The parenthetical in a check name lists axis values, not the extras an
-    // include entry attached — but a combination the include *created* shows
-    // every key it has.
     const combos = expandMatrixDetailed({
       matrix: { a: ["x"], include: [{ a: "x", extra: "e1" }, { a: "z", extra: "e2" }] },
     });
@@ -26,7 +23,6 @@ describe("expandMatrixDetailed", () => {
   });
 
   it("resolves an axis written as an expression through the scope", () => {
-    // Typed as the expr module's own Scope — the seam this function takes.
     const scope: Scope = { needs: { d: { outputs: { langs: '["ts","rust"]' } } } };
     expect(
       expandMatrixDetailed({ matrix: { language: "${{ fromJSON(needs.d.outputs.langs) }}" } }, scope),

@@ -272,13 +272,13 @@ describe("workflow-level verdicts", () => {
     mergeSha: "m-child",
     refs: {
       "o/r@m-child": "m-child",
-      "o/r@feature-1": "tip-1", // the base tip is NOT what the preview sits on
+      "o/r@feature-1": "tip-1",
       "o/r@m-parent": "m-parent",
       "o/r@main": "tip-main",
     },
     parents: {
-      "m-child": ["m-parent"], // built on the parent PR's test merge: stacked
-      "m-parent": ["tip-main"], // parent built on the main tip: walk ends here
+      "m-child": ["m-parent"],
+      "m-parent": ["tip-main"],
     },
     openPrs: [{ headRef: "feature-1", baseRef: "main", mergeSha: "m-parent" }],
   };

@@ -1,6 +1,5 @@
 import { patternToRegex } from "./patternToRegex.js";
 
-/** Order-sensitive match: last matching pattern wins; ! negates. */
 export function matchFilters(value: string, patterns: string[]): boolean {
   let matched = false;
   for (const pat of patterns) {
