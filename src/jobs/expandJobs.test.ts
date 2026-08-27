@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { expandJobs } from "./expandJobs.js";
 import type { Scope } from "../expr/val.js";
+import type { ExecOutcome, JobExecutor } from "../execute/types.js";
 import type {
   Ctx,
   FetchWorkflow,
@@ -397,6 +398,72 @@ describe("reusable workflows", () => {
       job: "call",
       status: "unknown",
       reason: "unresolvable reusable reference: not-a-reference",
+    });
+  });
+});
+
+describe("granted execution", () => {
+  const executorOf = (results: Record<string, ExecOutcome>): JobExecutor => ({
+    granted: (_source, jobId) => jobId in results,
+    executeJob: async (jobId) => results[jobId],
+  });
+
+  it("resolves a dynamic matrix from a granted job's outputs", async () => {
+    const ex = executorOf({ detect: { ok: true, outputs: { m: '["linux","mac"]' } } });
+    const entries = await expandJobs(
+      {
+        on: { pull_request: null },
+        jobs: {
+          detect: {},
+          use: {
+            needs: ["detect"],
+            strategy: { matrix: { os: "${{ fromJSON(needs.detect.outputs.m) }}" } },
+          },
+        },
+      } as Workflow,
+      CTX,
+      readerFor({}),
+      SOURCE,
+      0,
+      "",
+      true,
+      {},
+      ex,
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["detect", "run"],
+      ["use (linux)", "run"],
+      ["use (mac)", "run"],
+    ]);
+  });
+
+  it("threads a failed execution's reason into the entries that needed it", async () => {
+    const ex = executorOf({ detect: { ok: false, reason: "boom" } });
+    const entries = await expandJobs(
+      {
+        on: { pull_request: null },
+        jobs: {
+          detect: {},
+          use: {
+            needs: ["detect"],
+            strategy: { matrix: { os: "${{ fromJSON(needs.detect.outputs.m) }}" } },
+          },
+        },
+      } as Workflow,
+      CTX,
+      readerFor({}),
+      SOURCE,
+      0,
+      "",
+      true,
+      {},
+      ex,
+    );
+    expect(entries[1]).toEqual({
+      job: "use",
+      checkName: null,
+      status: "unknown",
+      reason: "dynamic matrix; executing 'detect' failed: boom",
     });
   });
 });
