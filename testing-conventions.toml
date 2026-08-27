@@ -5,3 +5,48 @@
 path = "types.ts"
 rules = ["colocated-test", "co-change"]
 reason = "types-only module with no runtime behavior; nothing executes at runtime to test"
+
+# The next block is stack-scoped to the eslint stock-rules PRs (#82-#95):
+# mechanical eqeqeq precise-form conversions where the null/undefined boundary
+# the conversion committed to is already pinned by a named assertion in the
+# colocated test. Remove the block once the stack merges.
+
+[[typescript.exempt]]
+path = "expr/evaluateValue.ts"
+rules = ["co-change"]
+reason = "eqeqeq conversion only; the tokenize-failure boundary is pinned by 'refuses the same shapes evaluate refuses'"
+
+[[typescript.exempt]]
+path = "jobs/evalIf.ts"
+rules = ["co-change"]
+reason = "eqeqeq conversion only; evalIf(null) and evalIf(undefined) are each pinned to 'run' in the colocated table"
+
+[[typescript.exempt]]
+path = "matrix/expandMatrix.ts"
+rules = ["co-change"]
+reason = "eqeqeq conversion only; the null-return (dynamic matrix) and null-combo cases are pinned by 'gives up on a matrix that is an expression' and 'returns a single null combination'"
+
+[[typescript.exempt]]
+path = "matrix/formatMatrixValue.ts"
+rules = ["co-change"]
+reason = "eqeqeq conversion only; pinned by 'renders null and undefined as nothing'"
+
+[[typescript.exempt]]
+path = "names/jobDisplayName.ts"
+rules = ["co-change"]
+reason = "eqeqeq conversion only; the name:-null and name:-absent fallbacks are pinned; a null job itself is unconstructible under Workflow without a cast"
+
+[[typescript.exempt]]
+path = "names/skippedDisplayName.ts"
+rules = ["co-change"]
+reason = "eqeqeq conversion only; pinned by 'falls back to the job id when there is no name'"
+
+[[typescript.exempt]]
+path = "triggers/workflowDispatches.ts"
+rules = ["co-change"]
+reason = "eqeqeq conversion only; the base-branch and stack-target reason labels are each pinned by name"
+
+[[typescript.exempt]]
+path = "verify.ts"
+rules = ["co-change"]
+reason = "eqeqeq conversion only; the null-checkName entry is pinned by the 'name unresolved' line of the e2e drive"
