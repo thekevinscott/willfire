@@ -105,12 +105,16 @@ async function execute(
 }
 
 const failure = (o: ExecOutcome): string => {
-  if (o.ok) throw new Error("expected a failure");
+  if (o.ok) {
+    throw new Error("expected a failure");
+  }
   return o.reason;
 };
 
 const success = (o: ExecOutcome): Record<string, string> => {
-  if (!o.ok) throw new Error(`expected success, got: ${o.reason}`);
+  if (!o.ok) {
+    throw new Error(`expected success, got: ${o.reason}`);
+  }
   return o.outputs;
 };
 

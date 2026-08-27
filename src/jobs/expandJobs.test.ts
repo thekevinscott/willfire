@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { expandJobs } from "./expandJobs.js";
+import type { Scope } from "../expr/val.js";
 import type {
   Ctx,
   FetchWorkflow,
@@ -42,6 +43,22 @@ const expand = (jobs: Record<string, unknown>, reader: WorkflowReader = readerFo
   expandJobs({ on: { pull_request: null }, jobs } as Workflow, CTX, reader, SOURCE);
 
 describe("job expansion", () => {
+  it("decides job guards against the scope the caller handed in", async () => {
+    // The scope param is the expr module's own Scope, threaded into evalIf.
+    const scope: Scope = { inputs: { x: { kind: "value", v: "v" } } };
+    const entries = await expandJobs(
+      { on: { pull_request: null }, jobs: { a: { if: "inputs.x == 'v'" } } } as Workflow,
+      CTX,
+      readerFor({}),
+      SOURCE,
+      0,
+      "",
+      true,
+      scope,
+    );
+    expect(entries).toEqual([{ job: "a", checkName: "a", status: "run", reason: `if: "inputs.x == 'v'"` }]);
+  });
+
   it("tolerates a job whose body is empty", async () => {
     const entries = await expand({ a: null });
     expect(entries).toEqual([{ job: "a", checkName: "a", status: "run", reason: "" }]);
