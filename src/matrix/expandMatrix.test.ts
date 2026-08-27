@@ -80,10 +80,6 @@ describe("expandMatrix", () => {
     expect(expandMatrix({ matrix: { os: ["linux"], exclude: [{ os: "linux" }] } })).toEqual([]);
   });
 
-  it("returns no combinations for an empty axis", () => {
-    expect(expandMatrix({ matrix: { language: [] } })).toEqual([]);
-  });
-
   it("returns no combinations when any axis is empty", () => {
     // The product with an empty axis is empty, however many values the other
     // axes carry.
