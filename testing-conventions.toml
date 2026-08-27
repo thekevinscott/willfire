@@ -1,0 +1,230 @@
+# Co-change exemptions for the eslint formatting sweep (#48). Each lifts only
+# the co-change rule — colocated-test presence and the 100% coverage floor
+# still apply to every file here. The sweep braced single-statement bodies
+# mechanically with no behavior change; coverage was already 100%, so a test
+# co-change would be filler. Delete this file once the sweep lands on main.
+
+[[typescript.exempt]]
+path = "execute/bindActionInputs.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "execute/makeCloneProvider.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "execute/makeTreeProvider.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "execute/materialize.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "execute/parseActionUses.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "execute/parseGithubOutput.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "execute/renderEnvLayer.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "execute/runCheckout.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "execute/runNodeAction.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "execute/runRun.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "execute/runSetupNode.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "execute/runShell.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "execute/runSteps.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "execute/runUses.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "expr/applyFunction.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "expr/coalesceAnd.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "expr/coalesceOr.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "expr/compare.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "expr/evaluateValue.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "expr/fromJson.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "expr/indexVal.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "expr/lookup.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "expr/parseAtom.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "expr/parseCall.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "expr/parsePrimary.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "expr/tokenize.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "expr/truthy.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "filters/matchFilters.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "jobs/deriveStatus.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "jobs/evalIf.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "jobs/executeNeeded.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "jobs/inputValue.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "jobs/workflowCallInputs.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "matrix/expandMatrixDetailed.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "matrix/formatMatrixValue.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "matrix/matrixSuffix.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "names/lookupPath.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "names/renderName.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "predict/finalizePrediction.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "predict/makeOctokit.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "sandbox/sandboxArgv.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "triggers/getPrTrigger.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "triggers/workflowDispatches.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "uses/parseUses.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
+
+[[typescript.exempt]]
+path = "verify.ts"
+rules = ["co-change"]
+reason = "mechanical curly formatting sweep (#48); no behavior change"
