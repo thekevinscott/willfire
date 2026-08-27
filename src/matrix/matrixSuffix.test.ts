@@ -6,6 +6,10 @@ describe("matrixSuffix", () => {
     expect(matrixSuffix({ values: {}, displayKeys: [] })).toBe("");
   });
 
+  it("keeps a key whose value is null, rendering it empty", () => {
+    expect(matrixSuffix({ values: { a: null }, displayKeys: ["a"] })).toBe(" ()");
+  });
+
   it("skips a display key the combination does not carry", () => {
     expect(matrixSuffix({ values: { a: "x" }, displayKeys: ["a", "gone"] })).toBe(" (x)");
   });

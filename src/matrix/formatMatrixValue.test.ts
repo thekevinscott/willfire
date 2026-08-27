@@ -15,6 +15,10 @@ describe("formatMatrixValue", () => {
     expect(formatMatrixValue({ os: "linux", arch: "x64" })).toBe("linux, x64");
   });
 
+  it("flattens nested composites recursively", () => {
+    expect(formatMatrixValue([["a", "b"], { c: "d" }])).toBe("a, b, d");
+  });
+
   it("stringifies a scalar", () => {
     expect(formatMatrixValue("linux")).toBe("linux");
     expect(formatMatrixValue(20)).toBe("20");

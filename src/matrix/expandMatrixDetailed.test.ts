@@ -8,6 +8,15 @@ describe("expandMatrixDetailed", () => {
     expect(expandMatrixDetailed({})).toEqual([null]);
   });
 
+  it("expands two static axes to their full cross product in order", () => {
+    expect(expandMatrixDetailed({ matrix: { os: ["linux", "mac"], node: [18, 20] } })).toEqual([
+      { values: { os: "linux", node: 18 }, displayKeys: ["os", "node"] },
+      { values: { os: "linux", node: 20 }, displayKeys: ["os", "node"] },
+      { values: { os: "mac", node: 18 }, displayKeys: ["os", "node"] },
+      { values: { os: "mac", node: 20 }, displayKeys: ["os", "node"] },
+    ]);
+  });
+
   it("shows only the axis keys for a combination an include merged into", () => {
     // The parenthetical in a check name lists axis values, not the extras an
     // include entry attached — but a combination the include *created* shows
