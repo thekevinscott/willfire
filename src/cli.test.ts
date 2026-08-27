@@ -170,12 +170,4 @@ describe("the CLI entrypoint", () => {
     expect(out).toEqual([`${WF} :: a :: run`, HEAD_READ]);
   });
 
-  it("passes --execute grants through to prediction", async () => {
-    // The grant names a repo no workflow here comes from, so nothing executes
-    // and nothing downloads — but the flag parses and the prediction runs.
-    await invoke(["--repo", "o/r", "--pr", "1", "--execute", "x/y:detect"], {
-      contents: { [WF]: WORKFLOW },
-    });
-    expect(out).toEqual([`${WF} :: a :: run`, HEAD_READ]);
-  });
 });

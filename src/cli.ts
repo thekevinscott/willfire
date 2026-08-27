@@ -15,7 +15,6 @@ if (isMain) {
   const args = parseArgs(process.argv.slice(2));
   const prediction = await predict(makeOctokit(), args.repo, args.pr, {
     action: args.action,
-    execute: args.execute,
   });
   const { entries, skip, sources } = prediction;
   if (args.json) {

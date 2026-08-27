@@ -25,6 +25,27 @@ function axisValues(v: unknown, scope: Scope): unknown[] | null {
   return val.v;
 }
 
+/**
+ * An `include:`/`exclude:` block: a literal list or an expression evaluating
+ * to one. Absent means empty; anything unresolvable fails the expansion.
+ */
+function comboList(v: unknown, scope: Scope): any[] | null {
+  if (v === null || v === undefined) {
+    return [];
+  }
+  if (Array.isArray(v)) {
+    return v;
+  }
+  if (typeof v !== "string") {
+    return null;
+  }
+  const val = evaluateValue(v, scope);
+  if (val.kind !== "json" || !Array.isArray(val.v)) {
+    return null;
+  }
+  return val.v;
+}
+
 export function expandMatrixDetailed(strategy: any, scope: Scope = {}): DetailedCombos {
   const matrix = strategy?.matrix;
   if (matrix == null) {
@@ -36,9 +57,9 @@ export function expandMatrixDetailed(strategy: any, scope: Scope = {}): Detailed
   if (typeof matrix === "string") {
     return null;
   }
-  const include: any[] = matrix.include ?? [];
-  const exclude: any[] = matrix.exclude ?? [];
-  if (typeof include === "string" || typeof exclude === "string") {
+  const include = comboList(matrix.include, scope);
+  const exclude = comboList(matrix.exclude, scope);
+  if (include === null || exclude === null) {
     return null;
   }
   const axes: Record<string, any[]> = {};

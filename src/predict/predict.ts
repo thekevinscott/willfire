@@ -9,11 +9,11 @@
 import type { Octokit } from "@octokit/rest";
 import { parse as parseYaml } from "yaml";
 import { jobName } from "../entries/jobName.js";
-import { makeExecutor, makeTreeProvider, runShell, type JobExecutor } from "../execute.js";
 import type { Scope } from "../expr/val.js";
 import { expandJobs } from "../jobs/expandJobs.js";
 import { workflowDispatches } from "../triggers/workflowDispatches.js";
 import { finalizePrediction } from "./finalizePrediction.js";
+import { makeLiveExecutor } from "./makeLiveExecutor.js";
 import { sourceKey } from "./sourceKey.js";
 import { stackTargetRef } from "./stackTargetRef.js";
 import type {
@@ -146,35 +146,11 @@ export async function predict(
 
   const reader: WorkflowReader = { fetchWorkflow, resolveRef };
 
-  // The executor exists only when the caller granted something. Trees come
-  // from the tarball endpoint at the resolved commit, and every subprocess —
-  // `tar` included — goes through the one `runShell` seam.
-  let executor: JobExecutor | undefined;
-  if (opts.execute !== undefined && opts.execute.length > 0) {
-    const download = async (src: WorkflowSource): Promise<Uint8Array | null> => {
-      try {
-        const { data } = await octokit.rest.repos.downloadTarballArchive({
-          owner: src.owner,
-          repo: src.repo,
-          ref: src.sha,
-        });
-        return new Uint8Array(data as ArrayBuffer);
-      } catch {
-        // Private, deleted, rate limit, network: one answer, and the entries
-        // behind it stay unresolved with the failure named.
-        return null;
-      }
-    };
-    executor = makeExecutor({
-      grants: opts.execute,
-      workspace: headSource,
-      deps: {
-        provideTree: makeTreeProvider(download, runShell),
-        runCommand: runShell,
-        resolveRef,
-      },
-    });
-  }
+  // Execution is on by default and costs nothing until a workflow needs it.
+  const executor =
+    opts.executor === undefined
+      ? makeLiveExecutor(octokit, headSource, resolveRef)
+      : (opts.executor ?? undefined);
 
   const workflows = await octokit.paginate(octokit.rest.actions.listRepoWorkflows, {
     ...base,
