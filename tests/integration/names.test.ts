@@ -1,11 +1,6 @@
-// Check-name resolution, pinned to observed GitHub behaviour.
-//
-// Every expectation in this file was read back from a live dispatch on
-// thekevinbot/willrun-probe: PR #8 for `.github/workflows/names.yml` and
-// `names-caller.yml`, PR #9 for `remote-caller.yml` (all mirrored under
-// `tests/fixtures/willrun-probe/`). The fixtures below are that same YAML; the
-// expected names are the `name` field of the jobs the run actually created.
-// Nothing here is inferred from the docs alone.
+// Every expectation here was read back from a live dispatch on
+// thekevinbot/willrun-probe — PR #8 for `names.yml` and `names-caller.yml`,
+// PR #9 for `remote-caller.yml` — not inferred from the docs.
 
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -19,12 +14,9 @@ import {
 } from "../../src/index.js";
 
 /**
- * A workflow from the probe tree, read rather than restated.
- *
- * The expectations below are only ground truth while the YAML under test is the
- * YAML that ran, and a second copy is a copy that drifts. Inlining also forces
- * every `${{` to be hand-escaped for the template literal, which is a silent way
- * to change what a fixture asserts while it still parses.
+ * Read from the probe tree rather than inlined: a second copy drifts, and
+ * hand-escaping every `${{` for a template literal silently changes what a
+ * fixture asserts while it still parses.
  */
 const workflow = (name: string) =>
   readFileSync(
@@ -34,7 +26,6 @@ const workflow = (name: string) =>
 
 const ctx = { action: "opened", baseRef: "main", files: ["src/app.txt"] };
 
-/** The probe repo at the PR head — the repo and ref expansion starts from. */
 const HEAD: WorkflowSource = {
   owner: "thekevinbot",
   repo: "willrun-probe",
@@ -43,24 +34,20 @@ const HEAD: WorkflowSource = {
 };
 
 /**
- * A workflow file's full address. Fixtures key on this rather than on a bare
- * path so a lookup that resolves against the wrong repo or the wrong ref
- * misses instead of quietly finding the caller's copy.
+ * Fixtures key on the full address, not a bare path, so a lookup against the
+ * wrong repo or ref misses instead of quietly finding the caller's copy.
  */
 const at = (source: SourceRef, path: string) =>
   `${source.owner}/${source.repo}/${path}@${source.ref}`;
 
-/** Address a file in the probe repo at head, the way a local `./` call does. */
 const local = (path: string) => at(HEAD, path);
 
 async function jobs(yaml: string, files: Record<string, string> = {}) {
   const wf = parseYaml(yaml);
   const fetchWorkflow = async (p: string, source: WorkflowSource) =>
     files[at(source, p)] ?? null;
-  // Every ref in these fixtures is its own commit. This suite is about the
-  // names expansion produces, and resolving `remote-v0` to a hex string here
-  // would only rename the keys in `files` — the ref-to-commit step has its own
-  // tests in the unit suite.
+  // Every ref in these fixtures is its own commit, so resolving `remote-v0` to
+  // a hex string would only rename the keys in `files`.
   const resolveRef = async (source: SourceRef) => source.ref;
   const entries = await expandWorkflowJobs(wf, ctx, { fetchWorkflow, resolveRef }, HEAD);
   return entries.map((e) => ({ job: e.job, checkName: e.checkName, status: e.status }));
@@ -244,8 +231,6 @@ jobs:
     ]);
 });
 
-// ------------------------------------------------------- reusable workflows
-
 const REUSABLE = workflow("names-reusable.yml");
 
 const MID = workflow("names-mid.yml");
@@ -321,31 +306,20 @@ jobs:
     ]);
 });
 
-// --------------------------------------------- remote (cross-repo) reusables
-
 /**
- * The `owner/repo/path@ref` form, pinned to probe PR #9
- * (`.github/workflows/remote-caller.yml`, mirrored under the fixture tree).
- *
- * The probe is built so the answers cannot be guessed. `remote-reusable.yml`
- * and `remote-inner.yml` exist at three refs that deliberately disagree:
+ * `remote-reusable.yml` and `remote-inner.yml` exist at three refs that
+ * deliberately disagree, so the job name in a check says which ref GitHub read:
  *
  *   tag `remote-v0` / its SHA -> `r-inner`,          `deep-at-v0`
  *   branch `main`             -> `r-inner-at-main`,  `deep-at-main`
  *   the PR head               -> (same as main)
- *
- * so the job name that shows up in a check says which ref GitHub read, and
- * the fixtures below key on the full `owner/repo/path@ref` address for the
- * same reason: a lookup that resolves against the wrong ref finds the wrong
- * file rather than quietly finding the right one.
  */
 const REMOTE_REUSABLE = workflow("remote-reusable.yml");
 const REMOTE_INNER = workflow("remote-inner.yml");
 
 /**
- * The `remote-v0` variant of a checked-in file. `setup-probe.sh` builds that
- * tag by renaming exactly these two jobs in the `main` copies, so mirroring the
- * rename keeps both refs sourced from one file instead of two.
+ * `setup-probe.sh` builds the `remote-v0` tag by renaming exactly these two
+ * jobs in the `main` copies; mirroring the rename keeps both refs on one file.
  */
 const atV0 = (yaml: string) =>
   yaml
@@ -353,10 +327,8 @@ const atV0 = (yaml: string) =>
     .replace(/^  deep-at-main:$/m, "  deep-at-v0:");
 
 /**
- * The decoy, and the one variant with no file behind it. The probe repo's PR
- * head carries its own `remote-inner.yml`; this stands in for it under a third
- * job name so resolving the callee's `./` call against the caller finds a file
- * and produces a plausible wrong name rather than a miss.
+ * The decoy. Resolving the callee's `./` call against the caller has to find a
+ * file and produce a plausible wrong name, not a miss.
  */
 const REMOTE_INNER_AT_CALLER_HEAD = REMOTE_INNER.replace(
   /^  deep-at-main:$/m,
@@ -366,9 +338,8 @@ const REMOTE_INNER_AT_CALLER_HEAD = REMOTE_INNER.replace(
 const REMOTE_CALLER = workflow("remote-caller.yml");
 
 /**
- * The SHA `remote-v0` points at. Read out of the caller that pins it rather
- * than restated: `setup-probe.sh` rewrites that line to whatever the tag
- * resolves to at push time, so a literal here would go stale on the next seed.
+ * `setup-probe.sh` rewrites the pinned SHA at push time, so a literal here
+ * would go stale on the next seed.
  */
 const V0_SHA = (() => {
   const m = REMOTE_CALLER.match(/remote-reusable\.yml@([0-9a-f]{40})$/m);
@@ -464,10 +435,9 @@ jobs:
 });
 
 test("a remote call costs one level of depth, same as a local one", async () => {
-  // Four `uses:` deep is the limit. This chain alternates local and remote
-  // hops — local, remote, local, remote — so the counter has to have counted
-  // both kinds for the fifth hop to be the one declined. The fifth here is
-  // `r-call-local`, the callee's own `./` call.
+  // Four `uses:` deep is the limit. The chain alternates local and remote hops,
+  // so the counter has to have counted both kinds for the fifth — the callee's
+  // own `./` call — to be the one declined.
   const chain = (uses: string) => `
 on: { workflow_call: {} }
 jobs:
@@ -494,9 +464,8 @@ jobs:
 });
 
 test("a remote callee that cannot be fetched is one unknown entry", async () => {
-  // Probe-observed shape on `remote-bad.yml`: GitHub fails the whole run at
-  // startup and creates no job checks at all. One `unknown` entry is the
-  // conservative reading — it is never a name we would compare against.
+  // Probe-observed on `remote-bad.yml`: GitHub fails the whole run at startup
+  // and creates no job checks. One `unknown` is the conservative reading.
   expect(await jobs(
       `
 jobs:
