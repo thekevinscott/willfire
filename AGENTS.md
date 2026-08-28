@@ -28,17 +28,6 @@ Unit tests are **colocated** with their source (`foo.ts` ↔ `foo.test.ts`) at
 [testing-conventions](https://github.com/thekevinscott/testing-conventions)
 standard, enforced by `.github/workflows/conventions.yml`.
 
-There are no exemptions, and no `testing-conventions.toml` to write one in. A
-red gate means the code is wrong or the gate is wrong upstream. Fix whichever
-it is. `verify.ts` is a top-level script and still gets driven end to end by
-its colocated test rather than waived.
-
-`src/types.ts` is the standing trap. The presence check skips type-only
-modules, but co-change still asks for a colocated test the file cannot have, so
-editing it turns the PR red. Put the type in the module that owns it instead,
-and move the ones already there out as you touch them. Do not bring the waiver
-back.
-
 The expectations in `src/predict.test.ts` are **not** opinions about how GitHub
 ought to behave. Every workflow-level verdict was read off a live dispatch on
 [willrun-probe](https://github.com/thekevinbot/willrun-probe); the workflows
