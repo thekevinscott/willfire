@@ -1,7 +1,0 @@
-# Exemptions from the testing-conventions gates. Every entry needs a written
-# reason; the bar for adding one is high (see AGENTS.md).
-
-[[typescript.exempt]]
-path = "types.ts"
-rules = ["colocated-test", "co-change"]
-reason = "types-only module with no runtime behavior; nothing executes at runtime to test"
