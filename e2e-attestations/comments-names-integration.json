@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1787877764,
+  "exit_code": 0,
+  "commit": "7fdcaee3feb40aec4f86b399008426d48c7c1839",
+  "branch": "comments-names-integration"
+}
