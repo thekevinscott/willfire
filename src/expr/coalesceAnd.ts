@@ -2,9 +2,8 @@ import { truthy } from "./truthy.js";
 import { UNKNOWN, type Val } from "./val.js";
 
 /**
- * `A && B`. Short-circuits from either side: a falsy left decides it, and so
- * does a falsy right, because a truthy left would then yield the falsy right.
- * Only "left unknown, right not falsy" is genuinely undecided.
+ * Short-circuits from either side: a falsy right decides it too, because a
+ * truthy left would then yield that falsy right.
  */
 export function coalesceAnd(left: Val, right: Val): Val {
   const l = truthy(left);
