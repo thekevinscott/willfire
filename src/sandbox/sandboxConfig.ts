@@ -1,7 +1,4 @@
-/**
- * The node major the image ships — also the refusal boundary for `setup-node`
- * and `node2x` runtimes asking for any other major.
- */
+/** Also the refusal boundary: `setup-node` and `node2x` get no other major. */
 export const SANDBOX_NODE_MAJOR = 24;
 
 // git and python3: checkout's postcondition and the interpreters a script on
