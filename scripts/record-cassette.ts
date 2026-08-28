@@ -1,21 +1,13 @@
-/**
- * Regenerate one pinned-PR cassette from a live dispatch.
- *
- *   pnpm exec tsx tests/fixtures/pinned/record.ts \
- *     --repo owner/name --pr N --shape "what this pin holds"
- *
- * Needs GH_TOKEN (or GITHUB_TOKEN) and a working docker: job execution is
- * captured by running the jobs the way `predict` runs them, not by describing
- * what they would do. Refuses to write while any run for the head commit is
- * still in flight — an unfinished dispatch is not ground truth yet.
- */
+// Regenerates one pinned cassette from a live dispatch. Needs GH_TOKEN (or
+// GITHUB_TOKEN) and a working docker: job execution is captured by running the
+// jobs the way `predict` runs them, not by describing what they would do.
 
 import { writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { makeGithubClient, predict } from "../../../src/index.js";
-import type { GithubClient } from "../../../src/index.js";
-import type { GithubPullSummary } from "../../../src/predict/makeGithubClient.js";
-import { makeLiveExecutor } from "../../../src/predict/makeLiveExecutor.js";
+import { makeGithubClient, predict } from "../src/index.js";
+import type { GithubClient } from "../src/index.js";
+import type { GithubPullSummary } from "../src/predict/makeGithubClient.js";
+import { makeLiveExecutor } from "../src/predict/makeLiveExecutor.js";
 import {
   apiKey,
   execKey,
@@ -27,7 +19,7 @@ import {
   type Cassette,
   type DispatchedCheck,
   type ExecRecord,
-} from "./cassette.js";
+} from "../tests/fixtures/pinned/cassette.js";
 
 const arg = (flag: string): string | undefined => {
   const i = process.argv.indexOf(flag);
@@ -38,7 +30,7 @@ const repo = arg("--repo");
 const prArg = arg("--pr");
 const shape = arg("--shape");
 if (repo === undefined || prArg === undefined || shape === undefined) {
-  console.error('usage: record --repo owner/name --pr N --shape "what this pin holds"');
+  console.error('usage: record-cassette --repo owner/name --pr N --shape "what this pin holds"');
   process.exit(2);
 }
 const prNumber = Number(prArg);
@@ -47,14 +39,8 @@ const [owner, name] = repo.split("/");
 const api = new Map<string, ApiRecord>();
 const exec = new Map<string, ExecRecord>();
 
-/**
- * Wrap one read so its answer lands in the cassette. `project` narrows the
- * response to the fields `GithubClient` declares — a PR payload is 18KB of
- * avatars and URLs willfire never looks at, and a cassette that carried them
- * would make its own diff unreadable. Failures are recorded as failures and
- * rethrown: `predict` catches most of them itself, and a recording that
- * dropped them would replay as a different program.
- */
+// `project` narrows a response to the fields `GithubClient` declares; failures
+// are recorded too, since `predict` catches most of them by design.
 const record = async <T extends ApiData>(
   call: string,
   params: ApiParams,
@@ -74,8 +60,6 @@ const record = async <T extends ApiData>(
 
 const live = makeGithubClient();
 
-// The tarball download is deliberately not recorded: replay answers from the
-// recorded execution outcomes instead, so no cassette carries a repo tree.
 const summary = (p: GithubPullSummary): GithubPullSummary => ({
   base: { ref: p.base.ref },
   merge_commit_sha: p.merge_commit_sha,
@@ -138,6 +122,8 @@ const recording: GithubClient = {
           () => live.rest.repos.getContent(p),
           (d) => d,
         ),
+      // Deliberately not recorded: replay answers from the recorded execution
+      // outcomes instead, so no cassette carries a repo tree.
       downloadTarballArchive: (p) => live.rest.repos.downloadTarballArchive(p),
     },
     actions: {
@@ -161,8 +147,8 @@ const { data: pr } = await recording.rest.pulls.get({
   pull_number: prNumber,
 });
 
-// Mirrors the workspace `predict` builds. The assertion after the prediction
-// catches the day that stops being true — see the guard below.
+// Mirrors the workspace `predict` builds; the guard after the prediction
+// catches the day that stops being true.
 const workspace = { owner, repo: name, ref: pr.head.sha, sha: pr.head.sha };
 const resolveRef = async (src: { owner: string; repo: string; ref: string }) => {
   try {
@@ -198,7 +184,7 @@ const workspaceSource = prediction.sources.find(
 );
 if (workspaceSource === undefined) {
   console.error(
-    `predict no longer reads ${repo} at ${workspace.sha}; update the workspace in record.ts`,
+    `predict no longer reads ${repo} at ${workspace.sha}; update the workspace in record-cassette.ts`,
   );
   process.exit(1);
 }
@@ -212,6 +198,7 @@ const runs = await recording.paginate(recording.rest.actions.listWorkflowRunsFor
 });
 const dispatched: DispatchedCheck[] = [];
 for (const run of runs) {
+  // An unfinished dispatch is not ground truth yet.
   if (run.status !== "completed") {
     console.error(`run for ${run.path} is ${run.status}; wait for the dispatch to settle`);
     process.exit(1);
@@ -228,9 +215,7 @@ for (const run of runs) {
 }
 
 // A cassette that disagrees with its own dispatch would pin a wrong answer as
-// the expected one, so the recorder refuses to write it. This fires for real:
-// dirsql's release matrix carries versions its `plan` job computes from repo
-// state, so re-predicting an older PR yields versions that dispatch never saw.
+// the expected one, so the recorder refuses to write it.
 const entries = predictedEntries(prediction.entries);
 const disagreements = reconcile(dispatched, entries);
 if (disagreements.length > 0) {
@@ -264,6 +249,8 @@ const cassette: Cassette = {
   },
 };
 
-const out = fileURLToPath(new URL(`./${name}-${prNumber}.json`, import.meta.url));
+const out = fileURLToPath(
+  new URL(`../tests/fixtures/pinned/${name}-${prNumber}.json`, import.meta.url),
+);
 await writeFile(out, `${JSON.stringify(cassette, null, 2)}\n`);
 console.log(`wrote ${out}: ${dispatched.length} dispatched, ${api.size} reads, ${exec.size} runs`);

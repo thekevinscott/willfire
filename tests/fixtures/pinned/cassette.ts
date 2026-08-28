@@ -1,11 +1,12 @@
 /**
  * The pinned-PR cassette: one live dispatch, captured whole.
  *
- * `record.ts` writes one per pinned PR and `tests/integration/pinned-prs.test.ts`
- * replays it with no network and no docker. A cassette is a record of observed
- * GitHub behaviour, in the same sense `tests/fixtures/willrun-probe/` is: every
- * field was read off a real dispatch, so editing one is a claim that GitHub
- * changed. See `README.md` in this directory.
+ * `scripts/record-cassette.ts` writes one per pinned PR and
+ * `tests/integration/pinned-dispatches.test.ts` replays it with no network and
+ * no docker. A cassette is a record of observed GitHub behaviour, in the same
+ * sense `tests/fixtures/willrun-probe/` is: every field was read off a real
+ * dispatch, so editing one is a claim that GitHub changed. See `README.md` in
+ * this directory.
  */
 
 import { createHash } from "node:crypto";

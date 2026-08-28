@@ -32,7 +32,7 @@ network was broken.
 ## Regenerating one
 
 ```
-pnpm exec tsx tests/fixtures/pinned/record.ts \
+pnpm exec tsx scripts/record-cassette.ts \
   --repo owner/name --pr N --shape "what this pin holds"
 ```
 
