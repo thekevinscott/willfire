@@ -15,7 +15,7 @@ const stage = (...responses: Response[]): void => {
   });
 };
 
-const json = (body: unknown): Response => new Response(JSON.stringify(body));
+const json = <T>(body: T): Response => new Response(JSON.stringify(body));
 
 /** Reads GH_TOKEN="gh" from the suite's default environment. */
 const client = makeGithubClient;

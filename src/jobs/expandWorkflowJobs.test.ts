@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { expandWorkflowJobs } from "./expandWorkflowJobs.js";
 import type { ExecOutcome, JobExecutor } from "../execute.js";
 import type { FetchWorkflow, ResolveRef, WorkflowReader, WorkflowSource } from "../types.js";
+import type { YamlMap } from "../yamlValue.js";
 
 /** A 40-hex commit id, so anything pinned to it is already resolved. */
 const SHA = "a".repeat(40);
@@ -98,7 +99,7 @@ describe("scope isolation across the call boundary", () => {
    * YAML, so serializing the document is enough — and it keeps this suite from
    * importing `yaml`, which a unit test has no business reaching for.
    */
-  const calleeDoc = (doc: Record<string, unknown>) => JSON.stringify(doc);
+  const calleeDoc = (doc: YamlMap) => JSON.stringify(doc);
 
   it("does not carry the outputs into a called workflow", async () => {
     // `needs` is workflow-scoped: a callee's `needs.detect` is the callee's own
@@ -161,7 +162,7 @@ describe("derived execution during expansion", () => {
   const reader = readerOf(async () => null);
 
   /** A detect-shaped workflow: one producer, one dynamic-matrix consumer. */
-  const wfWith = (detect: Record<string, unknown> | null) => ({
+  const wfWith = (detect: YamlMap | null) => ({
     on: { pull_request: null },
     jobs: {
       detect,

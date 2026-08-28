@@ -2,13 +2,14 @@ import { evaluateValue } from "../expr/evaluateValue.js";
 import { UNKNOWN, type Scope, type Val } from "../expr/val.js";
 import { renderTemplate } from "../execute.js";
 import { prScope } from "./prScope.js";
+import type { YamlValue } from "../yamlValue.js";
 
 /**
  * A `with:` value as the callee will see it, evaluated in the caller's scope.
  * A whole-expression value keeps its evaluated type; mixed text renders to a
  * string, all or nothing; anything unresolvable stays unknown.
  */
-export function inputValue(raw: unknown, scope: Scope): Val {
+export function inputValue(raw: YamlValue | undefined, scope: Scope): Val {
   if (raw === null || raw === undefined) {
     return { kind: "value", v: "" };
   }

@@ -15,6 +15,7 @@ import { evaluate } from "./expr/evaluate.js";
 import { evaluateValue } from "./expr/evaluateValue.js";
 import { UNKNOWN, type Scope, type Val } from "./expr/val.js";
 import type { ResolveRef, SourceRef, WorkflowSource } from "./types.js";
+import type { YamlMap, YamlValue } from "./yamlValue.js";
 
 /** A host path a sandboxed runner must expose inside, at the same path. */
 export interface Mount {
@@ -96,7 +97,7 @@ export function renderTemplate(text: string, scope: Scope): string | null {
 }
 
 /** An `env:` block rendered to concrete strings, every key or nothing. */
-function renderEnvLayer(layer: unknown, scope: Scope): Res<Record<string, string>> {
+function renderEnvLayer(layer: YamlValue | undefined, scope: Scope): Res<Record<string, string>> {
   if (layer === null || layer === undefined) {
     return { ok: true, v: {} };
   }
@@ -104,7 +105,7 @@ function renderEnvLayer(layer: unknown, scope: Scope): Res<Record<string, string
     return err("env block is not a map");
   }
   const out: Record<string, string> = {};
-  for (const [k, raw] of Object.entries(layer as Record<string, unknown>)) {
+  for (const [k, raw] of Object.entries<YamlValue | undefined>(layer)) {
     const rendered = renderTemplate(String(raw ?? ""), scope);
     if (rendered === null) {
       return err(`cannot resolve env '${k}'`);
@@ -188,8 +189,12 @@ async function readActionManifest(dir: string): Promise<string | null> {
  * are untyped, and an unset input is the empty string. An unrenderable value
  * stays unknown; it only fails if a step reads it.
  */
-function bindActionInputs(action: any, withBlock: unknown, scope: Scope): Record<string, Val> {
-  const bind = (raw: unknown): Val => {
+function bindActionInputs(
+  action: any,
+  withBlock: YamlValue | undefined,
+  scope: Scope,
+): Record<string, Val> {
+  const bind = (raw: YamlValue | undefined): Val => {
     if (raw === null || raw === undefined) {
       return { kind: "value", v: "" };
     }
@@ -200,13 +205,13 @@ function bindActionInputs(action: any, withBlock: unknown, scope: Scope): Record
     return rendered === null ? UNKNOWN : { kind: "value", v: rendered };
   };
   const out: Record<string, Val> = {};
-  for (const [name, decl] of Object.entries(action?.inputs ?? {})) {
+  for (const [name, decl] of Object.entries<YamlValue | undefined>(action?.inputs ?? {})) {
     // An input declared without a `default:` binds the same empty string a
     // missing declaration does, so the two cases share one path.
-    out[name] = bind((decl as Record<string, unknown> | null)?.["default"]);
+    out[name] = bind((decl as YamlMap | null)?.["default"]);
   }
   if (withBlock !== null && typeof withBlock === "object") {
-    for (const [name, raw] of Object.entries(withBlock as Record<string, unknown>)) {
+    for (const [name, raw] of Object.entries<YamlValue | undefined>(withBlock)) {
       out[name] = bind(raw);
     }
   }
@@ -236,7 +241,7 @@ interface WalkCtx {
    */
   actionRoot?: string;
   /** Raw `env:` blocks from enclosing scopes, outermost first. */
-  envLayers: unknown[];
+  envLayers: (YamlValue | undefined)[];
   deps: ExecDeps;
   depth: number;
 }
@@ -403,8 +408,8 @@ async function runUses(
   // Every declared output must land; a partial map would be a lie.
   const outScope: Scope = { ...childScope, steps: walked.v };
   const outputs: Record<string, string> = {};
-  for (const [name, decl] of Object.entries(action.outputs ?? {})) {
-    const raw = (decl as Record<string, unknown> | null)?.["value"];
+  for (const [name, decl] of Object.entries<YamlValue | undefined>(action.outputs ?? {})) {
+    const raw = (decl as YamlMap | null)?.["value"];
     if (raw === null || raw === undefined) {
       return err(`${label}: output '${name}' of ${uses} has no value`);
     }

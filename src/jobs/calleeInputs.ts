@@ -2,6 +2,7 @@ import { UNKNOWN, type Scope, type Val } from "../expr/val.js";
 import { inputValue } from "./inputValue.js";
 import { workflowCallInputs } from "./workflowCallInputs.js";
 import type { Workflow } from "../types.js";
+import type { YamlValue } from "../yamlValue.js";
 
 /**
  * What `inputs.*` resolves to inside a called workflow: what the caller passed,
@@ -13,7 +14,7 @@ import type { Workflow } from "../types.js";
  * silently decide guards that are not decided.
  */
 export function calleeInputs(
-  withBlock: unknown,
+  withBlock: YamlValue | undefined,
   subWf: Workflow,
   scope: Scope,
 ): Record<string, Val> {
@@ -22,11 +23,11 @@ export function calleeInputs(
     out[name] =
       decl !== null && typeof decl === "object" && "default" in decl
         ? // Defaults live in the callee, out of the caller's context's reach.
-          inputValue((decl as Record<string, unknown>)["default"], {})
+          inputValue(decl["default"], {})
         : UNKNOWN;
   }
   if (withBlock !== null && typeof withBlock === "object") {
-    for (const [name, raw] of Object.entries(withBlock as Record<string, unknown>)) {
+    for (const [name, raw] of Object.entries<YamlValue | undefined>(withBlock)) {
       out[name] = inputValue(raw, scope);
     }
   }

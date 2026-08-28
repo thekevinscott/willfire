@@ -9,7 +9,7 @@ import type { GithubClient } from "./predict/makeGithubClient.js";
 // Replacing the module lets the CLI be driven without a token or a network.
 // `hoisted` is the handoff: `vi.mock` factories are lifted above the imports,
 // so they cannot close over ordinary module scope.
-const hoisted = vi.hoisted(() => ({ github: undefined as unknown }));
+const hoisted = vi.hoisted(() => ({ github: undefined as GithubClient | undefined }));
 
 vi.mock("./predict/makeGithubClient.js", async () => {
   const actual = await vi.importActual<typeof import("./predict/makeGithubClient.js")>(

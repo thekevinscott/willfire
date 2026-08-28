@@ -1,3 +1,5 @@
+import type { YamlMap, YamlValue } from "../yamlValue.js";
+
 /**
  * A partially-known value.
  *
@@ -14,7 +16,7 @@ export type Val =
    * refuses it, and its truthiness is not modelled. Matrix expansion is the
    * one consumer, and it asks for the array directly.
    */
-  | { kind: "json"; v: unknown[] | Record<string, unknown> }
+  | { kind: "json"; v: YamlValue[] | YamlMap }
   | { kind: "truthy" }
   | { kind: "falsy" }
   | { kind: "unknown" };

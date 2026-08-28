@@ -1,4 +1,5 @@
 import { UNKNOWN, type Val } from "./val.js";
+import type { YamlValue } from "../yamlValue.js";
 
 /**
  * `fromJSON(s)` on a known string.
@@ -13,7 +14,7 @@ export function fromJson(arg: Val): Val {
   if (arg.kind !== "value" || typeof arg.v !== "string") {
     return UNKNOWN;
   }
-  let parsed: unknown;
+  let parsed: YamlValue;
   try {
     parsed = JSON.parse(arg.v);
   } catch {
@@ -23,7 +24,7 @@ export function fromJson(arg: Val): Val {
     return { kind: "falsy" };
   }
   if (typeof parsed === "object") {
-    return { kind: "json", v: parsed as unknown[] };
+    return { kind: "json", v: parsed };
   }
-  return { kind: "value", v: parsed as string | number | boolean };
+  return { kind: "value", v: parsed };
 }

@@ -21,6 +21,7 @@ import {
   type RunSpec,
 } from "./execute.js";
 import type { WorkflowSource } from "./types.js";
+import type { YamlMap, YamlValue } from "./yamlValue.js";
 
 const SHA = "c".repeat(40);
 const REMOTE_SHA = "d".repeat(40);
@@ -94,10 +95,10 @@ function executorOf(trees: Record<string, string>, overrides: Partial<ExecDeps> 
 
 /** Execute one job body against a workspace containing `files`. */
 async function execute(
-  job: Record<string, unknown>,
+  job: YamlMap,
   files: Record<string, string> = {},
   overrides: Partial<ExecDeps> = {},
-  wf: Record<string, unknown> = {},
+  wf: YamlMap = {},
   scope = {},
 ): Promise<ExecOutcome> {
   const tree = await tempTree(files);
@@ -610,8 +611,8 @@ describe("actions/setup-node", () => {
 
 /** A composite action manifest, JSON-spelled. */
 const compositeAction = (
-  steps: unknown[],
-  extra: Record<string, unknown> = {},
+  steps: YamlValue[],
+  extra: YamlMap = {},
 ): string => JSON.stringify({ runs: { using: "composite", steps }, ...extra });
 
 describe("composite actions", () => {
@@ -996,7 +997,7 @@ describe("composite actions", () => {
 // --------------------------------------------------------------- node actions
 
 /** A node action manifest, JSON-spelled. `main` is a path next to it. */
-const nodeAction = (main: string, extra: Record<string, unknown> = {}): string =>
+const nodeAction = (main: string, extra: YamlMap = {}): string =>
   JSON.stringify({ runs: { using: "node24", main }, ...extra });
 
 describe("node actions", () => {

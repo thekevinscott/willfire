@@ -38,6 +38,9 @@ interface Behavior {
   error?: true;
 }
 
+/** What the fake hands a listener: a spawn error, a stderr chunk, or an exit code. */
+type HandlerArg = Error | string | number | null;
+
 const h = vi.hoisted(() => ({
   calls: [] as { bin: string; argv: string[]; stdin: string }[],
   script: [] as { stderr?: string[]; close?: number | null; error?: true }[],
@@ -49,16 +52,16 @@ vi.mock("node:child_process", async () => {
     const behavior: Behavior = h.script.shift() ?? {};
     const call: DockerCall = { bin, argv, stdin: "" };
     h.calls.push(call);
-    const handlers = new Map<string, (arg?: unknown) => void>();
+    const handlers = new Map<string, (arg?: HandlerArg) => void>();
     const child = {
-      stderr: { on: (ev: string, cb: (d: unknown) => void) => handlers.set(`stderr:${ev}`, cb) },
+      stderr: { on: (ev: string, cb: (d?: HandlerArg) => void) => handlers.set(`stderr:${ev}`, cb) },
       stdin: {
         write: (d: string) => {
           call.stdin += d;
         },
         end: () => {},
       },
-      on: (ev: string, cb: (arg?: unknown) => void) => handlers.set(ev, cb),
+      on: (ev: string, cb: (arg?: HandlerArg) => void) => handlers.set(ev, cb),
     };
     // After the synchronous return, so every handler is registered first.
     queueMicrotask(() => {
