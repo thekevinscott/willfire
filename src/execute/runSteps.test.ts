@@ -43,6 +43,13 @@ describe("runSteps", () => {
     });
   });
 
+  it("records nothing for a skipped step that has no id", async () => {
+    expect(await runSteps([{ if: "false", run: "exit 1" }], {}, ctxOf())).toEqual({
+      ok: true,
+      v: {},
+    });
+  });
+
   it("records a run step's outputs under its id", async () => {
     expect(await runSteps([{ id: "s", run: "true" }], {}, ctxOf())).toEqual({
       ok: true,
