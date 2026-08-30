@@ -249,6 +249,22 @@ describe("verify", () => {
     expect(code).toBe(0);
   });
 
+  it("keeps an unresolved name from excusing another workflow's surprises", async () => {
+    // An unresolved entry marks its own workflow unknown, and that leniency has
+    // to stop there — a check nobody predicted in a different workflow is still
+    // a MISS.
+    const code = await invoke({
+      predicted: [entry("a.yml", "j", "run", null)],
+      runs: [{ id: 1, path: "b.yml", jobs: [{ name: "x", conclusion: "success" }] }],
+    });
+    expect(out).toEqual([
+      "MISS  b.yml :: x :: ran (run) but was not predicted",
+      "  ?   a.yml :: j :: name unresolved: because",
+      "FAIL",
+    ]);
+    expect(code).toBe(1);
+  });
+
   it("says nothing about a workflow-level entry that is already decided", async () => {
     const code = await invoke({ predicted: [wfEntry("w.yml", "no-dispatch")], runs: [] });
     expect(out).toEqual(["PASS"]);

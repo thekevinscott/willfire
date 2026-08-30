@@ -23,4 +23,11 @@ describe("formatMatrixValue", () => {
     expect(formatMatrixValue("linux")).toBe("linux");
     expect(formatMatrixValue(20)).toBe("20");
   });
+
+  it("stringifies a falsy scalar rather than dropping it", () => {
+    // `experimental: [true, false]` is a real axis, and its second check is
+    // named `(false)` — not `()`.
+    expect(formatMatrixValue(false)).toBe("false");
+    expect(formatMatrixValue(0)).toBe("0");
+  });
 });
