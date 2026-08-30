@@ -11,9 +11,23 @@ describe("bindActionInputs", () => {
   });
 
   it("binds a declaration that is not a map as the empty string", () => {
-    expect(bindActionInputs({ inputs: { x: "str" } }, undefined, {})).toEqual({
-      x: { kind: "value", v: "" },
-    });
+    // `inputs:\n  x:` parses to null; reading `default` off either shape would throw.
+    for (const decl of ["str", null]) {
+      expect(bindActionInputs({ inputs: { x: decl } }, undefined, {})).toEqual({
+        x: { kind: "value", v: "" },
+      });
+    }
+  });
+
+  it("binds the caller's with: over an action that declares no inputs at all", () => {
+    expect(bindActionInputs(null, { who: "w" }, {})).toEqual({ who: { kind: "value", v: "w" } });
+  });
+
+  it("ignores a with: that is not a map", () => {
+    // `with:` with nothing under it parses to null; a scalar is malformed.
+    for (const withBlock of [null, "scalar"]) {
+      expect(bindActionInputs({}, withBlock, {})).toEqual({});
+    }
   });
 
   it("stringifies booleans and numbers, and null as the empty string", () => {

@@ -28,4 +28,16 @@ describe("parseActionUses", () => {
       expect(parseActionUses(uses)).toBe(null);
     }
   });
+
+  it("refuses a templated uses whose remaining shape would otherwise parse", () => {
+    // Without the guard the expression itself would be taken for an owner.
+    expect(parseActionUses("${{ matrix.owner }}/repo@v1")).toBe(null);
+  });
+
+  it("refuses docker:// as a prefix only, not wherever the text appears", () => {
+    expect(parseActionUses("o/r@docker://")).toEqual({
+      path: "",
+      source: { owner: "o", repo: "r", ref: "docker://" },
+    });
+  });
 });

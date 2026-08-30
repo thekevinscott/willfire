@@ -7,10 +7,21 @@ describe("parseGithubOutput", () => {
   });
 
   it("reads a heredoc as one multi-line value", () => {
-    expect(parseGithubOutput("k<<EOF\nline1\nline2\nEOF\na=1\n")).toEqual({
-      k: "line1\nline2",
+    expect(parseGithubOutput("key<<EOF\nline1\nline2\nEOF\na=1\n")).toEqual({
+      key: "line1\nline2",
       a: "1",
     });
+  });
+
+  it("treats << inside a value as text, not a heredoc opener", () => {
+    // The heredoc form is anchored: only a whole line of `name<<DELIM` opens one.
+    expect(parseGithubOutput("a=b<<EOF\n")).toEqual({ a: "b<<EOF" });
+  });
+
+  it("refuses a CRLF heredoc opener instead of reading a value out of it", () => {
+    // The opener is anchored at both ends and `.` stops at a carriage return,
+    // so a CRLF-written file has no heredoc line here and no `=` either.
+    expect(parseGithubOutput("key<<EOF\r\nline1\nEOF\n")).toBe(null);
   });
 
   it("skips blank lines between assignments", () => {
