@@ -123,6 +123,17 @@ describe("makeCloneProvider", () => {
     expect(await provide(sourceAt(main))).toBe(tree);
   });
 
+  it("keys the cache per commit, so a second sha clones again", async () => {
+    const seen: string[] = [];
+    const provide = makeCloneProvider(async (spec) => {
+      seen.push(spec.env.WILLFIRE_SHA);
+      return { code: 1, stderr: "" };
+    }, null);
+    expect(await provide(sourceAt(SHA))).toBe(null);
+    expect(await provide(sourceAt("d".repeat(40)))).toBe(null);
+    expect(seen).toEqual([SHA, "d".repeat(40)]);
+  });
+
   it("falls back to fetching a sha parked under refs/pull", async () => {
     const { repo, parked } = await gitFixture();
     const provide = makeCloneProvider(runShell, null, { remoteUrl: () => `file://${repo}` });

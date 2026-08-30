@@ -21,4 +21,16 @@ describe("materialize", () => {
       ),
     ).toBe(null);
   });
+
+  it("yields the extraction root when the archive holds no single top-level directory", async () => {
+    // The fake extractor writes nothing, so the root stays empty — the
+    // unwrap-one-directory shortcut must not reach for a first entry.
+    expect(
+      await materialize(
+        SOURCE,
+        async () => new Uint8Array([1, 2, 3]),
+        async () => ({ code: 0, stderr: "" }),
+      ),
+    ).toMatch(/\/tree$/);
+  });
 });
