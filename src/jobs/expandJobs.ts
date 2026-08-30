@@ -50,7 +50,7 @@ function workflowCallInputs(wf: Workflow): Record<string, any> {
     return {};
   }
   const call = (on as Record<string, any>)["workflow_call"];
-  if (call === null || typeof call !== "object") {
+  if (call === null || call === undefined) {
     return {};
   }
   const inputs = call["inputs"];
@@ -245,15 +245,18 @@ export async function expandJobs(
               failure = `cannot fetch ${uses}`;
             } else {
               try {
-                subWf = parseYaml(content);
+                const parsed = parseYaml(content);
                 // `inputs.*` changes at the call boundary; `github.*` does
                 // not. A callee's jobs run in the caller's repo, so the facts
                 // seeded at the top of the prediction stay true all the way
                 // down.
                 subScope = {
-                  inputs: calleeInputs(job.with, subWf ?? {}, scoped),
+                  inputs: calleeInputs(job.with, parsed ?? {}, scoped),
                   github: scoped.github,
                 };
+                // Assigned last, so a throw above leaves it null and the one
+                // check below covers every way the call failed to resolve.
+                subWf = parsed;
               } catch (e) {
                 failure = `YAML parse error in ${uses}: ${e}`;
               }
@@ -265,7 +268,7 @@ export async function expandJobs(
           const disp = jobDisplayName(jobId, job, combo);
           const baseName = prefix + disp.name;
           const nameResolved = prefixResolved && disp.resolved;
-          if (failure !== null || subWf === null) {
+          if (subWf === null) {
             entries.push({
               job: baseName,
               checkName: null,
