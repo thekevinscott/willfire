@@ -94,7 +94,6 @@ export default [
       'src/execute.ts',
       'src/jobs/expandJobs.ts',
       'src/matrix/expandMatrixDetailed.ts',
-      'src/predict/finalizePrediction.ts',
       'src/verify.ts',
     ],
     languageOptions: {
