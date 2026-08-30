@@ -27,6 +27,8 @@ interface Fixture {
   workflows?: { path: string; state: string }[];
   /** Repo contents at head, keyed by path. A missing key is a 404. */
   contents?: Record<string, string>;
+  /** Contents at `mergeSha`, served instead of `contents`. Missing key: 404. */
+  mergeContents?: Record<string, string>;
   /**
    * What a cross-repo ref resolves to, keyed `owner/repo@ref`. A ref that is
    * not listed 404s, which is the answer a deleted tag or a private repo gives.
@@ -51,6 +53,10 @@ const HEAD_SHA = "deadbeef";
 
 /** The one source every prediction reads, whatever else it reaches. */
 const HEAD_SOURCE = { owner: "o", repo: "r", ref: HEAD_SHA, sha: HEAD_SHA };
+
+/** The test merge commit. Sorts after the head, the order `sources` is in. */
+const MERGE_SHA = "f".repeat(40);
+const MERGE_SOURCE = { owner: "o", repo: "r", ref: MERGE_SHA, sha: MERGE_SHA };
 
 /**
  * A commit in some other repo, spelled the full 40 hex digits.
@@ -100,11 +106,13 @@ function fakeGithub(f: Fixture): GithubClient {
           const parents = ((f.parents ?? {})[sha] ?? []).map((p) => ({ sha: p }));
           return { data: { sha, commit: { message: "" }, parents } };
         },
-        getContent: async ({ path }: { path: string }) => {
-          if (!(path in contents)) {
+        getContent: async ({ path, ref }: { path: string; ref: string }) => {
+          const at =
+            f.mergeContents !== undefined && ref === f.mergeSha ? f.mergeContents : contents;
+          if (!(path in at)) {
             throw new Error(`404 ${path}`);
           }
-          return { data: contents[path] };
+          return { data: at[path] };
         },
         downloadTarballArchive: async ({ owner, repo, ref }: Record<string, string>) => {
           const bytes = (f.tarballs ?? {})[`${owner}/${repo}@${ref}`];
@@ -545,6 +553,71 @@ describe("predict", () => {
   });
 });
 
+// --------------------------------------------------- the commit that is read (#105)
+
+describe("the commit workflow files are read at", () => {
+  const AT_HEAD = "on: pull_request\njobs:\n  a: {}\n";
+  const AT_MERGE = "on: pull_request\njobs:\n  a: {}\n  b: {}\n";
+
+  const both: Fixture = {
+    contents: { [WF]: AT_HEAD },
+    mergeContents: { [WF]: AT_MERGE },
+  };
+
+  it("reads the test merge commit when GitHub offers one", async () => {
+    const { checkNames } = await predict(
+      fakeGithub({ ...both, mergeSha: MERGE_SHA }),
+      "o/r",
+      1,
+    );
+    expect(checkNames).toEqual(["a", "b"]);
+  });
+
+  it("falls back to the head when there is no test merge commit", async () => {
+    const { checkNames } = await predict(fakeGithub({ ...both, mergeSha: null }), "o/r", 1);
+    expect(checkNames).toEqual(["a"]);
+  });
+
+  it("names the test merge commit among the sources it read", async () => {
+    const { sources } = await run(AT_HEAD, { mergeSha: MERGE_SHA });
+    expect(sources).toEqual([HEAD_SOURCE, MERGE_SOURCE]);
+  });
+
+  it("names only the head when it fell back to the head", async () => {
+    const { sources } = await run(AT_HEAD, { mergeSha: null });
+    expect(sources).toEqual([HEAD_SOURCE]);
+  });
+
+  it("claims no merge commit on the skip path, which never reads one", async () => {
+    const f = { mergeSha: MERGE_SHA, message: "chore: docs [skip ci]" };
+    expect(await run(AT_HEAD, f)).toEqual({
+      entries: [],
+      checkNames: [],
+      skip: "head commit message contains a skip instruction",
+      sources: [HEAD_SOURCE],
+    });
+  });
+
+  it("says which commit a missing workflow file was missing from", async () => {
+    const github = fakeGithub({ contents: { [WF]: AT_HEAD }, mergeContents: {}, mergeSha: MERGE_SHA });
+    const { entries } = await predict(github, "o/r", 1);
+    expect(entries).toEqual([
+      {
+        workflow: WF,
+        job: "*",
+        checkName: null,
+        status: "no-dispatch",
+        reason: "no workflow file at the test merge commit",
+      },
+    ]);
+  });
+
+  it("still says `head` when that is the commit it read", async () => {
+    const { entries } = await predict(fakeGithub({ contents: {}, mergeSha: null }), "o/r", 1);
+    expect(entries).toMatchObject([{ reason: "no workflow file at head" }]);
+  });
+});
+
 // ------------------------------------------------------------------ provenance
 
 describe("the commits a prediction was read from", () => {
@@ -790,6 +863,13 @@ describe("the executor seam through predict", () => {
     expect(e).toMatchObject({
       status: "unknown",
       reason: `dynamic matrix; executing 'detect' failed: cannot materialize workspace o/r@${HEAD_SHA}`,
+    });
+  });
+
+  it("materializes the workspace at the test merge commit (#105)", async () => {
+    const e = await coverEntry({ mergeSha: MERGE_SHA });
+    expect(e).toMatchObject({
+      reason: `dynamic matrix; executing 'detect' failed: cannot materialize workspace o/r@${MERGE_SHA}`,
     });
   });
 

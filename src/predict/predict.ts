@@ -58,10 +58,21 @@ export async function predict(
   const headSha = pr.head.sha;
 
   /**
-   * The PR's own repo at the head commit — where expansion starts, and already
-   * a commit id, so its `ref` and `sha` are the same string.
+   * The PR's own repo at the head commit — the surface the skip instruction is
+   * read from, and already a commit id, so its `ref` and `sha` are the same
+   * string.
    */
   const headSource: WorkflowSource = { owner, repo: name, ref: headSha, sha: headSha };
+
+  /**
+   * GitHub evaluates a `pull_request` at the test merge, not the head (#105).
+   * Null when it has none: a conflict, or a merge not computed yet.
+   */
+  const mergeSha = pr.merge_commit_sha;
+  const readSource: WorkflowSource =
+    mergeSha === null ? headSource : { owner, repo: name, ref: mergeSha, sha: mergeSha };
+
+  const readLabel = readSource.sha === headSha ? "head" : "the test merge commit";
 
   // Provenance for the answer, filled as expansion reaches each source. The head
   // is in from the start: it is read even on the skip path, where the commit
@@ -81,6 +92,8 @@ export async function predict(
       sources,
     );
   }
+
+  sources.set(sourceKey(readSource), readSource);
 
   // A `uses:` naming a tag is the same lookup from every caller that writes it,
   // so resolve each `owner/repo@ref` once. Misses are cached too: a ref that
@@ -148,7 +161,7 @@ export async function predict(
   // Execution is on by default and costs nothing until a workflow needs it.
   const executor =
     opts.executor === undefined
-      ? makeLiveExecutor(github, headSource, resolveRef)
+      ? makeLiveExecutor(github, readSource, resolveRef)
       : (opts.executor ?? undefined);
 
   const workflows = await github.paginate(github.rest.actions.listRepoWorkflows, {
@@ -170,13 +183,18 @@ export async function predict(
         { workflow: path, job: "*", status: "no-dispatch", reason: `workflow state: ${state}` },
       ];
     }
-    const content = await fetchWorkflow(path, headSource);
+    const content = await fetchWorkflow(path, readSource);
     if (content === null) {
       // The Actions API keeps listing a workflow as `active` after its file is
-      // deleted. There is no file at head, so there is nothing to dispatch —
+      // deleted. There is no file to evaluate, so there is nothing to dispatch —
       // the same verdict as the disabled case above, reached a different way.
       return [
-        { workflow: path, job: "*", status: "no-dispatch", reason: "no workflow file at head" },
+        {
+          workflow: path,
+          job: "*",
+          status: "no-dispatch",
+          reason: `no workflow file at ${readLabel}`,
+        },
       ];
     }
     let wf: Workflow;
@@ -192,7 +210,7 @@ export async function predict(
     if (!dispatches) {
       return [{ workflow: path, job: "*", status: "no-dispatch", reason }];
     }
-    const jobs = await expandJobs(wf, ctx, reader, headSource, 0, "", true, prFacts, executor);
+    const jobs = await expandJobs(wf, ctx, reader, readSource, 0, "", true, prFacts, executor);
     return jobs.map((j) => ({
       workflow: path,
       job: jobName(j.job),
