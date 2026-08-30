@@ -1,7 +1,7 @@
 /**
  * The pinned-PR cassette: one live dispatch, captured whole.
  *
- * `scripts/record-cassette.ts` writes one per pinned PR and
+ * `scripts/record-cassette/` writes one per pinned PR and
  * `tests/integration/pinned-dispatches.test.ts` replays it with no network and
  * no docker. A cassette is a record of observed GitHub behaviour, in the same
  * sense `tests/fixtures/willrun-probe/` is: every field was read off a real

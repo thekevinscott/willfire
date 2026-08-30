@@ -69,11 +69,12 @@ const oneFunctionPerFile = {
 
 export default [
   {
-    ignores: ['dist/', 'coverage/'],
+    ignores: ['**/dist/', '**/coverage/'],
   },
-  // Stock rules for all of src, tests included.
+  // Stock rules for all of src, tests included. The workspace packages under
+  // `scripts/` are source too, and held to the same rules.
   {
-    files: ['src/**/*.ts'],
+    files: ['src/**/*.ts', 'scripts/*/src/**/*.ts'],
     languageOptions: {
       parser: tseslint.parser,
     },
@@ -85,12 +86,13 @@ export default [
     },
   },
   {
-    files: ['src/**/*.ts'],
+    files: ['src/**/*.ts', 'scripts/*/src/**/*.ts'],
     // Test files keep their module-scope helpers; the one-function principle
     // is about source decomposition. The rest is the burn-down list: files
     // that predate the rule; remove each entry as #14 decomposes its file.
     ignores: [
       'src/**/*.test.ts',
+      'scripts/*/src/**/*.test.ts',
       'src/execute.ts',
       'src/matrix/expandMatrixDetailed.ts',
       'src/verify.ts',

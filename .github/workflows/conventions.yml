@@ -6,6 +6,10 @@ name: Testing Conventions
 # Every gate runs (`gates` left at its empty default): mutation's Stryker deps
 # are in devDependencies, and `e2e-attestations/` holds the receipt the
 # e2e-verify gate checks.
+#
+# One call per workspace package (docs/monorepo.md): each `source` names that
+# package's source directory and everything else — install, suite, config,
+# packaging — derives by walking up to its own `package.json`.
 
 on:
   pull_request:
@@ -16,8 +20,15 @@ permissions:
   contents: read
 
 jobs:
+  # Job id kept as-is: it prefixes every check name this call produces.
   conventions:
     uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
     with:
       languages: '["typescript"]'
       source: src
+
+  record-cassette:
+    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
+    with:
+      languages: '["typescript"]'
+      source: scripts/record-cassette/src

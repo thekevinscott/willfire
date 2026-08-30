@@ -1,10 +1,17 @@
 # Agent contract
 
-willfire is one TypeScript package: `src/predict.ts` (the prediction engine and
-its CLI), `src/expr/` (a tri-state evaluator for the slice of the GitHub
-expression language that job `if:` conditions use), and `src/verify.ts` (a
-script that diffs a prediction against what GitHub actually dispatched). `README.md` describes the model; this file is the
-operating contract for working in the repo.
+willfire is a pnpm workspace. The published package is at the root: `src/predict.ts`
+(the prediction engine and its CLI), `src/expr/` (a tri-state evaluator for the
+slice of the GitHub expression language that job `if:` conditions use), and
+`src/verify.ts` (a script that diffs a prediction against what GitHub actually
+dispatched). `README.md` describes the model; this file is the operating
+contract for working in the repo.
+
+Each development tool under `scripts/` is its own private workspace package —
+`scripts/record-cassette/` today. A tool goes there rather than in `src/` because
+it is not library surface; it is a package rather than a loose file so
+`conventions.yml` reaches it. Every package's sources live at `<package>/src/`
+with colocated tests, and every package gets its own `conventions.yml` call.
 
 ## Goals
 
@@ -14,12 +21,14 @@ operating contract for working in the repo.
 
 | | |
 |---|---|
-| `pnpm typecheck` | `tsc` over `src/`, tests included |
-| `pnpm test` | Vitest, once |
-| `pnpm test:coverage` | Vitest at the 100% floor CI enforces |
+| `pnpm typecheck` | `tsc` over every package's sources, tests included |
+| `pnpm test` | Vitest over every package, once |
+| `pnpm test:coverage` | Vitest at the 100% floor CI enforces, every package |
+| `pnpm lint` | ESLint over every package |
 | `pnpm build` | emit `dist/` (tests excluded) |
 | `pnpm predict --repo owner/name --pr N` | run the CLI against a live PR |
 | `pnpm verify --repo owner/name --pr N` | compare a prediction against reality |
+| `pnpm record-cassette --repo owner/name --pr N --shape "…"` | re-record one pinned cassette |
 
 ## Testing
 

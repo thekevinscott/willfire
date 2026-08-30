@@ -1,0 +1,35 @@
+{
+  "name": "record-cassette",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Records one pinned willfire cassette from a live GitHub dispatch",
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
+  "type": "module",
+  "files": [],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "lint": "eslint src",
+    "record": "tsx src/index.ts",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "willfire": "workspace:*"
+  },
+  "devDependencies": {
+    "@stryker-mutator/core": "^10.0.0",
+    "@stryker-mutator/vitest-runner": "^10.0.0",
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "^10.9.1",
+    "testing-conventions": "^0.0.92",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.68.0",
+    "vitest": "^4.1.10"
+  }
+}

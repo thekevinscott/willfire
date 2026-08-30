@@ -2,7 +2,7 @@
  * Six pinned PRs, replayed against the dispatch each one actually produced.
  *
  * Every expectation here was read off a live dispatch on a fleet repo and
- * captured whole by `scripts/record-cassette.ts`: the checks GitHub
+ * captured whole by `scripts/record-cassette/`: the checks GitHub
  * created, the commits it created them from, the workflow files as they read at
  * those commits, and what running the jobs that decide a runtime matrix
  * yielded. Nothing is inferred and nothing is hand-written, so a diff to a

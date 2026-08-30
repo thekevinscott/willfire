@@ -13,7 +13,9 @@ export default mergeConfig(
       // `pnpm test`, but `src/` when the testing-conventions CLI invokes Vitest
       // there. This root-relative pattern finds the suite under either root.
       include: ['**/*.test.ts'],
-      exclude: [...defaultExclude, 'tests/e2e/**'],
+      // `scripts/*` are their own workspace packages with their own configs and
+      // their own conventions.yml call; this suite is willfire's alone.
+      exclude: [...defaultExclude, 'tests/e2e/**', 'scripts/**'],
       coverage: {
         // The CLI measures the whole `src/` tree and ignores these excludes; they
         // only scope the local `pnpm test:coverage` report. mergeConfig concatenates,

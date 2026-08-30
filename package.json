@@ -23,6 +23,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./internal": {
+      "types": "./dist/internal.d.ts",
+      "default": "./dist/internal.js"
     }
   },
   "bin": {
@@ -39,10 +43,11 @@
     "lint": "eslint .",
     "predict": "tsx src/cli.ts",
     "prepare": "pnpm build",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "record-cassette": "pnpm --filter record-cassette record",
+    "test": "vitest run && pnpm --filter record-cassette test",
+    "test:coverage": "vitest run --coverage && pnpm --filter record-cassette test:coverage",
     "test:e2e": "vitest run --config tests/e2e/vitest.config.mts",
-    "typecheck": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json && pnpm --filter record-cassette typecheck",
     "verify": "tsx src/verify.ts"
   },
   "dependencies": {
