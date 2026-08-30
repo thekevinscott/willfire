@@ -13,6 +13,20 @@ describe("finalize", () => {
     expect(finalize(wf)).toEqual({ ...wf, checkName: null });
   });
 
+  it("nulls a workflow-level draft's checkName even when one is carried", () => {
+    // `DraftWorkflowEntry` omits `checkName` rather than forbidding it, so a
+    // spread can carry one; passing it through would name a "run" workflow.
+    const carried = {
+      workflow: WF,
+      job: "*" as const,
+      status: "run" as const,
+      reason: "YAML parse error: bad indent",
+      checkName: "A",
+    };
+    const draft: DraftEntry = carried;
+    expect(finalize(draft)).toEqual({ ...carried, checkName: null });
+  });
+
   it("settles an omitted job checkName to null and keeps a given one", () => {
     const drafted: DraftEntry = {
       workflow: WF,
