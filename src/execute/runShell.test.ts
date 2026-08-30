@@ -11,16 +11,18 @@ describe("runShell", () => {
   });
 
   it("keeps only the stderr tail", async () => {
+    // 100 lines of 50 characters: 5000 in, more than the cap and less than
+    // twice it, so the kept tail is exactly the last 4096 whatever the chunking.
     const r = await runShell({
-      script: 'for i in $(seq 1 200); do printf "%050d\\n" "$i" >&2; done; exit 1',
+      script: 'for i in $(seq 1 100); do printf "%049d\\n" "$i" >&2; done; exit 1',
       shell: "bash",
       cwd: TMP,
       env: SH_ENV,
     });
     expect(r.code).toBe(1);
-    expect(r.stderr.length).toBeLessThanOrEqual(4096);
-    // The tail survives truncation — the last line is the 200th.
-    expect(r.stderr.trimEnd().endsWith("200")).toBe(true);
+    expect(r.stderr.length).toBe(4096);
+    // The tail survives truncation — the last line is the 100th.
+    expect(r.stderr.trimEnd().endsWith("100")).toBe(true);
   });
 
   it("reports a signal death as exit 1", async () => {
