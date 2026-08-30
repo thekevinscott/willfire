@@ -38,6 +38,13 @@ describe("calleeInputs", () => {
     });
   });
 
+  it("ignores a with: block that is not a mapping", () => {
+    const wf = callee({ lang: { default: "ts" } });
+    expect(calleeInputs(null, wf, {})).toEqual({ lang: { kind: "value", v: "ts" } });
+    // Without the object guard a string `with:` would enumerate as characters.
+    expect(calleeInputs("lang", wf, {})).toEqual({ lang: { kind: "value", v: "ts" } });
+  });
+
   it("evaluates a caller value in the caller's scope", () => {
     const scope = { needs: { d: { outputs: { lang: "rust" } } } };
     expect(calleeInputs({ lang: "${{ needs.d.outputs.lang }}" }, callee({}), scope)).toEqual({
