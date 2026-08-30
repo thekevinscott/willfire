@@ -14,9 +14,6 @@ import type { DisplayName, Workflow } from "../types.js";
  * caller, with no `/ <callee job>` entries.
  */
 export function skippedDisplayName(jobId: string, job: Workflow): DisplayName {
-  const raw =
-    job !== undefined && job !== null && job.name !== undefined && job.name !== null
-      ? String(job.name)
-      : null;
+  const raw = job.name !== undefined && job.name !== null ? String(job.name) : null;
   return { name: capDisplayName(raw ?? jobId), resolved: true };
 }

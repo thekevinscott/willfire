@@ -17,6 +17,11 @@ describe("jobDisplayName", () => {
     expect(jobDisplayName("a", { name: null }, null)).toEqual({ name: "a", resolved: true });
   });
 
+  it("renders a name YAML read as a number", () => {
+    // `name: 2024` is a number, not a string, and the check name is its text.
+    expect(jobDisplayName("a", { name: 2024 }, null)).toEqual({ name: "2024", resolved: true });
+  });
+
   it("suppresses the parenthetical when the name holds an expression", () => {
     const d = jobDisplayName(
       "a",
