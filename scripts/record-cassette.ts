@@ -147,9 +147,12 @@ const { data: pr } = await recording.rest.pulls.get({
   pull_number: prNumber,
 });
 
-// Mirrors the workspace `predict` builds; the guard after the prediction
-// catches the day that stops being true.
-const workspace = { owner, repo: name, ref: pr.head.sha, sha: pr.head.sha };
+// Mirrors the workspace `predict` builds — the test merge commit, falling back
+// to head when the PR has none; the guard after the prediction catches the day
+// that stops being true.
+const mergeSha = pr.merge_commit_sha;
+const readSha = mergeSha === null ? pr.head.sha : mergeSha;
+const workspace = { owner, repo: name, ref: readSha, sha: readSha };
 const resolveRef = async (src: { owner: string; repo: string; ref: string }) => {
   try {
     const { data } = await recording.rest.repos.getCommit({
