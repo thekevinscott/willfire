@@ -233,6 +233,31 @@ describe("executing run steps", () => {
     expect(asked).toEqual([{ history: true }]);
   });
 
+  it("does not read a checkout out of a uses that is not a string", async () => {
+    const tree = await tempTree({});
+    const asked: Array<{ history?: boolean } | undefined> = [];
+    const ex = makeExecutor({
+      workspace: WORKSPACE,
+      deps: depsOf(
+        {},
+        {
+          provideTree: async (_src, opts) => {
+            asked.push(opts);
+            return tree;
+          },
+        },
+      ),
+    });
+    const o = await ex.executeJob(
+      "detect",
+      { steps: [{ uses: ["actions/checkout@v6"], with: { "fetch-depth": 0 } }] },
+      {},
+      {},
+    );
+    expect(failure(o)).toBe("step '#1' has neither uses nor run");
+    expect(asked).toEqual([{ history: false }]);
+  });
+
   it("skips a step whose if is false and coalesces past its empty outputs", async () => {
     // The exact shape of the fleet's detect job: hermetic step skipped for an
     // external consumer, published step runs, outputs coalesce with ||.
@@ -392,8 +417,11 @@ describe("executing run steps", () => {
   });
 
   it("stops on a step that has neither uses nor run", async () => {
-    const o = await execute({ steps: [null] });
-    expect(failure(o)).toBe("step '#1' has neither uses nor run");
+    // A hole in the list is reported like any other unusable step, not thrown on.
+    for (const step of [null, undefined]) {
+      const o = await execute({ steps: [step] });
+      expect(failure(o)).toBe("step '#1' has neither uses nor run");
+    }
   });
 
   it("yields an empty map for a job that declares no outputs", async () => {
@@ -413,6 +441,18 @@ describe("executing run steps", () => {
     expect(failure(await execute({ container: "img", steps: [] }))).toMatch(/container or services/);
     expect(failure(await execute({ services: {}, steps: [] }))).toMatch(/container or services/);
     expect(failure(await execute({}))).toMatch(/has no steps/);
+  });
+
+  it("treats a key present with nothing under it as absent", async () => {
+    // `strategy:` and friends with an empty body parse to null, not to a value.
+    expect(success(await execute({ strategy: null, steps: [{ run: "true" }] }))).toEqual({});
+  });
+
+  it("runs a job whose workflow carries no env layer at all", async () => {
+    const ex = executorOf({ [`o/r@${SHA}`]: await tempTree({}) });
+    expect(success(await ex.executeJob("detect", { steps: [{ run: "true" }] }, undefined, {}))).toEqual(
+      {},
+    );
   });
 
   it("fails when the workspace cannot be materialized", async () => {
