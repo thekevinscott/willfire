@@ -32,9 +32,10 @@ describe("tokenize", () => {
   });
 
   it("reads negative and decimal numbers", () => {
-    expect(tokenize("-1.5 42")).toEqual([
+    expect(tokenize("-1.5 42 3.25")).toEqual([
       { t: "num", v: -1.5 },
       { t: "num", v: 42 },
+      { t: "num", v: 3.25 },
     ]);
   });
 
@@ -43,5 +44,8 @@ describe("tokenize", () => {
     // A bare `=` starts no operator (only `==` is one), no word, and no
     // number, so every matcher misses.
     expect(tokenize("=")).toBe(null);
+    // Every matcher is anchored at the cursor, so a number further along the
+    // source does not rescue a character that has no token.
+    expect(tokenize("$5")).toBe(null);
   });
 });

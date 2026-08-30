@@ -33,5 +33,8 @@ describe("Cursor", () => {
     cur.advance();
     // An exhausted cursor has nothing to eat.
     expect(cur.eatOp("(")).toBe(false);
+    // `'('` tokenizes to a string whose value spells the operator; it is still
+    // not one.
+    expect(new Cursor([{ t: "str", v: "(" }]).eatOp("(")).toBe(false);
   });
 });
