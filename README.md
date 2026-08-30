@@ -196,8 +196,8 @@ pnpm test:coverage    # the 100% floor CI enforces
 Unit tests are colocated with their source (`foo.ts` ↔ `foo.test.ts`) at 100%
 coverage, per the
 [testing-conventions](https://github.com/thekevinscott/testing-conventions)
-standard. `.github/workflows/conventions.yml` enforces that in CI;
-`testing-conventions.toml` holds the thresholds.
+standard. `.github/workflows/conventions.yml` enforces that in CI, at the
+upstream thresholds and with no exemptions.
 
 ## Verification
 

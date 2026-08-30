@@ -26,10 +26,7 @@ operating contract for working in the repo.
 Unit tests are **colocated** with their source (`foo.ts` ↔ `foo.test.ts`) at
 100% coverage, per the
 [testing-conventions](https://github.com/thekevinscott/testing-conventions)
-standard, enforced by `.github/workflows/conventions.yml`. Thresholds and any
-exemptions live in `testing-conventions.toml`; an exemption needs a written
-reason, and the bar is high — `verify.ts` is a top-level script and still gets
-driven end to end by its colocated test rather than waived.
+standard, enforced by `.github/workflows/conventions.yml`.
 
 The expectations in `src/predict.test.ts` are **not** opinions about how GitHub
 ought to behave. Every workflow-level verdict was read off a live dispatch on

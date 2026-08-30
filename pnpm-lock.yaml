@@ -28,8 +28,8 @@ importers:
         specifier: ^10.9.1
         version: 10.9.1
       testing-conventions:
-        specifier: ^0.0.91
-        version: 0.0.91(@types/node@22.20.1)(vitest@4.1.10)
+        specifier: ^0.0.92
+        version: 0.0.92(@types/node@22.20.1)(vitest@4.1.10)
       tsx:
         specifier: ^4.19.0
         version: 4.23.12
@@ -895,29 +895,29 @@ packages:
       '@stryker-mutator/core': 9.6.1
       vitest: '>=2.0.0'
 
-  '@testing-conventions/aarch64-apple-darwin@0.0.91':
-    resolution: {integrity: sha512-UuLsNhn21Vz9AZL0ZrKPoj2Wx/s4y8CbLzSqNEnsEhjhtsMFNFBANlEkqa83+zvFSYBFdX1ohbi/KC/swhVZ4g==}
+  '@testing-conventions/aarch64-apple-darwin@0.0.92':
+    resolution: {integrity: sha512-MQULbTvX51GW2JHpHQFy4+bWL+AJRz/gnC358Q9FH/uyMNErXCuRBBIomh88jXQ8Sy6Gqi7p0uJDSi0WFIK0nQ==}
     cpu: [arm64]
     os: [darwin]
 
-  '@testing-conventions/aarch64-unknown-linux-gnu@0.0.91':
-    resolution: {integrity: sha512-BrmkrNhV1o6/SutMYvQWOWiDohfvPD5ae8v/kzRveQojvFkfktrfnB3STvRgocx9+d9Gcl6ITG16ZqET+eCKTg==}
+  '@testing-conventions/aarch64-unknown-linux-gnu@0.0.92':
+    resolution: {integrity: sha512-pBhTT063zm9lLlj8aCvyz6fqLerA9UeRFU08R+71YOSXLDxpcPKRiHv/t+IaDI+wymX9CVWpTCKWH49spArhBQ==}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@testing-conventions/x86_64-apple-darwin@0.0.91':
-    resolution: {integrity: sha512-iDRICo4sdL3fCoPX8aTWxddf7fb/tJG6E5Tgq1vrIoDEEzyXqqplLp8sOIS2ZzRRt1AHw+NkEzFg9Av60YaM5w==}
+  '@testing-conventions/x86_64-apple-darwin@0.0.92':
+    resolution: {integrity: sha512-IMdKt4W7A5svednk7mPvvjQnmz85OYC4ePJDZlNGkaZiHGPE7xg76WzquSnBXAv/x7NQvk5gBo5y4VE8lpFBVw==}
     cpu: [x64]
     os: [darwin]
 
-  '@testing-conventions/x86_64-pc-windows-msvc@0.0.91':
-    resolution: {integrity: sha512-f/WKSklMgk/6E4A7ItY+QBi7EgJxtjpQPQvYTjdbW5VIBLsoDVVzx3Zy4kigMAhTcuC83Q+hZaCNF6tSoI2LJw==}
+  '@testing-conventions/x86_64-pc-windows-msvc@0.0.92':
+    resolution: {integrity: sha512-soT7Gfu3RgarhyQk0Ka609IbBpfWvt/CcGwAQ/RIxL6GioSBMjQ7rHtiE1feR9NRiPLNNpMGuAOvFdv8ibv01g==}
     cpu: [x64]
     os: [win32]
 
-  '@testing-conventions/x86_64-unknown-linux-gnu@0.0.91':
-    resolution: {integrity: sha512-vDnylEZKJmqTRohBtTanlcsskrTC1iACaml5lXLBNID+Mcwm+BTe62V7HfMMBquNEimlVFbEOMuD5//2j2ZW3w==}
+  '@testing-conventions/x86_64-unknown-linux-gnu@0.0.92':
+    resolution: {integrity: sha512-j8aJvAunEzextGJyO3f1YlO8JSbK/EQ8/vDH8x8Myk3L5S+wDKwMyF2LrRBZpmjhE/J1haAxzGTPm+l2eol0GQ==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
@@ -1086,8 +1086,8 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
-  bin-shim@0.1.4:
-    resolution: {integrity: sha512-DEyiBDg48DLb02/u4G684EAf9pZTaEGHgEF2KF7XfCsHWG5fSyabM3xq3weMTcBgWSePZpY57kxtbLGJi0MlHQ==}
+  bin-shim@0.2.2:
+    resolution: {integrity: sha512-G+f67xoIHsAgoJdG03LV5ei91G6P0QH6tI1h/rKSb//EYdF8mw6eBLCUqqZBdzL9sROVz3/141X/wjutdxWFuQ==}
     engines: {node: '>=20.20.0'}
 
   brace-expansion@5.0.9:
@@ -1757,8 +1757,8 @@ packages:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
 
-  testing-conventions@0.0.91:
-    resolution: {integrity: sha512-QSHu/eOtTwd4ItdCViLO5yUZHU7rn4IlrWnd9X7X//oi1y5ez2fXmYuYybPe800Mde2V0Z+42te51lu1Vgbdxw==}
+  testing-conventions@0.0.92:
+    resolution: {integrity: sha512-PsUS084vpqeH4fwof0/hudqCXLjdkMRNJUEvyI7SGSvxjOrctzyyOpIM6B4QUC33QSclG0oCDIuefVwFYXM3Uw==}
     engines: {node: '>=24', pnpm: '>=11'}
     hasBin: true
     peerDependencies:
@@ -2861,19 +2861,19 @@ snapshots:
       tslib: 2.8.1
       vitest: 4.1.10(@types/node@22.20.1)(@vitest/coverage-v8@4.1.10)(vite@8.2.1(@types/node@22.20.1)(esbuild@0.28.2)(tsx@4.23.12)(yaml@2.9.0))
 
-  '@testing-conventions/aarch64-apple-darwin@0.0.91':
+  '@testing-conventions/aarch64-apple-darwin@0.0.92':
     optional: true
 
-  '@testing-conventions/aarch64-unknown-linux-gnu@0.0.91':
+  '@testing-conventions/aarch64-unknown-linux-gnu@0.0.92':
     optional: true
 
-  '@testing-conventions/x86_64-apple-darwin@0.0.91':
+  '@testing-conventions/x86_64-apple-darwin@0.0.92':
     optional: true
 
-  '@testing-conventions/x86_64-pc-windows-msvc@0.0.91':
+  '@testing-conventions/x86_64-pc-windows-msvc@0.0.92':
     optional: true
 
-  '@testing-conventions/x86_64-unknown-linux-gnu@0.0.91':
+  '@testing-conventions/x86_64-unknown-linux-gnu@0.0.92':
     optional: true
 
   '@types/chai@5.2.3':
@@ -3086,7 +3086,7 @@ snapshots:
 
   baseline-browser-mapping@2.11.15: {}
 
-  bin-shim@0.1.4: {}
+  bin-shim@0.2.2: {}
 
   brace-expansion@5.0.9:
     dependencies:
@@ -3704,17 +3704,17 @@ snapshots:
     dependencies:
       has-flag: 4.0.0
 
-  testing-conventions@0.0.91(@types/node@22.20.1)(vitest@4.1.10):
+  testing-conventions@0.0.92(@types/node@22.20.1)(vitest@4.1.10):
     dependencies:
       '@stryker-mutator/core': 9.6.1(@types/node@22.20.1)
       '@stryker-mutator/vitest-runner': 9.6.1(@stryker-mutator/core@9.6.1(@types/node@22.20.1))(vitest@4.1.10)
-      bin-shim: 0.1.4
+      bin-shim: 0.2.2
     optionalDependencies:
-      '@testing-conventions/aarch64-apple-darwin': 0.0.91
-      '@testing-conventions/aarch64-unknown-linux-gnu': 0.0.91
-      '@testing-conventions/x86_64-apple-darwin': 0.0.91
-      '@testing-conventions/x86_64-pc-windows-msvc': 0.0.91
-      '@testing-conventions/x86_64-unknown-linux-gnu': 0.0.91
+      '@testing-conventions/aarch64-apple-darwin': 0.0.92
+      '@testing-conventions/aarch64-unknown-linux-gnu': 0.0.92
+      '@testing-conventions/x86_64-apple-darwin': 0.0.92
+      '@testing-conventions/x86_64-pc-windows-msvc': 0.0.92
+      '@testing-conventions/x86_64-unknown-linux-gnu': 0.0.92
       vitest: 4.1.10(@types/node@22.20.1)(@vitest/coverage-v8@4.1.10)(vite@8.2.1(@types/node@22.20.1)(esbuild@0.28.2)(tsx@4.23.12)(yaml@2.9.0))
     transitivePeerDependencies:
       - '@types/node'
