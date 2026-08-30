@@ -1,7 +1,6 @@
 import { evaluateValue } from "../expr/evaluateValue.js";
 import type { Scope } from "../expr/val.js";
 import type { DetailedCombo, DetailedCombos } from "../types.js";
-import type { YamlValue } from "../yamlValue.js";
 
 /**
  * The values of one matrix axis, or null when they cannot be known.
@@ -12,7 +11,7 @@ import type { YamlValue } from "../yamlValue.js";
  * carries that job's outputs. Anything else stays null, which is what makes
  * the whole job `unknown` rather than a guess at how many checks it creates.
  */
-function axisValues(v: YamlValue | undefined, scope: Scope): YamlValue[] | null {
+function axisValues(v: unknown, scope: Scope): unknown[] | null {
   if (Array.isArray(v)) {
     return v;
   }
@@ -30,7 +29,7 @@ function axisValues(v: YamlValue | undefined, scope: Scope): YamlValue[] | null 
  * An `include:`/`exclude:` block: a literal list or an expression evaluating
  * to one. Absent means empty; anything unresolvable fails the expansion.
  */
-function comboList(v: YamlValue | undefined, scope: Scope): any[] | null {
+function comboList(v: unknown, scope: Scope): any[] | null {
   if (v === null || v === undefined) {
     return [];
   }
@@ -64,7 +63,7 @@ export function expandMatrixDetailed(strategy: any, scope: Scope = {}): Detailed
     return null;
   }
   const axes: Record<string, any[]> = {};
-  for (const [k, v] of Object.entries<YamlValue | undefined>(matrix)) {
+  for (const [k, v] of Object.entries(matrix)) {
     if (k !== "include" && k !== "exclude") {
       const vals = axisValues(v, scope);
       if (vals === null) {

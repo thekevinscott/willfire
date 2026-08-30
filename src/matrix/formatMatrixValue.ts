@@ -1,5 +1,3 @@
-import type { YamlValue } from "../yamlValue.js";
-
 /**
  * How a single matrix value is rendered inside a check name.
  *
@@ -7,7 +5,7 @@ import type { YamlValue } from "../yamlValue.js";
  * `cfg: {os: linux, arch: x64}` renders as `linux, x64` — the check is
  * `m-object (linux, x64)`.
  */
-export function formatMatrixValue(v: YamlValue | undefined): string {
+export function formatMatrixValue(v: unknown): string {
   if (v === null || v === undefined) {
     return "";
   }
