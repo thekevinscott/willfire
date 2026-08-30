@@ -92,7 +92,6 @@ export default [
     ignores: [
       'src/**/*.test.ts',
       'src/execute.ts',
-      'src/jobs/expandJobs.ts',
       'src/matrix/expandMatrixDetailed.ts',
       'src/verify.ts',
     ],
