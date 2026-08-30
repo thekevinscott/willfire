@@ -5,6 +5,7 @@ import { expandMatrixDetailed } from "../matrix/expandMatrixDetailed.js";
 import { jobDisplayName } from "../names/jobDisplayName.js";
 import { skippedDisplayName } from "../names/skippedDisplayName.js";
 import { parseUses } from "../uses/parseUses.js";
+import { absentInputs } from "./absentInputs.js";
 import { calleeInputs } from "./calleeInputs.js";
 import { evalIf } from "./evalIf.js";
 import { neededJobIds } from "./neededJobIds.js";
@@ -47,10 +48,14 @@ export async function expandJobs(
   const jobs: Record<string, Workflow> = wf.jobs ?? {};
   const statuses: Record<string, string> = {};
 
+  // Nothing dispatched or called this run, so an input this workflow declares
+  // and nothing supplied reads as the empty string (#125) — laid under, never
+  // over, whatever the caller bound.
+  let scoped: Scope = { ...scope, inputs: { ...absentInputs(wf), ...scope.inputs } };
+
   // Selection is derived, never configured: execute exactly the jobs some
   // sibling's `needs.*.outputs` read depends on, under the same `evalIf`
   // verdict the main loop applies.
-  let scoped = scope;
   const execFailures: Record<string, string> = {};
   if (executor !== undefined) {
     const needed = neededJobIds(jobs);

@@ -771,3 +771,85 @@ describe("with: values across the call boundary", () => {
     expect(entries.map((e) => [e.job, e.status])).toEqual([["call / leg", "run"]]);
   });
 });
+
+describe("inputs the event never supplied", () => {
+  const CALLEE = ".github/workflows/callee.yml";
+
+  const withDispatchInput = (jobs: Record<string, unknown>): Workflow =>
+    ({
+      on: {
+        pull_request: null,
+        workflow_dispatch: { inputs: { version: { type: "string", default: "" } } },
+      },
+      jobs,
+    }) as Workflow;
+
+  it("decides a guard on an input a pull_request never carried", async () => {
+    const entries = await expandJobs(
+      withDispatchInput({ gate: { if: "inputs.version == ''" } }),
+      CTX,
+      readerFor({}),
+      SOURCE,
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([["gate", "run"]]);
+  });
+
+  it("keeps a binding the caller handed in over the absent one", async () => {
+    const scope: Scope = { inputs: { version: { kind: "value", v: "1.2.3" } } };
+    const entries = await expandJobs(
+      withDispatchInput({ gate: { if: "inputs.version == '1.2.3'" } }),
+      CTX,
+      readerFor({}),
+      SOURCE,
+      0,
+      "",
+      true,
+      scope,
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([["gate", "run"]]);
+  });
+
+  it("forwards the empty binding into a callee's executed job (#125)", async () => {
+    // The reported shape: a `workflow_dispatch` input absent on this event is
+    // passed down a `with:`, and the callee's job execution reads it.
+    const scopes: Scope[] = [];
+    const executor: JobExecutor = {
+      executeJob: async (_jobId, _job, _wf, scope) => {
+        scopes.push(scope);
+        return { ok: true, outputs: { langs: '["ts"]' } };
+      },
+    };
+    const entries = await expandJobs(
+      withDispatchInput({
+        call: {
+          uses: "./.github/workflows/callee.yml",
+          with: { version: "${{ inputs.version }}" },
+        },
+      }),
+      CTX,
+      readerFor({
+        [CALLEE]: JSON.stringify({
+          on: { workflow_call: { inputs: { version: { type: "string" } } } },
+          jobs: {
+            detect: { steps: [] },
+            static: {
+              needs: "detect",
+              strategy: { matrix: { lang: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+            },
+          },
+        }),
+      }),
+      SOURCE,
+      0,
+      "",
+      true,
+      {},
+      executor,
+    );
+    expect(scopes.map((s) => s.inputs?.version)).toEqual([{ kind: "value", v: "" }]);
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["call / detect", "run"],
+      ["call / static (ts)", "run"],
+    ]);
+  });
+});
