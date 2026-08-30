@@ -205,7 +205,7 @@ function bindActionInputs(
     return rendered === null ? UNKNOWN : { kind: "value", v: rendered };
   };
   const out: Record<string, Val> = {};
-  for (const [name, decl] of Object.entries<YamlValue | undefined>(action?.inputs ?? {})) {
+  for (const [name, decl] of Object.entries(action?.inputs ?? {})) {
     // An input declared without a `default:` binds the same empty string a
     // missing declaration does, so the two cases share one path.
     out[name] = bind((decl as YamlMap | null)?.["default"]);
