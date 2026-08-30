@@ -129,19 +129,12 @@ export function parseGithubOutput(text: string): Record<string, string> | null {
       const heredoc = /^([^=<]+)<<(.+)$/.exec(line);
       if (heredoc !== null) {
         const [, name, delim] = heredoc;
-        const buf: string[] = [];
-        for (;;) {
-          if (i >= lines.length) {
-            return null; // unterminated heredoc
-          }
-          if (lines[i] === delim) {
-            i++;
-            break;
-          }
-          buf.push(lines[i]);
-          i++;
+        const end = lines.indexOf(delim, i);
+        if (end === -1) {
+          return null; // unterminated heredoc
         }
-        out[name] = buf.join("\n");
+        out[name] = lines.slice(i, end).join("\n");
+        i = end + 1;
       } else {
         const eq = line.indexOf("=");
         if (eq <= 0) {
@@ -208,10 +201,9 @@ function bindActionInputs(action: any, withBlock: unknown, scope: Scope): Record
   };
   const out: Record<string, Val> = {};
   for (const [name, decl] of Object.entries(action?.inputs ?? {})) {
-    out[name] =
-      decl !== null && typeof decl === "object" && "default" in decl
-        ? bind((decl as Record<string, unknown>)["default"])
-        : { kind: "value", v: "" };
+    // An input declared without a `default:` binds the same empty string a
+    // missing declaration does, so the two cases share one path.
+    out[name] = bind((decl as Record<string, unknown> | null)?.["default"]);
   }
   if (withBlock !== null && typeof withBlock === "object") {
     for (const [name, raw] of Object.entries(withBlock as Record<string, unknown>)) {
@@ -362,7 +354,7 @@ async function runUses(
     if (root === null) {
       return err(`${label}: cannot materialize ${source.owner}/${source.repo}@${sha}`);
     }
-    actionDir = target.path === "" ? root : join(root, target.path);
+    actionDir = join(root, target.path);
     actionRoot = root;
   }
   const manifest = await readActionManifest(actionDir);

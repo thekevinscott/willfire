@@ -131,10 +131,20 @@ describe("parseGithubOutput", () => {
   });
 
   it("reads a heredoc as one multi-line value", () => {
-    expect(parseGithubOutput("k<<EOF\nline1\nline2\nEOF\na=1\n")).toEqual({
-      k: "line1\nline2",
+    expect(parseGithubOutput("key<<EOF\nline1\nline2\nEOF\na=1\n")).toEqual({
+      key: "line1\nline2",
       a: "1",
     });
+  });
+
+  it("reads a << on the right of an = as part of the value", () => {
+    expect(parseGithubOutput("a=b<<c\n")).toEqual({ a: "b<<c" });
+  });
+
+  it("refuses a heredoc header with anything after the delimiter", () => {
+    // A CRLF line ending leaves the CR there, and the runner would take it as
+    // part of the delimiter; refusing beats guessing which one it meant.
+    expect(parseGithubOutput("a<<EOF\r\nx\nEOF\n")).toBe(null);
   });
 
   it("skips blank lines between assignments", () => {
@@ -397,6 +407,32 @@ describe("executing run steps", () => {
     expect(failure(o)).toMatch(/shell 'python' is not modelled/);
   });
 
+  it("treats a shell left empty as the default bash", async () => {
+    // YAML `shell:` with no value parses to null, not the string "null".
+    const out = success(
+      await execute({
+        steps: [{ id: "s", shell: null, run: 'echo "v=${BASH_VERSION:+bash}" >> "$GITHUB_OUTPUT"' }],
+        outputs: { v: "${{ steps.s.outputs.v }}" },
+      }),
+    );
+    expect(out).toEqual({ v: "bash" });
+  });
+
+  it("treats an if: left empty as absent", async () => {
+    const out = success(
+      await execute({
+        steps: [{ id: "s", if: null, run: 'echo "v=1" >> "$GITHUB_OUTPUT"' }],
+        outputs: { v: "${{ steps.s.outputs.v }}" },
+      }),
+    );
+    expect(out).toEqual({ v: "1" });
+  });
+
+  it("treats a run left empty as no step body at all", async () => {
+    const o = await execute({ steps: [{ run: null }] });
+    expect(failure(o)).toBe("step '#1' has neither uses nor run");
+  });
+
   it("runs sh steps under sh -e", async () => {
     const out = success(
       await execute({
@@ -426,6 +462,22 @@ describe("executing run steps", () => {
     expect(out).toEqual({ d: "sub" });
   });
 
+  it("treats a working-directory left empty as the workspace root", async () => {
+    const out = success(
+      await execute({
+        steps: [
+          {
+            id: "s",
+            "working-directory": null,
+            run: 'echo "d=$([ "$PWD" = "$GITHUB_WORKSPACE" ] && echo root)" >> "$GITHUB_OUTPUT"',
+          },
+        ],
+        outputs: { d: "${{ steps.s.outputs.d }}" },
+      }),
+    );
+    expect(out).toEqual({ d: "root" });
+  });
+
   it("stops on a working-directory it cannot render", async () => {
     const o = await execute({
       steps: [{ "working-directory": "${{ env.nope }}", run: "true" }],
@@ -441,6 +493,21 @@ describe("executing run steps", () => {
   it("stops on a step that has neither uses nor run", async () => {
     const o = await execute({ steps: [null] });
     expect(failure(o)).toBe("step '#1' has neither uses nor run");
+  });
+
+  it("keys step outputs only by a declared id", async () => {
+    // An id-less step publishes nothing — not even under the key an absent
+    // id stringifies to, where it would clobber a step that declared one.
+    const out = success(
+      await execute({
+        steps: [
+          { id: "undefined", run: 'echo "v=named" >> "$GITHUB_OUTPUT"' },
+          { run: 'echo "v=anonymous" >> "$GITHUB_OUTPUT"' },
+        ],
+        outputs: { v: "${{ steps.undefined.outputs.v }}" },
+      }),
+    );
+    expect(out).toEqual({ v: "named" });
   });
 
   it("yields an empty map for a job that declares no outputs", async () => {
@@ -460,6 +527,12 @@ describe("executing run steps", () => {
     expect(failure(await execute({ container: "img", steps: [] }))).toMatch(/container or services/);
     expect(failure(await execute({ services: {}, steps: [] }))).toMatch(/container or services/);
     expect(failure(await execute({}))).toMatch(/has no steps/);
+  });
+
+  it("treats container: and services: left empty as absent", async () => {
+    // Only a declared one puts the job out of reach; an empty key is null.
+    const o = await execute({ container: null, services: null, steps: [{ run: "true" }] });
+    expect(success(o)).toEqual({});
   });
 
   it("fails when the workspace cannot be materialized", async () => {
@@ -656,6 +729,62 @@ describe("composite actions", () => {
       ),
     );
     expect(out.got).toBe("<>");
+  });
+
+  it("treats a with: left empty as passing no inputs", async () => {
+    const manifest = compositeAction(
+      [{ id: "s", shell: "bash", run: 'echo "got=<${{ inputs.x }}>" >> "$GITHUB_OUTPUT"' }],
+      {
+        inputs: { x: { default: "d" } },
+        outputs: { got: { value: "${{ steps.s.outputs.got }}" } },
+      },
+    );
+    const tree = await tempTree({ "action/action.yml": manifest });
+    const ex = executorOf({ [`o/r@${SHA}`]: tree });
+    const out = success(
+      await ex.executeJob(
+        "detect",
+        {
+          steps: [{ id: "a", uses: "./action", with: null }],
+          outputs: { got: "${{ steps.a.outputs.got }}" },
+        },
+        {},
+        {},
+      ),
+    );
+    expect(out.got).toBe("<d>");
+  });
+
+  it("binds an input declared with an empty body as the empty string", async () => {
+    // `inputs:\n  x:\n` gives a null declaration, not an empty map.
+    const manifest = compositeAction(
+      [{ id: "s", shell: "bash", run: 'echo "got=<${{ inputs.x }}>" >> "$GITHUB_OUTPUT"' }],
+      { inputs: { x: null }, outputs: { got: { value: "${{ steps.s.outputs.got }}" } } },
+    );
+    const tree = await tempTree({ "action/action.yml": manifest });
+    const ex = executorOf({ [`o/r@${SHA}`]: tree });
+    const out = success(
+      await ex.executeJob(
+        "detect",
+        {
+          steps: [{ id: "a", uses: "./action" }],
+          outputs: { got: "${{ steps.a.outputs.got }}" },
+        },
+        {},
+        {},
+      ),
+    );
+    expect(out.got).toBe("<>");
+  });
+
+  it("refuses a declared output whose value: is empty", async () => {
+    const manifest = compositeAction([{ shell: "bash", run: "true" }], {
+      outputs: { v: { value: null } },
+    });
+    const tree = await tempTree({ "action/action.yml": manifest });
+    const ex = executorOf({ [`o/r@${SHA}`]: tree });
+    const o = await ex.executeJob("detect", { steps: [{ uses: "./action" }] }, {}, {});
+    expect(failure(o)).toBe("step '#1': output 'v' of ./action has no value");
   });
 
   it("leaves an unrenderable with: value unknown until a step reads it", async () => {
