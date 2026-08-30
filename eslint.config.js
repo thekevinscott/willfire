@@ -71,6 +71,19 @@ export default [
   {
     ignores: ['dist/', 'coverage/'],
   },
+  // Stock rules for all of src, tests included.
+  {
+    files: ['src/**/*.ts'],
+    languageOptions: {
+      parser: tseslint.parser,
+    },
+    rules: {
+      curly: ['error', 'all'],
+      eqeqeq: ['error', 'always'],
+      'no-continue': 'error',
+      semi: ['error', 'always'],
+    },
+  },
   {
     files: ['src/**/*.ts'],
     // Test files keep their module-scope helpers; the one-function principle

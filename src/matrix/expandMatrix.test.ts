@@ -6,6 +6,8 @@ describe("expandMatrix", () => {
   it("returns a single null combination when there is no strategy", () => {
     expect(expandMatrix(undefined)).toEqual([null]);
     expect(expandMatrix({})).toEqual([null]);
+    // `strategy:` written with no value parses to null, not an empty block.
+    expect(expandMatrix(null)).toEqual([null]);
   });
 
   it("gives up on a matrix that is an expression", () => {

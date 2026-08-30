@@ -124,6 +124,15 @@ describe("workflowDispatches", () => {
     ]);
   });
 
+  it("does not fall back to the base ref when a stack target is set", () => {
+    // The stack target replaces the base ref outright: a `branches:` naming the
+    // immediate base declines, because that is not where the stack lands.
+    expect(workflowDispatches(onPr({ branches: ["feature-1"] }), STACKED)).toEqual([
+      false,
+      "stack target 'main' not in branches",
+    ]);
+  });
+
   it("names the stack target when branches-ignore declines", () => {
     expect(workflowDispatches(onPr({ "branches-ignore": ["main"] }), STACKED)).toEqual([
       false,

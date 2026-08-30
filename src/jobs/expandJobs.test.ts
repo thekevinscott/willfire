@@ -108,6 +108,12 @@ describe("job expansion", () => {
     expect(entries[0]).toMatchObject({ job: "a", status: "skipped", reason: "if: false" });
   });
 
+  it("treats an `if:` left empty as absent", async () => {
+    // YAML `if:` with no value parses to null; the guard is absent, not false.
+    const entries = await expand({ a: { if: null } });
+    expect(entries[0]).toMatchObject({ job: "a", status: "run", reason: "" });
+  });
+
   describe("needs", () => {
     it("skips a job that needs a skipped job", async () => {
       const entries = await expand({ a: { if: false }, b: { needs: ["a"] } });
@@ -710,7 +716,12 @@ describe("with: values across the call boundary", () => {
     const shapes: unknown[] = [
       { jobs },
       { on: "push", jobs },
+      // `on:` written with no value: YAML 1.1 reads the key as the boolean.
+      { true: null, jobs },
+      { on: { pull_request: null }, jobs },
       { on: { workflow_call: "yes" }, jobs },
+      { on: { workflow_call: {} }, jobs },
+      { on: { workflow_call: { inputs: null } }, jobs },
       { on: { workflow_call: { inputs: 5 } }, jobs },
     ];
     for (const shape of shapes) {
@@ -720,6 +731,19 @@ describe("with: values across the call boundary", () => {
       );
       expect(entries.map((e) => [e.job, e.status])).toEqual([["call / leg", "unknown"]]);
     }
+  });
+
+  it("treats a `with:` left empty as passing nothing", async () => {
+    const entries = await expand(
+      { call: { uses: "./.github/workflows/callee.yml", with: null } },
+      readerFor({
+        [CALLEE]: JSON.stringify({
+          on: { workflow_call: { inputs: { e: { default: "x" } } } },
+          jobs: { leg: { if: "inputs.e == 'x'" } },
+        }),
+      }),
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([["call / leg", "run"]]);
   });
 
   it("reads the declared inputs when YAML 1.1 parsed `on:` as a boolean key", async () => {

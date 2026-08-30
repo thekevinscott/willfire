@@ -14,6 +14,11 @@ describe("skippedDisplayName", () => {
     expect(skippedDisplayName("a", { name: null })).toEqual({ name: "a", resolved: true });
   });
 
+  it("renders a name YAML read as a number", () => {
+    // `name: 2024` is a number, not a string, and the check name is its text.
+    expect(skippedDisplayName("a", { name: 2024 })).toEqual({ name: "2024", resolved: true });
+  });
+
   it("caps the name at GitHub's 100-character display limit", () => {
     expect(skippedDisplayName("a", { name: "y".repeat(120) })).toEqual({
       name: `${"y".repeat(97)}...`,

@@ -23,7 +23,11 @@ describe("evalIf", () => {
   });
 
   it("coerces a non-string condition before evaluating", () => {
+    // A falsy condition still goes through the evaluator: only an absent `if:`
+    // takes the early return.
     expect(evalIf(false)).toBe("skipped");
+    expect(evalIf(0)).toBe("skipped");
+    expect(evalIf(1)).toBe("run");
   });
 
   it("resolves against the scope the caller handed in", () => {

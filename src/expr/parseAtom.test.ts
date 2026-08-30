@@ -10,6 +10,10 @@ vi.mock("./cursor.js", async () => {
 describe("parseAtom", () => {
   it("is unknown at the end of the tokens", () => {
     expect(parseAtom(new Cursor([]), {})).toEqual({ kind: "unknown" });
+    // A consumed cursor, not just an empty one: peek is undefined either way.
+    const spent = new Cursor([{ t: "null" }]);
+    parseAtom(spent, {});
+    expect(parseAtom(spent, {})).toEqual({ kind: "unknown" });
   });
 
   it("reads each literal kind, coercing null to the empty string", () => {

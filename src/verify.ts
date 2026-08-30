@@ -59,10 +59,10 @@ const { entries: predictedRaw } = await predict(octokit, repo, pr);
 const predicted = new Map(
   predictedRaw
     .filter(isJobEntry)
-    .filter((r) => r.checkName != null)
+    .filter((r) => r.checkName !== null)
     .map((r) => [`${r.workflow} :: ${r.checkName}`, r.status]),
 );
-const unresolved = predictedRaw.filter(isJobEntry).filter((r) => r.checkName == null);
+const unresolved = predictedRaw.filter(isJobEntry).filter((r) => r.checkName === null);
 const unknownWfs = new Set(
   predictedRaw
     .filter((r) => r.status === "unknown")

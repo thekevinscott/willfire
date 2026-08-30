@@ -30,5 +30,11 @@ describe("Cursor", () => {
     expect(cur.eatOp("(")).toBe(true);
     // A non-op token never matches, whatever its value.
     expect(cur.eatOp("(")).toBe(false);
+    cur.advance();
+    // An exhausted cursor has nothing to eat.
+    expect(cur.eatOp("(")).toBe(false);
+    // `'('` tokenizes to a string whose value spells the operator; it is still
+    // not one.
+    expect(new Cursor([{ t: "str", v: "(" }]).eatOp("(")).toBe(false);
   });
 });
