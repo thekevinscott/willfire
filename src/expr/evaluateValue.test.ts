@@ -49,5 +49,7 @@ describe("evaluateValue", () => {
 
   it("strips the wrapper the way an if: does", () => {
     expect(evaluateValue("${{ 'a' }}")).toEqual({ kind: "value", v: "a" });
+    // A YAML block scalar keeps its newlines, so the wrapper spans lines.
+    expect(evaluateValue("${{\n  'a'\n}}")).toEqual({ kind: "value", v: "a" });
   });
 });
