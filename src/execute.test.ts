@@ -510,6 +510,21 @@ describe("executing run steps", () => {
     expect(out).toEqual({ v: "named" });
   });
 
+  it("keys a skipped step's empty outputs only by a declared id", async () => {
+    // A skipped step occupies its id, but an id-less one occupies nothing —
+    // otherwise it would blank the entry a step that declared one published.
+    const out = success(
+      await execute({
+        steps: [
+          { id: "undefined", run: 'echo "v=named" >> "$GITHUB_OUTPUT"' },
+          { if: "false", run: "true" },
+        ],
+        outputs: { v: "${{ steps.undefined.outputs.v }}" },
+      }),
+    );
+    expect(out).toEqual({ v: "named" });
+  });
+
   it("yields an empty map for a job that declares no outputs", async () => {
     expect(success(await execute({ steps: [{ run: "true" }] }))).toEqual({});
   });
