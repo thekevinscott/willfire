@@ -1,0 +1,32 @@
+name: matrix-expr
+# Does GitHub interpolate a `${{ }}` expression written as an ELEMENT of a
+# matrix list literal, and does the interpolated value reach the check name?
+# The already-probed cases cover an expression as the WHOLE value of an axis or
+# of `include:`; this is the element-level form, which is a different entry
+# point in willfire's expansion. Each job pairs the expression leg with a
+# plain-value control leg in the same matrix, so one dispatch shows both.
+#
+# Scoped to `src/matrix-expr.txt` so it stays out of the other probe PRs'
+# predictions, the same convention as remote-caller.yml.
+on:
+  pull_request:
+    paths:
+      - src/matrix-expr.txt
+jobs:
+  axis-expr:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [plain, "${{ github.event_name }}"]
+    steps:
+      - run: echo "a=${{ matrix.a }}"
+
+  include-expr:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        b: [plain]
+        include:
+          - b: "${{ github.event_name }}"
+    steps:
+      - run: echo "b=${{ matrix.b }}"
