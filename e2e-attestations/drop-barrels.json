@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1788205130,
+  "exit_code": 0,
+  "commit": "f56e3319f2949eb17b8761558a355057e910876b",
+  "branch": "drop-barrels"
+}
