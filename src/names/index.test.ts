@@ -6,13 +6,11 @@ describe("names barrel", () => {
     expect(Object.keys(barrel).sort()).toEqual([
       "EXPRESSION_RE",
       "jobDisplayName",
-      "lookupPath",
       "renderName",
       "skippedDisplayName",
     ]);
     expect(barrel.EXPRESSION_RE).toBeInstanceOf(RegExp);
     expect(typeof barrel.jobDisplayName).toBe("function");
-    expect(typeof barrel.lookupPath).toBe("function");
     expect(typeof barrel.renderName).toBe("function");
     expect(typeof barrel.skippedDisplayName).toBe("function");
   });

@@ -11,7 +11,8 @@ import type { YamlMap, YamlValue } from "../yamlValue.js";
 export type Val =
   | { kind: "value"; v: string | number | boolean }
   /**
-   * An array or an object, which only `fromJSON` produces. Kept apart from
+   * An array or an object, which `fromJSON` and a structured matrix value
+   * produce. Kept apart from
    * `value` because nothing else in the language accepts one: comparison
    * refuses it, and its truthiness is not modelled. Matrix expansion is the
    * one consumer, and it asks for the array directly.
@@ -61,4 +62,10 @@ export interface Scope {
    * it.
    */
   steps?: Record<string, { outputs: Record<string, string> }>;
+  /**
+   * The matrix combination a name is being rendered for. Only `renderName`
+   * fills it: a job `if:` is evaluated once for the job, before the matrix is
+   * expanded, so there is no single combination to read there.
+   */
+  matrix?: YamlMap;
 }
