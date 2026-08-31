@@ -28,7 +28,7 @@ loose file so `conventions.yml` reaches it. Every package's sources live at
 | `pnpm build` | emit `dist/` (tests excluded) |
 | `pnpm predict --repo owner/name --pr N` | run the CLI against a live PR |
 | `pnpm verify --repo owner/name --pr N` | compare a prediction against reality |
-| `pnpm capture-e2e --repo owner/name --pr N --shape "…"` | re-record one pinned capture |
+| `pnpm capture-e2e --repo owner/name --pr N` | re-record one pinned dispatch |
 
 ## Testing
 

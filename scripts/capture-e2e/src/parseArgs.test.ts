@@ -14,31 +14,26 @@ describe("parseArgs", () => {
   });
 
   it("reads the flag that follows each name, wherever it sits", () => {
-    expect(parseArgs(["--shape", "a fan-out", "--repo", "o/r", "--pr", "12"])).toEqual({
-      repo: "o/r",
-      pr: 12,
-      shape: "a fan-out",
-    });
+    expect(parseArgs(["--pr", "12", "--repo", "o/r"])).toEqual({ repo: "o/r", pr: 12 });
   });
 
   it("takes the PR number as a number", () => {
-    expect(parseArgs(["--repo", "o/r", "--pr", "7", "--shape", "s"]).pr).toBe(7);
+    expect(parseArgs(["--repo", "o/r", "--pr", "7"]).pr).toBe(7);
   });
 
   it.each([
-    ["--repo", ["--pr", "1", "--shape", "s"]],
-    ["--pr", ["--repo", "o/r", "--shape", "s"]],
-    ["--shape", ["--repo", "o/r", "--pr", "1"]],
+    ["--repo", ["--pr", "1"]],
+    ["--pr", ["--repo", "o/r"]],
   ])("exits 2 with a usage line when %s is missing", (_flag, argv) => {
     expect(() => parseArgs(argv)).toThrow("exited");
     expect(process.exit).toHaveBeenCalledWith(2);
     expect(vi.mocked(console.error).mock.calls[0][0]).toBe(
-      'usage: capture-e2e --repo owner/name --pr N --shape "what this pin holds"',
+      "usage: capture-e2e --repo owner/name --pr N",
     );
   });
 
   it("exits 2 when a flag is named with no value after it", () => {
-    expect(() => parseArgs(["--repo", "o/r", "--pr", "1", "--shape"])).toThrow("exited");
+    expect(() => parseArgs(["--repo", "o/r", "--pr"])).toThrow("exited");
     expect(process.exit).toHaveBeenCalledWith(2);
   });
 });

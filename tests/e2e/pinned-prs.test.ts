@@ -1,9 +1,11 @@
 import { execFile } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { expect, test } from "vitest";
-import { isJobEntry, type Prediction } from "../../src/index.js";
+import { isJobEntry, makeGithubClient, predict, type Prediction } from "../../src/index.js";
+import type { E2ECapture } from "../fixtures/pinned/capture.js";
 
 const exec = promisify(execFile);
 const root = fileURLToPath(new URL("../..", import.meta.url));
@@ -120,5 +122,46 @@ for (const [repo, pr] of [
     const { stdout } = await tsx(["scripts/verify/src/index.ts", "--repo", repo, "--pr", String(pr)]);
     const lines = stdout.trimEnd().split("\n");
     expect(lines[lines.length - 1]).toBe("PASS");
+  });
+}
+
+/**
+ * One per shape the probe repo does not exercise, two PRs each: dirsql for
+ * filters at fleet scale and a runtime-computed release matrix, putitoutthere
+ * for a reusable-workflow fan-out, pr-monitor for the testing-conventions
+ * dispatch every fleet repo gates on.
+ */
+const PINS = [
+  "dirsql-1010.json",
+  "dirsql-1014.json",
+  "putitoutthere-647.json",
+  "putitoutthere-649.json",
+  "pr-monitor-24.json",
+  "pr-monitor-26.json",
+];
+
+const load = (file: string): E2ECapture =>
+  JSON.parse(
+    readFileSync(fileURLToPath(new URL(`../fixtures/pinned/${file}`, import.meta.url)), "utf8"),
+  ) as E2ECapture;
+
+/**
+ * A check GitHub created and then concluded `skipped` never ran, and
+ * `checkNames` holds only entries predicted to run — so the comparable set is
+ * the non-skipped names. GitHub elides a long job name with a literal `...`,
+ * which collapses several matrix combinations onto one name, so it is a set.
+ */
+const dispatchedNames = (capture: E2ECapture): string[] =>
+  [
+    ...new Set(
+      capture.dispatched.filter((d) => d.conclusion !== "skipped").map((d) => d.name),
+    ),
+  ].sort();
+
+for (const file of PINS) {
+  const capture = load(file);
+  test(`${capture.repo}#${capture.pr}: predicts exactly what GitHub dispatched`, async () => {
+    const prediction = await predict(makeGithubClient(), capture.repo, capture.pr);
+    expect(prediction.checkNames).toEqual(dispatchedNames(capture));
   });
 }
