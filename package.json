@@ -40,14 +40,14 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "capture-e2e": "pnpm --filter capture-e2e record",
     "lint": "eslint .",
     "predict": "tsx src/cli.ts",
     "prepare": "pnpm build",
-    "record-cassette": "pnpm --filter record-cassette record",
-    "test": "vitest run && pnpm --filter record-cassette test",
-    "test:coverage": "vitest run --coverage && pnpm --filter record-cassette test:coverage",
+    "test": "vitest run && pnpm --filter capture-e2e test",
+    "test:coverage": "vitest run --coverage && pnpm --filter capture-e2e test:coverage",
     "test:e2e": "vitest run --config tests/e2e/vitest.config.mts",
-    "typecheck": "tsc -p tsconfig.json && pnpm --filter record-cassette typecheck",
+    "typecheck": "tsc -p tsconfig.json && pnpm --filter capture-e2e typecheck",
     "verify": "tsx src/verify.ts"
   },
   "dependencies": {

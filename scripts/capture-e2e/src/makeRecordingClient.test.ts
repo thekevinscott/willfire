@@ -1,15 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import type { GithubClient } from "willfire";
-import { apiKey } from "../../../tests/fixtures/pinned/cassette.js";
+import { apiKey } from "../../../tests/fixtures/pinned/capture.js";
 import { makeRecordingClient } from "./makeRecordingClient.js";
 
 // The key derivation is the contract the recorder and the replayer share, so
 // it is exercised for real rather than stubbed.
 vi.mock(
-  "../../../tests/fixtures/pinned/cassette.js",
+  "../../../tests/fixtures/pinned/capture.js",
   async () =>
-    await vi.importActual<typeof import("../../../tests/fixtures/pinned/cassette.js")>(
-      "../../../tests/fixtures/pinned/cassette.js",
+    await vi.importActual<typeof import("../../../tests/fixtures/pinned/capture.js")>(
+      "../../../tests/fixtures/pinned/capture.js",
     ),
 );
 

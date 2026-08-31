@@ -1,9 +1,9 @@
 /**
- * The pinned-PR cassette: one live dispatch, captured whole.
+ * The pinned-PR capture: one live dispatch, captured whole.
  *
- * `scripts/record-cassette/` writes one per pinned PR and
+ * `scripts/capture-e2e/` writes one per pinned PR and
  * `tests/integration/pinned-dispatches.test.ts` replays it with no network and
- * no docker. A cassette is a record of observed GitHub behaviour, in the same
+ * no docker. A capture is a record of observed GitHub behaviour, in the same
  * sense `tests/fixtures/willrun-probe/` is: every field was read off a real
  * dispatch, so editing one is a claim that GitHub changed. See `README.md` in
  * this directory.
@@ -77,7 +77,7 @@ export interface PredictedEntry {
   reason?: string;
 }
 
-export interface Cassette {
+export interface E2ECapture {
   repo: string;
   pr: number;
   /** Which workflow shape this pin exists to hold — read by humans, not by code. */
@@ -122,7 +122,7 @@ export const execKey: (...args: Parameters<JobExecutor["executeJob"]>) => string
     .slice(0, 16);
 
 /**
- * A prediction's entries in the shape the cassette stores, built the same way
+ * A prediction's entries in the shape the capture stores, built the same way
  * at record time and at assert time so the two cannot disagree about format.
  */
 export const predictedEntries = (entries: Entry[]): PredictedEntry[] =>
@@ -140,8 +140,8 @@ export const predictedEntries = (entries: Entry[]): PredictedEntry[] =>
 /**
  * Where a prediction and the dispatch it is pinned to disagree, one line each.
  *
- * The recorder refuses to write a cassette this finds anything in, and the test
- * asserts it stays empty — so no cassette can encode a prediction that was
+ * The recorder refuses to write a capture this finds anything in, and the test
+ * asserts it stays empty — so no capture can encode a prediction that was
  * already wrong when it was captured. An `unknown` entry is not a disagreement:
  * it is willfire declining to answer, which the fixture records as such.
  */
@@ -181,25 +181,25 @@ export function reconcile(dispatched: DispatchedCheck[], entries: PredictedEntry
 }
 
 /**
- * A `GithubClient` that answers only from the cassette.
+ * A `GithubClient` that answers only from the capture.
  *
  * Misses are collected rather than thrown, because `predict` catches read
  * failures by design and would quietly turn a gap in the recording into an
  * `unknown` entry. The test asserts the list is empty, so an incomplete
- * cassette fails loudly instead.
+ * capture fails loudly instead.
  */
-export function replayClient(cassette: Cassette): { client: GithubClient; misses: string[] } {
-  const byKey = new Map(cassette.recording.api.map((r) => [r.key, r]));
+export function replayClient(capture: E2ECapture): { client: GithubClient; misses: string[] } {
+  const byKey = new Map(capture.recording.api.map((r) => [r.key, r]));
   const misses: string[] = [];
   const lookup = (call: string, params: ApiParams): ApiData => {
     const key = apiKey(call, params);
     const rec = byKey.get(key);
     if (rec === undefined) {
       misses.push(key);
-      throw new Error(`cassette miss: ${key}`);
+      throw new Error(`capture miss: ${key}`);
     }
     if (rec.data === undefined) {
-      throw new Error(rec.error ?? `cassette record has neither data nor error: ${key}`);
+      throw new Error(rec.error ?? `capture record has neither data nor error: ${key}`);
     }
     return rec.data;
   };
@@ -279,12 +279,12 @@ export function replayClient(cassette: Cassette): { client: GithubClient; misses
   return { client, misses };
 }
 
-/** A `JobExecutor` that answers only from the cassette. Misses are collected, as above. */
-export function replayExecutor(cassette: Cassette): {
+/** A `JobExecutor` that answers only from the capture. Misses are collected, as above. */
+export function replayExecutor(capture: E2ECapture): {
   executor: JobExecutor;
   misses: string[];
 } {
-  const byKey = new Map(cassette.recording.exec.map((r) => [r.key, r]));
+  const byKey = new Map(capture.recording.exec.map((r) => [r.key, r]));
   const misses: string[] = [];
   return {
     executor: {
@@ -293,7 +293,7 @@ export function replayExecutor(cassette: Cassette): {
         const rec = byKey.get(key);
         if (rec === undefined) {
           misses.push(`${jobId} ${key}`);
-          return { ok: false, reason: `cassette miss: execution of '${jobId}'` };
+          return { ok: false, reason: `capture miss: execution of '${jobId}'` };
         }
         return rec.outcome;
       },

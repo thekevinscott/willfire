@@ -43,7 +43,7 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@22.20.1)(@vitest/coverage-v8@4.1.10)(vite@8.2.1(@types/node@22.20.1)(esbuild@0.28.2)(tsx@4.23.12)(yaml@2.9.0))
 
-  scripts/record-cassette:
+  scripts/capture-e2e:
     dependencies:
       willfire:
         specifier: workspace:*

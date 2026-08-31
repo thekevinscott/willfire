@@ -33,7 +33,7 @@ describe("parseArgs", () => {
     expect(() => parseArgs(argv)).toThrow("exited");
     expect(process.exit).toHaveBeenCalledWith(2);
     expect(vi.mocked(console.error).mock.calls[0][0]).toBe(
-      'usage: record-cassette --repo owner/name --pr N --shape "what this pin holds"',
+      'usage: capture-e2e --repo owner/name --pr N --shape "what this pin holds"',
     );
   });
 

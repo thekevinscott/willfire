@@ -1,4 +1,4 @@
-const USAGE = 'usage: record-cassette --repo owner/name --pr N --shape "what this pin holds"';
+const USAGE = 'usage: capture-e2e --repo owner/name --pr N --shape "what this pin holds"';
 
 export function parseArgs(argv: string[]): { repo: string; pr: number; shape: string } {
   const get = (flag: string) => {

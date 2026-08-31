@@ -8,7 +8,7 @@ import type {
   ApiRecord,
   DispatchedCheck,
   ExecRecord,
-} from "../../../tests/fixtures/pinned/cassette.js";
+} from "../../../tests/fixtures/pinned/capture.js";
 
 const hoisted = vi.hoisted(() => ({
   writeFile: vi.fn(),
@@ -17,7 +17,7 @@ const hoisted = vi.hoisted(() => ({
   makeGithubClient: vi.fn(),
   predict: vi.fn(),
   makeLiveExecutor: vi.fn(),
-  buildCassette: vi.fn(),
+  buildCapture: vi.fn(),
   dispatchedChecks: vi.fn(),
   makeRecordingClient: vi.fn(),
   makeRecordingExecutor: vi.fn(),
@@ -29,10 +29,10 @@ vi.mock("node:fs/promises", async () => {
   const actual = await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises");
   return { ...actual, writeFile: hoisted.writeFile };
 });
-vi.mock("../../../tests/fixtures/pinned/cassette.js", async () => {
+vi.mock("../../../tests/fixtures/pinned/capture.js", async () => {
   const actual =
-    await vi.importActual<typeof import("../../../tests/fixtures/pinned/cassette.js")>(
-      "../../../tests/fixtures/pinned/cassette.js",
+    await vi.importActual<typeof import("../../../tests/fixtures/pinned/capture.js")>(
+      "../../../tests/fixtures/pinned/capture.js",
     );
   return { ...actual, predictedEntries: hoisted.predictedEntries, reconcile: hoisted.reconcile };
 });
@@ -44,10 +44,10 @@ vi.mock("willfire/internal", async () => {
   const actual = await vi.importActual<typeof import("willfire/internal")>("willfire/internal");
   return { ...actual, makeLiveExecutor: hoisted.makeLiveExecutor };
 });
-vi.mock("./buildCassette.js", async () => {
+vi.mock("./buildCapture.js", async () => {
   const actual =
-    await vi.importActual<typeof import("./buildCassette.js")>("./buildCassette.js");
-  return { ...actual, buildCassette: hoisted.buildCassette };
+    await vi.importActual<typeof import("./buildCapture.js")>("./buildCapture.js");
+  return { ...actual, buildCapture: hoisted.buildCapture };
 });
 vi.mock("./dispatchedChecks.js", async () => {
   const actual =
@@ -88,7 +88,7 @@ const LIVE = Symbol("live client");
 const LIVE_EXECUTOR = Symbol("live executor");
 const RESOLVE_REF = Symbol("resolveRef");
 const EXECUTOR = Symbol("recording executor");
-const CASSETTE = { repo: "o/r", pr: 5 };
+const CAPTURE = { repo: "o/r", pr: 5 };
 
 const HEAD_SOURCE: WorkflowSource = { owner: "o", repo: "r", ref: HEAD, sha: HEAD };
 const MERGE_SOURCE: WorkflowSource = { owner: "o", repo: "r", ref: MERGE, sha: MERGE };
@@ -118,7 +118,7 @@ interface Fixture {
   disagreements?: string[];
 }
 
-describe("the cassette recorder", () => {
+describe("the capture recorder", () => {
   const argv = process.argv;
   let out: string[];
   let err: string[];
@@ -160,7 +160,7 @@ describe("the cassette recorder", () => {
     });
     hoisted.predictedEntries.mockReturnValue(ENTRIES);
     hoisted.reconcile.mockReturnValue(f.disagreements ?? []);
-    hoisted.buildCassette.mockReturnValue(CASSETTE);
+    hoisted.buildCapture.mockReturnValue(CAPTURE);
     process.argv = [
       "node",
       "/somewhere/index.ts",
@@ -172,11 +172,11 @@ describe("the cassette recorder", () => {
 
   const OUT = "/tests/fixtures/pinned/r-5.json";
 
-  it("writes the cassette the builder handed back", async () => {
+  it("writes the capture the builder handed back", async () => {
     await invoke();
     const [path, body] = hoisted.writeFile.mock.calls[0];
     expect(path).toContain(OUT);
-    expect(body).toBe(`${JSON.stringify(CASSETTE, null, 2)}\n`);
+    expect(body).toBe(`${JSON.stringify(CAPTURE, null, 2)}\n`);
     expect(out).toEqual([`wrote ${path}: 2 dispatched, 1 reads, 1 runs`]);
   });
 
@@ -194,7 +194,7 @@ describe("the cassette recorder", () => {
 
   it("hands the builder the prediction, the dispatch and both recordings", async () => {
     await invoke();
-    expect(hoisted.buildCassette).toHaveBeenCalledWith({
+    expect(hoisted.buildCapture).toHaveBeenCalledWith({
       repo: "o/r",
       pr: 5,
       shape: "a fan-out",
@@ -227,7 +227,7 @@ describe("the cassette recorder", () => {
     await invoke({ merge: null, sources: [HEAD_SOURCE] });
     const client = hoisted.makeRecordingClient.mock.results[0].value.client;
     expect(hoisted.makeLiveExecutor).toHaveBeenCalledWith(client, HEAD_SOURCE, RESOLVE_REF);
-    expect(hoisted.buildCassette).toHaveBeenCalledWith(
+    expect(hoisted.buildCapture).toHaveBeenCalledWith(
       expect.objectContaining({ commits: { head: HEAD, merge: null } }),
     );
   });
@@ -241,7 +241,7 @@ describe("the cassette recorder", () => {
     await expect(invoke({ sources: [source] })).rejects.toThrow("exited");
     expect(process.exit).toHaveBeenCalledWith(1);
     expect(err).toEqual([
-      `predict no longer reads o/r at ${MERGE}; update the workspace in record-cassette`,
+      `predict no longer reads o/r at ${MERGE}; update the workspace in capture-e2e`,
     ]);
     expect(hoisted.writeFile).not.toHaveBeenCalled();
   });
@@ -254,7 +254,7 @@ describe("the cassette recorder", () => {
   });
 
   it("exits 1, listing every disagreement, rather than pinning a wrong answer", async () => {
-    // A cassette the reconciler finds anything in would record a prediction
+    // A capture the reconciler finds anything in would record a prediction
     // that was already wrong when it was captured.
     await expect(
       invoke({ disagreements: ["MISS a.yml :: three", "OVER a.yml :: two"] }),

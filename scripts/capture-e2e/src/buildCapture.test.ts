@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Cassette } from "../../../tests/fixtures/pinned/cassette.js";
-import { buildCassette } from "./buildCassette.js";
+import type { E2ECapture } from "../../../tests/fixtures/pinned/capture.js";
+import { buildCapture } from "./buildCapture.js";
 
 const check = (workflow: string, name: string) => ({ workflow, name, conclusion: "success" });
 
-const PARTS: Omit<Cassette, "capturedAt"> = {
+const PARTS: Omit<E2ECapture, "capturedAt"> = {
   repo: "o/r",
   pr: 1,
   shape: "one workflow",
@@ -23,7 +23,7 @@ const PARTS: Omit<Cassette, "capturedAt"> = {
   },
 };
 
-describe("buildCassette", () => {
+describe("buildCapture", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-01-02T03:04:05.000Z"));
@@ -34,11 +34,11 @@ describe("buildCassette", () => {
   });
 
   it("stamps the capture time", () => {
-    expect(buildCassette(PARTS).capturedAt).toBe("2026-01-02T03:04:05.000Z");
+    expect(buildCapture(PARTS).capturedAt).toBe("2026-01-02T03:04:05.000Z");
   });
 
   it("sorts the dispatch on workflow then check name", () => {
-    expect(buildCassette(PARTS).dispatched.map((d) => `${d.workflow} :: ${d.name}`)).toEqual([
+    expect(buildCapture(PARTS).dispatched.map((d) => `${d.workflow} :: ${d.name}`)).toEqual([
       "a.yml :: one",
       "a.yml :: two",
       "b.yml :: one",
@@ -46,18 +46,18 @@ describe("buildCassette", () => {
   });
 
   it("sorts both recordings on their key", () => {
-    const { recording } = buildCassette(PARTS);
+    const { recording } = buildCapture(PARTS);
     expect(recording.api.map((r) => r.key)).toEqual(["a", "b", "c"]);
     expect(recording.exec.map((r) => r.key)).toEqual(["x", "y", "z"]);
   });
 
   it("carries the rest of the parts through untouched", () => {
-    const cassette = buildCassette(PARTS);
-    expect(cassette.repo).toBe("o/r");
-    expect(cassette.pr).toBe(1);
-    expect(cassette.shape).toBe("one workflow");
-    expect(cassette.commits).toEqual({ head: "head-sha", merge: "merge-sha" });
-    expect(cassette.predicted).toEqual({
+    const capture = buildCapture(PARTS);
+    expect(capture.repo).toBe("o/r");
+    expect(capture.pr).toBe(1);
+    expect(capture.shape).toBe("one workflow");
+    expect(capture.commits).toEqual({ head: "head-sha", merge: "merge-sha" });
+    expect(capture.predicted).toEqual({
       checkNames: ["one"],
       entries: [],
       sources: [],
@@ -66,7 +66,7 @@ describe("buildCassette", () => {
   });
 
   it("leaves the caller's arrays in the order they were handed over", () => {
-    buildCassette(PARTS);
+    buildCapture(PARTS);
     expect(PARTS.dispatched.map((d) => d.name)).toEqual(["two", "one", "one"]);
     expect(PARTS.recording.api.map((r) => r.key)).toEqual(["b", "c", "a"]);
     expect(PARTS.recording.exec.map((r) => r.key)).toEqual(["y", "z", "x"]);

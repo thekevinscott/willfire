@@ -1,6 +1,6 @@
 # Pinned dispatches
 
-One JSON cassette per pinned pull request. Each is a record of a dispatch that
+One JSON capture per pinned pull request. Each is a record of a dispatch that
 happened: the checks GitHub created, the commits it created them from, the
 workflow files as they read at those commits, and what running the jobs that
 decide a runtime matrix yielded. `../../integration/pinned-dispatches.test.ts`
@@ -8,10 +8,10 @@ replays one and asserts the prediction matches, with no network, no token and
 no docker.
 
 These are records in the same sense `../willrun-probe/` is. Nothing here is
-inferred and nothing is hand-written, so **editing a cassette is a claim that
+inferred and nothing is hand-written, so **editing a capture is a claim that
 GitHub's behaviour changed** — re-record it against a live dispatch instead.
 
-## What a cassette holds
+## What a capture holds
 
 | field | what it is |
 |---|---|
@@ -32,18 +32,18 @@ network was broken.
 ## Regenerating one
 
 ```
-pnpm record-cassette --repo owner/name --pr N --shape "what this pin holds"
+pnpm capture-e2e --repo owner/name --pr N --shape "what this pin holds"
 ```
 
 Needs `GH_TOKEN` (or `GITHUB_TOKEN`) and a working docker — job execution is
 captured by running the jobs the way `predict` runs them. The recorder refuses
 to write when any run for the head commit is still in flight, and when the
-prediction disagrees with the dispatch, so no cassette can encode an answer
+prediction disagrees with the dispatch, so no capture can encode an answer
 that was already wrong when it was captured.
 
 ## What cannot be re-recorded
 
-A cassette can only be captured while the repo state that produced the dispatch
+A capture can only be captured while the repo state that produced the dispatch
 is still current. dirsql's `release-ci.yml` computes its release matrix from a
 `plan` job that reads versions off the repo, so re-predicting a PR whose
 dispatch predates a release yields versions that dispatch never saw, and the

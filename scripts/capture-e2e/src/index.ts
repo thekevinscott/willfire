@@ -1,15 +1,15 @@
-// Regenerates one pinned cassette from a live dispatch. Needs GH_TOKEN (or
+// Regenerates one pinned capture from a live dispatch. Needs GH_TOKEN (or
 // GITHUB_TOKEN) and a working docker: job execution is captured by running the
 // jobs the way `predict` runs them, not by describing what they would do.
 //
-// Usage: pnpm record-cassette --repo owner/name --pr N --shape "what this pin holds"
+// Usage: pnpm capture-e2e --repo owner/name --pr N --shape "what this pin holds"
 
 import { writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { makeGithubClient, predict } from "willfire";
 import { makeLiveExecutor } from "willfire/internal";
-import { predictedEntries, reconcile } from "../../../tests/fixtures/pinned/cassette.js";
-import { buildCassette } from "./buildCassette.js";
+import { predictedEntries, reconcile } from "../../../tests/fixtures/pinned/capture.js";
+import { buildCapture } from "./buildCapture.js";
 import { dispatchedChecks } from "./dispatchedChecks.js";
 import { makeRecordingClient } from "./makeRecordingClient.js";
 import { makeRecordingExecutor } from "./makeRecordingExecutor.js";
@@ -43,7 +43,7 @@ const workspaceSource = prediction.sources.find(
 );
 if (workspaceSource === undefined) {
   console.error(
-    `predict no longer reads ${repo} at ${workspace.sha}; update the workspace in record-cassette`,
+    `predict no longer reads ${repo} at ${workspace.sha}; update the workspace in capture-e2e`,
   );
   process.exit(1);
 }
@@ -59,7 +59,7 @@ if (incomplete.length > 0) {
   process.exit(1);
 }
 
-// A cassette that disagrees with its own dispatch would pin a wrong answer as
+// A capture that disagrees with its own dispatch would pin a wrong answer as
 // the expected one, so the recorder refuses to write it.
 const entries = predictedEntries(prediction.entries);
 const disagreements = reconcile(dispatched, entries);
@@ -71,7 +71,7 @@ if (disagreements.length > 0) {
   process.exit(1);
 }
 
-const cassette = buildCassette({
+const capture = buildCapture({
   repo,
   pr: prNumber,
   shape,
@@ -89,5 +89,5 @@ const cassette = buildCassette({
 const out = fileURLToPath(
   new URL(`../../../tests/fixtures/pinned/${name}-${prNumber}.json`, import.meta.url),
 );
-await writeFile(out, `${JSON.stringify(cassette, null, 2)}\n`);
+await writeFile(out, `${JSON.stringify(capture, null, 2)}\n`);
 console.log(`wrote ${out}: ${dispatched.length} dispatched, ${api.size} reads, ${exec.size} runs`);
