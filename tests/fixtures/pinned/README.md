@@ -32,8 +32,7 @@ network was broken.
 ## Regenerating one
 
 ```
-pnpm exec tsx scripts/record-cassette.ts \
-  --repo owner/name --pr N --shape "what this pin holds"
+pnpm record-cassette --repo owner/name --pr N --shape "what this pin holds"
 ```
 
 Needs `GH_TOKEN` (or `GITHUB_TOKEN`) and a working docker — job execution is
