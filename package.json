@@ -44,11 +44,11 @@
     "lint": "eslint .",
     "predict": "tsx src/cli.ts",
     "prepare": "pnpm build",
-    "test": "vitest run && pnpm --filter capture-e2e test",
-    "test:coverage": "vitest run --coverage && pnpm --filter capture-e2e test:coverage",
+    "test": "vitest run && pnpm --filter capture-e2e test && pnpm --filter verify test",
+    "test:coverage": "vitest run --coverage && pnpm --filter capture-e2e test:coverage && pnpm --filter verify test:coverage",
     "test:e2e": "vitest run --config tests/e2e/vitest.config.mts",
-    "typecheck": "tsc -p tsconfig.json && pnpm --filter capture-e2e typecheck",
-    "verify": "tsx src/verify.ts"
+    "typecheck": "tsc -p tsconfig.json && pnpm --filter capture-e2e typecheck && pnpm --filter verify typecheck",
+    "verify": "pnpm --filter verify verify"
   },
   "dependencies": {
     "yaml": "^2.6.0"
