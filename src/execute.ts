@@ -338,8 +338,15 @@ async function runUses(
   }
   if (SETUP_NODE_RE.test(uses)) {
     // The execution world ships exactly one node: asking for it is already
-    // satisfied, asking for anything else cannot be.
-    const withKeys = Object.keys(withBlock);
+    // satisfied, asking for anything else cannot be. setup-node reads every
+    // input through core.getInput, which trims and cannot tell an empty value
+    // from an absent one, so an empty one asks for nothing.
+    const withKeys = Object.entries(withBlock)
+      .filter(([, raw]) => {
+        const rendered = renderTemplate(String(raw ?? ""), scope);
+        return rendered === null || rendered.trim() !== "";
+      })
+      .map(([k]) => k);
     if (withKeys.length === 0) {
       return { ok: true, v: {} };
     }
