@@ -5,8 +5,8 @@
 // Ground truth: workflow runs for the PR head SHA with a pull_request event,
 // and the job entries inside each run (skipped jobs included).
 
-import { isJobEntry, makeGithubClient, predict } from "./index.js";
-import type { GithubClient } from "./index.js";
+import { isJobEntry, makeGithubClient, predict } from "willfire";
+import type { GithubClient } from "willfire";
 
 async function actualEntries(octokit: GithubClient, repo: string, prNumber: number) {
   const [owner, name] = repo.split("/");
@@ -41,7 +41,7 @@ async function actualEntries(octokit: GithubClient, repo: string, prNumber: numb
 
 const get = (flag: string) => {
   const i = process.argv.indexOf(flag);
-  return i >= 0 ? process.argv[i + 1] : undefined;
+  return i === -1 ? undefined : process.argv[i + 1];
 };
 const repo = get("--repo");
 const prArg = get("--pr");
@@ -58,8 +58,7 @@ const { entries: predictedRaw } = await predict(octokit, repo, pr);
 // no key to compare and are reported separately below.
 const predicted = new Map(
   predictedRaw
-    .filter(isJobEntry)
-    .filter((r) => r.checkName !== null)
+    .filter((r) => isJobEntry(r) && r.checkName !== null)
     .map((r) => [`${r.workflow} :: ${r.checkName}`, r.status]),
 );
 const unresolved = predictedRaw.filter(isJobEntry).filter((r) => r.checkName === null);

@@ -37,3 +37,10 @@ jobs:
       languages: '["typescript"]'
       source: scripts/capture-e2e/src
       version: '0.0.96'
+
+  verify:
+    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
+    with:
+      languages: '["typescript"]'
+      source: scripts/verify/src
+      version: '0.0.96'

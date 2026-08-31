@@ -117,7 +117,7 @@ for (const [repo, pr] of [
   ["thekevinscott/willfire", 34],
 ] as const) {
   test(`${repo}#${pr}: predicted set matches what GitHub dispatched`, async () => {
-    const { stdout } = await tsx(["src/verify.ts", "--repo", repo, "--pr", String(pr)]);
+    const { stdout } = await tsx(["scripts/verify/src/index.ts", "--repo", repo, "--pr", String(pr)]);
     const lines = stdout.trimEnd().split("\n");
     expect(lines[lines.length - 1]).toBe("PASS");
   });

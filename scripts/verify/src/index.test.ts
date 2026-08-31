@@ -1,24 +1,24 @@
 // Unit suite for the prediction/reality comparison script.
 //
-// `verify.ts` is a top-level script: importing it *is* running it. So each case
+// The script is a top-level script: importing it *is* running it. So each case
 // stands up the world it wants — argv, a stubbed `predict()`, and a GitHub client
 // stand-in for the workflow-run queries — then re-imports the module and reads
 // back what it printed and the code it exited with.
 //
-// `./index.js` is mocked because it is the collaborator this script is being
-// isolated from; its own behavior is covered in `predict/predict.test.ts`.
+// `willfire` is mocked because it is the collaborator this script is being
+// isolated from; its own behavior is covered in that package's own suite.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { jobName } from "./index.js";
-import type { Entry, JobEntry, WorkflowEntry } from "./index.js";
+import { jobName } from "willfire";
+import type { Entry, JobEntry, WorkflowEntry } from "willfire";
 
 const hoisted = vi.hoisted(() => ({
   makeGithubClient: vi.fn(),
   predict: vi.fn(),
 }));
 
-vi.mock("./index.js", async () => {
-  const actual = await vi.importActual<typeof import("./index.js")>("./index.js");
+vi.mock("willfire", async () => {
+  const actual = await vi.importActual<typeof import("willfire")>("willfire");
   return { ...actual, makeGithubClient: hoisted.makeGithubClient, predict: hoisted.predict };
 });
 
@@ -37,10 +37,18 @@ interface RunFixture {
   jobs: { name: string; conclusion: string }[];
 }
 
-function fakeGithub(runs: RunFixture[]) {
+/** Every request the script made, in order, so a case can assert the shape. */
+type Call = [string, Record<string, unknown>];
+
+function fakeGithub(runs: RunFixture[], calls: Call[] = []) {
   return {
     rest: {
-      pulls: { get: async () => ({ data: { head: { sha: "deadbeef" } } }) },
+      pulls: {
+        get: async (params: Record<string, unknown>) => {
+          calls.push(["pulls.get", params]);
+          return { data: { head: { sha: "deadbeef" } } };
+        },
+      },
       actions: {
         listWorkflowRunsForRepo: LIST_RUNS,
         listJobsForWorkflowRun: LIST_JOBS,
@@ -48,12 +56,14 @@ function fakeGithub(runs: RunFixture[]) {
     },
     paginate: async (route: symbol, params: { run_id?: number }) => {
       if (route === LIST_RUNS) {
+        calls.push(["listWorkflowRunsForRepo", params]);
         return runs.map(({ id, path, status }) => ({
           id,
           path,
           status: status ?? "completed",
         }));
       }
+      calls.push(["listJobsForWorkflowRun", params]);
       return runs.find((r) => r.id === params.run_id)?.jobs ?? [];
     },
   };
@@ -86,10 +96,12 @@ describe("verify", () => {
   const argv = process.argv;
   let out: string[];
   let err: string[];
+  let calls: Call[];
 
   beforeEach(() => {
     out = [];
     err = [];
+    calls = [];
     vi.spyOn(console, "log").mockImplementation((line: string) => void out.push(line));
     vi.spyOn(console, "error").mockImplementation((line: string) => void err.push(line));
   });
@@ -113,11 +125,11 @@ describe("verify", () => {
       throw stop;
     }) as () => never);
 
-    hoisted.makeGithubClient.mockReturnValue(fakeGithub(runs));
+    hoisted.makeGithubClient.mockReturnValue(fakeGithub(runs, calls));
     hoisted.predict.mockResolvedValue({ entries: predicted, skip: null });
     process.argv = ["node", "/somewhere/verify.ts", ...args];
     vi.resetModules();
-    await expect(import("./verify.js")).rejects.toBe(stop);
+    await expect(import("./index.js")).rejects.toBe(stop);
     return code;
   }
 
@@ -125,6 +137,28 @@ describe("verify", () => {
     expect(await invoke({ argv: ["--repo", "o/r"] })).toBe(2);
     expect(err[0]).toMatch(/^usage: verify /);
     expect(hoisted.predict).not.toHaveBeenCalled();
+  });
+
+  it("reads --repo and --pr off argv and asks GitHub about exactly that PR", async () => {
+    await invoke({
+      argv: ["--pr", "7", "--repo", "acme/widget"],
+      runs: [{ id: 3, path: "w.yml", jobs: [{ name: "a", conclusion: "success" }] }],
+    });
+    expect(hoisted.predict.mock.calls[0].slice(1)).toEqual(["acme/widget", 7]);
+    expect(calls).toEqual([
+      ["pulls.get", { owner: "acme", repo: "widget", pull_number: 7 }],
+      [
+        "listWorkflowRunsForRepo",
+        {
+          owner: "acme",
+          repo: "widget",
+          head_sha: "deadbeef",
+          event: "pull_request",
+          per_page: 100,
+        },
+      ],
+      ["listJobsForWorkflowRun", { owner: "acme", repo: "widget", run_id: 3, per_page: 100 }],
+    ]);
   });
 
   it("passes when every predicted entry matches reality", async () => {
@@ -172,6 +206,43 @@ describe("verify", () => {
     });
     expect(out).toContain("  ?   w.yml :: surprise :: actual run, workflow had unknown prediction");
     expect(code).toBe(0);
+  });
+
+  it("still judges surprises in a workflow whose every entry was decided", async () => {
+    // The leniency above is bought by an `unknown` somewhere in the workflow.
+    // Without one, the same extra check is a miss.
+    const code = await invoke({
+      predicted: [entry("w.yml", "known", "run")],
+      runs: [
+        {
+          id: 1,
+          path: "w.yml",
+          jobs: [
+            { name: "known", conclusion: "success" },
+            { name: "surprise", conclusion: "success" },
+          ],
+        },
+      ],
+    });
+    expect(out).toEqual([
+      "  OK  w.yml :: known :: run",
+      "MISS  w.yml :: surprise :: ran (run) but was not predicted",
+      "FAIL",
+    ]);
+    expect(code).toBe(1);
+  });
+
+  it("reports in sorted key order, not in the order the entries arrived", async () => {
+    const code = await invoke({
+      predicted: [entry("z.yml", "j", "run")],
+      runs: [{ id: 1, path: "a.yml", jobs: [{ name: "x", conclusion: "success" }] }],
+    });
+    expect(out).toEqual([
+      "MISS  a.yml :: x :: ran (run) but was not predicted",
+      "OVER  z.yml :: j :: predicted run but never appeared",
+      "FAIL",
+    ]);
+    expect(code).toBe(1);
   });
 
   it("fails on an entry that ran but was never predicted", async () => {

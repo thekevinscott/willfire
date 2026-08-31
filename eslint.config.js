@@ -99,7 +99,7 @@ export default [
       'scripts/*/src/**/*.test.ts',
       'src/execute.ts',
       'src/matrix/expandMatrixDetailed.ts',
-      'src/verify.ts',
+      'scripts/verify/src/index.ts',
     ],
     languageOptions: {
       parser: tseslint.parser,

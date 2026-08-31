@@ -1,17 +1,17 @@
 # Agent contract
 
 willfire is a pnpm workspace. The published package is at the root: `src/predict.ts`
-(the prediction engine and its CLI), `src/expr/` (a tri-state evaluator for the
-slice of the GitHub expression language that job `if:` conditions use), and
-`src/verify.ts` (a script that diffs a prediction against what GitHub actually
-dispatched). `README.md` describes the model; this file is the operating
-contract for working in the repo.
+(the prediction engine and its CLI) and `src/expr/` (a tri-state evaluator for the
+slice of the GitHub expression language that job `if:` conditions use).
+`README.md` describes the model; this file is the operating contract for working
+in the repo.
 
 Each development tool under `scripts/` is its own private workspace package —
-`scripts/capture-e2e/` today. A tool goes there rather than in `src/` because
-it is not library surface; it is a package rather than a loose file so
-`conventions.yml` reaches it. Every package's sources live at `<package>/src/`
-with colocated tests, and every package gets its own `conventions.yml` call.
+`scripts/capture-e2e/` and `scripts/verify/` today. A tool goes there rather
+than in `src/` because it is not library surface; it is a package rather than a
+loose file so `conventions.yml` reaches it. Every package's sources live at
+`<package>/src/` with colocated tests, and every package gets its own
+`conventions.yml` call.
 
 ## Goals
 
