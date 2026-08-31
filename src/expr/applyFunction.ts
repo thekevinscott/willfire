@@ -1,11 +1,13 @@
 import { asBool } from "./asBool.js";
+import { formatCall } from "./formatCall.js";
 import { fromJson } from "./fromJson.js";
 import { UNKNOWN, type Val } from "./val.js";
 
 /**
- * `always()` is true by definition and `fromJSON` is what a dynamic matrix axis
- * is built out of. The job-status functions depend on jobs that have not run,
- * so they are unknown — as is every function not modelled here.
+ * `always()` is true by definition, `fromJSON` is what a dynamic matrix axis
+ * is built out of, and `format` is what a conditional `name:` suffix is built
+ * out of. The job-status functions depend on jobs that have not run, so they
+ * are unknown — as is every function not modelled here.
  */
 export function applyFunction(name: string, args: Val[]): Val {
   if (name === "always") {
@@ -13,6 +15,9 @@ export function applyFunction(name: string, args: Val[]): Val {
   }
   if (name === "fromjson" && args.length === 1) {
     return fromJson(args[0]);
+  }
+  if (name === "format") {
+    return formatCall(args);
   }
   if (name === "contains" && args.length === 2) {
     const [hay, needle] = args;

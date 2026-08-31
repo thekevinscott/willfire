@@ -34,7 +34,14 @@ describe("the value lattice", () => {
       github: { event_name: "pull_request" },
       needs: { detect: { outputs: { x: "y" } } },
       steps: { scan: { outputs: {} } },
+      matrix: { os: "linux", cfg: { arch: "x64" } },
     };
     expect(scope.inputs?.mode).toEqual({ kind: "value", v: "fast" });
+    expect(scope.matrix).toEqual({ os: "linux", cfg: { arch: "x64" } });
+  });
+
+  it("admits a scope with no matrix, which is every scope but a name's", () => {
+    const scope: Scope = { github: { event_name: "pull_request" } };
+    expect(scope.matrix).toBeUndefined();
   });
 });

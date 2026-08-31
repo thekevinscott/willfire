@@ -1,3 +1,4 @@
+import { matrixVal } from "./matrixVal.js";
 import { UNKNOWN, type Scope, type Val } from "./val.js";
 
 export function lookup(scope: Scope, path: string): Val {
@@ -46,7 +47,10 @@ export function lookup(scope: Scope, path: string): Val {
     }
     return { kind: "value", v: step.outputs[parts[2]] ?? "" };
   }
-  // `matrix.*`, `env.*`, `vars.*`, `secrets.*`: all require something that
-  // has not happened yet at prediction time.
+  if (head === "matrix") {
+    return matrixVal(scope.matrix, rest);
+  }
+  // `env.*`, `vars.*`, `secrets.*`: all require something that has not
+  // happened yet at prediction time.
   return UNKNOWN;
 }

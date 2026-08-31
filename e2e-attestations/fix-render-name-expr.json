@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1788208722,
+  "exit_code": 0,
+  "commit": "fc8b2feadd6d69b281af98352d7cfe542c525cd6",
+  "branch": "fix/render-name-expr"
+}

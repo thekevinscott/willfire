@@ -15,6 +15,11 @@ describe("applyFunction", () => {
     expect(applyFunction("fromjson", [S("[1]"), S("x")])).toEqual({ kind: "unknown" });
   });
 
+  it("dispatches format at any arity", () => {
+    expect(applyFunction("format", [S("{0}!"), S("a")])).toEqual(S("a!"));
+    expect(applyFunction("format", [])).toEqual({ kind: "unknown" });
+  });
+
   it("evaluates contains over two known strings", () => {
     expect(applyFunction("contains", [S("abc"), S("b")])).toEqual(S(true));
     expect(applyFunction("contains", [S("abc"), S("z")])).toEqual(S(false));

@@ -47,8 +47,19 @@ describe("lookup", () => {
     expect(lookup({ steps: {} }, "steps.scan.outputs.x")).toEqual({ kind: "unknown" });
   });
 
-  it("leaves every runtime context unknown", () => {
+  it("resolves matrix only when a combination was supplied", () => {
+    // A job `if:` is evaluated before the matrix expands, so no combination
+    // reaches it and `matrix.*` stays unknown there.
     expect(lookup(SCOPE, "matrix.language")).toEqual({ kind: "unknown" });
+    expect(lookup({ matrix: { language: "go" } }, "matrix.language")).toEqual({
+      kind: "value",
+      v: "go",
+    });
+  });
+
+  it("leaves every runtime context unknown", () => {
     expect(lookup(SCOPE, "env.FOO")).toEqual({ kind: "unknown" });
+    // A supplied combination is not a fallback for another context's key.
+    expect(lookup({ matrix: { FOO: "x" } }, "env.FOO")).toEqual({ kind: "unknown" });
   });
 });
