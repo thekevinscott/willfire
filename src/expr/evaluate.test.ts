@@ -2,13 +2,8 @@ import { describe, expect, it } from "vitest";
 import { evaluate } from "./evaluate.js";
 import type { Scope } from "./val.js";
 
-/**
- * `evaluate` is the whole public surface, so everything below drives it rather
- * than the parser internals. The tri-state is the thing under test: `true` and
- * `false` are claims that a job's fate is settled, and `null` is the refusal to
- * claim. A test that turns a `null` into a `true` is widening what willfire
- * asserts about a repo's CI, not tidying a return value.
- */
+// A test that turns a `null` into a `true` widens what willfire asserts about a
+// repo's CI; it is not tidying a return value.
 
 /** The scope the fleet's `testing-conventions` callers actually produce. */
 const FLEET: Scope = {
@@ -37,8 +32,8 @@ describe("literals and truthiness", () => {
     ["0", false],
     ["-1", true],
     ["1.5", true],
-    // A non-empty string is truthy whatever it spells — the JavaScript trap,
-    // kept deliberately, because GitHub has it too.
+    // A non-empty string is truthy whatever it spells; GitHub has the
+    // JavaScript trap too.
     ["'false'", true],
     ["'0'", true],
     ["null", false],
@@ -82,8 +77,6 @@ describe("&& short-circuits from either side", () => {
   });
 
   it("is false when the right is false and the left is unknown", () => {
-    // The point of the whole module: an undecided operand does not make the
-    // expression undecided when the other operand settles it.
     expect(evaluate("needs.detect.outputs.x && false")).toBe(false);
   });
 
@@ -191,8 +184,7 @@ describe("context lookups", () => {
   });
 
   it("leaves an absent input unknown rather than empty", () => {
-    // Treating a missing input as `''` would silently decide guards that are
-    // not decided.
+    // Reading a missing input as `''` would silently decide undecided guards.
     expect(evaluate("inputs.mode == ''", { inputs: {} })).toBe(null);
     expect(evaluate("inputs.mode == ''")).toBe(null);
   });
@@ -228,9 +220,7 @@ describe("context lookups", () => {
   });
 });
 
-// `needs.*` is the one runtime context that can be supplied: the outputs are
-// computed before the jobs that read them expand. Nothing in this module works
-// out what they are — they are handed in.
+// `needs.*` outputs are handed in, never worked out here.
 describe("needs outputs", () => {
   const NEEDS: Scope = {
     needs: { detect: { outputs: { coverage_languages: '["typescript"]', e2e: "true" } } },
@@ -241,9 +231,8 @@ describe("needs outputs", () => {
   });
 
   it("keeps the output a raw string", () => {
-    // The runner substitutes what a step wrote, and the guards compare against
-    // strings. Parsing here would make `!= '[]'` a mixed-type comparison, which
-    // is unknown — turning a decidable guard undecidable.
+    // The runner substitutes what a step wrote. Parsing here would make
+    // `!= '[]'` a mixed-type comparison, turning a decidable guard undecidable.
     expect(evaluate("needs.detect.outputs.coverage_languages == '[\"typescript\"]'", NEEDS)).toBe(
       true,
     );
@@ -281,8 +270,8 @@ describe("needs outputs", () => {
   });
 });
 
-// `steps.*` mirrors `needs.*`: the executor's step walk is the one caller
-// that can supply it honestly, and the completeness contract is the same.
+// `steps.*` mirrors `needs.*`; the executor's step walk is the one honest
+// supplier, under the same completeness contract.
 describe("steps outputs", () => {
   const STEPS: Scope = {
     steps: {
@@ -297,8 +286,7 @@ describe("steps outputs", () => {
 
   it("coalesces past a skipped step the way the fleet's detect outputs do", () => {
     // A skipped step is present with no outputs, so every read against it is
-    // '', which is falsy, so `||` yields the step that ran. This is the exact
-    // shape of every one of detect's ~25 `outputs:` entries.
+    // '', which is falsy, so `||` yields the step that ran.
     const cond =
       "(steps.scan_hermetic.outputs.static_languages || steps.scan_published.outputs.static_languages)" +
       " == '[\"typescript\"]'";
@@ -358,9 +346,8 @@ describe("functions", () => {
   });
 
   it("leaves an unmodelled function unknown but still consumes its arguments", () => {
-    // If the argument list were not parsed, the tokens after it would parse
-    // against the wrong position and the result would be arbitrary rather
-    // than unknown.
+    // Unparsed, its tokens would parse against the wrong position and the
+    // result would be arbitrary rather than unknown.
     expect(evaluate("toJSON('a') == 'b'")).toBe(null);
     expect(evaluate("format('{0}', 'a', 'b') == 'x' || true")).toBe(true);
   });
@@ -370,9 +357,8 @@ describe("functions", () => {
   });
 });
 
-// `fromJSON` is what a dynamic matrix axis is built out of; the value side of
-// it lives in evaluateValue's tests. What belongs here is how its results
-// behave under truthiness and comparison.
+// The value side of `fromJSON` lives in evaluateValue's tests; here it is only
+// how its results behave under truthiness and comparison.
 describe("fromJSON", () => {
   const NEEDS: Scope = {
     needs: {
@@ -406,10 +392,8 @@ describe("fromJSON", () => {
 });
 
 describe("the shapes that appear in testing-conventions", () => {
-  // Every condition below is copied from
+  // Every condition below is copied verbatim from
   // `thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0`.
-  // They are the reason this evaluator exists; if one of them regresses to
-  // `null`, a fleet gate loses a check name.
 
   it("skips mutation, because the caller's gates list decides it", () => {
     const cond =
@@ -431,10 +415,8 @@ describe("the shapes that appear in testing-conventions", () => {
 
   it("leaves unit-coverage unknown, because only detect's outputs decide it", () => {
     // The gate is requested, so the only remaining clause reads an output of a
-    // job that has not run. Short-circuiting cannot settle that, and guessing
-    // would be a claim about which languages the repo has sources for. If
-    // those outputs ever arrive in the scope, this becomes decidable there —
-    // not here.
+    // job that has not run; guessing would claim which languages the repo has
+    // sources for.
     const cond =
       "(inputs.gates == '' || contains(inputs.gates, '\"unit-coverage\"')) && needs.detect.outputs.coverage_languages != '[]'";
     expect(evaluate(cond, FLEET)).toBe(null);

@@ -3,13 +3,9 @@ import { fromJson } from "./fromJson.js";
 import { UNKNOWN, type Val } from "./val.js";
 
 /**
- * The functions worth modelling.
- *
- * `always()` is true by definition. `contains` on two known strings is the one
- * that unlocks the fleet's `gates` pattern. `fromJSON` is what a dynamic matrix
- * axis is built out of. `success()`, `failure()` and `cancelled()` depend on
- * jobs that have not run, and everything else is simply not modelled — all
- * unknown.
+ * `always()` is true by definition and `fromJSON` is what a dynamic matrix axis
+ * is built out of. The job-status functions depend on jobs that have not run,
+ * so they are unknown — as is every function not modelled here.
  */
 export function applyFunction(name: string, args: Val[]): Val {
   if (name === "always") {
