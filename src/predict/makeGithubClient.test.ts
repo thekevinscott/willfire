@@ -1,13 +1,12 @@
-// The global `fetch` is the one third-party edge this module reaches for.
-// Stubbing it lets every route be driven without a network, and captures the
-// exact URL and headers each one sends.
+// Stubbing the global `fetch` drives every route without a network and
+// captures the exact URL and headers each one sends.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { makeGithubClient } from "./makeGithubClient.js";
 
 const calls: { url: string; headers: Record<string, string> }[] = [];
 
-/** Serve the staged responses in order; a request past the end fails loudly. */
+/** A request past the end of the staged responses fails loudly. */
 const stage = (...responses: Response[]): void => {
   vi.stubGlobal("fetch", async (url: URL, init: { headers: Record<string, string> }) => {
     calls.push({ url: String(url), headers: init.headers });

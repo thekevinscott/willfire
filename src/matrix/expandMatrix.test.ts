@@ -29,8 +29,8 @@ describe("expandMatrix", () => {
   });
 
   it("expands an axis written as an expression over known outputs", () => {
-    // The fleet shape: the axis is the values another job computed, and they
-    // are knowable exactly when the scope carries that job's outputs.
+    // The axis is another job's computed values, knowable exactly when the
+    // scope carries that job's outputs.
     const strategy = { matrix: { language: "${{ fromJSON(needs.d.outputs.langs) }}" } };
     // Typed as the expr module's own Scope — the seam expandMatrix takes.
     const scope: Scope = { needs: { d: { outputs: { langs: '["typescript","rust"]' } } } };
@@ -87,8 +87,6 @@ describe("expandMatrix", () => {
   });
 
   it("returns no combinations when any axis is empty", () => {
-    // The product with an empty axis is empty, however many values the other
-    // axes carry.
     expect(expandMatrix({ matrix: { a: [], b: ["x"] } })).toEqual([]);
     expect(expandMatrix({ matrix: { a: ["x"], b: [] } })).toEqual([]);
     expect(expandMatrix({ matrix: { a: [], b: [] } })).toEqual([]);

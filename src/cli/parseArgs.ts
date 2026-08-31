@@ -20,9 +20,8 @@ export function parseArgs(argv: string[]): {
     console.error(USAGE);
     process.exit(2);
   }
-  // An unrecognised action is refused rather than ignored. Silently falling
-  // back to the guess would turn a typo into a wrong prediction, which is the
-  // failure this flag exists to remove.
+  // Refused, not ignored: falling back to the guess would turn a typo into a
+  // wrong prediction, the failure this flag exists to remove.
   const action = get("--action");
   if (action !== undefined && !isPrEventAction(action)) {
     console.error(`unknown --action: ${action}`);

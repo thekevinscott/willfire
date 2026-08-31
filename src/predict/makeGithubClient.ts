@@ -1,6 +1,5 @@
-// The GitHub REST surface willfire uses: a handful of GET endpoints plus the
-// tarball download, over plain `fetch`. The shape mirrors the octokit subset
-// it replaced (#75) so call sites and their fakes carry over unchanged.
+// Plain `fetch`, shaped to mirror the octokit subset it replaced (#75) so call
+// sites and their fakes carry over unchanged.
 
 interface RepoParams {
   owner: string;
@@ -62,7 +61,6 @@ export interface GithubClient {
     };
     repos: {
       getCommit(params: RepoParams & { ref: string }): Promise<{ data: GithubCommit }>;
-      /** The file at `path` as text — always the `raw` media type. */
       getContent(params: RepoParams & { path: string; ref: string }): Promise<{ data: string }>;
       downloadTarballArchive(params: RepoParams & { ref: string }): Promise<{ data: ArrayBuffer }>;
     };
@@ -188,9 +186,8 @@ export function makeGithubClient(): GithubClient {
         },
       },
     },
-    // A short page ends the walk. A count landing exactly on a page boundary
-    // costs one extra empty-page request, which keeps this free of Link-header
-    // parsing.
+    // A short page ends the walk. An exact page boundary costs one extra empty
+    // request, which keeps this free of Link-header parsing.
     paginate: async (route, params) => {
       const perPage = params.per_page ?? 30;
       const all = [];

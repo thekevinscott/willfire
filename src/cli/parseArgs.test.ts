@@ -56,8 +56,6 @@ describe("parseArgs", () => {
   });
 
   it("exits 2 on an --action it does not recognise", () => {
-    // Refused, not ignored: falling back to the guess would turn a typo into a
-    // wrong prediction, which is the failure the flag exists to remove.
     expect(() =>
       parseArgs(["--repo", "o/r", "--pr", "1", "--action", "syncronize"]),
     ).toThrow("exited");
