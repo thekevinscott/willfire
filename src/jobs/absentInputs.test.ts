@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { absentInputs } from "./absentInputs.js";
 import type { Workflow } from "../types.js";
 
@@ -39,7 +39,14 @@ describe("absentInputs", () => {
     ).toEqual({ v: EMPTY });
   });
 
+  it("reads the trigger block off a document, not off `any`", () => {
+    const wf: Workflow = { on: { workflow_dispatch: { inputs: { v: null } } } };
+    expectTypeOf(wf["on"]).not.toBeAny();
+    expect(absentInputs(wf)).toEqual({ v: EMPTY });
+  });
+
   it("says nothing for a workflow that declares no inputs", () => {
+    expect(absentInputs({ on: ["workflow_dispatch"] } as Workflow)).toEqual({});
     expect(absentInputs({ on: { pull_request: null } } as Workflow)).toEqual({});
     expect(absentInputs({ on: { workflow_dispatch: null } } as Workflow)).toEqual({});
     expect(absentInputs({ on: { workflow_dispatch: { inputs: null } } } as Workflow)).toEqual({});

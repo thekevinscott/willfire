@@ -142,6 +142,15 @@ describe("job expansion", () => {
       expect(entries[1]).toMatchObject({ job: "b", status: "skipped" });
     });
 
+    it("reads every id of a multi-job `needs`, not the list as one id", async () => {
+      const entries = await expand({ a: { if: false }, b: {}, c: { needs: ["b", "a"] } });
+      expect(entries[2]).toMatchObject({
+        job: "c",
+        status: "skipped",
+        reason: "needs 'a' which is skipped",
+      });
+    });
+
     it("propagates an unknown upstream status", async () => {
       const entries = await expand({
         a: { if: "needs.x.outputs.y == 'z'" },

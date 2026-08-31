@@ -45,7 +45,7 @@ export async function expandJobs(
   executor?: JobExecutor,
 ): Promise<ExpandedJob[]> {
   const entries: ExpandedJob[] = [];
-  const jobs: Record<string, Workflow> = wf.jobs ?? {};
+  const jobs = (wf["jobs"] ?? {}) as Record<string, Workflow>;
   const statuses: Record<string, string> = {};
 
   // Nothing dispatched or called this run, so an input this workflow declares
@@ -83,10 +83,9 @@ export async function expandJobs(
     const job = jobRaw ?? {};
     let status = evalIf(job.if, scoped);
     let reason = job.if !== undefined && job.if !== null ? `if: ${JSON.stringify(job.if)}` : "";
-    let needs: string[] = job.needs ?? [];
-    if (typeof needs === "string") {
-      needs = [needs];
-    }
+    const needsRaw = job["needs"];
+    const needs: string[] =
+      typeof needsRaw === "string" ? [needsRaw] : ((needsRaw ?? []) as string[]);
     const cond = String(job.if ?? "");
     if (status !== "skipped" && !cond.includes("always()")) {
       for (const n of needs) {
@@ -119,7 +118,7 @@ export async function expandJobs(
       // call names its checks exactly the same way a local one does — probe
       // PR #9, `call-remote-tag / r-inner` alongside `call-plain / inner`.
       const combos = expandMatrixDetailed(job.strategy, prScope(scoped));
-      const uses: string = job.uses;
+      const uses = job["uses"] as string;
       if (combos === null) {
         entries.push({
           job: prefix + jobId,

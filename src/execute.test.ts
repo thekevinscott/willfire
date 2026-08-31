@@ -9,7 +9,7 @@
 // `action.yml` files are written as JSON, which is valid YAML, so the suite
 // never imports a parser, a filesystem, or a path library of its own.
 
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import {
   makeCloneProvider,
   makeExecutor,
@@ -18,6 +18,7 @@ import {
   runShell,
   type ExecDeps,
   type ExecOutcome,
+  type JobExecutor,
   type RunSpec,
 } from "./execute.js";
 import type { WorkflowSource } from "./types.js";
@@ -161,6 +162,13 @@ describe("parseGithubOutput", () => {
   it("refuses a line that assigns nothing", () => {
     expect(parseGithubOutput("garbage\n")).toBe(null);
     expect(parseGithubOutput("=value\n")).toBe(null);
+  });
+});
+
+describe("the JobExecutor contract", () => {
+  it("takes job and workflow documents, not `any`", () => {
+    expectTypeOf<JobExecutor["executeJob"]>().parameter(1).not.toBeAny();
+    expectTypeOf<JobExecutor["executeJob"]>().parameter(2).not.toBeAny();
   });
 });
 

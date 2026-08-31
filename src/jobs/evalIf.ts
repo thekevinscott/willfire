@@ -10,7 +10,7 @@ import { prScope } from "./prScope.js";
  * unknown, because every one of them is written against `inputs.*` or
  * `needs.*`.
  */
-export function evalIf(cond: any, scope: Scope = {}): "run" | "skipped" | "unknown" {
+export function evalIf(cond: unknown, scope: Scope = {}): "run" | "skipped" | "unknown" {
   if (cond === null || cond === undefined) {
     return "run";
   }

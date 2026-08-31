@@ -17,7 +17,7 @@ export function workflowDispatches(
     return [false, "no pull_request trigger"];
   }
 
-  const types: string[] = trig["types"] ?? DEFAULT_TYPES;
+  const types = (trig["types"] ?? DEFAULT_TYPES) as string[];
   if (!types.includes(ctx.action)) {
     return [false, `action '${ctx.action}' not in types [${types}]`];
   }
@@ -29,11 +29,11 @@ export function workflowDispatches(
     return [true, "both branches and branches-ignore set: startup failure"];
   }
   const branchRef = ctx.stackTarget ?? ctx.baseRef;
-  if ("branches" in trig && !matchFilters(branchRef, trig["branches"])) {
+  if ("branches" in trig && !matchFilters(branchRef, trig["branches"] as string[])) {
     const label = ctx.stackTarget === undefined ? "base branch" : "stack target";
     return [false, `${label} '${branchRef}' not in branches`];
   }
-  if ("branches-ignore" in trig && matchFilters(branchRef, trig["branches-ignore"])) {
+  if ("branches-ignore" in trig && matchFilters(branchRef, trig["branches-ignore"] as string[])) {
     return [
       false,
       ctx.stackTarget === undefined
@@ -45,10 +45,13 @@ export function workflowDispatches(
   if ("paths" in trig && "paths-ignore" in trig) {
     return [true, "both paths and paths-ignore set: startup failure"];
   }
-  if ("paths" in trig && !ctx.files.some((f) => matchFilters(f, trig["paths"]))) {
+  if ("paths" in trig && !ctx.files.some((f) => matchFilters(f, trig["paths"] as string[]))) {
     return [false, "no changed file matches paths"];
   }
-  if ("paths-ignore" in trig && ctx.files.every((f) => matchFilters(f, trig["paths-ignore"]))) {
+  if (
+    "paths-ignore" in trig &&
+    ctx.files.every((f) => matchFilters(f, trig["paths-ignore"] as string[]))
+  ) {
     return [false, "all changed files match paths-ignore"];
   }
 

@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1788139656,
+  "exit_code": 0,
+  "commit": "5fecfb20f17c3036fb1dbb14d063f72a270b7b64",
+  "branch": "eslint-no-explicit-any-restack"
+}
