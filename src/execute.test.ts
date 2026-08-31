@@ -613,6 +613,49 @@ describe("actions/setup-node", () => {
       );
     }
   });
+
+  it("treats an input left empty as absent", async () => {
+    // Verified against setup-node's source: every input is read with
+    // core.getInput, which trims, and each is guarded by truthiness or an
+    // `|| default`, so an empty value takes the same branch as no value.
+    const out = success(
+      await execute({
+        steps: [
+          { uses: "actions/setup-node@v5", with: { "node-version": "24", "registry-url": "" } },
+          { uses: "actions/setup-node@v5", with: { "registry-url": "   " } },
+          { uses: "actions/setup-node@v5", with: { "registry-url": null } },
+          { id: "s", run: 'echo "x=ran" >> "$GITHUB_OUTPUT"' },
+        ],
+        outputs: { x: "${{ steps.s.outputs.x }}" },
+      }),
+    );
+    expect(out).toEqual({ x: "ran" });
+  });
+
+  it("counts an input whose value it cannot render as present", async () => {
+    const o = await execute({
+      steps: [
+        {
+          uses: "actions/setup-node@v5",
+          with: { "node-version": "24", "registry-url": "${{ env.nope }}" },
+        },
+      ],
+    });
+    expect(failure(o)).toBe("step '#1': setup-node with inputs beyond node-version is not modelled");
+  });
+
+  it("treats an input a composite caller left empty as absent", async () => {
+    // The shape a single-source-of-truth composite has: it forwards an
+    // optional input that most call sites never set.
+    const manifest = compositeAction(
+      [{ uses: "actions/setup-node@v5", with: { "node-version": "24", "registry-url": "${{ inputs.registry-url }}" } }],
+      { inputs: { "registry-url": { default: "" } } },
+    );
+    const tree = await tempTree({ "action/action.yml": manifest });
+    const ex = executorOf({ [`o/r@${SHA}`]: tree });
+    const o = await ex.executeJob("detect", { steps: [{ uses: "./action" }] }, {}, {});
+    expect(success(o)).toEqual({});
+  });
 });
 
 // ---------------------------------------------------------- composite actions

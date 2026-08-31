@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1788207399,
+  "exit_code": 0,
+  "commit": "305d8c547cdad9d3097506193810416ba59dd47d",
+  "branch": "setup-node-inert-inputs"
+}
