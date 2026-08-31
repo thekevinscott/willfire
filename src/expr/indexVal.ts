@@ -1,4 +1,5 @@
 import { UNKNOWN, type Val } from "./val.js";
+import type { YamlValue } from "../yamlValue.js";
 
 /**
  * `a[i]` on what `fromJSON` produced. GitHub yields `null` for a missing
@@ -12,7 +13,7 @@ export function indexVal(base: Val, idx: Val): Val {
   if (idx.kind !== "value") {
     return UNKNOWN;
   }
-  let el: unknown;
+  let el: YamlValue | undefined;
   if (Array.isArray(base.v)) {
     if (typeof idx.v !== "number") {
       return UNKNOWN;
@@ -28,7 +29,7 @@ export function indexVal(base: Val, idx: Val): Val {
     return { kind: "value", v: "" };
   }
   if (typeof el === "object") {
-    return { kind: "json", v: el as unknown[] };
+    return { kind: "json", v: el };
   }
-  return { kind: "value", v: el as string | number | boolean };
+  return { kind: "value", v: el };
 }

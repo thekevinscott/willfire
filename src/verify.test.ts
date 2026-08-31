@@ -37,7 +37,7 @@ interface RunFixture {
   jobs: { name: string; conclusion: string }[];
 }
 
-function fakeGithub(runs: RunFixture[]): unknown {
+function fakeGithub(runs: RunFixture[]) {
   return {
     rest: {
       pulls: { get: async () => ({ data: { head: { sha: "deadbeef" } } }) },

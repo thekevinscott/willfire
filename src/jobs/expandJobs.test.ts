@@ -22,6 +22,7 @@ import type {
   WorkflowReader,
   WorkflowSource,
 } from "../types.js";
+import type { YamlMap } from "../yamlValue.js";
 
 /**
  * A 40-hex commit id, so anything pinned to it is already resolved.
@@ -52,12 +53,12 @@ const readerOf = (
 const readerFor = (files: Record<string, string>) =>
   readerOf(async (path) => files[path] ?? null);
 
-const expand = (jobs: Record<string, unknown>, reader: WorkflowReader = readerFor({})) =>
+const expand = (jobs: YamlMap, reader: WorkflowReader = readerFor({})) =>
   expandJobs({ on: { pull_request: null }, jobs } as Workflow, CTX, reader, SOURCE);
 
 /** The same expansion with an executor wired in, scope starting empty. */
 const expandWith = (
-  jobs: Record<string, unknown>,
+  jobs: YamlMap,
   executor: JobExecutor,
   reader: WorkflowReader = readerFor({}),
 ) =>
@@ -725,7 +726,7 @@ describe("with: values across the call boundary", () => {
 
   it("treats a malformed or absent workflow_call block as no declared inputs", async () => {
     const jobs = { leg: { if: "inputs.q == 'x'" } };
-    const shapes: unknown[] = [
+    const shapes: YamlMap[] = [
       { jobs },
       { on: "push", jobs },
       // `on:` written with no value: YAML 1.1 reads the key as the boolean.

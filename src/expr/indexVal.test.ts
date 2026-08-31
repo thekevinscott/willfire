@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { YamlMap, YamlValue } from "../yamlValue.js";
 import { indexVal } from "./indexVal.js";
 import type { Val } from "./val.js";
 
@@ -14,6 +15,13 @@ describe("indexVal", () => {
   it("keeps a structured element structured", () => {
     expect(indexVal(ARR, { kind: "value", v: 1 })).toEqual({ kind: "json", v: [7] });
     expect(indexVal(OBJ, { kind: "value", v: "nested" })).toEqual({ kind: "json", v: {} });
+  });
+
+  it("hands a structured element back as document values, not `unknown`", () => {
+    const base: Val = { kind: "json", v: { cfg: { os: "linux", tags: [1, null] } } };
+    const r = indexVal(base, { kind: "value", v: "cfg" });
+    const v: YamlValue[] | YamlMap | undefined = r.kind === "json" ? r.v : undefined;
+    expect(v).toEqual({ os: "linux", tags: [1, null] });
   });
 
   it("reads a missing or null element as the empty string", () => {

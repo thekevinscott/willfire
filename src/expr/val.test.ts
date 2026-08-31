@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { YamlValue } from "../yamlValue.js";
 import { UNKNOWN, type Scope, type Val } from "./val.js";
 
 describe("the value lattice", () => {
@@ -18,6 +19,13 @@ describe("the value lattice", () => {
       UNKNOWN,
     ];
     expect(vals).toHaveLength(8);
+  });
+
+  it("reads into a json point as a document value, not `unknown`", () => {
+    const v: Val = { kind: "json", v: { cfg: { os: "linux", tags: [1, null] } } };
+    const read: YamlValue | undefined =
+      v.kind === "json" && !Array.isArray(v.v) ? v.v["cfg"] : undefined;
+    expect(read).toEqual({ os: "linux", tags: [1, null] });
   });
 
   it("admits a scope with every context supplied", () => {

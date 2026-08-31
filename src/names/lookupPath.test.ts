@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest";
+import type { YamlValue } from "../yamlValue.js";
 import { lookupPath } from "./lookupPath.js";
 
 describe("lookupPath", () => {
   it("walks a dotted path", () => {
     expect(lookupPath({ a: { b: "v" } }, "a.b")).toBe("v");
+  });
+
+  it("hands back a document value, not `unknown`", () => {
+    const found: YamlValue | undefined = lookupPath({ a: { b: [1, "x"] } }, "a.b");
+    expect(found).toEqual([1, "x"]);
   });
 
   it("is undefined for a missing segment", () => {
