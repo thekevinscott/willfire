@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1788204767,
+  "exit_code": 0,
+  "commit": "882f81d5c1e30bd334566648c526c71bb8359753",
+  "branch": "verify-package"
+}
