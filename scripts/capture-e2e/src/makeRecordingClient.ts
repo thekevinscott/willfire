@@ -5,15 +5,15 @@ import {
   type ApiData,
   type ApiParams,
   type ApiRecord,
-} from "../../../tests/fixtures/pinned/cassette.js";
+} from "../../../tests/fixtures/pinned/capture.js";
 
 /**
  * A `GithubClient` that answers from the live one and keeps what it saw.
  *
  * Failures are recorded too, since `predict` catches most of them by design and
- * a cassette that dropped them would replay a different prediction. The tarball
+ * a capture that dropped them would replay a different prediction. The tarball
  * download and the workflow-run reads are passed through unrecorded: replay
- * answers execution from the recorded outcomes, so no cassette carries a repo
+ * answers execution from the recorded outcomes, so no capture carries a repo
  * tree, and the dispatch is stored as `dispatched` rather than as raw reads.
  */
 export function makeRecordingClient(live: GithubClient): {
@@ -22,7 +22,7 @@ export function makeRecordingClient(live: GithubClient): {
 } {
   const api = new Map<string, ApiRecord>();
   // `project` narrows a response to the fields `GithubClient` declares, so a
-  // cassette holds no field willfire never reads.
+  // capture holds no field willfire never reads.
   const record = async <T extends ApiData>(
     call: string,
     params: ApiParams,

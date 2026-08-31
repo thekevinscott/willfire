@@ -1,5 +1,5 @@
 import type { JobExecutor } from "willfire";
-import { execKey, type ExecRecord } from "../../../tests/fixtures/pinned/cassette.js";
+import { execKey, type ExecRecord } from "../../../tests/fixtures/pinned/capture.js";
 
 /**
  * A `JobExecutor` that runs the live one and keeps each outcome. Keyed by

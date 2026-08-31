@@ -1,8 +1,8 @@
 {
-  "name": "record-cassette",
+  "name": "capture-e2e",
   "version": "0.0.0",
   "private": true,
-  "description": "Records one pinned willfire cassette from a live GitHub dispatch",
+  "description": "Records one pinned willfire capture from a live GitHub dispatch",
   "license": "MIT",
   "packageManager": "pnpm@10.33.0",
   "type": "module",

@@ -1,5 +1,5 @@
 import type { GithubClient } from "willfire";
-import type { DispatchedCheck } from "../../../tests/fixtures/pinned/cassette.js";
+import type { DispatchedCheck } from "../../../tests/fixtures/pinned/capture.js";
 
 /**
  * Ground truth for one dispatch: every check GitHub created at `headSha`,

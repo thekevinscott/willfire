@@ -2,11 +2,11 @@
  * Six pinned PRs, replayed against the dispatch each one actually produced.
  *
  * Every expectation here was read off a live dispatch on a fleet repo and
- * captured whole by `scripts/record-cassette/`: the checks GitHub
+ * captured whole by `scripts/capture-e2e/`: the checks GitHub
  * created, the commits it created them from, the workflow files as they read at
  * those commits, and what running the jobs that decide a runtime matrix
  * yielded. Nothing is inferred and nothing is hand-written, so a diff to a
- * cassette is a claim that GitHub's behaviour changed — the same standard
+ * capture is a claim that GitHub's behaviour changed — the same standard
  * `tests/fixtures/willrun-probe/` is held to.
  *
  * The pins do not drift, because none of this is read live. Replay needs no
@@ -23,8 +23,8 @@ import {
   reconcile,
   replayClient,
   replayExecutor,
-  type Cassette,
-} from "../fixtures/pinned/cassette.js";
+  type E2ECapture,
+} from "../fixtures/pinned/capture.js";
 
 /**
  * One per shape the probe repo does not exercise, two PRs each: dirsql for
@@ -32,7 +32,7 @@ import {
  * for a reusable-workflow fan-out that is honestly undecidable, pr-monitor for
  * the testing-conventions dispatch every fleet repo gates on.
  */
-const CASSETTES = [
+const CAPTURES = [
   "dirsql-1010.json",
   "dirsql-1014.json",
   "putitoutthere-647.json",
@@ -41,43 +41,43 @@ const CASSETTES = [
   "pr-monitor-26.json",
 ];
 
-const load = (file: string): Cassette =>
+const load = (file: string): E2ECapture =>
   JSON.parse(
     readFileSync(fileURLToPath(new URL(`../fixtures/pinned/${file}`, import.meta.url)), "utf8"),
-  ) as Cassette;
+  ) as E2ECapture;
 
-for (const file of CASSETTES) {
-  const cassette = load(file);
-  test(`${cassette.repo}#${cassette.pr}: ${cassette.shape}`, async () => {
-    const { client, misses: reads } = replayClient(cassette);
-    const { executor, misses: runs } = replayExecutor(cassette);
-    const prediction = await predict(client, cassette.repo, cassette.pr, { executor });
+for (const file of CAPTURES) {
+  const capture = load(file);
+  test(`${capture.repo}#${capture.pr}: ${capture.shape}`, async () => {
+    const { client, misses: reads } = replayClient(capture);
+    const { executor, misses: runs } = replayExecutor(capture);
+    const prediction = await predict(client, capture.repo, capture.pr, { executor });
 
     // A gap in the recording would otherwise surface as an entry quietly
     // degrading to `unknown`, since that is what `predict` does with a read it
-    // cannot make. Checked first so an incomplete cassette says so.
+    // cannot make. Checked first so an incomplete capture says so.
     expect({ reads, runs }).toEqual({ reads: [], runs: [] });
 
     // The check list, exactly: one string per check, matrix combinations
     // included. This is the answer consumers gate on.
-    expect(prediction.checkNames).toEqual(cassette.predicted.checkNames);
+    expect(prediction.checkNames).toEqual(capture.predicted.checkNames);
 
     // Every entry's verdict, `unknown` included, so an entry that stops being
     // decided fails here instead of passing as "no disagreement".
-    expect(predictedEntries(prediction.entries)).toEqual(cassette.predicted.entries);
-    expect(prediction.skip).toBe(cassette.predicted.skip);
-    expect(prediction.sources).toEqual(cassette.predicted.sources);
+    expect(predictedEntries(prediction.entries)).toEqual(capture.predicted.entries);
+    expect(prediction.skip).toBe(capture.predicted.skip);
+    expect(prediction.sources).toEqual(capture.predicted.sources);
 
-    // Prediction read the PR's own repo at a commit the cassette pins. Both
+    // Prediction read the PR's own repo at a commit the capture pins. Both
     // are pinned because prediction reads at the merge commit and falls back
     // to head, and a fixture that named neither could not be checked by hand.
-    const [owner, name] = cassette.repo.split("/");
+    const [owner, name] = capture.repo.split("/");
     const own = prediction.sources.filter((s) => s.owner === owner && s.repo === name);
-    expect(own.map((s) => s.sha)).toContain(cassette.commits.head);
-    expect([cassette.commits.head, cassette.commits.merge]).toContain(own[0].sha);
+    expect(own.map((s) => s.sha)).toContain(capture.commits.head);
+    expect([capture.commits.head, capture.commits.merge]).toContain(own[0].sha);
 
     // What makes `dispatched` load-bearing rather than decoration: the
     // prediction has to agree with the run GitHub actually produced.
-    expect(reconcile(cassette.dispatched, cassette.predicted.entries)).toEqual([]);
+    expect(reconcile(capture.dispatched, capture.predicted.entries)).toEqual([]);
   });
 }

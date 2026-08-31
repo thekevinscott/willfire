@@ -31,9 +31,9 @@ jobs:
       source: src
       version: '0.0.96'
 
-  record-cassette:
+  capture-e2e:
     uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
     with:
       languages: '["typescript"]'
-      source: scripts/record-cassette/src
+      source: scripts/capture-e2e/src
       version: '0.0.96'
