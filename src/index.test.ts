@@ -19,8 +19,11 @@ describe("root barrel", () => {
       "patternToRegex",
       "predict",
     ]);
-    for (const fn of Object.values(barrel)) {
+    // Each name is re-exported from the module that defines it, so the
+    // function's own name is what catches a re-export bound to the wrong one.
+    for (const [name, fn] of Object.entries(barrel)) {
       expect(typeof fn).toBe("function");
+      expect(fn.name).toBe(name);
     }
   });
 
