@@ -26,4 +26,8 @@ describe("matrixVal", () => {
   it("leaves an axis the combination does not carry unknown", () => {
     expect(matrixVal({ os: "linux" }, "nope")).toEqual({ kind: "unknown" });
   });
+
+  it("leaves everything unknown with no combination at all", () => {
+    expect(matrixVal(undefined, "os")).toEqual({ kind: "unknown" });
+  });
 });

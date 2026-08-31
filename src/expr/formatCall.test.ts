@@ -9,12 +9,25 @@ describe("formatCall", () => {
     expect(formatCall([S("{0}-{1}"), S("a"), S("b")])).toEqual(S("a-b"));
   });
 
+  it("keeps the literal text around a slot", () => {
+    expect(formatCall([S("a{0}b"), S("x")])).toEqual(S("axb"));
+  });
+
   it("repeats a slot referenced twice", () => {
     expect(formatCall([S("{0}/{0}"), S("x")])).toEqual(S("x/x"));
   });
 
+  it("reads a multi-digit index", () => {
+    const args = Array.from({ length: 11 }, (_, i) => S(`a${String(i)}`));
+    expect(formatCall([S("{10}"), ...args])).toEqual(S("a10"));
+  });
+
   it("coerces non-string arguments the way the runner does", () => {
     expect(formatCall([S("{0}{1}"), S(2), S(true)])).toEqual(S("2true"));
+  });
+
+  it("coerces a non-string format string too", () => {
+    expect(formatCall([S(7)])).toEqual(S("7"));
   });
 
   it("unescapes doubled braces", () => {
@@ -25,9 +38,8 @@ describe("formatCall", () => {
     expect(formatCall([])).toEqual({ kind: "unknown" });
   });
 
-  it("is unknown when the format string is not a known string", () => {
+  it("is unknown when the format string is not a known value", () => {
     expect(formatCall([{ kind: "unknown" }, S("a")])).toEqual({ kind: "unknown" });
-    expect(formatCall([S(1), S("a")])).toEqual({ kind: "unknown" });
   });
 
   it("is unknown when a referenced slot has no argument", () => {

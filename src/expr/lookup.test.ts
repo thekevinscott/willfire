@@ -59,5 +59,7 @@ describe("lookup", () => {
 
   it("leaves every runtime context unknown", () => {
     expect(lookup(SCOPE, "env.FOO")).toEqual({ kind: "unknown" });
+    // A supplied combination is not a fallback for another context's key.
+    expect(lookup({ matrix: { FOO: "x" } }, "env.FOO")).toEqual({ kind: "unknown" });
   });
 });

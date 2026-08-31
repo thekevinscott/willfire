@@ -12,10 +12,10 @@ export type Val =
   | { kind: "value"; v: string | number | boolean }
   /**
    * An array or an object, which `fromJSON` and a structured matrix value
-   * produce. Kept apart from
-   * `value` because nothing else in the language accepts one: comparison
-   * refuses it, and its truthiness is not modelled. Matrix expansion is the
-   * one consumer, and it asks for the array directly.
+   * produce. Kept apart from `value` because nothing else in the language
+   * accepts one: comparison refuses it, and its truthiness is not modelled.
+   * Its consumers ask for the document directly — matrix expansion for the
+   * array, name rendering for the parenthetical.
    */
   | { kind: "json"; v: YamlValue[] | YamlMap }
   | { kind: "truthy" }

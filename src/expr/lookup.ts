@@ -48,7 +48,7 @@ export function lookup(scope: Scope, path: string): Val {
     return { kind: "value", v: step.outputs[parts[2]] ?? "" };
   }
   if (head === "matrix") {
-    return scope.matrix === undefined ? UNKNOWN : matrixVal(scope.matrix, rest);
+    return matrixVal(scope.matrix, rest);
   }
   // `env.*`, `vars.*`, `secrets.*`: all require something that has not
   // happened yet at prediction time.
