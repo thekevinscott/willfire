@@ -8,3 +8,4 @@ Design goals for `willfire` include:
 2. **No repo knowledge in willfire.** `willfire` is a general tool and must not encode any consumer's internals or repositories.
 3. **No configuration required.**
 4. **Speed.** The job should execute as fast as is possible. Instant is ideal, and should be strived for.
+5. **No rendering of dynamic lists to static artifacts.** A runtime-computed value (a matrix, a job output) is computed at prediction time or reported `unknown` — never snapshotted into a committed artifact and read back. Snapshots drift, and a stale one produces a confidently wrong prediction instead of an honest `unknown`.
