@@ -98,7 +98,6 @@ export default [
       'src/**/*.test.ts',
       'scripts/*/src/**/*.test.ts',
       'src/execute.ts',
-      'src/matrix/expandMatrixDetailed.ts',
       'scripts/verify/src/index.ts',
     ],
     languageOptions: {

@@ -18,9 +18,12 @@ export type Val =
    * array, name rendering for the parenthetical.
    */
   | { kind: "json"; v: YamlValue[] | YamlMap }
-  | { kind: "truthy" }
-  | { kind: "falsy" }
-  | { kind: "unknown" };
+  // The valueless kinds declare `v` as absent so a consumer can test `val.v`
+  // across the whole union. `json` is the only kind whose `v` can be an array,
+  // which is what lets an array test alone stand in for a kind test.
+  | { kind: "truthy"; v?: undefined }
+  | { kind: "falsy"; v?: undefined }
+  | { kind: "unknown"; v?: undefined };
 
 export const UNKNOWN: Val = { kind: "unknown" };
 
