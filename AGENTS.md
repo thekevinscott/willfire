@@ -66,6 +66,7 @@ verdict logic as a change to every gated repo.
 
 ## Conventions
 
+- Never pin by SHA. Avoid pinning in YAML if possible.
 - Smallest reviewable PRs. One concern per PR; split by default.
 - Rebase proactively; never ask first. Getting a PR to green is the job, and a
   rebase is not a decision to bring back. Rebase onto the updated base whenever:
