@@ -66,7 +66,10 @@ verdict logic as a change to every gated repo.
 
 ## Conventions
 
-- Never pin by SHA. Avoid pinning in YAML if possible.
+- Never pin in workflow YAML — not by SHA, not by tag. Moving tags (`@v0`,
+  `@v1`) are the distribution channel for fleet CI conventions; consuming them
+  is the point. When a tag move breaks CI, adopt the change or fix forward.
+  Freezing the ref is never the fix (ruled on PR #145).
 - Smallest reviewable PRs. One concern per PR; split by default.
 - Rebase proactively; never ask first. Getting a PR to green is the job, and a
   rebase is not a decision to bring back. Rebase onto the updated base whenever:
