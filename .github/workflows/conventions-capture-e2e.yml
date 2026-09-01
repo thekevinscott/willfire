@@ -30,7 +30,7 @@ permissions:
 jobs:
   # Job id kept as-is: it prefixes every check name this call produces.
   capture-e2e:
-    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
+    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@testing-conventions-npm-v0.0.96
     with:
       languages: '["typescript"]'
       source: scripts/capture-e2e/src

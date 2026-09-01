@@ -1,7 +1,10 @@
 name: Testing Conventions (willfire)
 
-# Runs the upstream testing-conventions gates over the root `willfire` package,
-# pinned to the rolling `v0` tag (the same convention as check.yml).
+# Runs the upstream testing-conventions gates over the root `willfire` package.
+#
+# The `uses:` ref is an immutable release tag, not `v0`: `v0` moves, so a new
+# upstream gate can turn this repo red with no commit here. Keep it equal to
+# the `version:` CLI pin below so the workflow and the binary agree.
 #
 # `version` is pinned because the static job runs a bare `npx` with no
 # setup-node: left empty, the runner's older Node resolves 0.0.86, not latest.
@@ -46,7 +49,7 @@ permissions:
 jobs:
   # Job id kept as-is: it prefixes every check name this call produces.
   conventions:
-    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
+    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@testing-conventions-npm-v0.0.96
     with:
       languages: '["typescript"]'
       source: src
