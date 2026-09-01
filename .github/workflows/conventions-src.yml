@@ -1,0 +1,53 @@
+name: Testing Conventions (willfire)
+
+# Runs the upstream testing-conventions gates over the root `willfire` package,
+# pinned to the rolling `v0` tag (the same convention as check.yml).
+#
+# `version` is pinned because the static job runs a bare `npx` with no
+# setup-node: left empty, the runner's older Node resolves 0.0.86, not latest.
+#
+# Every gate runs (`gates` left at its empty default): mutation's Stryker deps
+# are in devDependencies, and `e2e-attestations/` holds the receipt the
+# e2e-verify gate checks.
+#
+# One workflow file per workspace package (docs/monorepo.md), because `paths:`
+# is per-file and each package's lane has a different trigger set.
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'e2e-attestations/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'tsconfig.json'
+      - 'tsconfig.build.json'
+      - 'vitest.config.mts'
+      - '.github/workflows/conventions-src.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'e2e-attestations/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'tsconfig.json'
+      - 'tsconfig.build.json'
+      - 'vitest.config.mts'
+      - '.github/workflows/conventions-src.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  # Job id kept as-is: it prefixes every check name this call produces.
+  conventions:
+    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
+    with:
+      languages: '["typescript"]'
+      source: src
+      version: '0.0.96'

@@ -1,0 +1,37 @@
+name: Testing Conventions (capture-e2e)
+
+# testing-conventions over the `scripts/capture-e2e` workspace package.
+#
+# `src/**` is a trigger because this package depends on `willfire`
+# (`workspace:*`) and imports from it, so a root source change can break it.
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/capture-e2e/**'
+      - 'src/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/conventions-capture-e2e.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/capture-e2e/**'
+      - 'src/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/conventions-capture-e2e.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  # Job id kept as-is: it prefixes every check name this call produces.
+  capture-e2e:
+    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
+    with:
+      languages: '["typescript"]'
+      source: scripts/capture-e2e/src
+      version: '0.0.96'
