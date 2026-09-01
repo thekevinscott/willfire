@@ -66,9 +66,10 @@ export interface Scope {
    */
   steps?: Record<string, { outputs: Record<string, string> }>;
   /**
-   * The matrix combination a name is being rendered for. Only `renderName`
-   * fills it: a job `if:` is evaluated once for the job, before the matrix is
-   * expanded, so there is no single combination to read there.
+   * The matrix combination in effect: the one a name is being rendered for,
+   * or the caller combination a reusable call's `with:` is evaluated under.
+   * A job `if:` never sees one — it is evaluated once for the job, before
+   * the matrix is expanded.
    */
   matrix?: YamlMap;
 }

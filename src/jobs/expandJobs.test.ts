@@ -669,6 +669,30 @@ describe("with: values across the call boundary", () => {
     ]);
   });
 
+  it("evaluates with: against each matrix combination of the caller", async () => {
+    // Each combination dispatches its own callee run with its own inputs, so
+    // the guard splits: one leg runs, the other is skipped.
+    const entries = await expand(
+      {
+        call: {
+          strategy: { matrix: { cfg: ["a", "b"] } },
+          uses: "./.github/workflows/callee.yml",
+          with: { cfg: "${{ matrix.cfg }}" },
+        },
+      },
+      readerFor({
+        [CALLEE]: JSON.stringify({
+          on: { workflow_call: { inputs: { cfg: { type: "string" } } } },
+          jobs: { leg: { if: "inputs.cfg == 'a'" } },
+        }),
+      }),
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["call (a) / leg", "run"],
+      ["call (b) / leg", "skipped"],
+    ]);
+  });
+
   it("passes literals through with their types and falls back to declared defaults", async () => {
     // Job ids mirror the input each guard reads: a–d literal from the caller,
     // e defaulted, f never passed (unknown, not empty), g–h malformed (unknown).
