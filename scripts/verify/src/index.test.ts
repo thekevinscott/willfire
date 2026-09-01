@@ -188,9 +188,9 @@ describe("verify", () => {
     expect(code).toBe(0);
   });
 
-  it("does not judge an unpredicted entry from a workflow with an unknown in it", async () => {
-    // A dynamic matrix or a non-local reusable call makes the whole workflow's
-    // job list unknowable, so extra entries from it are not a miss.
+  it("still misses an unpredicted entry from a workflow with an unknown in it", async () => {
+    // A dynamic matrix or a non-local reusable call is why willfire could not
+    // name the extra check; it is not a reason to stop counting it as a miss.
     const code = await invoke({
       predicted: [entry("w.yml", "known", "unknown")],
       runs: [
@@ -204,13 +204,15 @@ describe("verify", () => {
         },
       ],
     });
-    expect(out).toContain("  ?   w.yml :: surprise :: actual run, workflow had unknown prediction");
-    expect(code).toBe(0);
+    expect(out).toEqual([
+      "  ?   w.yml :: known :: predicted unknown, actual run",
+      "MISS  w.yml :: surprise :: ran (run) but was not predicted, workflow had an undecided entry",
+      "FAIL",
+    ]);
+    expect(code).toBe(1);
   });
 
-  it("still judges surprises in a workflow whose every entry was decided", async () => {
-    // The leniency above is bought by an `unknown` somewhere in the workflow.
-    // Without one, the same extra check is a miss.
+  it("misses a surprise with no note when the workflow was decided throughout", async () => {
     const code = await invoke({
       predicted: [entry("w.yml", "known", "run")],
       runs: [
@@ -296,11 +298,10 @@ describe("verify", () => {
     expect(code).toBe(0);
   });
 
-  it("reports an entry whose check name could not be resolved, and judges nothing", async () => {
+  it("reports an entry whose check name could not be resolved, and misses the check", async () => {
     // #9 made the comparison key the resolved name, so an entry without one has
-    // nothing to compare against. It is reported and its workflow is marked
-    // unknown, which also stops the real checks in that workflow reading as
-    // OVER — under-reporting beats a false failure.
+    // nothing to compare against. The check it failed to name still ran, so it
+    // is a miss, annotated with why willfire could not match it.
     const code = await invoke({
       predicted: [entry("w.yml", "a", "run", null)],
       runs: [
@@ -313,17 +314,16 @@ describe("verify", () => {
       ],
     });
     expect(out).toEqual([
-      "  ?   w.yml :: a (18) :: actual run, workflow had unknown prediction",
+      "MISS  w.yml :: a (18) :: ran (run) but was not predicted, workflow had an undecided entry",
       "  ?   w.yml :: a :: name unresolved: because",
-      "PASS",
+      "FAIL",
     ]);
-    expect(code).toBe(0);
+    expect(code).toBe(1);
   });
 
-  it("keeps an unresolved name from excusing another workflow's surprises", async () => {
-    // An unresolved entry marks its own workflow unknown, and that leniency has
-    // to stop there — a check nobody predicted in a different workflow is still
-    // a MISS.
+  it("keeps the undecided note on the workflow that earned it", async () => {
+    // An unresolved entry marks its own workflow undecided; a miss in a
+    // different workflow carries no note.
     const code = await invoke({
       predicted: [entry("a.yml", "j", "run", null)],
       runs: [{ id: 1, path: "b.yml", jobs: [{ name: "x", conclusion: "success" }] }],

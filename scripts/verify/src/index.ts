@@ -85,12 +85,12 @@ for (const key of keys) {
   } else if (p === "unknown") {
     console.log(`  ?   ${key} :: predicted unknown, actual ${a}`);
   } else if (p === undefined) {
-    if (unknownWfs.has(wf)) {
-      console.log(`  ?   ${key} :: actual ${a}, workflow had unknown prediction`);
-    } else {
-      ok = false;
-      console.log(`MISS  ${key} :: ran (${a}) but was not predicted`);
-    }
+    // An undecided entry elsewhere in the workflow annotates the miss, it never
+    // excuses it: willfire's contract is the exact set, so a check it did not
+    // name is a check it got wrong.
+    ok = false;
+    const note = unknownWfs.has(wf) ? ", workflow had an undecided entry" : "";
+    console.log(`MISS  ${key} :: ran (${a}) but was not predicted${note}`);
   } else if (a === undefined) {
     ok = false;
     console.log(`OVER  ${key} :: predicted ${p} but never appeared`);
