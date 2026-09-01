@@ -1,0 +1,37 @@
+name: Testing Conventions (verify)
+
+# testing-conventions over the `scripts/verify` workspace package.
+#
+# `src/**` is a trigger because this package depends on `willfire`
+# (`workspace:*`) and imports from it, so a root source change can break it.
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/verify/**'
+      - 'src/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/conventions-verify.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/verify/**'
+      - 'src/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/conventions-verify.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  # Job id kept as-is: it prefixes every check name this call produces.
+  verify:
+    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
+    with:
+      languages: '["typescript"]'
+      source: scripts/verify/src
+      version: '0.0.96'

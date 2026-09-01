@@ -1,7 +1,13 @@
 name: putitoutthere check
 
 on:
-  pull_request: {}
+  pull_request:
+    paths:
+      - 'putitoutthere.toml'
+      - 'package.json'
+      - 'scripts/*/package.json'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/check.yml'
 
 jobs:
   putitoutthere-check:
