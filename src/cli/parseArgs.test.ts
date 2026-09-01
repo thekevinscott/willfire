@@ -25,17 +25,28 @@ describe("parseArgs", () => {
       repo: "o/r",
       pr: 1,
       json: false,
+      execute: true,
       action: undefined,
     });
   });
 
   it("parses every flag", () => {
     expect(
-      parseArgs(["--repo", "o/r", "--pr", "2", "--json", "--action", "synchronize"]),
+      parseArgs([
+        "--repo",
+        "o/r",
+        "--pr",
+        "2",
+        "--json",
+        "--no-execute",
+        "--action",
+        "synchronize",
+      ]),
     ).toEqual({
       repo: "o/r",
       pr: 2,
       json: true,
+      execute: false,
       action: "synchronize",
     });
   });
@@ -53,6 +64,7 @@ describe("parseArgs", () => {
     expect(vi.mocked(console.error).mock.calls[0][0]).toContain(
       "--action opened|synchronize|reopened",
     );
+    expect(vi.mocked(console.error).mock.calls[0][0]).toContain("--no-execute");
   });
 
   it("exits 2 on an --action it does not recognise", () => {

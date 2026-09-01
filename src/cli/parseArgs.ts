@@ -2,12 +2,14 @@ import type { PrEventAction } from "../types.js";
 import { isPrEventAction } from "./isPrEventAction.js";
 
 const USAGE =
-  "usage: predict --repo owner/name --pr N [--action opened|synchronize|reopened] [--json]";
+  "usage: predict --repo owner/name --pr N " +
+  "[--action opened|synchronize|reopened] [--json] [--no-execute]";
 
 export function parseArgs(argv: string[]): {
   repo: string;
   pr: number;
   json: boolean;
+  execute: boolean;
   action?: PrEventAction;
 } {
   const get = (flag: string) => {
@@ -28,5 +30,11 @@ export function parseArgs(argv: string[]): {
     console.error(USAGE);
     process.exit(2);
   }
-  return { repo, pr: Number(pr), json: argv.includes("--json"), action };
+  return {
+    repo,
+    pr: Number(pr),
+    json: argv.includes("--json"),
+    execute: !argv.includes("--no-execute"),
+    action,
+  };
 }

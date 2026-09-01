@@ -161,4 +161,27 @@ describe("the CLI entrypoint", () => {
     expect(out).toEqual([`${WF} :: a :: run`, HEAD_READ]);
   });
 
+  const DYNAMIC =
+    "on: pull_request\njobs:\n  detect:\n    steps: []\n  cover:\n" +
+    "    needs: detect\n    strategy:\n      matrix:\n" +
+    "        language: ${{ fromJSON(needs.detect.outputs.langs) }}\n";
+
+  /** The reason on the entry the dynamic matrix belongs to. */
+  const coverReason = (): string => JSON.parse(out.join("\n")).entries[1].reason;
+
+  it("executes the needed job by default", async () => {
+    // The fixture serves no tarball, so the live executor fails to materialize
+    // the workspace — which is what proves it was built and reached at all.
+    await invoke(["--repo", "o/r", "--pr", "1", "--json"], { contents: { [WF]: DYNAMIC } });
+    expect(coverReason()).toBe(
+      `dynamic matrix; executing 'detect' failed: cannot materialize workspace o/r@${HEAD_SHA}`,
+    );
+  });
+
+  it("builds no executor at all under --no-execute", async () => {
+    await invoke(["--repo", "o/r", "--pr", "1", "--json", "--no-execute"], {
+      contents: { [WF]: DYNAMIC },
+    });
+    expect(coverReason()).toBe("dynamic matrix");
+  });
 });

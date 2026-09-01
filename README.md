@@ -85,11 +85,13 @@ Auth is any token with `contents: read`, `actions: read`, and
 
 ```sh
 GH_TOKEN=... willfire --repo owner/repo --pr 123 \
-  [--action opened|synchronize|reopened] [--json]
+  [--action opened|synchronize|reopened] [--json] [--no-execute]
 ```
 
 Plain-text output is one line per entry, then a `# read owner/repo@ref -> sha`
 line per source. `--json` prints the whole `Prediction`, `sources` included.
+`--no-execute` is `executor: null` from the CLI: no job is run, and anything
+that needed a job's outputs stays `unknown` — see "Executing needed jobs".
 
 ## What it handles
 
@@ -141,8 +143,8 @@ call: a callee's `needs.detect` is the callee's own job.
 
 Nothing here guesses what those outputs are. By default `predict` computes
 them, by executing the jobs that produce them — the section below. With
-execution turned off (`executor: null` in `PredictOptions`) a dynamic matrix
-stays `unknown`.
+execution turned off (`executor: null` in `PredictOptions`, `--no-execute` on
+the CLI) a dynamic matrix stays `unknown`.
 
 ## Executing needed jobs
 
