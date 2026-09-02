@@ -22,3 +22,5 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: thekevinscott/pr-monitor@v1
+        with:
+          execute: true
