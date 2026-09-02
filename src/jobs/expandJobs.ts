@@ -13,6 +13,7 @@ import { prScope } from "./prScope.js";
 import type {
   Ctx,
   ExpandedJob,
+  JobSite,
   Workflow,
   WorkflowReader,
   WorkflowSource,
@@ -37,7 +38,7 @@ export async function expandJobs(
   wf: Workflow,
   ctx: Ctx,
   reader: WorkflowReader,
-  source: WorkflowSource,
+  site: JobSite,
   depth = 0,
   prefix = "",
   prefixResolved = true,
@@ -130,10 +131,10 @@ export async function expandJobs(
         // Resolve the called workflow once, not once per matrix combination.
         let subWf: Workflow | null = null;
         let failure: string | null = null;
-        // Where the callee's own `./` calls will resolve. A remote `uses:`
-        // moves this to the callee's repo and pinned ref; a local one leaves
-        // it alone.
-        let subSource: WorkflowSource = source;
+        // Where the callee is defined, and where its own `./` calls will
+        // resolve. A remote `uses:` moves the source to the callee's repo and
+        // pinned ref; a local one keeps the caller's.
+        let subSite: JobSite = site;
         const target = parseUses(uses);
         if (depth + 1 > MAX_REUSABLE_DEPTH) {
           failure = `reusable workflow nested deeper than ${MAX_REUSABLE_DEPTH} levels`;
@@ -145,7 +146,7 @@ export async function expandJobs(
           // `uses:` string spelled — `@v0` — and has to be resolved before
           // anything is read from it, so the file that gets read and the
           // commit the prediction names are the same one.
-          let resolved: WorkflowSource | null = source;
+          let resolved: WorkflowSource | null = site.source;
           if (target.source !== null) {
             const { ref } = target.source;
             const sha = isSha(ref) ? ref : await reader.resolveRef(target.source);
@@ -154,8 +155,8 @@ export async function expandJobs(
           if (resolved === null) {
             failure = `cannot resolve ref for ${uses}`;
           } else {
-            subSource = resolved;
-            const content = await reader.fetchWorkflow(target.path, subSource);
+            subSite = { path: target.path, source: resolved };
+            const content = await reader.fetchWorkflow(target.path, resolved);
             if (content === null) {
               failure = `cannot fetch ${uses}`;
             } else {
@@ -198,7 +199,7 @@ export async function expandJobs(
                 subWf,
                 ctx,
                 reader,
-                subSource,
+                subSite,
                 depth + 1,
                 `${baseName} / `,
                 nameResolved,

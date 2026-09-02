@@ -17,6 +17,7 @@ import type { JobExecutor } from "../execute.js";
 import type {
   Ctx,
   FetchWorkflow,
+  JobSite,
   ResolveRef,
   Workflow,
   WorkflowReader,
@@ -37,6 +38,7 @@ const SHA = "a".repeat(40);
 const REMOTE_SHA = "b".repeat(40);
 
 const SOURCE: WorkflowSource = { owner: "o", repo: "r", ref: SHA, sha: SHA };
+const SITE: JobSite = { path: ".github/workflows/caller.yml", source: SOURCE };
 const CTX: Ctx = { action: "opened", baseRef: "main", files: ["src/app.ts"] };
 
 /**
@@ -54,7 +56,7 @@ const readerFor = (files: Record<string, string>) =>
   readerOf(async (path) => files[path] ?? null);
 
 const expand = (jobs: YamlMap, reader: WorkflowReader = readerFor({})) =>
-  expandJobs({ on: { pull_request: null }, jobs } as Workflow, CTX, reader, SOURCE);
+  expandJobs({ on: { pull_request: null }, jobs } as Workflow, CTX, reader, SITE);
 
 /** The same expansion with an executor wired in, scope starting empty. */
 const expandWith = (
@@ -66,7 +68,7 @@ const expandWith = (
     { on: { pull_request: null }, jobs } as Workflow,
     CTX,
     reader,
-    SOURCE,
+    SITE,
     0,
     "",
     true,
@@ -82,7 +84,7 @@ describe("job expansion", () => {
       { on: { pull_request: null }, jobs: { a: { if: "inputs.x == 'v'" } } } as Workflow,
       CTX,
       readerFor({}),
-      SOURCE,
+      SITE,
       0,
       "",
       true,
@@ -96,7 +98,7 @@ describe("job expansion", () => {
       { on: { pull_request: null } } as Workflow,
       CTX,
       readerFor({}),
-      SOURCE,
+      SITE,
     );
     expect(entries).toEqual([]);
   });
@@ -475,6 +477,36 @@ describe("reusable workflows", () => {
     });
   });
 
+  it("resolves a remote callee's own `./` calls in the callee's repo", async () => {
+    // The recursion has to descend with the callee's site, not the caller's:
+    // a `./` inside the callee names a file in the callee's repo at its pinned
+    // commit, and reading it from the caller instead fetches the wrong file.
+    const fetched: string[] = [];
+    const entries = await expand(
+      { call: { uses: `octo/repo/.github/workflows/outer.yml@${REMOTE_SHA}` } },
+      readerOf(async (path, src) => {
+        fetched.push(`${src.owner}/${src.repo}@${src.sha}:${path}`);
+        if (src.owner !== "octo" || src.sha !== REMOTE_SHA) {
+          return null;
+        }
+        if (path === ".github/workflows/outer.yml") {
+          return JSON.stringify({
+            on: { workflow_call: null },
+            jobs: { mid: { uses: "./.github/workflows/inner.yml" } },
+          });
+        }
+        return JSON.stringify({ on: { workflow_call: null }, jobs: { leaf: {} } });
+      }),
+    );
+    expect(entries).toEqual([
+      { job: "call / mid / leaf", checkName: "call / mid / leaf", status: "run", reason: "" },
+    ]);
+    expect(fetched).toEqual([
+      `octo/repo@${REMOTE_SHA}:.github/workflows/outer.yml`,
+      `octo/repo@${REMOTE_SHA}:.github/workflows/inner.yml`,
+    ]);
+  });
+
   it("reports a local reusable that is missing at head", async () => {
     const entries = await expand({ call: { uses: "./.github/workflows/sub.yml" } });
     expect(entries[0]).toMatchObject({
@@ -823,7 +855,7 @@ describe("inputs the event never supplied", () => {
       withDispatchInput({ gate: { if: "inputs.version == ''" } }),
       CTX,
       readerFor({}),
-      SOURCE,
+      SITE,
     );
     expect(entries.map((e) => [e.job, e.status])).toEqual([["gate", "run"]]);
   });
@@ -834,7 +866,7 @@ describe("inputs the event never supplied", () => {
       withDispatchInput({ gate: { if: "inputs.version == '1.2.3'" } }),
       CTX,
       readerFor({}),
-      SOURCE,
+      SITE,
       0,
       "",
       true,
@@ -873,7 +905,7 @@ describe("inputs the event never supplied", () => {
           },
         }),
       }),
-      SOURCE,
+      SITE,
       0,
       "",
       true,

@@ -226,6 +226,17 @@ export interface WorkflowSource extends SourceRef {
   sha: string;
 }
 
+/**
+ * Where a job is defined: the workflow file's repo-relative path and the repo
+ * and commit it was read from. Expansion threads one of these so a job can be
+ * named by its definition site — `uses:` crosses repos, so the path alone is
+ * not an identity.
+ */
+export interface JobSite {
+  path: string;
+  source: WorkflowSource;
+}
+
 /** Read one workflow file, or null if it is not reachable. Must not throw. */
 export type FetchWorkflow = (
   path: string,

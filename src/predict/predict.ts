@@ -210,7 +210,17 @@ export async function predict(
     if (!dispatches) {
       return [{ workflow: path, job: "*", status: "no-dispatch", reason }];
     }
-    const jobs = await expandJobs(wf, ctx, reader, readSource, 0, "", true, prFacts, executor);
+    const jobs = await expandJobs(
+      wf,
+      ctx,
+      reader,
+      { path, source: readSource },
+      0,
+      "",
+      true,
+      prFacts,
+      executor,
+    );
     return jobs.map((j) => ({
       workflow: path,
       job: jobName(j.job),

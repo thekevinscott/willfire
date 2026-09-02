@@ -1,8 +1,16 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { expandJobs } from "./expandJobs.js";
 import { expandWorkflowJobs } from "./expandWorkflowJobs.js";
 import type { ExecOutcome, JobExecutor } from "../execute.js";
 import type { FetchWorkflow, ResolveRef, WorkflowReader, WorkflowSource } from "../types.js";
 import type { YamlMap } from "../yamlValue.js";
+
+// A spy over the real expansion: the site this seam constructs is part of what
+// the suite pins, and its path is carried, not read, so only the handoff shows it.
+vi.mock("./expandJobs.js", async () => {
+  const actual = await vi.importActual<typeof import("./expandJobs.js")>("./expandJobs.js");
+  return { ...actual, expandJobs: vi.fn(actual.expandJobs) };
+});
 
 /** A 40-hex commit id, so anything pinned to it is already resolved. */
 const SHA = "a".repeat(40);
@@ -32,6 +40,20 @@ describe("expandWorkflowJobs", () => {
     expect(entries).toEqual([
       { job: "build", checkName: "build", status: "run", reason: "" },
     ]);
+  });
+
+  it("hands expansion a pathless site over the given source", async () => {
+    // Callers of this seam supply a parsed document with no file behind it, so
+    // the empty path is the contract, not a placeholder.
+    vi.mocked(expandJobs).mockClear();
+    const wf = { on: { pull_request: null }, jobs: { build: { "runs-on": "ubuntu-latest" } } };
+    await expandWorkflowJobs(
+      wf as never,
+      { action: "opened", baseRef: "main", files: ["src/app.txt"] },
+      readerOf(async () => null),
+      SOURCE,
+    );
+    expect(vi.mocked(expandJobs).mock.calls[0]?.[3]).toEqual({ path: "", source: SOURCE });
   });
 });
 
