@@ -9,8 +9,17 @@
 
 import type { GithubClient } from "./makeGithubClient.js";
 import { describe, expect, it, vi } from "vitest";
+import { expandJobs } from "../jobs/expandJobs.js";
 import { predict } from "./predict.js";
 import type { Entry, Prediction } from "../types.js";
+
+// A spy over the real expansion: the definition site each workflow is expanded
+// under is part of what this suite pins, and nothing downstream echoes it back.
+vi.mock("../jobs/expandJobs.js", async () => {
+  const actual =
+    await vi.importActual<typeof import("../jobs/expandJobs.js")>("../jobs/expandJobs.js");
+  return { ...actual, expandJobs: vi.fn(actual.expandJobs) };
+});
 
 // ------------------------------------------------------------------ fixtures
 
@@ -586,6 +595,17 @@ describe("the commit workflow files are read at", () => {
   it("names only the head when it fell back to the head", async () => {
     const { sources } = await run(AT_HEAD, { mergeSha: null });
     expect(sources).toEqual([HEAD_SOURCE]);
+  });
+
+  it("expands each workflow under its own path at the commit it was read from", async () => {
+    // The site is the identity the callback map will key on; a bare source
+    // here would leave every top-level job nameless.
+    vi.mocked(expandJobs).mockClear();
+    await run(AT_HEAD, { mergeSha: null });
+    expect(vi.mocked(expandJobs).mock.calls[0]?.[3]).toEqual({
+      path: WF,
+      source: HEAD_SOURCE,
+    });
   });
 
   it("claims no merge commit on the skip path, which never reads one", async () => {

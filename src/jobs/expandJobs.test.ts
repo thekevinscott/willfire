@@ -477,6 +477,36 @@ describe("reusable workflows", () => {
     });
   });
 
+  it("resolves a remote callee's own `./` calls in the callee's repo", async () => {
+    // The recursion has to descend with the callee's site, not the caller's:
+    // a `./` inside the callee names a file in the callee's repo at its pinned
+    // commit, and reading it from the caller instead fetches the wrong file.
+    const fetched: string[] = [];
+    const entries = await expand(
+      { call: { uses: `octo/repo/.github/workflows/outer.yml@${REMOTE_SHA}` } },
+      readerOf(async (path, src) => {
+        fetched.push(`${src.owner}/${src.repo}@${src.sha}:${path}`);
+        if (src.owner !== "octo" || src.sha !== REMOTE_SHA) {
+          return null;
+        }
+        if (path === ".github/workflows/outer.yml") {
+          return JSON.stringify({
+            on: { workflow_call: null },
+            jobs: { mid: { uses: "./.github/workflows/inner.yml" } },
+          });
+        }
+        return JSON.stringify({ on: { workflow_call: null }, jobs: { leaf: {} } });
+      }),
+    );
+    expect(entries).toEqual([
+      { job: "call / mid / leaf", checkName: "call / mid / leaf", status: "run", reason: "" },
+    ]);
+    expect(fetched).toEqual([
+      `octo/repo@${REMOTE_SHA}:.github/workflows/outer.yml`,
+      `octo/repo@${REMOTE_SHA}:.github/workflows/inner.yml`,
+    ]);
+  });
+
   it("reports a local reusable that is missing at head", async () => {
     const entries = await expand({ call: { uses: "./.github/workflows/sub.yml" } });
     expect(entries[0]).toMatchObject({
