@@ -41,6 +41,13 @@ export async function runCallbacks(commands: string[][]): Promise<CallbacksOutco
       child.on("close", (code) => resolve({ code: code ?? 1, stdout, stderr }));
     });
 
+  // Capped here as well as on the stream: stdout accumulates uncapped because
+  // a successful callback's whole stdout is the map.
+  const tailLine = (s: string): string => {
+    const trimmed = s.trim();
+    return trimmed.slice(trimmed.lastIndexOf("\n") + 1).slice(-4096);
+  };
+
   const collected: { label: string; map: CallbackMap }[] = [];
   for (const argv of commands) {
     const label = argv.join(" ");
@@ -49,8 +56,10 @@ export async function runCallbacks(commands: string[][]): Promise<CallbacksOutco
       return { ok: false, reason: `callback '${label}' failed to start: ${r.failed}` };
     }
     if (r.code !== 0) {
-      const trimmed = r.stderr.trim();
-      const tail = trimmed.slice(trimmed.lastIndexOf("\n") + 1);
+      // pnpm prints fatal errors such as ERR_PNPM_NO_PKG_MANIFEST to stdout,
+      // so stderr alone can leave a failure quoting no cause at all.
+      const fromStderr = tailLine(r.stderr);
+      const tail = fromStderr === "" ? tailLine(r.stdout) : fromStderr;
       return {
         ok: false,
         reason: `callback '${label}' exited ${r.code}${tail === "" ? "" : ` (${tail})`}`,
