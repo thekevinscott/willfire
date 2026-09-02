@@ -268,7 +268,7 @@ each line becomes one `--callback`:
 ```yaml
 - uses: thekevinscott/pr-monitor@v1
   with:
-    resolve-outputs: npx some-tool resolve
+    resolve-outputs: npx putitoutthere resolve
 ```
 
 A resolver ships as a CLI of the tool that owns the dynamic job, and the repo
