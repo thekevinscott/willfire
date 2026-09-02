@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import type { DetailedCombo, Workflow } from "./types.js";
+import type { DetailedCombo, PredictOptions, Workflow } from "./types.js";
 
 describe("the document types", () => {
   it("yields a document value on a read, not `any`", () => {
@@ -12,5 +12,12 @@ describe("the document types", () => {
     const combo: DetailedCombo = { values: { os: "linux" }, displayKeys: ["os"] };
     expectTypeOf(combo.values["os"]).not.toBeAny();
     expect(combo.values["os"]).toBe("linux");
+  });
+
+  it("takes callback commands as an immutable list, so a caller's array is safe to hand over", () => {
+    const commands = ["npx resolver"] as const;
+    const opts: PredictOptions = { callbacks: commands };
+    expectTypeOf(opts.callbacks).toEqualTypeOf<readonly string[] | undefined>();
+    expect(opts.callbacks).toEqual(["npx resolver"]);
   });
 });

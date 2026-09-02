@@ -9,13 +9,29 @@ import type { GithubClient } from "./predict/makeGithubClient.js";
 // Replacing the module lets the CLI be driven without a token or a network.
 // `hoisted` is the handoff: `vi.mock` factories are lifted above the imports,
 // so they cannot close over ordinary module scope.
-const hoisted = vi.hoisted(() => ({ github: undefined as GithubClient | undefined }));
+const hoisted = vi.hoisted(() => ({
+  github: undefined as GithubClient | undefined,
+  resolved: [] as (readonly string[])[],
+}));
 
 vi.mock("./predict/makeGithubClient.js", async () => {
   const actual = await vi.importActual<typeof import("./predict/makeGithubClient.js")>(
     "./predict/makeGithubClient.js",
   );
   return { ...actual, makeGithubClient: () => hoisted.github as GithubClient };
+});
+
+// Records what the prediction was asked to resolve, without spawning anything.
+// The hoisted array outlives the module resets each invocation performs.
+vi.mock("./callback/resolveCallbackMap.js", async () => {
+  const actual = await vi.importActual<typeof import("./callback/resolveCallbackMap.js")>(
+    "./callback/resolveCallbackMap.js",
+  );
+  const recording: typeof actual.resolveCallbackMap = async (commands) => {
+    hoisted.resolved.push(commands);
+    return undefined;
+  };
+  return { ...actual, resolveCallbackMap: recording };
 });
 
 const WF = ".github/workflows/w.yml";
@@ -89,6 +105,7 @@ describe("the CLI entrypoint", () => {
   afterEach(() => {
     process.argv = argv;
     hoisted.github = undefined;
+    hoisted.resolved.length = 0;
     vi.restoreAllMocks();
   });
 
@@ -161,4 +178,12 @@ describe("the CLI entrypoint", () => {
     expect(out).toEqual([`${WF} :: a :: run`, HEAD_READ]);
   });
 
+  it("hands every --callback command to the prediction, in order", async () => {
+    await invoke(
+      ["--repo", "o/r", "--pr", "1", "--callback", "npx resolver a", "--callback", "other b"],
+      { contents: { [WF]: WORKFLOW } },
+    );
+    expect(hoisted.resolved).toEqual([["npx resolver a", "other b"]]);
+    expect(out).toEqual([`${WF} :: a :: run`, HEAD_READ]);
+  });
 });

@@ -128,6 +128,7 @@ export interface PredictOptions {
    * {@link JobExecutor} is a test seam, not configuration.
    */
   executor?: JobExecutor | null;
+  callbacks?: readonly string[];
 }
 
 export interface Ctx {
