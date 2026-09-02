@@ -84,12 +84,14 @@ Auth is any token with `contents: read`, `actions: read`, and
 ## CLI
 
 ```sh
-GH_TOKEN=... willfire --repo owner/repo --pr 123 \
-  [--action opened|synchronize|reopened] [--json]
+GH_TOKEN=... npx willfire --repo owner/repo --pr 123 \
+  [--action opened|synchronize|reopened] [--callback "<command>"]... [--json]
 ```
 
 Plain-text output is one line per entry, then a `# read owner/repo@ref -> sha`
 line per source. `--json` prints the whole `Prediction`, `sources` included.
+`--callback` is repeatable — see "Answering with a callback". There is no flag
+for turning execution off; the CLI always executes what it needs.
 
 ## What it handles
 
@@ -140,9 +142,10 @@ lookup against it then stays unknown.
 call: a callee's `needs.detect` is the callee's own job.
 
 Nothing here guesses what those outputs are. By default `predict` computes
-them, by executing the jobs that produce them — the section below. With
-execution turned off (`executor: null` in `PredictOptions`) a dynamic matrix
-stays `unknown`.
+them, by executing the jobs that produce them — the section below — or takes
+them from a callback, for the jobs a sandbox cannot run. With execution turned
+off (`executor: null` in `PredictOptions`) and no callback answering, a dynamic
+matrix stays `unknown`.
 
 ## Executing needed jobs
 
@@ -183,6 +186,96 @@ through:
 ```
 dynamic matrix; executing 'detect' failed: step 'scan': exited 1 (...)
 ```
+
+## Answering with a callback
+
+Some jobs the sandbox cannot run — one needing installed dependencies, or the
+network. `--callback` supplies their outputs from outside:
+
+```sh
+npx willfire --repo owner/repo --pr 123 \
+  --callback "npx some-tool resolve" \
+  --callback "npx other-tool resolve"
+```
+
+Each value is split on whitespace into argv and spawned directly. There is no
+shell, so quoting, pipes, and redirection have no meaning here; a value that is
+empty or whose first token starts with `-` is a usage error, refused before the
+prediction starts. Every callback runs once, before any workflow is expanded, so
+every invocation consults the same map. They run outside the sandbox on the
+invoker's authority, with the invoker's environment minus `GH_TOKEN` and
+`GITHUB_TOKEN`: a prediction does not hand its repo credentials to a command a
+workflow asked it to run.
+
+A callback prints one JSON object on stdout, and nothing else:
+
+```json
+{
+  "owner/repo/.github/workflows/ci.yml:detect": [
+    { "inputs": {}, "outputs": { "coverage_languages": "[\"typescript\"]" } }
+  ]
+}
+```
+
+The key names a job by its definition site: the repo and repo-relative path of
+the workflow file the job is written in, then the job id. Repo-qualified, so one
+resolver emits the same map wherever its workflow is called from, and free of
+any ref or sha, so a moving tag never invalidates a map.
+
+Each entry is a recorded answer — the `outputs` to use when its `inputs` are a
+subset of the invocation's. Both keys are required and both are string-to-string
+maps; an unexpected key or a non-string value refuses to parse rather than being
+quietly dropped. Output values are raw strings, exactly as the `needs` scope
+above takes them. `inputs` are the reusable-workflow inputs the invocation was
+called with, and only the settled ones: an input willfire could not decide is
+left out, so an entry conditioning on it can never match. An entry with empty
+`inputs` answers every invocation of that job.
+
+Per job — the same jobs execution selects, those some sibling's
+`needs.<id>.outputs` reads:
+
+| the map | result |
+| --- | --- |
+| claims the key, exactly one entry matches | those `outputs`, nothing executed |
+| does not claim the key | sandbox execution |
+| claims the key, no entry matches | `unknown`; execution is not attempted |
+| claims the key, several entries match | fatal; the prediction aborts |
+
+The last two rows are the point of the distinction. A key the map does not claim
+means the resolver does not own that job, so execution is the next thing to try.
+A key it claims and cannot answer means the resolver is out of step with the
+workflow it claims; falling back to execution would paper over that, so the
+entries stay `unknown` with the reason attached:
+
+```
+dynamic matrix; no callback entry matches 'owner/repo/.github/workflows/ci.yml:detect' with inputs {}
+```
+
+Everything else a callback gets wrong is fatal to the whole prediction rather
+than to one job: a command that fails to start, a non-zero exit, stdout that is
+not exactly the map above, two callbacks claiming one key, two entries matching
+one invocation. A map that silently went missing would degrade into the
+executions and unknowns it exists to replace, which is a wrong answer wearing a
+recorded answer's face.
+
+### The consumer side
+
+A gate passes resolvers down rather than defining them. In
+[pr-monitor](https://github.com/thekevinscott/pr-monitor) that is the
+`resolve-outputs` input, one command per line — Actions has no list inputs — and
+each line becomes one callback command:
+
+```yaml
+- uses: thekevinscott/pr-monitor@v1
+  with:
+    resolve-outputs: npx some-tool resolve
+```
+
+A resolver ships as a CLI of the tool that owns the dynamic job, and the repo
+pins that tool as a devDependency, so `npx` runs the pinned local copy instead of
+resolving `latest` off the registry. The tool knows its own job's outputs;
+willfire knows none of them, and none of the arrangement is configured in
+willfire.
 
 ## Development
 
