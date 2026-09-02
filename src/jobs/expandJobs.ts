@@ -134,8 +134,6 @@ export async function expandJobs(
         // moves this to the callee's repo and pinned ref; a local one leaves
         // it alone.
         let subSource: WorkflowSource = source;
-        // What `inputs.*` means on the other side of the call.
-        let subScope: Scope = {};
         const target = parseUses(uses);
         if (depth + 1 > MAX_REUSABLE_DEPTH) {
           failure = `reusable workflow nested deeper than ${MAX_REUSABLE_DEPTH} levels`;
@@ -162,18 +160,7 @@ export async function expandJobs(
               failure = `cannot fetch ${uses}`;
             } else {
               try {
-                const parsed = parseYaml(content);
-                // `inputs.*` changes at the call boundary; `github.*` does
-                // not. A callee's jobs run in the caller's repo, so the facts
-                // seeded at the top of the prediction stay true all the way
-                // down.
-                subScope = {
-                  inputs: calleeInputs(job.with, parsed ?? {}, scoped),
-                  github: scoped.github,
-                };
-                // Assigned last, so a throw above leaves it null and the one
-                // check below covers every way the call failed to resolve.
-                subWf = parsed;
+                subWf = parseYaml(content);
               } catch (e) {
                 failure = `YAML parse error in ${uses}: ${e}`;
               }
@@ -193,6 +180,19 @@ export async function expandJobs(
               reason: failure ?? `cannot resolve ${uses}`,
             });
           } else {
+            // `inputs.*` changes at the call boundary; `github.*` does not.
+            // A callee's jobs run in the caller's repo, so the facts seeded at
+            // the top of the prediction stay true all the way down. Evaluated
+            // per combination: a `with:` may read `matrix.*`, and each
+            // combination dispatches its own callee run with its own inputs.
+            const subScope: Scope = {
+              inputs: calleeInputs(
+                job.with,
+                subWf,
+                combo === null ? scoped : { ...scoped, matrix: combo.values },
+              ),
+              github: scoped.github,
+            };
             entries.push(
               ...(await expandJobs(
                 subWf,
