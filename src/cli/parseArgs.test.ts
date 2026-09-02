@@ -116,16 +116,35 @@ describe("parseArgs", () => {
   it("exits 2 on a --callback with no value at all", () => {
     expect(() => parseArgs(["--repo", "o/r", "--pr", "1", "--callback"])).toThrow("exited");
     expect(process.exit).toHaveBeenCalledWith(2);
-    expect(vi.mocked(console.error).mock.calls[0][0]).toBe("--callback needs a command");
+    expect(vi.mocked(console.error).mock.calls[0][0]).toBe(
+      "option requires argument: --callback",
+    );
   });
 
+  it("exits 2 rather than let a flag take the next flag as its value", () => {
+    expect(() => parseArgs(["--repo", "--json", "--pr", "1"])).toThrow("exited");
+    expect(process.exit).toHaveBeenCalledWith(2);
+    expect(vi.mocked(console.error).mock.calls[0][0]).toBe("option requires argument: --repo");
+  });
+
+  // The separated form never reaches the guard: --callback --json is refused as
+  // a missing value, so `=` is the only way a dash-leading command gets through.
   it("exits 2 on a --callback command that starts with a dash", () => {
-    expect(() =>
-      parseArgs(["--repo", "o/r", "--pr", "1", "--callback", "--json"]),
-    ).toThrow("exited");
+    expect(() => parseArgs(["--repo", "o/r", "--pr", "1", "--callback=--json"])).toThrow(
+      "exited",
+    );
     expect(process.exit).toHaveBeenCalledWith(2);
     expect(vi.mocked(console.error).mock.calls[0][0]).toBe(
       "--callback command cannot start with '-': --json",
     );
+  });
+
+  it("exits 2 on a flag it does not recognise", () => {
+    expect(() => parseArgs(["--repo", "o/r", "--pr", "1", "--nope"])).toThrow("exited");
+    expect(process.exit).toHaveBeenCalledWith(2);
+    expect(vi.mocked(console.error).mock.calls[0][0]).toBe(
+      "unknown or unexpected option: --nope",
+    );
+    expect(vi.mocked(console.error).mock.calls[1][0]).toMatch(/^usage: predict /);
   });
 });
