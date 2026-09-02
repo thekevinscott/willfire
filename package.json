@@ -51,6 +51,7 @@
     "verify": "pnpm --filter verify verify"
   },
   "dependencies": {
+    "arg": "^5.0.2",
     "yaml": "^2.6.0"
   },
   "devDependencies": {
