@@ -263,7 +263,7 @@ recorded answer's face.
 A gate passes resolvers down rather than defining them. In
 [pr-monitor](https://github.com/thekevinscott/pr-monitor) that is the
 `resolve-outputs` input, one command per line — Actions has no list inputs — and
-each line becomes one `--callback`:
+each line becomes one callback command:
 
 ```yaml
 - uses: thekevinscott/pr-monitor@v1
