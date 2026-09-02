@@ -17,6 +17,7 @@ import type { JobExecutor } from "../execute.js";
 import type {
   Ctx,
   FetchWorkflow,
+  JobSite,
   ResolveRef,
   Workflow,
   WorkflowReader,
@@ -37,6 +38,7 @@ const SHA = "a".repeat(40);
 const REMOTE_SHA = "b".repeat(40);
 
 const SOURCE: WorkflowSource = { owner: "o", repo: "r", ref: SHA, sha: SHA };
+const SITE: JobSite = { path: ".github/workflows/caller.yml", source: SOURCE };
 const CTX: Ctx = { action: "opened", baseRef: "main", files: ["src/app.ts"] };
 
 /**
@@ -54,7 +56,7 @@ const readerFor = (files: Record<string, string>) =>
   readerOf(async (path) => files[path] ?? null);
 
 const expand = (jobs: YamlMap, reader: WorkflowReader = readerFor({})) =>
-  expandJobs({ on: { pull_request: null }, jobs } as Workflow, CTX, reader, SOURCE);
+  expandJobs({ on: { pull_request: null }, jobs } as Workflow, CTX, reader, SITE);
 
 /** The same expansion with an executor wired in, scope starting empty. */
 const expandWith = (
@@ -66,7 +68,7 @@ const expandWith = (
     { on: { pull_request: null }, jobs } as Workflow,
     CTX,
     reader,
-    SOURCE,
+    SITE,
     0,
     "",
     true,
@@ -82,7 +84,7 @@ describe("job expansion", () => {
       { on: { pull_request: null }, jobs: { a: { if: "inputs.x == 'v'" } } } as Workflow,
       CTX,
       readerFor({}),
-      SOURCE,
+      SITE,
       0,
       "",
       true,
@@ -96,7 +98,7 @@ describe("job expansion", () => {
       { on: { pull_request: null } } as Workflow,
       CTX,
       readerFor({}),
-      SOURCE,
+      SITE,
     );
     expect(entries).toEqual([]);
   });
@@ -823,7 +825,7 @@ describe("inputs the event never supplied", () => {
       withDispatchInput({ gate: { if: "inputs.version == ''" } }),
       CTX,
       readerFor({}),
-      SOURCE,
+      SITE,
     );
     expect(entries.map((e) => [e.job, e.status])).toEqual([["gate", "run"]]);
   });
@@ -834,7 +836,7 @@ describe("inputs the event never supplied", () => {
       withDispatchInput({ gate: { if: "inputs.version == '1.2.3'" } }),
       CTX,
       readerFor({}),
-      SOURCE,
+      SITE,
       0,
       "",
       true,
@@ -873,7 +875,7 @@ describe("inputs the event never supplied", () => {
           },
         }),
       }),
-      SOURCE,
+      SITE,
       0,
       "",
       true,

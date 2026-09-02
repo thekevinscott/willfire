@@ -21,5 +21,7 @@ export function expandWorkflowJobs(
   scope: Scope = {},
   executor?: JobExecutor,
 ): Promise<ExpandedJob[]> {
-  return expandJobs(wf, ctx, reader, source, 0, "", true, scope, executor);
+  // This seam's callers hand in an already-parsed document, not a file, so
+  // there is no path to name; `predict`, which reads real files, supplies one.
+  return expandJobs(wf, ctx, reader, { path: "", source }, 0, "", true, scope, executor);
 }
