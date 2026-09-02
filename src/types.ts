@@ -128,6 +128,13 @@ export interface PredictOptions {
    * {@link JobExecutor} is a test seam, not configuration.
    */
   executor?: JobExecutor | null;
+  /**
+   * Commands that answer needed-job outputs from a recording instead of
+   * execution — one string per `--callback`, split on whitespace and spawned
+   * directly, once per prediction. A callback failing, or two answering the
+   * same key, aborts the prediction.
+   */
+  callbacks?: readonly string[];
 }
 
 export interface Ctx {

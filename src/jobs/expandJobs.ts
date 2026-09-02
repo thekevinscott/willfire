@@ -1,4 +1,8 @@
 import { parse as parseYaml } from "yaml";
+import { decidedInputs } from "../callback/decidedInputs.js";
+import { jobKey } from "../callback/jobKey.js";
+import { matchOutputs } from "../callback/matchOutputs.js";
+import type { CallbackMap } from "../callback/parseCallbackMap.js";
 import type { Scope } from "../expr/val.js";
 import type { JobExecutor } from "../execute.js";
 import { expandMatrixDetailed } from "../matrix/expandMatrixDetailed.js";
@@ -44,6 +48,7 @@ export async function expandJobs(
   prefixResolved = true,
   scope: Scope = {},
   executor?: JobExecutor,
+  callbacks?: CallbackMap,
 ): Promise<ExpandedJob[]> {
   const entries: ExpandedJob[] = [];
   const jobs = (wf["jobs"] ?? {}) as Record<string, Workflow>;
@@ -58,26 +63,35 @@ export async function expandJobs(
   // sibling's `needs.*.outputs` read depends on, under the same `evalIf`
   // verdict the main loop applies.
   const execFailures: Record<string, string> = {};
-  if (executor !== undefined) {
-    const needed = neededJobIds(jobs);
-    for (const [jobId, jobRaw] of Object.entries(jobs)) {
-      const job = jobRaw ?? {};
-      // A reusable-call job has no steps of its own to run.
-      const runnable =
-        needed.has(jobId) && !("uses" in job) && evalIf(job.if, scoped) === "run";
-      if (runnable) {
+  const needed = neededJobIds(jobs);
+  for (const [jobId, jobRaw] of Object.entries(jobs)) {
+    const job = jobRaw ?? {};
+    // A reusable-call job has no steps of its own to run.
+    const runnable = needed.has(jobId) && !("uses" in job) && evalIf(job.if, scoped) === "run";
+    if (runnable) {
+      const answer = matchOutputs(callbacks ?? {}, jobKey(site, jobId), decidedInputs(scoped));
+      if (answer.kind === "ambiguous") {
+        // Two recorded answers claiming one invocation: either pick would be a
+        // guess wearing a recorded answer's face, so the whole prediction aborts.
+        throw new Error(answer.reason);
+      }
+      if (answer.kind === "hit") {
+        scoped = { ...scoped, needs: { ...scoped.needs, [jobId]: { outputs: answer.outputs } } };
+      } else if (answer.kind === "no-match") {
+        execFailures[jobId] = answer.reason;
+      } else if (executor !== undefined) {
         const res = await executor.executeJob(jobId, job, wf, scoped);
         if (res.ok) {
           scoped = { ...scoped, needs: { ...scoped.needs, [jobId]: { outputs: res.outputs } } };
         } else {
-          execFailures[jobId] = res.reason;
+          execFailures[jobId] = `executing '${jobId}' failed: ${res.reason}`;
         }
       }
     }
   }
   const execNote = (needs: string[]): string => {
     const failed = needs.find((n) => n in execFailures);
-    return failed === undefined ? "" : `; executing '${failed}' failed: ${execFailures[failed]}`;
+    return failed === undefined ? "" : `; ${execFailures[failed]}`;
   };
 
   for (const [jobId, jobRaw] of Object.entries(jobs)) {
@@ -205,6 +219,7 @@ export async function expandJobs(
                 nameResolved,
                 subScope,
                 executor,
+                callbacks,
               )),
             );
           }

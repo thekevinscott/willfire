@@ -7,6 +7,7 @@
 // src/names.test.ts.
 
 import { parse as parseYaml } from "yaml";
+import { resolveCallbackMap } from "../callback/resolveCallbackMap.js";
 import { jobName } from "../entries/jobName.js";
 import type { Scope } from "../expr/val.js";
 import { expandJobs } from "../jobs/expandJobs.js";
@@ -164,6 +165,10 @@ export async function predict(
       ? makeLiveExecutor(github, readSource, resolveRef)
       : (opts.executor ?? undefined);
 
+  // Callbacks run once, before any workflow is expanded, so every invocation
+  // consults the same map. A failing callback throws and aborts the prediction.
+  const callbackMap = await resolveCallbackMap(opts.callbacks ?? []);
+
   const workflows = await github.paginate(github.rest.actions.listRepoWorkflows, {
     ...base,
     per_page: 100,
@@ -220,6 +225,7 @@ export async function predict(
       true,
       prFacts,
       executor,
+      callbackMap,
     );
     return jobs.map((j) => ({
       workflow: path,

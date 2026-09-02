@@ -1,14 +1,17 @@
+import { parseCallbackCommand } from "../callback/parseCallbackCommand.js";
 import type { PrEventAction } from "../types.js";
 import { isPrEventAction } from "./isPrEventAction.js";
 
 const USAGE =
-  "usage: predict --repo owner/name --pr N [--action opened|synchronize|reopened] [--json]";
+  "usage: predict --repo owner/name --pr N [--action opened|synchronize|reopened]" +
+  ' [--callback "<command>"]... [--json]';
 
 export function parseArgs(argv: string[]): {
   repo: string;
   pr: number;
   json: boolean;
   action?: PrEventAction;
+  callbacks: string[];
 } {
   const get = (flag: string) => {
     const i = argv.indexOf(flag);
@@ -28,5 +31,18 @@ export function parseArgs(argv: string[]): {
     console.error(USAGE);
     process.exit(2);
   }
-  return { repo, pr: Number(pr), json: argv.includes("--json"), action };
+  // Refused up front for the same reason: a command the prediction would balk
+  // at later is a usage error now.
+  const callbacks = argv.flatMap((token, i) =>
+    token === "--callback" ? [argv[i + 1] ?? ""] : [],
+  );
+  for (const command of callbacks) {
+    const parsed = parseCallbackCommand(command);
+    if (!parsed.ok) {
+      console.error(parsed.reason);
+      console.error(USAGE);
+      process.exit(2);
+    }
+  }
+  return { repo, pr: Number(pr), json: argv.includes("--json"), action, callbacks };
 }

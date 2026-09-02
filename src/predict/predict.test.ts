@@ -9,6 +9,7 @@
 
 import type { GithubClient } from "./makeGithubClient.js";
 import { describe, expect, it, vi } from "vitest";
+import { resolveCallbackMap } from "../callback/resolveCallbackMap.js";
 import { expandJobs } from "../jobs/expandJobs.js";
 import { predict } from "./predict.js";
 import type { Entry, Prediction } from "../types.js";
@@ -19,6 +20,15 @@ vi.mock("../jobs/expandJobs.js", async () => {
   const actual =
     await vi.importActual<typeof import("../jobs/expandJobs.js")>("../jobs/expandJobs.js");
   return { ...actual, expandJobs: vi.fn(actual.expandJobs) };
+});
+
+// A spy over the real resolution, so callback tests can answer a map or fail
+// without spawning anything. The real thing resolves `[]` to no map at all.
+vi.mock("../callback/resolveCallbackMap.js", async () => {
+  const actual = await vi.importActual<typeof import("../callback/resolveCallbackMap.js")>(
+    "../callback/resolveCallbackMap.js",
+  );
+  return { ...actual, resolveCallbackMap: vi.fn(actual.resolveCallbackMap) };
 });
 
 // ------------------------------------------------------------------ fixtures
@@ -810,6 +820,36 @@ describe("a caller-supplied event action", () => {
     expect(entries).toMatchObject([
       { status: "no-dispatch", reason: "action 'synchronize' not in types [opened]" },
     ]);
+  });
+});
+
+// ------------------------------------------------------------------- callbacks
+
+describe("callback commands", () => {
+  const BODY = "on: pull_request\njobs:\n  a: {}\n";
+
+  it("resolves the commands once and hands every expansion the one map", async () => {
+    const map = { "o/r/.github/workflows/w.yml:a": [] };
+    vi.mocked(resolveCallbackMap).mockResolvedValueOnce(map);
+    vi.mocked(expandJobs).mockClear();
+    await predict(fakeGithub({ contents: { [WF]: BODY } }), "o/r", 1, {
+      callbacks: ["npx resolver"],
+    });
+    expect(resolveCallbackMap).toHaveBeenCalledWith(["npx resolver"]);
+    expect(vi.mocked(expandJobs).mock.calls[0]?.[9]).toBe(map);
+  });
+
+  it("hands expansion no map at all when no callbacks were given", async () => {
+    vi.mocked(expandJobs).mockClear();
+    await predict(fakeGithub({ contents: { [WF]: BODY } }), "o/r", 1);
+    expect(vi.mocked(expandJobs).mock.calls[0]?.[9]).toBeUndefined();
+  });
+
+  it("aborts the prediction when a callback fails", async () => {
+    vi.mocked(resolveCallbackMap).mockRejectedValueOnce(new Error("callback 'r' exited 2"));
+    await expect(
+      predict(fakeGithub({ contents: { [WF]: BODY } }), "o/r", 1, { callbacks: ["r"] }),
+    ).rejects.toThrow("callback 'r' exited 2");
   });
 });
 

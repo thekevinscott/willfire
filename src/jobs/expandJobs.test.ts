@@ -13,6 +13,7 @@ vi.mock(
   "./neededJobIds.js",
   async () => await vi.importActual<typeof import("./neededJobIds.js")>("./neededJobIds.js"),
 );
+import type { CallbackMap } from "../callback/parseCallbackMap.js";
 import type { JobExecutor } from "../execute.js";
 import type {
   Ctx,
@@ -541,18 +542,19 @@ describe("reusable workflows", () => {
   });
 });
 
-describe("derived execution", () => {
-  /** An executor that records what it is asked to run and answers `outputs`. */
-  const recording = (outputs: Record<string, string>) => {
-    const executed: string[] = [];
-    const executor: JobExecutor = {
-      executeJob: async (jobId) => {
-        executed.push(jobId);
-        return { ok: true, outputs };
-      },
-    };
-    return { executed, executor };
+/** An executor that records what it is asked to run and answers `outputs`. */
+const recording = (outputs: Record<string, string>) => {
+  const executed: string[] = [];
+  const executor: JobExecutor = {
+    executeJob: async (jobId) => {
+      executed.push(jobId);
+      return { ok: true, outputs };
+    },
   };
+  return { executed, executor };
+};
+
+describe("derived execution", () => {
 
   it("executes exactly the jobs a sibling reads outputs from", async () => {
     const { executed, executor } = recording({ langs: '["ts","py"]' });
@@ -636,6 +638,155 @@ describe("derived execution", () => {
     expect(entries.map((e) => [e.job, e.status, e.reason])).toEqual([
       ["detect", "run", ""],
       ["cover", "unknown", "dynamic matrix; executing 'detect' failed: docker not found"],
+    ]);
+  });
+});
+
+describe("callback answers", () => {
+  const KEY = `o/r/${SITE.path}:detect`;
+
+  /** A needed job and the sibling whose matrix reads its outputs. */
+  const JOBS: YamlMap = {
+    detect: { steps: [] },
+    cover: {
+      needs: "detect",
+      strategy: { matrix: { lang: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+    },
+  };
+
+  const expandCb = (
+    jobs: YamlMap,
+    callbacks: CallbackMap,
+    executor?: JobExecutor,
+    scope: Scope = {},
+    reader: WorkflowReader = readerFor({}),
+  ) =>
+    expandJobs(
+      { on: { pull_request: null }, jobs } as Workflow,
+      CTX,
+      reader,
+      SITE,
+      0,
+      "",
+      true,
+      scope,
+      executor,
+      callbacks,
+    );
+
+  it("uses a recorded answer instead of executing the job", async () => {
+    const { executed, executor } = recording({ langs: '["rb"]' });
+    const entries = await expandCb(
+      JOBS,
+      { [KEY]: [{ inputs: {}, outputs: { langs: '["ts","py"]' } }] },
+      executor,
+    );
+    expect(executed).toEqual([]);
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["detect", "run"],
+      ["cover (ts)", "run"],
+      ["cover (py)", "run"],
+    ]);
+  });
+
+  it("answers without any executor at all", async () => {
+    const entries = await expandCb(JOBS, {
+      [KEY]: [{ inputs: {}, outputs: { langs: '["ts"]' } }],
+    });
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["detect", "run"],
+      ["cover (ts)", "run"],
+    ]);
+  });
+
+  it("picks the entry whose inputs are a subset of the invocation's decided inputs", async () => {
+    // `n` arrives as the number 1 and matches its recorded string form; the
+    // undecided `u` can never satisfy an entry that conditions on it.
+    const scope: Scope = { inputs: { n: { kind: "value", v: 1 }, u: { kind: "unknown" } } };
+    const entries = await expandCb(
+      JOBS,
+      {
+        [KEY]: [
+          { inputs: { n: "2" }, outputs: { langs: '["py"]' } },
+          { inputs: { n: "1" }, outputs: { langs: '["ts"]' } },
+          { inputs: { u: "1" }, outputs: { langs: '["rb"]' } },
+        ],
+      },
+      undefined,
+      scope,
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["detect", "run"],
+      ["cover (ts)", "run"],
+    ]);
+  });
+
+  it("aborts the whole prediction when two entries match one invocation", async () => {
+    await expect(
+      expandCb(JOBS, {
+        [KEY]: [
+          { inputs: {}, outputs: { langs: '["ts"]' } },
+          { inputs: {}, outputs: { langs: '["py"]' } },
+        ],
+      }),
+    ).rejects.toThrow(`2 callback entries match '${KEY}' with inputs {}`);
+  });
+
+  it("leaves the reader unknown, loudly, when a claimed key matches nothing", async () => {
+    const { executed, executor } = recording({ langs: '["ts"]' });
+    const entries = await expandCb(
+      JOBS,
+      { [KEY]: [{ inputs: { n: "1" }, outputs: { langs: '["ts"]' } }] },
+      executor,
+    );
+    expect(executed).toEqual([]);
+    expect(entries.map((e) => [e.job, e.status, e.reason])).toEqual([
+      ["detect", "run", ""],
+      ["cover", "unknown", `dynamic matrix; no callback entry matches '${KEY}' with inputs {}`],
+    ]);
+  });
+
+  it("falls through to execution for a key the map does not claim", async () => {
+    const { executed, executor } = recording({ langs: '["ts"]' });
+    const entries = await expandCb(
+      JOBS,
+      { "o/r/.github/workflows/other.yml:detect": [{ inputs: {}, outputs: { langs: "[]" } }] },
+      executor,
+    );
+    expect(executed).toEqual(["detect"]);
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["detect", "run"],
+      ["cover (ts)", "run"],
+    ]);
+  });
+
+  it("consults a callee's jobs under the callee's own repo-qualified key", async () => {
+    const entries = await expandCb(
+      { call: { uses: `octo/repo/.github/workflows/wf.yml@${REMOTE_SHA}` } },
+      {
+        "octo/repo/.github/workflows/wf.yml:plan": [{ inputs: {}, outputs: { ls: '["a","b"]' } }],
+      },
+      undefined,
+      {},
+      readerOf(async (path, src) =>
+        src.owner === "octo"
+          ? JSON.stringify({
+              on: { workflow_call: null },
+              jobs: {
+                plan: { steps: [] },
+                use: {
+                  needs: "plan",
+                  strategy: { matrix: { l: "${{ fromJSON(needs.plan.outputs.ls) }}" } },
+                },
+              },
+            })
+          : null,
+      ),
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["call / plan", "run"],
+      ["call / use (a)", "run"],
+      ["call / use (b)", "run"],
     ]);
   });
 });

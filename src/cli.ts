@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Usage: pnpm predict --repo owner/name --pr N [--json]
+// Usage: pnpm predict --repo owner/name --pr N [--callback "<command>"]... [--json]
 // Auth: GH_TOKEN or GITHUB_TOKEN, needing contents/actions/pull-requests read.
 
 import { parseArgs } from "./cli/parseArgs.js";
@@ -12,6 +12,7 @@ if (isMain) {
   const args = parseArgs(process.argv.slice(2));
   const prediction = await predict(makeGithubClient(), args.repo, args.pr, {
     action: args.action,
+    callbacks: args.callbacks,
   });
   const { entries, skip, sources } = prediction;
   if (args.json) {
