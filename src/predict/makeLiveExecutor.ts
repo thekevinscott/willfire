@@ -1,4 +1,5 @@
-import { makeCloneProvider, makeExecutor, makeTreeProvider, runShell } from "../execute.js";
+import { makeCloneProvider, makeTreeProvider, runShell } from "../execute.js";
+import { makeExecutor } from "../execute/makeExecutor.js";
 import type { JobExecutor, ProvideTree, RunCommand } from "../execute/types.js";
 import type { GithubClient } from "./makeGithubClient.js";
 import { makeSandboxRunner } from "../sandbox/makeSandboxRunner.js";

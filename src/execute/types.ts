@@ -1,5 +1,5 @@
 import type { Scope } from "../expr/val.js";
-import type { ResolveRef, Workflow, WorkflowSource } from "../types.js";
+import type { ResolveRef, SourceRef, Workflow, WorkflowSource } from "../types.js";
 import type { YamlMap, YamlValue } from "../yamlValue.js";
 
 /** A host path a sandboxed runner must expose inside, at the same path. */
@@ -96,4 +96,10 @@ export interface WalkCtx {
   envLayers: (YamlValue | undefined)[];
   deps: ExecDeps;
   depth: number;
+}
+
+/** Where a `uses:` string points: a repo at a ref, plus a path inside it. */
+export interface ActionTarget {
+  path: string;
+  source: SourceRef;
 }
