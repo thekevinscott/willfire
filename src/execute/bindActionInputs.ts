@@ -17,9 +17,7 @@ export function bindActionInputs(
     if (raw === null || raw === undefined) {
       return { kind: "value", v: "" };
     }
-    if (typeof raw === "boolean" || typeof raw === "number") {
-      return { kind: "value", v: String(raw) };
-    }
+    // Booleans and numbers stringify template-free, so the render is a no-op.
     const rendered = renderTemplate(String(raw), scope);
     return rendered === null ? UNKNOWN : { kind: "value", v: rendered };
   };

@@ -7,11 +7,12 @@ import type { Scope } from "../expr/val.js";
  */
 export function renderTemplate(text: string, scope: Scope): string | null {
   let failed = false;
-  const out = text.replace(/\$\{\{(.*?)\}\}/g, (_whole, inner) => {
+  const out = text.replace(/\$\{\{(.*?)\}\}/g, (whole, inner) => {
     const val = evaluateValue(String(inner), scope);
     if (val.kind !== "value") {
+      // `out` is discarded once failed is set; any replacement works.
       failed = true;
-      return "";
+      return whole;
     }
     return String(val.v);
   });

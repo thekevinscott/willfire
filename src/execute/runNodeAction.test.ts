@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { runNodeAction } from "./runNodeAction.js";
-import type { RunCommand, WalkCtx } from "./types.js";
+import type { ActionModel, RunCommand, WalkCtx } from "./types.js";
 
 const ctxOf = (runCommand: RunCommand): WalkCtx => ({
   tree: "/nonexistent-tree",
@@ -53,5 +53,42 @@ describe("runNodeAction", () => {
     expect(
       await runNodeAction({}, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(ok)),
     ).toEqual({ ok: true, v: {} });
+  });
+
+  it("treats an explicit `pre: null` as no pre: step", async () => {
+    const action = { runs: { using: "node24", main: "index.js", pre: null } };
+    expect(
+      await runNodeAction({}, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(ok)),
+    ).toEqual({ ok: true, v: {} });
+  });
+
+  it("refuses an action with no runs block at all", async () => {
+    expect(
+      await runNodeAction({}, "step '#1'", "./a", {}, "/d", undefined, 24, {}, ctxOf(ok)),
+    ).toEqual({
+      ok: false,
+      reason: "step '#1': action ./a has no runs.main",
+    });
+  });
+
+  it("refuses a null action — YAML parses an empty manifest to null", async () => {
+    const action = null as unknown as ActionModel;
+    expect(
+      await runNodeAction({}, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(ok)),
+    ).toEqual({
+      ok: false,
+      reason: "step '#1': action ./a has no runs.main",
+    });
+  });
+
+  it("reports a non-zero exit with the last stderr line only", async () => {
+    const fail: RunCommand = async () => ({ code: 2, stderr: "one\nboom\n" });
+    const action = { runs: { using: "node24", main: "index.js" } };
+    expect(
+      await runNodeAction({}, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(fail)),
+    ).toEqual({
+      ok: false,
+      reason: "step '#1': exited 2 (boom)",
+    });
   });
 });
