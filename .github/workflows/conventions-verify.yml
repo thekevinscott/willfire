@@ -34,4 +34,3 @@ jobs:
     with:
       languages: '["typescript"]'
       source: scripts/verify/src
-      version: '0.0.96'

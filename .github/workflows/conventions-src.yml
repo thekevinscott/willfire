@@ -3,9 +3,6 @@ name: Testing Conventions (willfire)
 # Runs the upstream testing-conventions gates over the root `willfire` package,
 # pinned to the rolling `v0` tag (the same convention as check.yml).
 #
-# `version` is pinned because the static job runs a bare `npx` with no
-# setup-node: left empty, the runner's older Node resolves 0.0.86, not latest.
-#
 # Every gate runs (`gates` left at its empty default): mutation's Stryker deps
 # are in devDependencies, and `e2e-attestations/` holds the receipt the
 # e2e-verify gate checks.
@@ -50,4 +47,3 @@ jobs:
     with:
       languages: '["typescript"]'
       source: src
-      version: '0.0.96'
