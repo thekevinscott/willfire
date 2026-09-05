@@ -3,7 +3,7 @@
 
 import type { GithubClient } from "./makeGithubClient.js";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { runShell } from "../execute.js";
+import { runShell } from "../execute/runShell.js";
 import type { RunCommand } from "../execute/types.js";
 import { makeLiveExecutor } from "./makeLiveExecutor.js";
 import type { WorkflowSource } from "../types.js";
@@ -14,11 +14,21 @@ const hoisted = vi.hoisted(() => ({
   makeSandboxRunner: vi.fn(),
 }));
 
+// Real subprocesses are what the end-to-end cases below pin, so this mock
+// passes the real module through.
+vi.mock(
+  "../execute/runShell.js",
+  async () =>
+    await vi.importActual<typeof import("../execute/runShell.js")>("../execute/runShell.js"),
+);
+
 // The real module, with a spy on `makeCloneProvider` to observe the token.
-vi.mock("../execute.js", async () => {
-  const actual = await vi.importActual<typeof import("../execute.js")>("../execute.js");
+vi.mock("../execute/makeCloneProvider.js", async () => {
+  const actual = await vi.importActual<typeof import("../execute/makeCloneProvider.js")>(
+    "../execute/makeCloneProvider.js",
+  );
   hoisted.makeCloneProvider.mockImplementation(actual.makeCloneProvider);
-  return { ...actual, makeCloneProvider: hoisted.makeCloneProvider };
+  return { makeCloneProvider: hoisted.makeCloneProvider };
 });
 
 // Likewise, a spy on `makeExecutor` to observe the workspace it is handed.
