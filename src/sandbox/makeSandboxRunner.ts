@@ -40,7 +40,7 @@ export function makeSandboxRunner(opts: Partial<SandboxConfig> = {}): RunCommand
   return async (spec) => {
     const failure = await ensureImage();
     if (failure !== null) {
-      return { code: 125, stderr: failure };
+      return { code: 125, stdout: "", stderr: failure };
     }
     return runDocker(cfg.dockerBin, sandboxArgv(spec, cfg));
   };

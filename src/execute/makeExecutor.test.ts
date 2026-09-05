@@ -706,7 +706,7 @@ describe("composite actions", () => {
       {
         runCommand: async (spec) => {
           specs.push(spec);
-          return { code: 0, stderr: "" };
+          return { code: 0, stdout: "", stderr: "" };
         },
       },
     );
@@ -1114,7 +1114,7 @@ describe("node actions", () => {
       {
         runCommand: async (spec) => {
           specs.push(spec);
-          return { code: 0, stderr: "" };
+          return { code: 0, stdout: "", stderr: "" };
         },
       },
     );
@@ -1144,7 +1144,7 @@ describe("node actions", () => {
       {
         runCommand: async (spec) => {
           specs.push(spec);
-          return { code: 0, stderr: "" };
+          return { code: 0, stdout: "", stderr: "" };
         },
       },
     );
@@ -1173,7 +1173,7 @@ describe("node actions", () => {
       {
         runCommand: async (spec) => {
           specs.push(spec);
-          return { code: 0, stderr: "" };
+          return { code: 0, stdout: "", stderr: "" };
         },
       },
       {},

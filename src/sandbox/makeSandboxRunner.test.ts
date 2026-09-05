@@ -54,6 +54,7 @@ vi.mock("node:child_process", async () => {
     h.calls.push(call);
     const handlers = new Map<string, (arg?: HandlerArg) => void>();
     const child = {
+      stdout: { on: (ev: string, cb: (d?: HandlerArg) => void) => handlers.set(`stdout:${ev}`, cb) },
       stderr: { on: (ev: string, cb: (d?: HandlerArg) => void) => handlers.set(`stderr:${ev}`, cb) },
       stdin: {
         write: (d: string) => {
@@ -138,6 +139,7 @@ describe("makeSandboxRunner", () => {
     const run = makeSandboxRunner({ dockerBin: "dkr", dockerfile: "FROM x\n" });
     const r = await run(spec());
     expect(r.code).toBe(125);
+    expect(r.stdout).toBe("");
     expect(r.stderr).toContain("cannot build sandbox image");
     expect(r.stderr).toContain("stub build broke");
     // The failure is remembered: no retry for the next spec.

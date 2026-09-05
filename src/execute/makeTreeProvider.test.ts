@@ -98,7 +98,7 @@ describe("makeTreeProvider", () => {
       async () => new Uint8Array([0]),
       async (spec) => {
         seen.push(spec.env.PATH);
-        return { code: 1, stderr: "" };
+        return { code: 1, stdout: "", stderr: "" };
       },
     );
     expect(await provide(WORKSPACE)).toBe(null);

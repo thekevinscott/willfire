@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { tailLine } from "../tailLine.js";
 import { parseCallbackMap, type CallbackMap } from "./parseCallbackMap.js";
 
 export type CallbacksOutcome = { ok: true; map: CallbackMap } | { ok: false; reason: string };
@@ -40,13 +41,6 @@ export async function runCallbacks(commands: string[][]): Promise<CallbacksOutco
       child.on("error", (e: Error) => resolve({ failed: e.message }));
       child.on("close", (code) => resolve({ code: code ?? 1, stdout, stderr }));
     });
-
-  // Capped here as well as on the stream: stdout accumulates uncapped because
-  // a successful callback's whole stdout is the map.
-  const tailLine = (s: string): string => {
-    const trimmed = s.trim();
-    return trimmed.slice(trimmed.lastIndexOf("\n") + 1).slice(-4096);
-  };
 
   const collected: { label: string; map: CallbackMap }[] = [];
   for (const argv of commands) {

@@ -15,7 +15,7 @@ const ctxOf = (runCommand: RunCommand): WalkCtx => ({
   depth: 0,
 });
 
-const ok: RunCommand = async () => ({ code: 0, stderr: "" });
+const ok: RunCommand = async () => ({ code: 0, stdout: "", stderr: "" });
 
 describe("runNodeAction", () => {
   it("refuses an action wanting another node", async () => {
@@ -82,13 +82,39 @@ describe("runNodeAction", () => {
   });
 
   it("reports a non-zero exit with the last stderr line only", async () => {
-    const fail: RunCommand = async () => ({ code: 2, stderr: "one\nboom\n" });
+    const fail: RunCommand = async () => ({ code: 2, stdout: "", stderr: "one\nboom\n" });
     const action = { runs: { using: "node24", main: "index.js" } };
     expect(
       await runNodeAction({}, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(fail)),
     ).toEqual({
       ok: false,
       reason: "step '#1': exited 2 (boom)",
+    });
+  });
+
+  it("falls back to stdout when the program failed the way core.setFailed does", async () => {
+    const fail: RunCommand = async () => ({
+      code: 1,
+      stdout: "::error::no lockfile\n",
+      stderr: "",
+    });
+    const action = { runs: { using: "node24", main: "index.js" } };
+    expect(
+      await runNodeAction({}, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(fail)),
+    ).toEqual({
+      ok: false,
+      reason: "step '#1': exited 1 (::error::no lockfile)",
+    });
+  });
+
+  it("omits the parenthetical when both streams are blank", async () => {
+    const fail: RunCommand = async () => ({ code: 2, stdout: " \n ", stderr: "" });
+    const action = { runs: { using: "node24", main: "index.js" } };
+    expect(
+      await runNodeAction({}, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(fail)),
+    ).toEqual({
+      ok: false,
+      reason: "step '#1': exited 2",
     });
   });
 });

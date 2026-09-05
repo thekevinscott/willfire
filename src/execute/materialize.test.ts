@@ -8,7 +8,7 @@ const SOURCE: WorkflowSource = { owner: "o", repo: "r", ref: SHA, sha: SHA };
 describe("materialize", () => {
   it("hands a failed download through as null", async () => {
     expect(
-      await materialize(SOURCE, async () => null, async () => ({ code: 0, stderr: "" })),
+      await materialize(SOURCE, async () => null, async () => ({ code: 0, stdout: "", stderr: "" })),
     ).toBe(null);
   });
 
@@ -17,7 +17,7 @@ describe("materialize", () => {
       await materialize(
         SOURCE,
         async () => new Uint8Array([1, 2, 3]),
-        async () => ({ code: 1, stderr: "" }),
+        async () => ({ code: 1, stdout: "", stderr: "" }),
       ),
     ).toBe(null);
   });

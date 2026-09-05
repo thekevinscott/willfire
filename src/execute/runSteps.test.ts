@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { runSteps } from "./runSteps.js";
 import type { RunCommand, WalkCtx } from "./types.js";
 
-const ok: RunCommand = async () => ({ code: 0, stderr: "" });
+const ok: RunCommand = async () => ({ code: 0, stdout: "", stderr: "" });
 
 const ctxOf = (runCommand: RunCommand = ok): WalkCtx => ({
   tree: "/nonexistent-tree",

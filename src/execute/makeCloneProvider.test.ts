@@ -131,7 +131,7 @@ describe("makeCloneProvider", () => {
     const specs: RunSpec[] = [];
     const provide = makeCloneProvider(async (spec) => {
       specs.push(spec);
-      return { code: 1, stderr: "" };
+      return { code: 1, stdout: "", stderr: "" };
     }, "tok-123");
     expect(await provide(sourceAt(SHA))).toBe(null);
     const [spec] = specs;
@@ -153,7 +153,7 @@ describe("makeCloneProvider", () => {
     const seen: string[] = [];
     const provide = makeCloneProvider(async (spec) => {
       seen.push(spec.env.PATH);
-      return { code: 1, stderr: "" };
+      return { code: 1, stdout: "", stderr: "" };
     }, null);
     expect(await provide(sourceAt(SHA))).toBe(null);
     expect(seen).toEqual([""]);
