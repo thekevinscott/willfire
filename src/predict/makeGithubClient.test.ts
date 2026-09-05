@@ -116,6 +116,7 @@ describe("makeGithubClient", () => {
     const tarball = await client().downloadTarball({ ...REPO, ref: "abc" });
     expect(new Uint8Array(tarball)).toEqual(new Uint8Array([1, 2, 3]));
     expect(calls[0].url).toBe("https://api.github.com/repos/o/r/tarball/abc");
+    expect(calls[0].headers.accept).toBe("application/vnd.github+json");
   });
 
   it("unwraps the workflows envelope", async () => {

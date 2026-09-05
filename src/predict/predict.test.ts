@@ -88,17 +88,27 @@ const REMOTE_SHA = "b".repeat(40);
 function fakeGithub(f: Fixture): GithubClient {
   const contents = f.contents ?? {};
   const api = {
-    getPull: async () => ({
-      commits: f.commits ?? 1,
-      base: { ref: f.baseRef ?? "main" },
-      head: { sha: HEAD_SHA },
-      merge_commit_sha: f.mergeSha ?? null,
-    }),
+    getPull: async ({ pull_number }: { pull_number: number }) => {
+      if (pull_number !== 1) {
+        throw new Error(`404 pull ${pull_number}`);
+      }
+      return {
+        commits: f.commits ?? 1,
+        base: { ref: f.baseRef ?? "main" },
+        head: { sha: HEAD_SHA },
+        merge_commit_sha: f.mergeSha ?? null,
+      };
+    },
     listPulls: async ({ head }: { head: string }) =>
       (f.openPrs ?? [])
         .filter((p) => `o:${p.headRef}` === head)
         .map((p) => ({ base: { ref: p.baseRef }, merge_commit_sha: p.mergeSha })),
-    listPullFiles: async () => (f.files ?? ["src/app.ts"]).map((filename) => ({ filename })),
+    listPullFiles: async ({ pull_number }: { pull_number: number }) => {
+      if (pull_number !== 1) {
+        throw new Error(`404 pull ${pull_number}`);
+      }
+      return (f.files ?? ["src/app.ts"]).map((filename) => ({ filename }));
+    },
     getCommit: async ({ owner, repo, ref }: { owner: string; repo: string; ref: string }) => {
       // Two callers share this route: the head-commit read that looks for a
       // skip instruction, and ref resolution. Only the first has a message.
