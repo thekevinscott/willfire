@@ -8,7 +8,7 @@
 // assertions means claiming GitHub changed.
 
 import type { GithubClient } from "./makeGithubClient.js";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resolveCallbackMap } from "../callback/resolveCallbackMap.js";
 import { expandJobs } from "../jobs/expandJobs.js";
 import { predict } from "./predict.js";
@@ -66,6 +66,13 @@ interface Fixture {
   /** Open PRs, for the stack walk's `listPulls` lookup by head branch. */
   openPrs?: { headRef: string; baseRef: string; mergeSha: string | null }[];
 }
+
+/**
+ * What the real client throws: a message plus the HTTP status in a field.
+ * Rebuilt here rather than imported, so this suite stays isolated from it.
+ */
+const apiError = (status: number, path: string): Error =>
+  Object.assign(new Error(`GitHub API ${status} for ${path}`), { status });
 
 /** The head commit of the PR every fixture describes. */
 const HEAD_SHA = "deadbeef";
@@ -125,7 +132,7 @@ function fakeGithub(f: Fixture): GithubClient {
     getContent: async ({ path, ref }: { path: string; ref: string }) => {
       const at = f.mergeContents !== undefined && ref === f.mergeSha ? f.mergeContents : contents;
       if (!(path in at)) {
-        throw new Error(`404 ${path}`);
+        throw apiError(404, path);
       }
       return at[path];
     },
@@ -152,6 +159,16 @@ async function only(body: string, f: Fixture = {}): Promise<Entry> {
   expect(entries).toHaveLength(1);
   return entries[0];
 }
+
+// Every 404 a fixture serves writes a line to stderr. Silenced across the suite;
+// the line itself is pinned in "a workflow file that cannot be read".
+beforeEach(() => {
+  vi.spyOn(console, "warn").mockImplementation(() => undefined);
+});
+
+afterEach(() => {
+  vi.mocked(console.warn).mockRestore();
+});
 
 // ------------------------------------------------------- workflow-level verdicts
 
@@ -945,5 +962,38 @@ describe("the executor seam through predict", () => {
     // outputs turned the matrix into named entries.
     expect(executed).toEqual(["detect"]);
     expect(checkNames).toEqual(["Coverage (py)", "Coverage (ts)", "detect"]);
+  });
+});
+
+// ------------------------------------------------------- unreadable workflows
+
+describe("a workflow file that cannot be read", () => {
+  /** A client whose every content read fails with `err`. */
+  const rejecting = (err: unknown): GithubClient => {
+    const github = fakeGithub({});
+    vi.spyOn(github, "getContent").mockRejectedValue(err);
+    return github;
+  };
+
+  it("fails the prediction when the read fails with anything but a 404 (#177)", async () => {
+    // A 403, 429 or 5xx means "could not read", not "not there". Answering
+    // no-dispatch under-predicts, which downstream reads as a settled verdict.
+    await expect(predict(rejecting(apiError(503, WF)), "o/r", 1)).rejects.toThrow(
+      `GitHub API 503 for ${WF}`,
+    );
+  });
+
+  it("fails the prediction when the error carries no status at all (#177)", async () => {
+    await expect(predict(rejecting(new Error("fetch failed")), "o/r", 1)).rejects.toThrow(
+      "fetch failed",
+    );
+  });
+
+  it("keeps the no-dispatch verdict for a 404, and logs what it discarded", async () => {
+    const { entries } = await predict(rejecting(apiError(404, WF)), "o/r", 1);
+    expect(entries).toMatchObject([{ status: "no-dispatch", reason: "no workflow file at head" }]);
+    expect(vi.mocked(console.warn).mock.calls[0][0]).toBe(
+      `willfire: no file at o/r/${WF}@${HEAD_SHA} (Error: GitHub API 404 for ${WF})`,
+    );
   });
 });
