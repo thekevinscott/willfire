@@ -38,18 +38,31 @@ const SHA_RE = /^[0-9a-f]{40}$/i;
 
 const isSha = (ref: string): boolean => SHA_RE.test(ref);
 
-export async function expandJobs(
-  wf: Workflow,
-  ctx: Ctx,
-  reader: WorkflowReader,
-  site: JobSite,
-  depth = 0,
-  prefix = "",
-  prefixResolved = true,
-  scope: Scope = {},
-  executor?: JobExecutor,
-  callbacks?: CallbackMap,
-): Promise<ExpandedJob[]> {
+export interface ExpandJobsArgs {
+  wf: Workflow;
+  ctx: Ctx;
+  reader: WorkflowReader;
+  site: JobSite;
+  depth?: number;
+  prefix?: string;
+  prefixResolved?: boolean;
+  scope?: Scope;
+  executor?: JobExecutor;
+  callbacks?: CallbackMap;
+}
+
+export async function expandJobs(args: ExpandJobsArgs): Promise<ExpandedJob[]> {
+  const {
+    wf,
+    reader,
+    site,
+    depth = 0,
+    prefix = "",
+    prefixResolved = true,
+    scope = {},
+    executor,
+    callbacks,
+  } = args;
   const entries: ExpandedJob[] = [];
   const jobs = (wf["jobs"] ?? {}) as Record<string, Workflow>;
   const statuses: Record<string, string> = {};
@@ -209,18 +222,15 @@ export async function expandJobs(
               github: scoped.github,
             };
             entries.push(
-              ...(await expandJobs(
-                subWf,
-                ctx,
-                reader,
-                subSite,
-                depth + 1,
-                `${baseName} / `,
-                nameResolved,
-                subScope,
-                executor,
-                callbacks,
-              )),
+              ...(await expandJobs({
+                ...args,
+                wf: subWf,
+                site: subSite,
+                depth: depth + 1,
+                prefix: `${baseName} / `,
+                prefixResolved: nameResolved,
+                scope: subScope,
+              })),
             );
           }
         }

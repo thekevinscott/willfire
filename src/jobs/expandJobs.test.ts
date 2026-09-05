@@ -57,7 +57,12 @@ const readerFor = (files: Record<string, string>) =>
   readerOf(async (path) => files[path] ?? null);
 
 const expand = (jobs: YamlMap, reader: WorkflowReader = readerFor({})) =>
-  expandJobs({ on: { pull_request: null }, jobs } as Workflow, CTX, reader, SITE);
+  expandJobs({
+    wf: { on: { pull_request: null }, jobs } as Workflow,
+    ctx: CTX,
+    reader,
+    site: SITE,
+  });
 
 /** The same expansion with an executor wired in, scope starting empty. */
 const expandWith = (
@@ -65,42 +70,36 @@ const expandWith = (
   executor: JobExecutor,
   reader: WorkflowReader = readerFor({}),
 ) =>
-  expandJobs(
-    { on: { pull_request: null }, jobs } as Workflow,
-    CTX,
+  expandJobs({
+    wf: { on: { pull_request: null }, jobs } as Workflow,
+    ctx: CTX,
     reader,
-    SITE,
-    0,
-    "",
-    true,
-    {},
+    site: SITE,
+    scope: {},
     executor,
-  );
+  });
 
 describe("job expansion", () => {
   it("decides job guards against the scope the caller handed in", async () => {
     // The scope param is the expr module's own Scope, threaded into evalIf.
     const scope: Scope = { inputs: { x: { kind: "value", v: "v" } } };
-    const entries = await expandJobs(
-      { on: { pull_request: null }, jobs: { a: { if: "inputs.x == 'v'" } } } as Workflow,
-      CTX,
-      readerFor({}),
-      SITE,
-      0,
-      "",
-      true,
+    const entries = await expandJobs({
+      wf: { on: { pull_request: null }, jobs: { a: { if: "inputs.x == 'v'" } } } as Workflow,
+      ctx: CTX,
+      reader: readerFor({}),
+      site: SITE,
       scope,
-    );
+    });
     expect(entries).toEqual([{ job: "a", checkName: "a", status: "run", reason: `if: "inputs.x == 'v'"` }]);
   });
 
   it("expands a workflow with no jobs block to no entries", async () => {
-    const entries = await expandJobs(
-      { on: { pull_request: null } } as Workflow,
-      CTX,
-      readerFor({}),
-      SITE,
-    );
+    const entries = await expandJobs({
+      wf: { on: { pull_request: null } } as Workflow,
+      ctx: CTX,
+      reader: readerFor({}),
+      site: SITE,
+    });
     expect(entries).toEqual([]);
   });
 
@@ -661,18 +660,15 @@ describe("callback answers", () => {
     scope: Scope = {},
     reader: WorkflowReader = readerFor({}),
   ) =>
-    expandJobs(
-      { on: { pull_request: null }, jobs } as Workflow,
-      CTX,
+    expandJobs({
+      wf: { on: { pull_request: null }, jobs } as Workflow,
+      ctx: CTX,
       reader,
-      SITE,
-      0,
-      "",
-      true,
+      site: SITE,
       scope,
       executor,
       callbacks,
-    );
+    });
 
   it("uses a recorded answer instead of executing the job", async () => {
     const { executed, executor } = recording({ langs: '["rb"]' });
@@ -1002,27 +998,24 @@ describe("inputs the event never supplied", () => {
     }) as Workflow;
 
   it("decides a guard on an input a pull_request never carried", async () => {
-    const entries = await expandJobs(
-      withDispatchInput({ gate: { if: "inputs.version == ''" } }),
-      CTX,
-      readerFor({}),
-      SITE,
-    );
+    const entries = await expandJobs({
+      wf: withDispatchInput({ gate: { if: "inputs.version == ''" } }),
+      ctx: CTX,
+      reader: readerFor({}),
+      site: SITE,
+    });
     expect(entries.map((e) => [e.job, e.status])).toEqual([["gate", "run"]]);
   });
 
   it("keeps a binding the caller handed in over the absent one", async () => {
     const scope: Scope = { inputs: { version: { kind: "value", v: "1.2.3" } } };
-    const entries = await expandJobs(
-      withDispatchInput({ gate: { if: "inputs.version == '1.2.3'" } }),
-      CTX,
-      readerFor({}),
-      SITE,
-      0,
-      "",
-      true,
+    const entries = await expandJobs({
+      wf: withDispatchInput({ gate: { if: "inputs.version == '1.2.3'" } }),
+      ctx: CTX,
+      reader: readerFor({}),
+      site: SITE,
       scope,
-    );
+    });
     expect(entries.map((e) => [e.job, e.status])).toEqual([["gate", "run"]]);
   });
 
@@ -1036,15 +1029,15 @@ describe("inputs the event never supplied", () => {
         return { ok: true, outputs: { langs: '["ts"]' } };
       },
     };
-    const entries = await expandJobs(
-      withDispatchInput({
+    const entries = await expandJobs({
+      wf: withDispatchInput({
         call: {
           uses: "./.github/workflows/callee.yml",
           with: { version: "${{ inputs.version }}" },
         },
       }),
-      CTX,
-      readerFor({
+      ctx: CTX,
+      reader: readerFor({
         [CALLEE]: JSON.stringify({
           on: { workflow_call: { inputs: { version: { type: "string" } } } },
           jobs: {
@@ -1056,13 +1049,10 @@ describe("inputs the event never supplied", () => {
           },
         }),
       }),
-      SITE,
-      0,
-      "",
-      true,
-      {},
+      site: SITE,
+      scope: {},
       executor,
-    );
+    });
     expect(scopes.map((s) => s.inputs?.version)).toEqual([{ kind: "value", v: "" }]);
     expect(entries.map((e) => [e.job, e.status])).toEqual([
       ["call / detect", "run"],
