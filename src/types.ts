@@ -1,4 +1,4 @@
-import type { JobExecutor } from "./execute.js";
+import type { JobExecutor } from "./execute/types.js";
 import type { YamlMap } from "./yamlValue.js";
 
 export interface EntryBase {

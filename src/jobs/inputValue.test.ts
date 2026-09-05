@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { evaluateValue } from "../expr/evaluateValue.js";
-import { renderTemplate } from "../execute.js";
+import { renderTemplate } from "../execute/renderTemplate.js";
 import { inputValue } from "./inputValue.js";
 
 // Spies over the real modules: which collaborator a value is handed to, and in
@@ -10,8 +10,11 @@ vi.mock("../expr/evaluateValue.js", async () => {
     await vi.importActual<typeof import("../expr/evaluateValue.js")>("../expr/evaluateValue.js");
   return { ...actual, evaluateValue: vi.fn(actual.evaluateValue) };
 });
-vi.mock("../execute.js", async () => {
-  const actual = await vi.importActual<typeof import("../execute.js")>("../execute.js");
+vi.mock("../execute/renderTemplate.js", async () => {
+  const actual =
+    await vi.importActual<typeof import("../execute/renderTemplate.js")>(
+      "../execute/renderTemplate.js",
+    );
   return { ...actual, renderTemplate: vi.fn(actual.renderTemplate) };
 });
 

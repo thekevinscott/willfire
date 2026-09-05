@@ -20,4 +20,14 @@ describe("the document types", () => {
     expectTypeOf(opts.callbacks).toEqualTypeOf<readonly string[] | undefined>();
     expect(opts.callbacks).toEqual(["npx resolver"]);
   });
+
+  it("carries the executor seam as the JobExecutor contract, not `any`", () => {
+    // Compiling this is the assertion: an executor whose `executeJob` takes
+    // the wrong arity or returns the wrong shape would not assign here.
+    const opts: PredictOptions = {
+      executor: { executeJob: async () => ({ ok: false, reason: "r" }) },
+    };
+    expectTypeOf<NonNullable<PredictOptions["executor"]>["executeJob"]>().not.toBeAny();
+    expect(typeof opts.executor?.executeJob).toBe("function");
+  });
 });
