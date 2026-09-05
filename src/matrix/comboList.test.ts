@@ -1,6 +1,14 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { comboList } from "./comboList.js";
 import type { Scope } from "../expr/val.js";
+
+// The isolation gate wants collaborators mocked; what an include list resolves
+// to is what this suite pins, so the mock passes the real module through.
+vi.mock(
+  "./interpolateValue.js",
+  async () =>
+    await vi.importActual<typeof import("./interpolateValue.js")>("./interpolateValue.js"),
+);
 
 describe("comboList", () => {
   it("treats an absent block as empty", () => {
@@ -10,6 +18,17 @@ describe("comboList", () => {
 
   it("returns a literal list as itself", () => {
     expect(comboList([{ os: "mac" }], {})).toEqual([{ os: "mac" }]);
+  });
+
+  it("evaluates an expression written as an entry's value", () => {
+    const scope: Scope = { github: { event_name: "pull_request" } };
+    expect(comboList([{ b: "${{ github.event_name }}" }], scope)).toEqual([
+      { b: "pull_request" },
+    ]);
+  });
+
+  it("gives up on an entry value the scope cannot resolve", () => {
+    expect(comboList([{ b: "${{ github.run_id }}" }], {})).toBeNull();
   });
 
   it("resolves an expression through the scope", () => {

@@ -231,6 +231,28 @@ jobs:
     ]);
 });
 
+const MATRIX_EXPR_YML = workflow("matrix-expr.yml");
+
+/** The exact job names GitHub created for matrix-expr.yml on probe PR #14. */
+const OBSERVED_MATRIX_EXPR = [
+  "axis-expr (plain)",
+  "axis-expr (pull_request)",
+  "include-expr (plain)",
+  "include-expr (pull_request)",
+].sort();
+
+test("matrix-expr.yml resolves to exactly the checks GitHub created", async () => {
+  expect(await nameSet(MATRIX_EXPR_YML)).toEqual(OBSERVED_MATRIX_EXPR);
+});
+
+test("a matrix element we cannot evaluate leaves the job unknown", async () => {
+  expect(await jobs(`
+jobs:
+  j:
+    strategy: { matrix: { a: [x, "\${{ github.run_id }}"] } }
+`)).toEqual([{ job: "j", checkName: null, status: "unknown" }]);
+});
+
 const REUSABLE = workflow("names-reusable.yml");
 
 const MID = workflow("names-mid.yml");

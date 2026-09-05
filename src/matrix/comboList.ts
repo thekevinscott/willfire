@@ -1,6 +1,7 @@
 import { evaluateValue } from "../expr/evaluateValue.js";
 import type { Scope } from "../expr/val.js";
 import type { YamlMap } from "../yamlValue.js";
+import { interpolateValue } from "./interpolateValue.js";
 
 /**
  * An `include:`/`exclude:` block: a literal list or an expression evaluating
@@ -11,7 +12,8 @@ export function comboList(v: unknown, scope: Scope): YamlMap[] | null {
     return [];
   }
   if (Array.isArray(v)) {
-    return v;
+    const interpolated = interpolateValue(v, scope);
+    return interpolated === null ? null : (interpolated.v as YamlMap[]);
   }
   if (typeof v !== "string") {
     return null;

@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*(willfire#34|putitoutthere|dirsql#1014))\"",
+  "ran_at": 1788574429,
+  "exit_code": 0,
+  "commit": "594dd8c853ac2e34b8e07f5150b974b9d0e315ef",
+  "branch": "fix/matrix-element-expressions"
+}

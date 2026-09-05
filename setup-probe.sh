@@ -143,5 +143,17 @@ git commit -am "pr30: second child, opened after the parent"
 git push origin pr30-head2
 mkpr pr30-head2 stack-base "pr30 child2: opened under an existing parent PR"
 
+# PR11 (opened as #14): is a `${{ }}` written as an element of a matrix list
+# literal interpolated, and does the interpolated value reach the check name?
+# `matrix-expr.yml` is scoped to a path of its own so it stays out of the other
+# PRs' predictions; this is the PR that makes it fire. The expected names live
+# in willfire's tests/integration/names.test.ts.
+git checkout -b pr11-matrix-expr main
+echo "matrix expr probe" > src/matrix-expr.txt
+git add src/matrix-expr.txt
+git commit -m "pr11: touch the matrix-expr probe path"
+git push origin pr11-matrix-expr
+mkpr pr11-matrix-expr main "pr11: expression inside a matrix list element"
+
 git checkout main
 echo "done"
