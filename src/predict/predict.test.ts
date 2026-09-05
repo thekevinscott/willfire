@@ -600,7 +600,7 @@ describe("the commit workflow files are read at", () => {
     // here would leave every top-level job nameless.
     vi.mocked(expandJobs).mockClear();
     await run(AT_HEAD, { mergeSha: null });
-    expect(vi.mocked(expandJobs).mock.calls[0]?.[3]).toEqual({
+    expect(vi.mocked(expandJobs).mock.calls[0]?.[0].site).toEqual({
       path: WF,
       source: HEAD_SOURCE,
     });
@@ -824,13 +824,13 @@ describe("callback commands", () => {
       callbacks: ["npx resolver"],
     });
     expect(resolveCallbackMap).toHaveBeenCalledWith(["npx resolver"]);
-    expect(vi.mocked(expandJobs).mock.calls[0]?.[9]).toBe(map);
+    expect(vi.mocked(expandJobs).mock.calls[0]?.[0].callbacks).toBe(map);
   });
 
   it("hands expansion no map at all when no callbacks were given", async () => {
     vi.mocked(expandJobs).mockClear();
     await predict(fakeGithub({ contents: { [WF]: BODY } }), "o/r", 1);
-    expect(vi.mocked(expandJobs).mock.calls[0]?.[9]).toBeUndefined();
+    expect(vi.mocked(expandJobs).mock.calls[0]?.[0].callbacks).toBeUndefined();
   });
 
   it("aborts the prediction when a callback fails", async () => {
