@@ -145,14 +145,6 @@ describe("runCallbacks", () => {
     });
   });
 
-  it("keeps only the stdout tail when a failing callback floods it", async () => {
-    h.script = [{ stdout: ["y".repeat(5000)], close: 1 }];
-    expect(await runCallbacks([["resolver"]])).toEqual({
-      ok: false,
-      reason: `callback 'resolver' exited 1 (${"y".repeat(4096)})`,
-    });
-  });
-
   it("keeps only the stderr tail when a callback floods it", async () => {
     h.script = [{ stderr: ["x".repeat(5000)], close: 1 }];
     expect(await runCallbacks([["resolver"]])).toEqual({

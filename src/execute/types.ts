@@ -21,6 +21,7 @@ export interface RunSpec {
 
 export interface RunResult {
   code: number;
+  stdout: string;
   stderr: string;
 }
 

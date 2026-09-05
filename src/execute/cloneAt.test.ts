@@ -11,7 +11,7 @@ describe("cloneAt", () => {
     expect(
       await cloneAt(SOURCE, "https://example.invalid/o/r.git", null, async () => ({
         code: 1,
-        stderr: "",
+        stdout: "", stderr: "",
       })),
     ).toBe(null);
   });
@@ -19,7 +19,7 @@ describe("cloneAt", () => {
   it("yields the tree path on success", async () => {
     const dest = await cloneAt(SOURCE, "https://example.invalid/o/r.git", null, async () => ({
       code: 0,
-      stderr: "",
+      stdout: "", stderr: "",
     }));
     expect(dest).toMatch(/\/tree$/);
   });
@@ -28,7 +28,7 @@ describe("cloneAt", () => {
     const specs: RunSpec[] = [];
     await cloneAt(SOURCE, "https://example.invalid/o/r.git", null, async (spec) => {
       specs.push(spec);
-      return { code: 1, stderr: "" };
+      return { code: 1, stdout: "", stderr: "" };
     });
     const [spec] = specs;
     expect("WILLFIRE_AUTH" in spec.env).toBe(false);

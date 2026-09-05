@@ -6,18 +6,19 @@ export function runDocker(
   bin: string,
   argv: string[],
   stdin?: string,
-): Promise<{ code: number; stderr: string }> {
+): Promise<{ code: number; stdout: string; stderr: string }> {
   return new Promise((resolvePromise) => {
     const child = spawn(bin, argv, {
       env: process.env,
-      stdio: [stdin === undefined ? "ignore" : "pipe", "ignore", "pipe"],
+      stdio: [stdin === undefined ? "ignore" : "pipe", "pipe", "pipe"],
     });
+    let stdout = "";
     let stderr = "";
+    child.stdout!.on("data", (d: Buffer) => {
+      stdout = (stdout + String(d)).slice(-4096);
+    });
     child.stderr!.on("data", (d: Buffer) => {
-      stderr += String(d);
-      if (stderr.length > 4096) {
-        stderr = stderr.slice(-4096);
-      }
+      stderr = (stderr + String(d)).slice(-4096);
     });
     child.on("spawn", () => {
       if (stdin !== undefined) {
@@ -25,7 +26,7 @@ export function runDocker(
         child.stdin!.end();
       }
     });
-    child.on("error", () => resolvePromise({ code: 127, stderr }));
-    child.on("close", (code) => resolvePromise({ code: code ?? 1, stderr }));
+    child.on("error", () => resolvePromise({ code: 127, stdout, stderr }));
+    child.on("close", (code) => resolvePromise({ code: code ?? 1, stdout, stderr }));
   });
 }

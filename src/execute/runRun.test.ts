@@ -15,7 +15,7 @@ const ctxOf = (runCommand: RunCommand): WalkCtx => ({
   depth: 0,
 });
 
-const ok: RunCommand = async () => ({ code: 0, stderr: "" });
+const ok: RunCommand = async () => ({ code: 0, stdout: "", stderr: "" });
 
 describe("runRun", () => {
   it("refuses a shell it does not model", async () => {
@@ -37,7 +37,7 @@ describe("runRun", () => {
   });
 
   it("reports a non-zero exit with the last stderr line", async () => {
-    const fail: RunCommand = async () => ({ code: 3, stderr: "one\nboom\n" });
+    const fail: RunCommand = async () => ({ code: 3, stdout: "", stderr: "one\nboom\n" });
     expect(await runRun({ run: "true" }, "step 's'", {}, ctxOf(fail))).toEqual({
       ok: false,
       reason: "step 's': exited 3 (boom)",
@@ -45,10 +45,26 @@ describe("runRun", () => {
   });
 
   it("omits the parenthetical when stderr trims to nothing", async () => {
-    const fail: RunCommand = async () => ({ code: 3, stderr: " \n " });
+    const fail: RunCommand = async () => ({ code: 3, stdout: "", stderr: " \n " });
     expect(await runRun({ run: "true" }, "step 's'", {}, ctxOf(fail))).toEqual({
       ok: false,
       reason: "step 's': exited 3",
+    });
+  });
+
+  it("falls back to the last stdout line when a failing step wrote nothing to stderr", async () => {
+    const fail: RunCommand = async () => ({ code: 1, stdout: "one\nboom-out\n", stderr: "" });
+    expect(await runRun({ run: "true" }, "step 's'", {}, ctxOf(fail))).toEqual({
+      ok: false,
+      reason: "step 's': exited 1 (boom-out)",
+    });
+  });
+
+  it("prefers the stderr tail when a failing step wrote to both streams", async () => {
+    const fail: RunCommand = async () => ({ code: 3, stdout: "chatter\n", stderr: "one\nboom\n" });
+    expect(await runRun({ run: "true" }, "step 's'", {}, ctxOf(fail))).toEqual({
+      ok: false,
+      reason: "step 's': exited 3 (boom)",
     });
   });
 
@@ -60,7 +76,7 @@ describe("runRun", () => {
     const specs: RunSpec[] = [];
     const cmd: RunCommand = async (spec) => {
       specs.push(spec);
-      return { code: 0, stderr: "" };
+      return { code: 0, stdout: "", stderr: "" };
     };
     return { specs, cmd };
   };

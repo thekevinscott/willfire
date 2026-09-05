@@ -11,6 +11,12 @@ describe("runDocker", () => {
     expect(r.stderr).toBe("boom\n");
   });
 
+  it("hands back captured stdout", async () => {
+    const r = await runDocker("bash", ["-c", "echo spoken; exit 3"]);
+    expect(r.code).toBe(3);
+    expect(r.stdout).toBe("spoken\n");
+  });
+
   it("pipes stdin to the child when given", async () => {
     const r = await runDocker("bash", ["-c", "cat >&2"], "from-stdin");
     expect(r.code).toBe(0);
@@ -29,7 +35,20 @@ describe("runDocker", () => {
 
   it("caps captured stderr at its tail", async () => {
     const r = await runDocker("bash", ["-c", 'printf "%05000d" 0 >&2; echo END >&2']);
-    expect(r.stderr.length).toBeLessThanOrEqual(4096);
+    // Exactly the cap: the stream is over 4096, so the tail is all of it.
+    expect(r.stderr.length).toBe(4096);
     expect(r.stderr).toContain("END");
+  });
+
+  it("caps captured stdout at its tail", async () => {
+    const r = await runDocker("bash", ["-c", 'printf "%05000d" 0; echo END']);
+    // Exactly the cap: the stream is over 4096, so the tail is all of it.
+    expect(r.stdout.length).toBe(4096);
+    expect(r.stdout).toContain("END");
+  });
+
+  it("gives the child no stdin when none is passed — a read sees EOF, not an open pipe", async () => {
+    const r = await runDocker("bash", ["-c", "cat"]);
+    expect(r.code).toBe(0);
   });
 });

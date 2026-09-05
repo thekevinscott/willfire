@@ -8,7 +8,7 @@ const ctxOf = (over: Partial<WalkCtx> = {}, deps: Partial<WalkCtx["deps"]> = {})
   envLayers: [],
   deps: {
     provideTree: async () => null,
-    runCommand: async () => ({ code: 0, stderr: "" }),
+    runCommand: async () => ({ code: 0, stdout: "", stderr: "" }),
     resolveRef: async (s) => s.ref,
     nodeMajor: 24,
     ...deps,

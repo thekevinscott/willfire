@@ -6,6 +6,7 @@ import { bindActionInputs } from "./bindActionInputs.js";
 import { err } from "./err.js";
 import { parseGithubOutput } from "./parseGithubOutput.js";
 import { renderEnvLayer } from "./renderEnvLayer.js";
+import { tailLine } from "../tailLine.js";
 import type { ActionModel, Res, StepModel, WalkCtx } from "./types.js";
 
 /**
@@ -81,8 +82,9 @@ export async function runNodeAction(
     ],
   });
   if (r.code !== 0) {
-    const trimmed = r.stderr.trim();
-    const tail = trimmed.slice(trimmed.lastIndexOf("\n") + 1);
+    // `core.setFailed`, how a JS action fails, routes its message to stdout.
+    const fromStderr = tailLine(r.stderr);
+    const tail = fromStderr === "" ? tailLine(r.stdout) : fromStderr;
     return err(`${label}: exited ${r.code}${tail === "" ? "" : ` (${tail})`}`);
   }
   const outputs = parseGithubOutput(await readFile(outFile, "utf8"));

@@ -6,6 +6,7 @@ import { err } from "./err.js";
 import { parseGithubOutput } from "./parseGithubOutput.js";
 import { renderEnvLayer } from "./renderEnvLayer.js";
 import { renderTemplate } from "./renderTemplate.js";
+import { tailLine } from "../tailLine.js";
 import type { Res, StepModel, WalkCtx } from "./types.js";
 
 /** A `run:` step, executed under its declared shell with its declared env. */
@@ -71,8 +72,9 @@ export async function runRun(
     ],
   });
   if (r.code !== 0) {
-    const trimmed = r.stderr.trim();
-    const tail = trimmed.slice(trimmed.lastIndexOf("\n") + 1);
+    // A step's tooling may put its fatal error on stdout; pnpm does.
+    const fromStderr = tailLine(r.stderr);
+    const tail = fromStderr === "" ? tailLine(r.stdout) : fromStderr;
     return err(`${label}: exited ${r.code}${tail === "" ? "" : ` (${tail})`}`);
   }
   const outputs = parseGithubOutput(await readFile(outFile, "utf8"));
