@@ -10,18 +10,24 @@
 // of its own.
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { makeTreeProvider, runShell } from "../execute.js";
 import { makeExecutor } from "./makeExecutor.js";
+import { makeTreeProvider } from "./makeTreeProvider.js";
+import { runShell } from "./runShell.js";
 import type { ExecDeps, ExecOutcome, RunSpec } from "./types.js";
 import type { WorkflowSource } from "../types.js";
 import type { YamlMap, YamlValue } from "../yamlValue.js";
 
 // The isolation gate wants collaborators mocked; running real subprocesses
-// over real trees is this suite's whole point, so the mock passes the real
-// module through.
+// over real trees is this suite's whole point, so the mocks pass the real
+// modules through.
 vi.mock(
-  "../execute.js",
-  async () => await vi.importActual<typeof import("../execute.js")>("../execute.js"),
+  "./makeTreeProvider.js",
+  async () =>
+    await vi.importActual<typeof import("./makeTreeProvider.js")>("./makeTreeProvider.js"),
+);
+vi.mock(
+  "./runShell.js",
+  async () => await vi.importActual<typeof import("./runShell.js")>("./runShell.js"),
 );
 
 const SHA = "c".repeat(40);

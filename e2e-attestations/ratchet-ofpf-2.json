@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*(willfire#34|putitoutthere|dirsql#1014))\"",
+  "ran_at": 1788592992,
+  "exit_code": 0,
+  "commit": "ad3d41bf2b020d38339933cf09002032cb2418be",
+  "branch": "ratchet/ofpf-2"
+}

@@ -97,7 +97,6 @@ export default [
     ignores: [
       'src/**/*.test.ts',
       'scripts/*/src/**/*.test.ts',
-      'src/execute.ts',
       'scripts/verify/src/index.ts',
     ],
     languageOptions: {
