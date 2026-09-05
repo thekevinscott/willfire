@@ -10,6 +10,7 @@ import type { WorkflowSource } from "../types.js";
 
 const hoisted = vi.hoisted(() => ({
   makeCloneProvider: vi.fn(),
+  makeExecutor: vi.fn(),
   makeSandboxRunner: vi.fn(),
 }));
 
@@ -18,6 +19,15 @@ vi.mock("../execute.js", async () => {
   const actual = await vi.importActual<typeof import("../execute.js")>("../execute.js");
   hoisted.makeCloneProvider.mockImplementation(actual.makeCloneProvider);
   return { ...actual, makeCloneProvider: hoisted.makeCloneProvider };
+});
+
+// Likewise, a spy on `makeExecutor` to observe the workspace it is handed.
+vi.mock("../execute/makeExecutor.js", async () => {
+  const actual = await vi.importActual<typeof import("../execute/makeExecutor.js")>(
+    "../execute/makeExecutor.js",
+  );
+  hoisted.makeExecutor.mockImplementation(actual.makeExecutor);
+  return { makeExecutor: hoisted.makeExecutor };
 });
 
 // Likewise, a spy on `makeSandboxRunner` to observe the default run command.
@@ -105,6 +115,14 @@ describe("makeLiveExecutor", () => {
     expect(hoisted.makeSandboxRunner).toHaveBeenCalledTimes(1);
     makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef, { token: null, runCommand: runShell });
     expect(hoisted.makeSandboxRunner).toHaveBeenCalledTimes(1);
+  });
+
+  it("hands makeExecutor the caller's workspace", () => {
+    hoisted.makeExecutor.mockClear();
+    makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef, { token: null, runCommand: runShell });
+    expect(hoisted.makeExecutor).toHaveBeenCalledWith(
+      expect.objectContaining({ workspace: WORKSPACE }),
+    );
   });
 
   it("takes any RunCommand at the seam, runShell included", () => {
