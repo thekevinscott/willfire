@@ -39,16 +39,12 @@ const WRAPPED_TB = "H4sIAAAAAAAAA+3S0QrCIBSA4fMovsCcw6nPE2ODICaYQY/fqqvGWAQzqP3f
 /** A GitHub client whose only implemented route is the tarball download. */
 function githubOf(tarballs: Record<string, string>): GithubClient {
   const api = {
-    rest: {
-      repos: {
-        downloadTarballArchive: async ({ owner, repo, ref }: Record<string, string>) => {
-          const b64 = tarballs[`${owner}/${repo}@${ref}`];
-          if (b64 === undefined) {
-            throw new Error(`404 tarball ${owner}/${repo}@${ref}`);
-          }
-          return { data: new Uint8Array(Buffer.from(b64, "base64")).buffer };
-        },
-      },
+    downloadTarball: async ({ owner, repo, ref }: Record<string, string>) => {
+      const b64 = tarballs[`${owner}/${repo}@${ref}`];
+      if (b64 === undefined) {
+        throw new Error(`404 tarball ${owner}/${repo}@${ref}`);
+      }
+      return new Uint8Array(Buffer.from(b64, "base64")).buffer;
     },
   };
   return api as unknown as GithubClient;

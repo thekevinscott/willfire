@@ -1,15 +1,12 @@
-// Plain `fetch`, shaped to mirror the octokit subset it replaced (#75) so call
-// sites and their fakes carry over unchanged.
+// The GitHub REST surface willfire uses: a handful of GET endpoints plus the
+// tarball download, over plain `fetch`. Every `list*` method returns every page.
 
 interface RepoParams {
   owner: string;
   repo: string;
 }
 
-interface PageParams {
-  per_page?: number;
-  page?: number;
-}
+type Query = Record<string, string | number>;
 
 /** Response types carry only the fields willfire actually reads. */
 export interface GithubPullSummary {
@@ -49,36 +46,20 @@ export interface GithubJob {
 }
 
 export interface GithubClient {
-  rest: {
-    pulls: {
-      get(params: RepoParams & { pull_number: number }): Promise<{ data: GithubPull }>;
-      list(
-        params: RepoParams & PageParams & { state: string; head: string },
-      ): Promise<{ data: GithubPullSummary[] }>;
-      listFiles(
-        params: RepoParams & PageParams & { pull_number: number },
-      ): Promise<{ data: GithubPullFile[] }>;
-    };
-    repos: {
-      getCommit(params: RepoParams & { ref: string }): Promise<{ data: GithubCommit }>;
-      getContent(params: RepoParams & { path: string; ref: string }): Promise<{ data: string }>;
-      downloadTarballArchive(params: RepoParams & { ref: string }): Promise<{ data: ArrayBuffer }>;
-    };
-    actions: {
-      listRepoWorkflows(params: RepoParams & PageParams): Promise<{ data: GithubWorkflow[] }>;
-      listWorkflowRunsForRepo(
-        params: RepoParams & PageParams & { head_sha: string; event: string },
-      ): Promise<{ data: GithubWorkflowRun[] }>;
-      listJobsForWorkflowRun(
-        params: RepoParams & PageParams & { run_id: number },
-      ): Promise<{ data: GithubJob[] }>;
-    };
-  };
-  paginate<P extends PageParams, T>(
-    route: (params: P) => Promise<{ data: T[] }>,
-    params: P,
-  ): Promise<T[]>;
+  getPull(params: RepoParams & { pull_number: number }): Promise<GithubPull>;
+  listPulls(params: RepoParams & { state: string; head: string }): Promise<GithubPullSummary[]>;
+  listPullFiles(params: RepoParams & { pull_number: number }): Promise<GithubPullFile[]>;
+  getCommit(params: RepoParams & { ref: string }): Promise<GithubCommit>;
+  getContent(params: RepoParams & { path: string; ref: string }): Promise<string>;
+  downloadTarball(params: RepoParams & { ref: string }): Promise<ArrayBuffer>;
+  listWorkflows(params: RepoParams): Promise<GithubWorkflow[]>;
+  listWorkflowRuns(
+    params: RepoParams & { head_sha: string; event: string },
+  ): Promise<GithubWorkflowRun[]>;
+  listRunJobs(params: RepoParams & { run_id: number }): Promise<GithubJob[]>;
 }
+
+const PER_PAGE = 100;
 
 export function makeGithubClient(): GithubClient {
   const token = process.env.GH_TOKEN ?? process.env.GITHUB_TOKEN;
@@ -86,16 +67,10 @@ export function makeGithubClient(): GithubClient {
     throw new Error("GH_TOKEN or GITHUB_TOKEN must be set");
   }
 
-  const request = async (
-    path: string,
-    query: Record<string, string | number | undefined>,
-    accept: string,
-  ): Promise<Response> => {
+  const request = async (path: string, query: Query, accept: string): Promise<Response> => {
     const url = new URL(`https://api.github.com${path}`);
     for (const [key, value] of Object.entries(query)) {
-      if (value !== undefined) {
-        url.searchParams.set(key, String(value));
-      }
+      url.searchParams.set(key, String(value));
     }
     const res = await fetch(url, {
       headers: {
@@ -112,94 +87,73 @@ export function makeGithubClient(): GithubClient {
     return res;
   };
 
-  const json = async <T>(
-    path: string,
-    query: Record<string, string | number | undefined> = {},
-  ): Promise<{ data: T }> => {
+  const json = async <T>(path: string, query: Query = {}): Promise<T> => {
     const res = await request(path, query, "application/vnd.github+json");
-    return { data: (await res.json()) as T };
+    return (await res.json()) as T;
+  };
+
+  // A short page ends the walk. A count landing exactly on a page boundary
+  // costs one extra empty request, which keeps this free of Link-header
+  // parsing. `pick` is where the actions endpoints shed their envelope.
+  const pages = async <B, T>(
+    path: string,
+    pick: (body: B) => T[],
+    query: Query = {},
+  ): Promise<T[]> => {
+    const all: T[] = [];
+    let page = 1;
+    let full = true;
+    while (full) {
+      const items = pick(await json<B>(path, { ...query, per_page: PER_PAGE, page }));
+      all.push(...items);
+      full = items.length === PER_PAGE;
+      page += 1;
+    }
+    return all;
   };
 
   return {
-    rest: {
-      pulls: {
-        get: ({ owner, repo, pull_number }) =>
-          json<GithubPull>(`/repos/${owner}/${repo}/pulls/${pull_number}`),
-        list: ({ owner, repo, state, head, per_page, page }) =>
-          json<GithubPullSummary[]>(`/repos/${owner}/${repo}/pulls`, {
-            state,
-            head,
-            per_page,
-            page,
-          }),
-        listFiles: ({ owner, repo, pull_number, per_page, page }) =>
-          json<GithubPullFile[]>(`/repos/${owner}/${repo}/pulls/${pull_number}/files`, {
-            per_page,
-            page,
-          }),
-      },
-      repos: {
-        getCommit: ({ owner, repo, ref }) =>
-          json<GithubCommit>(`/repos/${owner}/${repo}/commits/${ref}`),
-        getContent: async ({ owner, repo, path, ref }) => {
-          const res = await request(
-            `/repos/${owner}/${repo}/contents/${path}`,
-            { ref },
-            "application/vnd.github.raw+json",
-          );
-          return { data: await res.text() };
-        },
-        // 302 to a short-lived codeload URL; fetch follows it, and undici
-        // drops the authorization header on the cross-origin hop.
-        downloadTarballArchive: async ({ owner, repo, ref }) => {
-          const res = await request(
-            `/repos/${owner}/${repo}/tarball/${ref}`,
-            {},
-            "application/vnd.github+json",
-          );
-          return { data: await res.arrayBuffer() };
-        },
-      },
-      actions: {
-        // The actions list endpoints wrap their arrays in an envelope; unwrap
-        // here so `paginate` sees one shape everywhere.
-        listRepoWorkflows: async ({ owner, repo, per_page, page }) => {
-          const { data } = await json<{ workflows: GithubWorkflow[] }>(
-            `/repos/${owner}/${repo}/actions/workflows`,
-            { per_page, page },
-          );
-          return { data: data.workflows };
-        },
-        listWorkflowRunsForRepo: async ({ owner, repo, head_sha, event, per_page, page }) => {
-          const { data } = await json<{ workflow_runs: GithubWorkflowRun[] }>(
-            `/repos/${owner}/${repo}/actions/runs`,
-            { head_sha, event, per_page, page },
-          );
-          return { data: data.workflow_runs };
-        },
-        listJobsForWorkflowRun: async ({ owner, repo, run_id, per_page, page }) => {
-          const { data } = await json<{ jobs: GithubJob[] }>(
-            `/repos/${owner}/${repo}/actions/runs/${run_id}/jobs`,
-            { per_page, page },
-          );
-          return { data: data.jobs };
-        },
-      },
+    getPull: ({ owner, repo, pull_number }) =>
+      json<GithubPull>(`/repos/${owner}/${repo}/pulls/${pull_number}`),
+    listPulls: ({ owner, repo, state, head }) =>
+      pages(`/repos/${owner}/${repo}/pulls`, (b: GithubPullSummary[]) => b, { state, head }),
+    listPullFiles: ({ owner, repo, pull_number }) =>
+      pages(`/repos/${owner}/${repo}/pulls/${pull_number}/files`, (b: GithubPullFile[]) => b),
+    getCommit: ({ owner, repo, ref }) =>
+      json<GithubCommit>(`/repos/${owner}/${repo}/commits/${ref}`),
+    getContent: async ({ owner, repo, path, ref }) => {
+      const res = await request(
+        `/repos/${owner}/${repo}/contents/${path}`,
+        { ref },
+        "application/vnd.github.raw+json",
+      );
+      return res.text();
     },
-    // A short page ends the walk. An exact page boundary costs one extra empty
-    // request, which keeps this free of Link-header parsing.
-    paginate: async (route, params) => {
-      const perPage = params.per_page ?? 30;
-      const all = [];
-      let page = 1;
-      let full = true;
-      while (full) {
-        const { data } = await route({ ...params, page });
-        all.push(...data);
-        full = data.length === perPage;
-        page += 1;
-      }
-      return all;
+    // 302 to a short-lived codeload URL; fetch follows it, and undici drops
+    // the authorization header on the cross-origin hop.
+    downloadTarball: async ({ owner, repo, ref }) => {
+      const res = await request(
+        `/repos/${owner}/${repo}/tarball/${ref}`,
+        {},
+        "application/vnd.github+json",
+      );
+      return res.arrayBuffer();
     },
+    listWorkflows: ({ owner, repo }) =>
+      pages(
+        `/repos/${owner}/${repo}/actions/workflows`,
+        (b: { workflows: GithubWorkflow[] }) => b.workflows,
+      ),
+    listWorkflowRuns: ({ owner, repo, head_sha, event }) =>
+      pages(
+        `/repos/${owner}/${repo}/actions/runs`,
+        (b: { workflow_runs: GithubWorkflowRun[] }) => b.workflow_runs,
+        { head_sha, event },
+      ),
+    listRunJobs: ({ owner, repo, run_id }) =>
+      pages(
+        `/repos/${owner}/${repo}/actions/runs/${run_id}/jobs`,
+        (b: { jobs: GithubJob[] }) => b.jobs,
+      ),
   };
 }

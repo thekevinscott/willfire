@@ -29,32 +29,23 @@ export async function stackTargetRef(
       if (mergeSha === null) {
         break;
       }
-      const { data: preview } = await github.rest.repos.getCommit({
-        owner,
-        repo,
-        ref: mergeSha,
-      });
+      const preview = await github.getCommit({ owner, repo, ref: mergeSha });
       const previewParent = preview.parents[0]?.sha;
       if (previewParent === undefined) {
         break;
       }
-      const { data: baseTip } = await github.rest.repos.getCommit({
-        owner,
-        repo,
-        ref: cur.base.ref,
-      });
+      const baseTip = await github.getCommit({ owner, repo, ref: cur.base.ref });
       // Built on the base branch tip: normal mode, the walk is done.
       if (previewParent === baseTip.sha) {
         break;
       }
       // Otherwise only an exact match against an open PR whose head is the
       // base branch proves stacked mode; a stale preview matches nothing.
-      const { data: candidates } = await github.rest.pulls.list({
+      const candidates = await github.listPulls({
         owner,
         repo,
         state: "open",
         head: `${owner}:${cur.base.ref}`,
-        per_page: 100,
       });
       const parent = candidates.find((p) => p.merge_commit_sha === previewParent);
       if (parent === undefined) {

@@ -37,12 +37,12 @@ export function makeLiveExecutor(
 ): JobExecutor {
   const download = async (src: WorkflowSource): Promise<Uint8Array | null> => {
     try {
-      const { data } = await github.rest.repos.downloadTarballArchive({
+      const tarball = await github.downloadTarball({
         owner: src.owner,
         repo: src.repo,
         ref: src.sha,
       });
-      return new Uint8Array(data);
+      return new Uint8Array(tarball);
     } catch {
       // Private, deleted, rate limit, network: one answer.
       return null;
