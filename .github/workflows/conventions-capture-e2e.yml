@@ -34,4 +34,3 @@ jobs:
     with:
       languages: '["typescript"]'
       source: scripts/capture-e2e/src
-      version: '0.0.96'
