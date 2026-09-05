@@ -1,6 +1,8 @@
 // The GitHub REST surface willfire uses: a handful of GET endpoints plus the
 // tarball download, over plain `fetch`. Every `list*` method returns every page.
 
+import { githubApiError } from "./githubApiError.js";
+
 interface RepoParams {
   owner: string;
   repo: string;
@@ -82,7 +84,13 @@ export function makeGithubClient(): GithubClient {
       },
     });
     if (!res.ok) {
-      throw new Error(`GitHub API ${res.status} for ${path}`);
+      // A consumer surfaces this message verbatim as its gate's failure text,
+      // so it names the repo and path via the URL and the ref via the query.
+      throw githubApiError(
+        res.status,
+        `${url.pathname}${url.search}`,
+        Object.fromEntries(res.headers),
+      );
     }
     return res;
   };
