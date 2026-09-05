@@ -61,9 +61,9 @@ interface Fixture {
   tarballs?: Record<string, Uint8Array>;
   /** The PR's `merge_commit_sha` — its test merge. Absent means null. */
   mergeSha?: string | null;
-  /** Parent shas by commit sha, via `repos.getCommit`. Unlisted: no parents. */
+  /** Parent shas by commit sha, via `getCommit`. Unlisted: no parents. */
   parents?: Record<string, string[]>;
-  /** Open PRs, for the stack walk's `pulls.list` lookup by head branch. */
+  /** Open PRs, for the stack walk's `listPulls` lookup by head branch. */
   openPrs?: { headRef: string; baseRef: string; mergeSha: string | null }[];
 }
 
@@ -85,70 +85,58 @@ const MERGE_SOURCE = { owner: "o", repo: "r", ref: MERGE_SHA, sha: MERGE_SHA };
  */
 const REMOTE_SHA = "b".repeat(40);
 
-// Sentinels standing in for the paginating route methods. `predict` passes the
-// method itself to `github.paginate`, never calls it, so identity is all the
-// stub needs to tell the two routes apart.
-const LIST_FILES = Symbol("pulls.listFiles");
-const LIST_WORKFLOWS = Symbol("actions.listRepoWorkflows");
-
 function fakeGithub(f: Fixture): GithubClient {
   const contents = f.contents ?? {};
   const api = {
-    rest: {
-      pulls: {
-        get: async () => ({
-          data: {
-            commits: f.commits ?? 1,
-            base: { ref: f.baseRef ?? "main" },
-            head: { sha: HEAD_SHA },
-            merge_commit_sha: f.mergeSha ?? null,
-          },
-        }),
-        list: async ({ head }: { head: string }) => ({
-          data: (f.openPrs ?? [])
-            .filter((p) => `o:${p.headRef}` === head)
-            .map((p) => ({ base: { ref: p.baseRef }, merge_commit_sha: p.mergeSha })),
-        }),
-        listFiles: LIST_FILES,
-      },
-      repos: {
-        getCommit: async ({ owner, repo, ref }: { owner: string; repo: string; ref: string }) => {
-          // Two callers share this route: the head-commit read that looks for a
-          // skip instruction, and ref resolution. Only the first has a message.
-          if (ref === HEAD_SHA) {
-            return { data: { sha: ref, commit: { message: f.message ?? "chore: routine" } } };
-          }
-          const sha = (f.refs ?? {})[`${owner}/${repo}@${ref}`];
-          if (sha === undefined) {
-            throw new Error(`404 ${owner}/${repo}@${ref}`);
-          }
-          const parents = ((f.parents ?? {})[sha] ?? []).map((p) => ({ sha: p }));
-          return { data: { sha, commit: { message: "" }, parents } };
-        },
-        getContent: async ({ path, ref }: { path: string; ref: string }) => {
-          const at =
-            f.mergeContents !== undefined && ref === f.mergeSha ? f.mergeContents : contents;
-          if (!(path in at)) {
-            throw new Error(`404 ${path}`);
-          }
-          return { data: at[path] };
-        },
-        downloadTarballArchive: async ({ owner, repo, ref }: Record<string, string>) => {
-          const bytes = (f.tarballs ?? {})[`${owner}/${repo}@${ref}`];
-          if (bytes === undefined) {
-            throw new Error(`404 tarball ${owner}/${repo}@${ref}`);
-          }
-          return { data: bytes.buffer };
-        },
-      },
-      actions: { listRepoWorkflows: LIST_WORKFLOWS },
-    },
-    paginate: async (route: symbol) => {
-      if (route === LIST_FILES) {
-        return (f.files ?? ["src/app.ts"]).map((filename) => ({ filename }));
+    getPull: async ({ pull_number }: { pull_number: number }) => {
+      if (pull_number !== 1) {
+        throw new Error(`404 pull ${pull_number}`);
       }
-      return f.workflows ?? [{ path: WF, state: "active" }];
+      return {
+        commits: f.commits ?? 1,
+        base: { ref: f.baseRef ?? "main" },
+        head: { sha: HEAD_SHA },
+        merge_commit_sha: f.mergeSha ?? null,
+      };
     },
+    listPulls: async ({ head }: { head: string }) =>
+      (f.openPrs ?? [])
+        .filter((p) => `o:${p.headRef}` === head)
+        .map((p) => ({ base: { ref: p.baseRef }, merge_commit_sha: p.mergeSha })),
+    listPullFiles: async ({ pull_number }: { pull_number: number }) => {
+      if (pull_number !== 1) {
+        throw new Error(`404 pull ${pull_number}`);
+      }
+      return (f.files ?? ["src/app.ts"]).map((filename) => ({ filename }));
+    },
+    getCommit: async ({ owner, repo, ref }: { owner: string; repo: string; ref: string }) => {
+      // Two callers share this route: the head-commit read that looks for a
+      // skip instruction, and ref resolution. Only the first has a message.
+      if (ref === HEAD_SHA) {
+        return { sha: ref, commit: { message: f.message ?? "chore: routine" } };
+      }
+      const sha = (f.refs ?? {})[`${owner}/${repo}@${ref}`];
+      if (sha === undefined) {
+        throw new Error(`404 ${owner}/${repo}@${ref}`);
+      }
+      const parents = ((f.parents ?? {})[sha] ?? []).map((p) => ({ sha: p }));
+      return { sha, commit: { message: "" }, parents };
+    },
+    getContent: async ({ path, ref }: { path: string; ref: string }) => {
+      const at = f.mergeContents !== undefined && ref === f.mergeSha ? f.mergeContents : contents;
+      if (!(path in at)) {
+        throw new Error(`404 ${path}`);
+      }
+      return at[path];
+    },
+    downloadTarball: async ({ owner, repo, ref }: Record<string, string>) => {
+      const bytes = (f.tarballs ?? {})[`${owner}/${repo}@${ref}`];
+      if (bytes === undefined) {
+        throw new Error(`404 tarball ${owner}/${repo}@${ref}`);
+      }
+      return bytes.buffer;
+    },
+    listWorkflows: async () => f.workflows ?? [{ path: WF, state: "active" }],
   };
   return api as unknown as GithubClient;
 }
@@ -697,7 +685,7 @@ describe("the commits a prediction was read from", () => {
       contents: { [WF]: body, ".github/workflows/x.yml": CALLEE },
       refs: { "octo/repo@v1": REMOTE_SHA },
     });
-    const getContent = vi.spyOn(github.rest.repos, "getContent");
+    const getContent = vi.spyOn(github, "getContent");
     await predict(github, "o/r", 1);
     expect(getContent).toHaveBeenCalledWith(
       expect.objectContaining({ owner: "octo", repo: "repo", ref: REMOTE_SHA }),
@@ -713,7 +701,7 @@ describe("the commits a prediction was read from", () => {
       contents: { [WF]: body, ".github/workflows/x.yml": CALLEE },
       refs: { "octo/repo@v1": REMOTE_SHA },
     });
-    const getCommit = vi.spyOn(github.rest.repos, "getCommit");
+    const getCommit = vi.spyOn(github, "getCommit");
     const { sources } = await predict(github, "o/r", 1);
     // One for the head commit's message, one for `v1`. The second `v1` is the
     // cache, not a request.
@@ -727,7 +715,7 @@ describe("the commits a prediction was read from", () => {
       "  a:\n    uses: octo/repo/.github/workflows/x.yml@v1\n" +
       "  b:\n    uses: octo/repo/.github/workflows/x.yml@v1\n";
     const github = fakeGithub({ contents: { [WF]: body } });
-    const getCommit = vi.spyOn(github.rest.repos, "getCommit");
+    const getCommit = vi.spyOn(github, "getCommit");
     const { entries } = await predict(github, "o/r", 1);
     expect(getCommit).toHaveBeenCalledTimes(2);
     expect(entries.map((e) => e.status)).toEqual(["unknown", "unknown"]);
@@ -744,7 +732,7 @@ describe("the commits a prediction was read from", () => {
       contents: { [WF]: body, ".github/workflows/x.yml": CALLEE },
       refs: { "octo/repo@v1": REMOTE_SHA },
     });
-    const getContent = vi.spyOn(github.rest.repos, "getContent");
+    const getContent = vi.spyOn(github, "getContent");
     await predict(github, "o/r", 1);
     // The caller's own workflow, then the callee once for both jobs.
     expect(getContent).toHaveBeenCalledTimes(2);
@@ -761,7 +749,7 @@ describe("the commits a prediction was read from", () => {
         [SUB]: "on:\n  workflow_call:\njobs:\n  inner:\n    name: Inner\n",
       },
     });
-    const spy = vi.spyOn(github.rest.repos, "getContent");
+    const spy = vi.spyOn(github, "getContent");
     const { entries } = await predict(github, "o/r", 1);
     expect(entries.map((e) => e.job)).toEqual(["a / Inner", "b / Inner"]);
     const subFetches = spy.mock.calls.filter((c) => c[0]?.path === SUB);

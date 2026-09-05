@@ -80,8 +80,8 @@ describe("the dispatch recorder", () => {
   /** Re-import the module as if node had been pointed at it directly. */
   async function invoke(f: Fixture = {}): Promise<void> {
     const merge = f.merge === undefined ? MERGE : f.merge;
-    pullsGet = vi.fn(async () => ({ data: { head: { sha: HEAD }, merge_commit_sha: merge } }));
-    client = { rest: { pulls: { get: pullsGet } } };
+    pullsGet = vi.fn(async () => ({ head: { sha: HEAD }, merge_commit_sha: merge }));
+    client = { getPull: pullsGet };
     hoisted.makeGithubClient.mockReturnValue(client);
     hoisted.dispatchedChecks.mockResolvedValue({
       checks: CHECKS,

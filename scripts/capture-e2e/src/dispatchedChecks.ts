@@ -12,12 +12,11 @@ export async function dispatchedChecks(
   repo: string,
   headSha: string,
 ): Promise<{ checks: DispatchedCheck[]; incomplete: string[] }> {
-  const runs = await github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
+  const runs = await github.listWorkflowRuns({
     owner,
     repo,
     head_sha: headSha,
     event: "pull_request",
-    per_page: 100,
   });
   const checks: DispatchedCheck[] = [];
   const incomplete: string[] = [];
@@ -25,12 +24,7 @@ export async function dispatchedChecks(
     if (run.status !== "completed") {
       incomplete.push(run.path);
     }
-    const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
-      owner,
-      repo,
-      run_id: run.id,
-      per_page: 100,
-    });
+    const jobs = await github.listRunJobs({ owner, repo, run_id: run.id });
     for (const job of jobs) {
       checks.push({ workflow: run.path, name: job.name, conclusion: job.conclusion });
     }

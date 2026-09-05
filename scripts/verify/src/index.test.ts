@@ -24,11 +24,6 @@ vi.mock("willfire", async () => {
 
 // ------------------------------------------------------------------ fixtures
 
-// Sentinels standing in for the paginating route methods; the script passes the
-// method itself to `github.paginate` and never calls it.
-const LIST_RUNS = Symbol("actions.listWorkflowRunsForRepo");
-const LIST_JOBS = Symbol("actions.listJobsForWorkflowRun");
-
 interface RunFixture {
   id: number;
   path: string;
@@ -42,28 +37,16 @@ type Call = [string, Record<string, unknown>];
 
 function fakeGithub(runs: RunFixture[], calls: Call[] = []) {
   return {
-    rest: {
-      pulls: {
-        get: async (params: Record<string, unknown>) => {
-          calls.push(["pulls.get", params]);
-          return { data: { head: { sha: "deadbeef" } } };
-        },
-      },
-      actions: {
-        listWorkflowRunsForRepo: LIST_RUNS,
-        listJobsForWorkflowRun: LIST_JOBS,
-      },
+    getPull: async (params: Record<string, unknown>) => {
+      calls.push(["getPull", params]);
+      return { head: { sha: "deadbeef" } };
     },
-    paginate: async (route: symbol, params: { run_id?: number }) => {
-      if (route === LIST_RUNS) {
-        calls.push(["listWorkflowRunsForRepo", params]);
-        return runs.map(({ id, path, status }) => ({
-          id,
-          path,
-          status: status ?? "completed",
-        }));
-      }
-      calls.push(["listJobsForWorkflowRun", params]);
+    listWorkflowRuns: async (params: Record<string, unknown>) => {
+      calls.push(["listWorkflowRuns", params]);
+      return runs.map(({ id, path, status }) => ({ id, path, status: status ?? "completed" }));
+    },
+    listRunJobs: async (params: { run_id?: number }) => {
+      calls.push(["listRunJobs", params]);
       return runs.find((r) => r.id === params.run_id)?.jobs ?? [];
     },
   };
@@ -146,18 +129,12 @@ describe("verify", () => {
     });
     expect(hoisted.predict.mock.calls[0].slice(1)).toEqual(["acme/widget", 7]);
     expect(calls).toEqual([
-      ["pulls.get", { owner: "acme", repo: "widget", pull_number: 7 }],
+      ["getPull", { owner: "acme", repo: "widget", pull_number: 7 }],
       [
-        "listWorkflowRunsForRepo",
-        {
-          owner: "acme",
-          repo: "widget",
-          head_sha: "deadbeef",
-          event: "pull_request",
-          per_page: 100,
-        },
+        "listWorkflowRuns",
+        { owner: "acme", repo: "widget", head_sha: "deadbeef", event: "pull_request" },
       ],
-      ["listJobsForWorkflowRun", { owner: "acme", repo: "widget", run_id: 3, per_page: 100 }],
+      ["listRunJobs", { owner: "acme", repo: "widget", run_id: 3 }],
     ]);
   });
 

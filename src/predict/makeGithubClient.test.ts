@@ -47,7 +47,7 @@ describe("makeGithubClient", () => {
   it("sends GH_TOKEN as the bearer token, with the API headers", async () => {
     vi.stubEnv("GITHUB_TOKEN", "gha");
     stage(json({}));
-    await client().rest.pulls.get({ ...REPO, pull_number: 5 });
+    await client().getPull({ ...REPO, pull_number: 5 });
     expect(calls[0].headers).toEqual({
       accept: "application/vnd.github+json",
       authorization: "Bearer gh",
@@ -60,133 +60,112 @@ describe("makeGithubClient", () => {
     vi.stubEnv("GH_TOKEN", undefined);
     vi.stubEnv("GITHUB_TOKEN", "gha");
     stage(json({}));
-    await client().rest.pulls.get({ ...REPO, pull_number: 5 });
+    await client().getPull({ ...REPO, pull_number: 5 });
     expect(calls[0].headers.authorization).toBe("Bearer gha");
   });
 
   it("gets a pull request", async () => {
     const pr = { commits: 1, base: { ref: "main" }, head: { sha: "abc" }, merge_commit_sha: null };
     stage(json(pr));
-    const { data } = await client().rest.pulls.get({ ...REPO, pull_number: 5 });
+    expect(await client().getPull({ ...REPO, pull_number: 5 })).toEqual(pr);
     expect(calls[0].url).toBe("https://api.github.com/repos/o/r/pulls/5");
-    expect(data).toEqual(pr);
   });
 
-  it("lists pull requests with the filters in the query, omitting unset params", async () => {
-    stage(json([{ base: { ref: "dev" }, merge_commit_sha: "m0" }]));
-    const { data } = await client().rest.pulls.list({
-      ...REPO,
-      state: "open",
-      head: "o:main",
-      per_page: 100,
-    });
+  it("lists pull requests with the filters in the query", async () => {
+    const summary = { base: { ref: "dev" }, merge_commit_sha: "m0" };
+    stage(json([summary]));
+    expect(await client().listPulls({ ...REPO, state: "open", head: "o:main" })).toEqual([summary]);
     expect(calls[0].url).toBe(
-      "https://api.github.com/repos/o/r/pulls?state=open&head=o%3Amain&per_page=100",
+      "https://api.github.com/repos/o/r/pulls?state=open&head=o%3Amain&per_page=100&page=1",
     );
-    expect(data).toEqual([{ base: { ref: "dev" }, merge_commit_sha: "m0" }]);
   });
 
   it("lists a pull request's files", async () => {
     stage(json([{ filename: "src/app.ts" }]));
-    const { data } = await client().rest.pulls.listFiles({
-      ...REPO,
-      pull_number: 5,
-      per_page: 2,
-      page: 3,
-    });
-    expect(calls[0].url).toBe("https://api.github.com/repos/o/r/pulls/5/files?per_page=2&page=3");
-    expect(data).toEqual([{ filename: "src/app.ts" }]);
+    expect(await client().listPullFiles({ ...REPO, pull_number: 5 })).toEqual([
+      { filename: "src/app.ts" },
+    ]);
+    expect(calls[0].url).toBe(
+      "https://api.github.com/repos/o/r/pulls/5/files?per_page=100&page=1",
+    );
   });
 
   it("gets a commit", async () => {
     const commit = { sha: "abc", commit: { message: "m" }, parents: [] };
     stage(json(commit));
-    const { data } = await client().rest.repos.getCommit({ ...REPO, ref: "abc" });
+    expect(await client().getCommit({ ...REPO, ref: "abc" })).toEqual(commit);
     expect(calls[0].url).toBe("https://api.github.com/repos/o/r/commits/abc");
-    expect(data).toEqual(commit);
   });
 
   it("reads a file as text via the raw media type", async () => {
     stage(new Response("on: pull_request\n"));
-    const { data } = await client().rest.repos.getContent({
+    const body = await client().getContent({
       ...REPO,
       path: ".github/workflows/w.yml",
       ref: "abc",
     });
+    expect(body).toBe("on: pull_request\n");
     expect(calls[0].url).toBe(
       "https://api.github.com/repos/o/r/contents/.github/workflows/w.yml?ref=abc",
     );
     expect(calls[0].headers.accept).toBe("application/vnd.github.raw+json");
-    expect(data).toBe("on: pull_request\n");
   });
 
   it("downloads a tarball as an ArrayBuffer", async () => {
     stage(new Response(new Uint8Array([1, 2, 3])));
-    const { data } = await client().rest.repos.downloadTarballArchive({ ...REPO, ref: "abc" });
+    const tarball = await client().downloadTarball({ ...REPO, ref: "abc" });
+    expect(new Uint8Array(tarball)).toEqual(new Uint8Array([1, 2, 3]));
     expect(calls[0].url).toBe("https://api.github.com/repos/o/r/tarball/abc");
-    expect(new Uint8Array(data)).toEqual(new Uint8Array([1, 2, 3]));
+    expect(calls[0].headers.accept).toBe("application/vnd.github+json");
   });
 
   it("unwraps the workflows envelope", async () => {
-    stage(json({ total_count: 1, workflows: [{ path: ".github/workflows/w.yml", state: "active" }] }));
-    const { data } = await client().rest.actions.listRepoWorkflows({ ...REPO, per_page: 100 });
-    expect(calls[0].url).toBe("https://api.github.com/repos/o/r/actions/workflows?per_page=100");
-    expect(data).toEqual([{ path: ".github/workflows/w.yml", state: "active" }]);
+    const workflow = { path: ".github/workflows/w.yml", state: "active" };
+    stage(json({ total_count: 1, workflows: [workflow] }));
+    expect(await client().listWorkflows(REPO)).toEqual([workflow]);
+    expect(calls[0].url).toBe(
+      "https://api.github.com/repos/o/r/actions/workflows?per_page=100&page=1",
+    );
   });
 
   it("unwraps the workflow-runs envelope", async () => {
     const run = { id: 1, path: ".github/workflows/w.yml", status: "completed" };
     stage(json({ total_count: 1, workflow_runs: [run] }));
-    const { data } = await client().rest.actions.listWorkflowRunsForRepo({
+    const runs = await client().listWorkflowRuns({
       ...REPO,
       head_sha: "abc",
       event: "pull_request",
     });
+    expect(runs).toEqual([run]);
     expect(calls[0].url).toBe(
-      "https://api.github.com/repos/o/r/actions/runs?head_sha=abc&event=pull_request",
+      "https://api.github.com/repos/o/r/actions/runs?head_sha=abc&event=pull_request&per_page=100&page=1",
     );
-    expect(data).toEqual([run]);
   });
 
   it("unwraps the jobs envelope", async () => {
-    stage(json({ total_count: 1, jobs: [{ name: "a", conclusion: "success" }] }));
-    const { data } = await client().rest.actions.listJobsForWorkflowRun({ ...REPO, run_id: 7 });
-    expect(calls[0].url).toBe("https://api.github.com/repos/o/r/actions/runs/7/jobs");
-    expect(data).toEqual([{ name: "a", conclusion: "success" }]);
+    const job = { name: "a", conclusion: "success" };
+    stage(json({ total_count: 1, jobs: [job] }));
+    expect(await client().listRunJobs({ ...REPO, run_id: 7 })).toEqual([job]);
+    expect(calls[0].url).toBe(
+      "https://api.github.com/repos/o/r/actions/runs/7/jobs?per_page=100&page=1",
+    );
   });
 
   it("throws on a non-2xx, naming the path and never the token", async () => {
     stage(new Response("gone", { status: 404 }));
-    await expect(client().rest.pulls.get({ ...REPO, pull_number: 5 })).rejects.toThrow(
+    await expect(client().getPull({ ...REPO, pull_number: 5 })).rejects.toThrow(
       /^GitHub API 404 for \/repos\/o\/r\/pulls\/5$/,
     );
   });
 
-  it("paginates until a page comes back short", async () => {
-    stage(
-      json([{ filename: "a" }, { filename: "b" }]),
-      json([{ filename: "c" }]),
-    );
-    const c = client();
-    const files = await c.paginate(c.rest.pulls.listFiles, {
-      ...REPO,
-      pull_number: 5,
-      per_page: 2,
-    });
-    expect(files).toEqual([{ filename: "a" }, { filename: "b" }, { filename: "c" }]);
+  it("keeps asking for pages until one comes back short", async () => {
+    const full = Array.from({ length: 100 }, (_, i) => ({ filename: `f${i}` }));
+    stage(json(full), json([{ filename: "last" }]));
+    const files = await client().listPullFiles({ ...REPO, pull_number: 5 });
+    expect(files.map((f) => f.filename)).toEqual([...full.map((f) => f.filename), "last"]);
     expect(calls.map((call) => call.url)).toEqual([
-      "https://api.github.com/repos/o/r/pulls/5/files?per_page=2&page=1",
-      "https://api.github.com/repos/o/r/pulls/5/files?per_page=2&page=2",
-    ]);
-  });
-
-  it("paginates against GitHub's default page size when none is given", async () => {
-    stage(json([{ filename: "a" }]));
-    const c = client();
-    const files = await c.paginate(c.rest.pulls.listFiles, { ...REPO, pull_number: 5 });
-    expect(files).toEqual([{ filename: "a" }]);
-    expect(calls.map((call) => call.url)).toEqual([
-      "https://api.github.com/repos/o/r/pulls/5/files?page=1",
+      "https://api.github.com/repos/o/r/pulls/5/files?per_page=100&page=1",
+      "https://api.github.com/repos/o/r/pulls/5/files?per_page=100&page=2",
     ]);
   });
 });

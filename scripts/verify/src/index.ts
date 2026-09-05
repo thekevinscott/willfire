@@ -8,15 +8,14 @@
 import { isJobEntry, makeGithubClient, predict } from "willfire";
 import type { GithubClient } from "willfire";
 
-async function actualEntries(octokit: GithubClient, repo: string, prNumber: number) {
+async function actualEntries(github: GithubClient, repo: string, prNumber: number) {
   const [owner, name] = repo.split("/");
   const base = { owner, repo: name };
-  const { data: pr } = await octokit.rest.pulls.get({ ...base, pull_number: prNumber });
-  const runs = await octokit.paginate(octokit.rest.actions.listWorkflowRunsForRepo, {
+  const pr = await github.getPull({ ...base, pull_number: prNumber });
+  const runs = await github.listWorkflowRuns({
     ...base,
     head_sha: pr.head.sha,
     event: "pull_request",
-    per_page: 100,
   });
   const entries = new Map<string, "run" | "skipped">();
   const incomplete: string[] = [];
@@ -24,11 +23,7 @@ async function actualEntries(octokit: GithubClient, repo: string, prNumber: numb
     if (run.status !== "completed") {
       incomplete.push(run.path);
     }
-    const jobs = await octokit.paginate(octokit.rest.actions.listJobsForWorkflowRun, {
-      ...base,
-      run_id: run.id,
-      per_page: 100,
-    });
+    const jobs = await github.listRunJobs({ ...base, run_id: run.id });
     for (const j of jobs) {
       entries.set(
         `${run.path} :: ${j.name}`,
@@ -51,8 +46,8 @@ if (!repo || !prArg) {
 }
 const pr = Number(prArg);
 
-const octokit = makeGithubClient();
-const { entries: predictedRaw } = await predict(octokit, repo, pr);
+const github = makeGithubClient();
+const { entries: predictedRaw } = await predict(github, repo, pr);
 // Compare on the resolved check name — that is the string GitHub actually
 // puts on the job. Entries whose name could not be resolved statically have
 // no key to compare and are reported separately below.
@@ -68,7 +63,7 @@ const unknownWfs = new Set(
     .map((r) => r.workflow)
     .concat(unresolved.map((r) => r.workflow)),
 );
-const { entries: actual, incomplete } = await actualEntries(octokit, repo, pr);
+const { entries: actual, incomplete } = await actualEntries(github, repo, pr);
 
 if (incomplete.length > 0) {
   console.log(`WARNING: runs still in progress: ${incomplete}`);

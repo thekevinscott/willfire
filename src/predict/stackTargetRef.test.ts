@@ -8,31 +8,24 @@ interface Fake {
   refs?: Record<string, string>;
   /** Parent shas by commit sha. Unlisted: no parents. */
   parents?: Record<string, string[]>;
-  /** Open PRs, for the walk's `pulls.list` lookup by head branch. */
+  /** Open PRs, for the walk's `listPulls` lookup by head branch. */
   openPrs?: { headRef: string; baseRef: string; mergeSha: string | null }[];
 }
 
 const fakeGithub = (f: Fake) =>
   ({
-    rest: {
-      repos: {
-        getCommit: async ({ owner, repo, ref }: Record<string, string>) => {
-          const sha = (f.refs ?? {})[`${owner}/${repo}@${ref}`];
-          if (sha === undefined) {
-            throw new Error(`404 ${owner}/${repo}@${ref}`);
-          }
-          const parents = ((f.parents ?? {})[sha] ?? []).map((p) => ({ sha: p }));
-          return { data: { sha, parents } };
-        },
-      },
-      pulls: {
-        list: async ({ head }: { head: string }) => ({
-          data: (f.openPrs ?? [])
-            .filter((p) => `o:${p.headRef}` === head)
-            .map((p) => ({ base: { ref: p.baseRef }, merge_commit_sha: p.mergeSha })),
-        }),
-      },
+    getCommit: async ({ owner, repo, ref }: Record<string, string>) => {
+      const sha = (f.refs ?? {})[`${owner}/${repo}@${ref}`];
+      if (sha === undefined) {
+        throw new Error(`404 ${owner}/${repo}@${ref}`);
+      }
+      const parents = ((f.parents ?? {})[sha] ?? []).map((p) => ({ sha: p }));
+      return { sha, parents };
     },
+    listPulls: async ({ head }: { head: string }) =>
+      (f.openPrs ?? [])
+        .filter((p) => `o:${p.headRef}` === head)
+        .map((p) => ({ base: { ref: p.baseRef }, merge_commit_sha: p.mergeSha })),
   }) as unknown as GithubClient;
 
 const walk = (pr: StackNode, f: Fake) => stackTargetRef(fakeGithub(f), "o", "r", pr);

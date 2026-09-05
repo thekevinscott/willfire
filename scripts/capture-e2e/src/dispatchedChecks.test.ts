@@ -2,11 +2,6 @@ import { describe, expect, it, vi } from "vitest";
 import type { GithubClient } from "willfire";
 import { dispatchedChecks } from "./dispatchedChecks.js";
 
-// Sentinels standing in for the paginating route methods: the caller hands the
-// method itself to `paginate` and never calls it, so identity is all a stub needs.
-const LIST_RUNS = Symbol("actions.listWorkflowRunsForRepo");
-const LIST_JOBS = Symbol("actions.listJobsForWorkflowRun");
-
 interface RunFixture {
   id: number;
   path: string;
@@ -14,18 +9,17 @@ interface RunFixture {
   jobs: { name: string; conclusion: string | null }[];
 }
 
-const paginated: { route: symbol; params: Record<string, unknown> }[] = [];
+/** Every request the caller made, in order, so a case can assert the shape. */
+const asked: [string, Record<string, unknown>][] = [];
 
 function githubOf(runs: RunFixture[]): GithubClient {
   const api = {
-    rest: {
-      actions: { listWorkflowRunsForRepo: LIST_RUNS, listJobsForWorkflowRun: LIST_JOBS },
-    },
-    paginate: vi.fn(async (route: symbol, params: Record<string, unknown>) => {
-      paginated.push({ route, params });
-      if (route === LIST_RUNS) {
-        return runs.map(({ id, path, status }) => ({ id, path, status: status ?? "completed" }));
-      }
+    listWorkflowRuns: vi.fn(async (params: Record<string, unknown>) => {
+      asked.push(["listWorkflowRuns", params]);
+      return runs.map(({ id, path, status }) => ({ id, path, status: status ?? "completed" }));
+    }),
+    listRunJobs: vi.fn(async (params: Record<string, unknown>) => {
+      asked.push(["listRunJobs", params]);
       return runs.find((r) => r.id === params.run_id)?.jobs ?? [];
     }),
   };
@@ -66,21 +60,12 @@ describe("dispatchedChecks", () => {
   });
 
   it("asks only for the pull_request runs at the head commit", async () => {
-    paginated.length = 0;
+    asked.length = 0;
     const github = githubOf([{ id: 9, path: "a.yml", jobs: [] }]);
     await dispatchedChecks(github, "o", "r", "head-sha");
-    expect(paginated).toEqual([
-      {
-        route: LIST_RUNS,
-        params: {
-          owner: "o",
-          repo: "r",
-          head_sha: "head-sha",
-          event: "pull_request",
-          per_page: 100,
-        },
-      },
-      { route: LIST_JOBS, params: { owner: "o", repo: "r", run_id: 9, per_page: 100 } },
+    expect(asked).toEqual([
+      ["listWorkflowRuns", { owner: "o", repo: "r", head_sha: "head-sha", event: "pull_request" }],
+      ["listRunJobs", { owner: "o", repo: "r", run_id: 9 }],
     ]);
   });
 

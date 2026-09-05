@@ -41,12 +41,8 @@ export async function predict(
   const [owner, name] = repo.split("/");
   const base = { owner, repo: name };
 
-  const { data: pr } = await github.rest.pulls.get({ ...base, pull_number: prNumber });
-  const files = await github.paginate(github.rest.pulls.listFiles, {
-    ...base,
-    pull_number: prNumber,
-    per_page: 100,
-  });
+  const pr = await github.getPull({ ...base, pull_number: prNumber });
+  const files = await github.listPullFiles({ ...base, pull_number: prNumber });
   const stackTarget = await stackTargetRef(github, owner, name, pr);
   const ctx: Ctx = {
     // The caller's answer wins whenever it has one. The commit-count fallback
@@ -80,10 +76,7 @@ export async function predict(
   // message is what decides the verdict.
   const sources = new Map<string, WorkflowSource>([[sourceKey(headSource), headSource]]);
 
-  const { data: headCommit } = await github.rest.repos.getCommit({
-    ...base,
-    ref: headSha,
-  });
+  const headCommit = await github.getCommit({ ...base, ref: headSha });
   const headMsg = headCommit.commit.message;
 
   if (SKIP_RE.test(headMsg) || SKIP_TRAILER_RE.test(headMsg)) {
@@ -108,12 +101,12 @@ export async function predict(
     }
     let sha: string | null;
     try {
-      const { data } = await github.rest.repos.getCommit({
+      const commit = await github.getCommit({
         owner: src.owner,
         repo: src.repo,
         ref: src.ref,
       });
-      sha = data.sha;
+      sha = commit.sha;
     } catch {
       // Deleted tag, private repo, rate limit, network: all one answer here.
       // The caller turns it into an `unknown` entry rather than throwing.
@@ -141,13 +134,12 @@ export async function predict(
     }
     let content: string | null;
     try {
-      const { data } = await github.rest.repos.getContent({
+      content = await github.getContent({
         owner: src.owner,
         repo: src.repo,
         path,
         ref: src.sha,
       });
-      content = data;
     } catch {
       // Private, deleted, bad ref, rate limit, network: all one answer here.
       // The caller turns it into an `unknown` entry rather than throwing.
@@ -169,10 +161,7 @@ export async function predict(
   // consults the same map. A failing callback throws and aborts the prediction.
   const callbackMap = await resolveCallbackMap(opts.callbacks ?? []);
 
-  const workflows = await github.paginate(github.rest.actions.listRepoWorkflows, {
-    ...base,
-    per_page: 100,
-  });
+  const workflows = await github.listWorkflows(base);
 
   // `github.repository` is fixed for everything predicted here: reusable
   // workflows and composite actions all run in the repo the PR is against.

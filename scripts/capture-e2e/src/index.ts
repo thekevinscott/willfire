@@ -15,11 +15,7 @@ const { repo, pr: prNumber } = parseArgs(process.argv.slice(2));
 const [owner, name] = repo.split("/");
 
 const client = makeGithubClient();
-const { data: pr } = await client.rest.pulls.get({
-  owner,
-  repo: name,
-  pull_number: prNumber,
-});
+const pr = await client.getPull({ owner, repo: name, pull_number: prNumber });
 
 const { checks: dispatched, incomplete } = await dispatchedChecks(
   client,

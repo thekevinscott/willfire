@@ -48,46 +48,27 @@ const HEAD_SHA = "deadbeef";
 
 const HEAD_SOURCE = { owner: "o", repo: "r", ref: HEAD_SHA, sha: HEAD_SHA };
 
-// Sentinels standing in for the paginating route methods. `predict` passes the
-// method itself to `github.paginate`, never calls it, so identity is all the
-// stub needs to tell the two routes apart.
-const LIST_FILES = Symbol("pulls.listFiles");
-const LIST_WORKFLOWS = Symbol("actions.listRepoWorkflows");
-
 function fakeGithub(f: Fixture): GithubClient {
   const contents = f.contents ?? {};
   const api = {
-    rest: {
-      pulls: {
-        get: async () => ({
-          data: {
-            commits: f.commits ?? 1,
-            base: { ref: "main" },
-            head: { sha: HEAD_SHA },
-            merge_commit_sha: null,
-          },
-        }),
-        listFiles: LIST_FILES,
-      },
-      repos: {
-        getCommit: async () => ({
-          data: { sha: HEAD_SHA, commit: { message: f.message ?? "chore: routine" } },
-        }),
-        getContent: async ({ path }: { path: string }) => {
-          if (!(path in contents)) {
-            throw new Error(`404 ${path}`);
-          }
-          return { data: contents[path] };
-        },
-      },
-      actions: { listRepoWorkflows: LIST_WORKFLOWS },
-    },
-    paginate: async (route: symbol) => {
-      if (route === LIST_FILES) {
-        return [{ filename: "src/app.ts" }];
+    getPull: async () => ({
+      commits: f.commits ?? 1,
+      base: { ref: "main" },
+      head: { sha: HEAD_SHA },
+      merge_commit_sha: null,
+    }),
+    listPullFiles: async () => [{ filename: "src/app.ts" }],
+    getCommit: async () => ({
+      sha: HEAD_SHA,
+      commit: { message: f.message ?? "chore: routine" },
+    }),
+    getContent: async ({ path }: { path: string }) => {
+      if (!(path in contents)) {
+        throw new Error(`404 ${path}`);
       }
-      return [{ path: WF, state: "active" }];
+      return contents[path];
     },
+    listWorkflows: async () => [{ path: WF, state: "active" }],
   };
   return api as unknown as GithubClient;
 }
