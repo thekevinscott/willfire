@@ -34,4 +34,14 @@ describe("root barrel", () => {
     const executor: JobExecutor = { executeJob: async () => outcome };
     expect(typeof executor.executeJob).toBe("function");
   });
+
+  it("re-exports the success variant of the outcome, not just the failure", async () => {
+    // Both arms travel: pr-monitor reads `outputs` off a successful one.
+    const outcome: ExecOutcome = { ok: true, outputs: { languages: "[]" } };
+    const executor: JobExecutor = { executeJob: async () => outcome };
+    expect(await executor.executeJob("detect", {}, {}, {})).toEqual({
+      ok: true,
+      outputs: { languages: "[]" },
+    });
+  });
 });

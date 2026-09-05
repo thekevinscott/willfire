@@ -14,7 +14,7 @@ vi.mock(
   async () => await vi.importActual<typeof import("./neededJobIds.js")>("./neededJobIds.js"),
 );
 import type { CallbackMap } from "../callback/parseCallbackMap.js";
-import type { JobExecutor } from "../execute.js";
+import type { JobExecutor } from "../execute/types.js";
 import type {
   Ctx,
   FetchWorkflow,

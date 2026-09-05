@@ -4,7 +4,7 @@ import { jobKey } from "../callback/jobKey.js";
 import { matchOutputs } from "../callback/matchOutputs.js";
 import type { CallbackMap } from "../callback/parseCallbackMap.js";
 import type { Scope } from "../expr/val.js";
-import type { JobExecutor } from "../execute.js";
+import type { JobExecutor } from "../execute/types.js";
 import { expandMatrixDetailed } from "../matrix/expandMatrixDetailed.js";
 import { jobDisplayName } from "../names/jobDisplayName.js";
 import { skippedDisplayName } from "../names/skippedDisplayName.js";

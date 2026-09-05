@@ -4,6 +4,7 @@
 import type { GithubClient } from "./makeGithubClient.js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { runShell } from "../execute.js";
+import type { RunCommand } from "../execute/types.js";
 import { makeLiveExecutor } from "./makeLiveExecutor.js";
 import type { WorkflowSource } from "../types.js";
 
@@ -104,6 +105,14 @@ describe("makeLiveExecutor", () => {
     expect(hoisted.makeSandboxRunner).toHaveBeenCalledTimes(1);
     makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef, { token: null, runCommand: runShell });
     expect(hoisted.makeSandboxRunner).toHaveBeenCalledTimes(1);
+  });
+
+  it("takes any RunCommand at the seam, runShell included", () => {
+    // Compiling the assignment is the assertion: the option is the seam type,
+    // not a structural accident of runShell's shape.
+    const cmd: RunCommand = runShell;
+    makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef, { token: null, runCommand: cmd });
+    expect(typeof cmd).toBe("function");
   });
 
   it("reads clone auth from the environment only when no token is given", () => {

@@ -9,144 +9,30 @@
 import { spawn } from "node:child_process";
 import { mkdir, mkdtemp, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
+import { bindActionInputs } from "./execute/bindActionInputs.js";
+import { err } from "./execute/err.js";
+import { renderTemplate } from "./execute/renderTemplate.js";
+import { runNodeAction } from "./execute/runNodeAction.js";
+import { runRun } from "./execute/runRun.js";
+import type {
+  ActionModel,
+  ExecDeps,
+  ExecOutcome,
+  JobExecutor,
+  ProvideTree,
+  Res,
+  RunCommand,
+  StepModel,
+  WalkCtx,
+} from "./execute/types.js";
 import { evaluate } from "./expr/evaluate.js";
-import { evaluateValue } from "./expr/evaluateValue.js";
-import { UNKNOWN, type Scope, type Val } from "./expr/val.js";
-import type { ResolveRef, SourceRef, Workflow, WorkflowSource } from "./types.js";
+import type { Scope } from "./expr/val.js";
+import type { SourceRef, WorkflowSource } from "./types.js";
 import type { YamlMap, YamlValue } from "./yamlValue.js";
 
-/** A host path a sandboxed runner must expose inside, at the same path. */
-export interface Mount {
-  path: string;
-  writable: boolean;
-}
-
-/** One shell invocation, fully specified — nothing is inherited implicitly. */
-export interface RunSpec {
-  script: string;
-  shell: "bash" | "sh";
-  cwd: string;
-  env: Record<string, string>;
-  /** For runners that isolate: what of the host this run may see. A direct
-   * shell ignores this — it already sees everything. */
-  mounts?: Mount[];
-}
-
-export interface RunResult {
-  code: number;
-  stderr: string;
-}
-
-export type RunCommand = (spec: RunSpec) => Promise<RunResult>;
-
-/**
- * Materialize a repo tree at a commit, or null when it cannot be had. Must not
- * throw. `history: true` demands full git history (the `fetch-depth: 0`
- * postcondition); a provider that cannot supply it answers null.
- */
-export type ProvideTree = (
-  source: WorkflowSource,
-  opts?: { history?: boolean },
-) => Promise<string | null>;
-
-export interface ExecDeps {
-  provideTree: ProvideTree;
-  runCommand: RunCommand;
-  resolveRef: ResolveRef;
-  /** The node major `runCommand`'s world provides; asking for another is refused. */
-  nodeMajor: number;
-}
-
-export type ExecOutcome =
-  | { ok: true; outputs: Record<string, string> }
-  | { ok: false; reason: string };
-
-/**
- * The caller decides *whether* a job runs; the executor only decides what
- * running it yields.
- */
-export interface JobExecutor {
-  executeJob(jobId: string, job: Workflow, wf: Workflow, scope: Scope): Promise<ExecOutcome>;
-}
-
-// ------------------------------------------------------------------ plumbing
-
-type Res<T> = { ok: true; v: T } | { ok: false; reason: string };
-
-const err = (reason: string): { ok: false; reason: string } => ({ ok: false, reason });
-
 const SHA_RE = /^[0-9a-f]{40}$/i;
-
-/**
- * Render every `${{ }}` to literal text, or null when any cannot be settled —
- * a partial render would be a different program.
- */
-export function renderTemplate(text: string, scope: Scope): string | null {
-  let failed = false;
-  const out = text.replace(/\$\{\{(.*?)\}\}/g, (_whole, inner) => {
-    const val = evaluateValue(String(inner), scope);
-    if (val.kind !== "value") {
-      failed = true;
-      return "";
-    }
-    return String(val.v);
-  });
-  return failed ? null : out;
-}
-
-/** An `env:` block rendered to concrete strings, every key or nothing. */
-function renderEnvLayer(layer: YamlValue | undefined, scope: Scope): Res<Record<string, string>> {
-  if (layer === null || layer === undefined) {
-    return { ok: true, v: {} };
-  }
-  if (typeof layer !== "object" || Array.isArray(layer)) {
-    return err("env block is not a map");
-  }
-  const out: Record<string, string> = {};
-  for (const [k, raw] of Object.entries<YamlValue | undefined>(layer)) {
-    const rendered = renderTemplate(String(raw ?? ""), scope);
-    if (rendered === null) {
-      return err(`cannot resolve env '${k}'`);
-    }
-    out[k] = rendered;
-  }
-  return { ok: true, v: out };
-}
-
-/**
- * `name=value` lines or `name<<DELIMITER` heredocs. Anything else fails the
- * parse, as the runner fails the step on a malformed line.
- */
-export function parseGithubOutput(text: string): Record<string, string> | null {
-  const out: Record<string, string> = {};
-  const lines = text.split("\n");
-  let i = 0;
-  while (i < lines.length) {
-    const line = lines[i];
-    i++;
-    if (line !== "") {
-      const heredoc = /^([^=<]+)<<(.+)$/.exec(line);
-      if (heredoc !== null) {
-        const [, name, delim] = heredoc;
-        const end = lines.indexOf(delim, i);
-        if (end === -1) {
-          return null; // unterminated heredoc
-        }
-        out[name] = lines.slice(i, end).join("\n");
-        i = end + 1;
-      } else {
-        const eq = line.indexOf("=");
-        if (eq <= 0) {
-          return null;
-        }
-        out[line.slice(0, eq)] = line.slice(eq + 1);
-      }
-    }
-  }
-  return out;
-}
 
 // ------------------------------------------------------------------- actions
 
@@ -184,60 +70,6 @@ async function readActionManifest(dir: string): Promise<string | null> {
   return null;
 }
 
-/** The step keys the walker reads. Values stay YAML-shaped until a runtime
- * guard narrows them. */
-interface StepModel {
-  id?: YamlValue;
-  name?: YamlValue;
-  if?: YamlValue;
-  uses?: YamlValue;
-  run?: YamlValue;
-  shell?: YamlValue;
-  with?: YamlMap | null;
-  env?: YamlValue;
-  "working-directory"?: YamlValue;
-}
-
-interface ActionModel {
-  inputs?: YamlMap | null;
-  outputs?: YamlMap | null;
-  runs?: { using?: YamlValue; pre?: YamlValue; main?: YamlValue; steps?: StepModel[] | null } | null;
-}
-
-/**
- * Caller's `with:` over declared defaults, everything a string — action inputs
- * are untyped, and an unset input is the empty string. An unrenderable value
- * stays unknown; it only fails if a step reads it.
- */
-function bindActionInputs(
-  action: ActionModel,
-  withBlock: YamlValue | undefined,
-  scope: Scope,
-): Record<string, Val> {
-  const bind = (raw: YamlValue | undefined): Val => {
-    if (raw === null || raw === undefined) {
-      return { kind: "value", v: "" };
-    }
-    if (typeof raw === "boolean" || typeof raw === "number") {
-      return { kind: "value", v: String(raw) };
-    }
-    const rendered = renderTemplate(String(raw), scope);
-    return rendered === null ? UNKNOWN : { kind: "value", v: rendered };
-  };
-  const out: Record<string, Val> = {};
-  for (const [name, decl] of Object.entries(action?.inputs ?? {})) {
-    // An input declared without a `default:` binds the same empty string a
-    // missing declaration does, so the two cases share one path.
-    out[name] = bind((decl as YamlMap | null)?.["default"]);
-  }
-  if (withBlock !== null && typeof withBlock === "object") {
-    for (const [name, raw] of Object.entries<YamlValue | undefined>(withBlock)) {
-      out[name] = bind(raw);
-    }
-  }
-  return out;
-}
-
 // ----------------------------------------------------------------- step walk
 
 /** A cycle guard, not a fidelity claim — a self-including composite would recurse forever. */
@@ -246,25 +78,6 @@ const MAX_ACTION_DEPTH = 4;
 const CHECKOUT_RE = /^actions\/checkout@/;
 
 const SETUP_NODE_RE = /^actions\/setup-node@/;
-
-interface WalkCtx {
-  /** Workspace root: the PR head tree, where every step runs by default. */
-  tree: string;
-  /** Whether that tree carries its full git history (a clone, not a tarball). */
-  hasHistory: boolean;
-  /** Set inside a composite action — where `$GITHUB_ACTION_PATH` points. */
-  actionPath?: string;
-  /**
-   * The whole materialized repo a remote action came from. A real runner
-   * checks out the action's repo, not its `uses:` subdirectory, and actions do
-   * reach past their own dir — so this, not `actionPath`, is the mount unit.
-   */
-  actionRoot?: string;
-  /** Raw `env:` blocks from enclosing scopes, outermost first. */
-  envLayers: (YamlValue | undefined)[];
-  deps: ExecDeps;
-  depth: number;
-}
 
 async function runSteps(
   steps: StepModel[],
@@ -446,164 +259,6 @@ async function runUses(
       return err(`${label}: cannot resolve output '${name}' of ${uses}`);
     }
     outputs[name] = rendered;
-  }
-  return { ok: true, v: outputs };
-}
-
-/**
- * `node <main>` with inputs bound as `INPUT_*` env vars. What lands in
- * `$GITHUB_OUTPUT` is the whole output surface — a node action's manifest
- * `outputs:` block is documentation, not a mapping.
- */
-async function runNodeAction(
-  step: StepModel,
-  label: string,
-  uses: string,
-  action: ActionModel,
-  actionDir: string,
-  actionRoot: string | undefined,
-  usingMajor: number,
-  scope: Scope,
-  ctx: WalkCtx,
-): Promise<Res<Record<string, string>>> {
-  if (usingMajor !== ctx.deps.nodeMajor) {
-    return err(
-      `${label}: action ${uses} wants node ${usingMajor}; the sandbox has node ${ctx.deps.nodeMajor}`,
-    );
-  }
-  if (action?.runs?.pre !== undefined && action.runs.pre !== null) {
-    return err(`${label}: action ${uses} declares a pre: step; not modelled`);
-  }
-  // `post:` runs after the job's own steps, so no job output can depend on it.
-  const main = action?.runs?.main;
-  if (typeof main !== "string") {
-    return err(`${label}: action ${uses} has no runs.main`);
-  }
-  const env: Record<string, string> = {
-    PATH: process.env.PATH ?? "",
-    HOME: process.env.HOME ?? "",
-    GITHUB_WORKSPACE: ctx.tree,
-  };
-  if (scope.github?.repository !== undefined) {
-    env.GITHUB_REPOSITORY = scope.github.repository;
-  }
-  if (scope.github?.event_name !== undefined) {
-    env.GITHUB_EVENT_NAME = scope.github.event_name;
-  }
-  for (const layer of [...ctx.envLayers, step.env]) {
-    const rendered = renderEnvLayer(layer, scope);
-    if (!rendered.ok) {
-      return err(`${label}: ${rendered.reason}`);
-    }
-    Object.assign(env, rendered.v);
-  }
-  // Unlike a composite's, a node action's input reads are opaque, so every
-  // binding must be concrete up front.
-  for (const [name, val] of Object.entries(bindActionInputs(action, step.with, scope))) {
-    if (val.kind !== "value") {
-      return err(`${label}: cannot resolve input '${name}' of ${uses}`);
-    }
-    env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] = String(val.v);
-  }
-  const outDir = await mkdtemp(join(tmpdir(), "willfire-out-"));
-  const outFile = join(outDir, "output");
-  await writeFile(outFile, "");
-  // After the layers, so no `env:` block can redirect either one.
-  env.GITHUB_OUTPUT = outFile;
-  env.WILLFIRE_ACTION_MAIN = join(actionDir, main);
-  const r = await ctx.deps.runCommand({
-    script: 'exec node "$WILLFIRE_ACTION_MAIN"',
-    shell: "bash",
-    cwd: ctx.tree,
-    env,
-    mounts: [
-      { path: ctx.tree, writable: true },
-      ...(actionRoot !== undefined ? [{ path: actionRoot, writable: false }] : []),
-      { path: outDir, writable: true },
-    ],
-  });
-  if (r.code !== 0) {
-    const trimmed = r.stderr.trim();
-    const tail = trimmed.slice(trimmed.lastIndexOf("\n") + 1);
-    return err(`${label}: exited ${r.code}${tail === "" ? "" : ` (${tail})`}`);
-  }
-  const outputs = parseGithubOutput(await readFile(outFile, "utf8"));
-  if (outputs === null) {
-    return err(`${label}: malformed GITHUB_OUTPUT`);
-  }
-  return { ok: true, v: outputs };
-}
-
-/** A `run:` step, executed under its declared shell with its declared env. */
-async function runRun(
-  step: StepModel,
-  label: string,
-  scope: Scope,
-  ctx: WalkCtx,
-): Promise<Res<Record<string, string>>> {
-  const shell = step.shell === null || step.shell === undefined ? "bash" : String(step.shell);
-  if (shell !== "bash" && shell !== "sh") {
-    return err(`${label}: shell '${shell}' is not modelled`);
-  }
-  const script = renderTemplate(String(step.run), scope);
-  if (script === null) {
-    return err(`${label}: cannot resolve \${{ }} in run`);
-  }
-  const env: Record<string, string> = {
-    // Everything else a step sees, it declared. A sandboxed runner swaps PATH
-    // and HOME for its own.
-    PATH: process.env.PATH ?? "",
-    HOME: process.env.HOME ?? "",
-    GITHUB_WORKSPACE: ctx.tree,
-  };
-  if (scope.github?.repository !== undefined) {
-    env.GITHUB_REPOSITORY = scope.github.repository;
-  }
-  if (scope.github?.event_name !== undefined) {
-    env.GITHUB_EVENT_NAME = scope.github.event_name;
-  }
-  if (ctx.actionPath !== undefined) {
-    env.GITHUB_ACTION_PATH = ctx.actionPath;
-  }
-  for (const layer of [...ctx.envLayers, step.env]) {
-    const rendered = renderEnvLayer(layer, scope);
-    if (!rendered.ok) {
-      return err(`${label}: ${rendered.reason}`);
-    }
-    Object.assign(env, rendered.v);
-  }
-  let cwd = ctx.tree;
-  if (step["working-directory"] !== undefined && step["working-directory"] !== null) {
-    const wd = renderTemplate(String(step["working-directory"]), scope);
-    if (wd === null) {
-      return err(`${label}: cannot resolve working-directory`);
-    }
-    cwd = resolve(ctx.tree, wd);
-  }
-  const outDir = await mkdtemp(join(tmpdir(), "willfire-out-"));
-  const outFile = join(outDir, "output");
-  await writeFile(outFile, "");
-  // After the layers, so no `env:` block can redirect where outputs land.
-  env.GITHUB_OUTPUT = outFile;
-  const r = await ctx.deps.runCommand({
-    script,
-    shell,
-    cwd,
-    env,
-    mounts: [
-      { path: ctx.tree, writable: true },
-      ...(ctx.actionRoot !== undefined ? [{ path: ctx.actionRoot, writable: false }] : []),
-      { path: outDir, writable: true },
-    ],
-  });
-  if (r.code !== 0) {
-    const trimmed = r.stderr.trim();
-    const tail = trimmed.slice(trimmed.lastIndexOf("\n") + 1);
-    return err(`${label}: exited ${r.code}${tail === "" ? "" : ` (${tail})`}`);
-  }
-  const outputs = parseGithubOutput(await readFile(outFile, "utf8"));
-  if (outputs === null) {
-    return err(`${label}: malformed GITHUB_OUTPUT`);
   }
   return { ok: true, v: outputs };
 }

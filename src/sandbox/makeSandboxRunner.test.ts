@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { RunSpec } from "../execute.js";
+import type { RunSpec } from "../execute/types.js";
 import { imageTag } from "./imageTag.js";
 import { makeSandboxRunner } from "./makeSandboxRunner.js";
 import { sandboxArgv } from "./sandboxArgv.js";

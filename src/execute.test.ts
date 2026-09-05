@@ -9,18 +9,9 @@
 // `action.yml` files are written as JSON, which is valid YAML, so the suite
 // never imports a parser, a filesystem, or a path library of its own.
 
-import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
-import {
-  makeCloneProvider,
-  makeExecutor,
-  makeTreeProvider,
-  parseGithubOutput,
-  runShell,
-  type ExecDeps,
-  type ExecOutcome,
-  type JobExecutor,
-  type RunSpec,
-} from "./execute.js";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { makeCloneProvider, makeExecutor, makeTreeProvider, runShell } from "./execute.js";
+import type { ExecDeps, ExecOutcome, RunSpec } from "./execute/types.js";
 import type { WorkflowSource } from "./types.js";
 import type { YamlMap, YamlValue } from "./yamlValue.js";
 
@@ -123,53 +114,6 @@ const success = (o: ExecOutcome): Record<string, string> => {
 
 afterEach(() => {
   vi.unstubAllEnvs();
-});
-
-// -------------------------------------------------------- parseGithubOutput
-
-describe("parseGithubOutput", () => {
-  it("reads name=value lines, last write winning", () => {
-    expect(parseGithubOutput("a=1\nb=\na=2\n")).toEqual({ a: "2", b: "" });
-  });
-
-  it("reads a heredoc as one multi-line value", () => {
-    expect(parseGithubOutput("key<<EOF\nline1\nline2\nEOF\na=1\n")).toEqual({
-      key: "line1\nline2",
-      a: "1",
-    });
-  });
-
-  it("reads a << on the right of an = as part of the value", () => {
-    expect(parseGithubOutput("a=b<<c\n")).toEqual({ a: "b<<c" });
-  });
-
-  it("refuses a heredoc header with anything after the delimiter", () => {
-    // A CRLF line ending leaves the CR there, and the runner would take it as
-    // part of the delimiter; refusing beats guessing which one it meant.
-    expect(parseGithubOutput("a<<EOF\r\nx\nEOF\n")).toBe(null);
-  });
-
-  it("skips blank lines between assignments", () => {
-    expect(parseGithubOutput("a=1\n\nb=2\n")).toEqual({ a: "1", b: "2" });
-  });
-
-  it("refuses an unterminated heredoc", () => {
-    // The runner fails the step on one; tolerating it here would invent
-    // outputs a real run never had.
-    expect(parseGithubOutput("k<<EOF\nline1\n")).toBe(null);
-  });
-
-  it("refuses a line that assigns nothing", () => {
-    expect(parseGithubOutput("garbage\n")).toBe(null);
-    expect(parseGithubOutput("=value\n")).toBe(null);
-  });
-});
-
-describe("the JobExecutor contract", () => {
-  it("takes job and workflow documents, not `any`", () => {
-    expectTypeOf<JobExecutor["executeJob"]>().parameter(1).not.toBeAny();
-    expectTypeOf<JobExecutor["executeJob"]>().parameter(2).not.toBeAny();
-  });
 });
 
 // ------------------------------------------------------------ run: execution

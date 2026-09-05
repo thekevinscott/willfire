@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { expandJobs } from "./expandJobs.js";
 import { expandWorkflowJobs } from "./expandWorkflowJobs.js";
-import type { ExecOutcome, JobExecutor } from "../execute.js";
+import type { ExecOutcome, JobExecutor } from "../execute/types.js";
 import type { FetchWorkflow, ResolveRef, WorkflowReader, WorkflowSource } from "../types.js";
 import type { YamlMap } from "../yamlValue.js";
 
