@@ -26,8 +26,9 @@ describe("runShell", () => {
       env: SH_ENV,
     });
     expect(r.code).toBe(1);
-    expect(r.stderr.length).toBeLessThanOrEqual(4096);
-    // The tail survives truncation — the last line is the 200th.
+    // Exactly the cap: 200 51-byte lines overflow it, and the tail survives
+    // truncation — the last line is the 200th.
+    expect(r.stderr.length).toBe(4096);
     expect(r.stderr.trimEnd().endsWith("200")).toBe(true);
   });
 

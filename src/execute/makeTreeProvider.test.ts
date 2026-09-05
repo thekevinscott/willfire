@@ -47,6 +47,8 @@ const WRAPPED_TB = "H4sIAAAAAAAAA+3S0QrCIBSA4fMovsCcw6nPE2ODICaYQY/fqqvGWAQzqP3f
 const TWO_TB = "H4sIAAAAAAAAA+3TSwqDMBSF4buUrCAPyWM9dgOCRnD5xtKJUuygxLT4f5MbSAYnHK42Up0tUgrPWRznm3OKwYsK9aOJzFPuR6VkHIZ89u7T/Z/Sptd5qfuzrdQY/Un/bt+/s7Er/duqqV5u3r9rHQBNafP4zf0P7P8VutYBAAAAAAAAAAAAAADA11aiM229ACgAAA==";
 /** `only.txt` = "1" — a single top-level *file*, not a directory. */
 const ONE_TB = "H4sIAAAAAAAAA+3RTQqAIBCG4TmKJ7Ck1PO0j4QyqNv3s4kiCgKJ6H02M6CLb/h0JsnlM+/tOmfHebJ7Z0tRNn00kb6LVauUtCHEq3937x+ls9DUo45DwuOWUp0rL/o3+/6NKZwVlaeLtPl5/+btAAAAAAAAAAAAAAAAAAAemwDJjzcgACgAAA==";
+/** `d1/a.txt` = "1", `d2/b.txt` = "2" — two top-level directories. */
+const TWO_DIRS_TB = "H4sIAAAAAAAAA+3UQQqDMBCF4RwlJ6iZaMx5LNkLNoUev6PQjQW7aYzi/20mkCwmPHhJGlOaUzGGZar1/D6Lc741NhTfTD0feZisNdM45q13v+5PKkkz3PKr6NfmUPu+28hf1vnHqPm7kkt9XDx/qb0Aqkr+oP3f0f970Pzvh+z/QP/vwddeAAAAAAAAAAAAAADwF29Gl9pOACgAAA==";
 
 describe("makeTreeProvider", () => {
   it("downloads once per commit and unwraps the single wrapping directory", async () => {
@@ -73,6 +75,15 @@ describe("makeTreeProvider", () => {
     const provide = makeTreeProvider(async () => tarball(ONE_TB), runShell);
     const tree = await provide(WORKSPACE);
     expect(await fileIs(`${tree}/only.txt`, "1")).toBe(true);
+  });
+
+  it("keeps two top-level directories side by side", async () => {
+    // Descending into either directory would orphan the other, whichever
+    // order readdir yields them in.
+    const provide = makeTreeProvider(async () => tarball(TWO_DIRS_TB), runShell);
+    const tree = await provide(WORKSPACE);
+    expect(await fileIs(`${tree}/d1/a.txt`, "1")).toBe(true);
+    expect(await fileIs(`${tree}/d2/b.txt`, "2")).toBe(true);
   });
 
   it("hands a failed download through as null", async () => {
