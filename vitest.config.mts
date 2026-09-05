@@ -29,7 +29,11 @@ export default mergeConfig(
         // only scope the local `pnpm test:coverage` report. mergeConfig concatenates,
         // so they add to the base's `src/**/*.d.ts` rather than replacing it.
         exclude: ['**/*.test.ts'],
-        reporter: ['text', 'json-summary'],
+        // Vitest 4 forces `skipFull: true` onto the text reporter whenever
+        // std-env reports an AI agent, which at 100% coverage suppresses every
+        // row and the `All files` total, leaving a header-only table. An
+        // explicit value survives that override.
+        reporter: [['text', { skipFull: false }], 'json-summary'],
       },
     },
   }),
