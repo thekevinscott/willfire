@@ -1,0 +1,17 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  // AGENTS.md forbids freezing a workflow ref: the fleet's `@v0`/`@v1` tags
+  // are its CI distribution channel, so moving off one is an adoption
+  // decision, not a dependency bump (ruled on PR #145).
+  "github-actions": {
+    "enabled": false
+  },
+  "packageRules": [
+    {
+      "groupName": "devDependencies",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor", "patch"]
+    }
+  ]
+}
