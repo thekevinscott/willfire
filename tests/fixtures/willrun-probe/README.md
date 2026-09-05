@@ -16,6 +16,11 @@ Two families of workflow live here:
 - **Cross-repo reusable probes** — `remote-caller.yml`, `remote-reusable.yml`,
   `remote-inner.yml`, `remote-bad.yml`. These answer "which repo and which ref
   does a `owner/repo/path@ref` call actually read?"
+- **Step-level action probe** — `action-decline.yml`, the only workflow here
+  that uses an action at all. It answers "what does GitHub run when willfire's
+  executor refuses a step?" Observed on PR #15: GitHub ran `action-gen`,
+  `action-use (r)` and `action-use (s)`, so the checks willfire leaves
+  undecided are real ones it declined to name rather than guess.
 
 The check-name probes are the ground truth behind willfire's
 `src/names.test.ts`: every expectation in that file is a job name read back
