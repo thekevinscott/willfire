@@ -1,3 +1,0 @@
-# Starting ceiling for one-function-per-file, to be ratcheted down over time.
-[typescript]
-one_function_per_file = { max_lines = 2 }
