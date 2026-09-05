@@ -22,6 +22,10 @@ vi.mock("willfire", async () => {
   return { ...actual, makeGithubClient: hoisted.makeGithubClient, predict: hoisted.predict };
 });
 
+// The isolation gate wants collaborators mocked; the flag reader is what the
+// argv cases below exercise, so the mock passes the real module through.
+vi.mock("./get.js", async () => await vi.importActual<typeof import("./get.js")>("./get.js"));
+
 // ------------------------------------------------------------------ fixtures
 
 interface RunFixture {

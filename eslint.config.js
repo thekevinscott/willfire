@@ -92,13 +92,8 @@ export default [
   {
     files: ['src/**/*.ts', 'scripts/*/src/**/*.ts'],
     // Test files keep their module-scope helpers; the one-function principle
-    // is about source decomposition. The rest is the burn-down list: files
-    // that predate the rule; remove each entry as #14 decomposes its file.
-    ignores: [
-      'src/**/*.test.ts',
-      'scripts/*/src/**/*.test.ts',
-      'scripts/verify/src/index.ts',
-    ],
+    // is about source decomposition.
+    ignores: ['src/**/*.test.ts', 'scripts/*/src/**/*.test.ts'],
     languageOptions: {
       parser: tseslint.parser,
     },

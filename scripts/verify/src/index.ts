@@ -7,6 +7,7 @@
 
 import { isJobEntry, makeGithubClient, predict } from "willfire";
 import type { GithubClient } from "willfire";
+import { get } from "./get.js";
 
 async function actualEntries(github: GithubClient, repo: string, prNumber: number) {
   const [owner, name] = repo.split("/");
@@ -34,10 +35,6 @@ async function actualEntries(github: GithubClient, repo: string, prNumber: numbe
   return { entries, incomplete };
 }
 
-const get = (flag: string) => {
-  const i = process.argv.indexOf(flag);
-  return i === -1 ? undefined : process.argv[i + 1];
-};
 const repo = get("--repo");
 const prArg = get("--pr");
 if (!repo || !prArg) {
