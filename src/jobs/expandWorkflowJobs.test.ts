@@ -53,7 +53,7 @@ describe("expandWorkflowJobs", () => {
       readerOf(async () => null),
       SOURCE,
     );
-    expect(vi.mocked(expandJobs).mock.calls[0]?.[3]).toEqual({ path: "", source: SOURCE });
+    expect(vi.mocked(expandJobs).mock.calls[0]?.[0].site).toEqual({ path: "", source: SOURCE });
   });
 });
 

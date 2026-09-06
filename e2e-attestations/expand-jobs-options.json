@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*(willfire#34|putitoutthere|dirsql#1014))\"",
+  "ran_at": 1788608094,
+  "exit_code": 0,
+  "commit": "31327c2b7d88bd6167e3fa06d3e4a32e555da2c5",
+  "branch": "refactor/expand-jobs-options"
+}
