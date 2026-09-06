@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*(willfire#34|putitoutthere))\"",
+  "ran_at": 1788608947,
+  "exit_code": 0,
+  "commit": "2ea2372ba5039ca71399dab4a4c9392e5aabb664",
+  "branch": "pins/drop-unpinnable-dirsql-release-matrix"
+}

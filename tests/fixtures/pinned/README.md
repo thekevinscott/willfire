@@ -33,9 +33,17 @@ to write while any run for the head commit is still in flight.
 
 ## What cannot be re-recorded
 
-A pin is only reproducible while the repo state that produced the dispatch is
-still current. dirsql's `release-ci.yml` computes its release matrix from a
-`plan` job that reads versions off the repo, so re-predicting a PR whose
-dispatch predates a release yields versions that dispatch never saw. That is an
-argument for a dedicated test repo whose state does not move, not for relaxing
-the comparison.
+A pin is only reproducible while the state that produced the dispatch is still
+current. dirsql's `release-ci.yml` computes its release matrix in a `plan` job
+that runs putitoutthere's action, and that action derives each row's version
+from the **live registry** — npm, PyPI and crates.io — not from anything in the
+repo (dirsql's own `package.json` says `0.0.1`). Every dirsql release therefore
+invalidates every dirsql release-matrix pin at once.
+
+Measured on 2026-09-05 (#180): npm `dirsql` went 0.4.30 → 0.4.39 in three days,
+and a PyPI release landed mid-investigation, so two predictions of the same PR
+thirteen minutes apart disagreed. Re-recording buys hours, and picking a
+different dirsql PR buys the same hours — the drift is not a property of the PR.
+So there is no dirsql PR that pins this shape, which is why none is pinned here.
+Covering a runtime-computed release matrix needs a repo whose registry state
+does not move; relaxing the comparison is not the answer.

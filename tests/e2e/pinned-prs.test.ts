@@ -126,14 +126,13 @@ for (const [repo, pr] of [
 }
 
 /**
- * One per shape the probe repo does not exercise, two PRs each: dirsql for
- * filters at fleet scale and a runtime-computed release matrix, putitoutthere
- * for a reusable-workflow fan-out, pr-monitor for the testing-conventions
- * dispatch every fleet repo gates on.
+ * One per shape the probe repo does not exercise: dirsql for filters at fleet
+ * scale, putitoutthere for a reusable-workflow fan-out, pr-monitor for the
+ * testing-conventions dispatch every fleet repo gates on. dirsql's
+ * runtime-computed release matrix is unpinnable — see the README (#180).
  */
 const PINS = [
   "dirsql-1010.json",
-  "dirsql-1014.json",
   "putitoutthere-647.json",
   "putitoutthere-649.json",
   "pr-monitor-24.json",
