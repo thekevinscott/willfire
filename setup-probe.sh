@@ -155,5 +155,17 @@ git commit -m "pr11: touch the matrix-expr probe path"
 git push origin pr11-matrix-expr
 mkpr pr11-matrix-expr main "pr11: expression inside a matrix list element"
 
+# PR12 (opened as #15): the only probe workflow with a step-level action. Its
+# producer job runs one the executor refuses, so the consumer's matrix cannot
+# be computed. `action-decline.yml` is scoped to a path of its own so it stays
+# out of the other PRs' predictions; this is the PR that makes it fire. The
+# recorded dispatch lives in willfire's tests/integration/actionDecline.test.ts.
+git checkout -b pr12-action-decline main
+echo "action decline probe" > src/action-decline.txt
+git add src/action-decline.txt
+git commit -m "pr12: touch the action-decline probe path"
+git push origin pr12-action-decline
+mkpr pr12-action-decline main "pr12: step-level action the executor refuses"
+
 git checkout main
 echo "done"

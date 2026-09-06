@@ -1,0 +1,33 @@
+name: action-decline
+# Probe: a step-level action the executor refuses. No other probe workflow
+# uses an action at all, so the path where willfire declines to run a step —
+# and the consumer entry that must stay `unknown` rather than guess a matrix —
+# had no live dispatch behind it. Scoped to src/action-decline.txt to stay out
+# of the other probes' predictions.
+on:
+  pull_request:
+    paths:
+      - src/action-decline.txt
+jobs:
+  action-gen:
+    runs-on: ubuntu-latest
+    outputs:
+      items: ${{ steps.set.outputs.items }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: setup-node with an input beyond node-version
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          check-latest: true
+      - id: set
+        run: echo 'items=["r","s"]' >> "$GITHUB_OUTPUT"
+
+  action-use:
+    needs: action-gen
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        item: ${{ fromJSON(needs.action-gen.outputs.items) }}
+    steps:
+      - run: echo "${{ matrix.item }}"
