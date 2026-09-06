@@ -9,6 +9,7 @@
 import { parse as parseYaml } from "yaml";
 import { resolveCallbackMap } from "../callback/resolveCallbackMap.js";
 import { jobName } from "../entries/jobName.js";
+import { errorStatus } from "./errorStatus.js";
 import type { Scope } from "../expr/val.js";
 import { expandJobs } from "../jobs/expandJobs.js";
 import { workflowDispatches } from "../triggers/workflowDispatches.js";
@@ -140,9 +141,13 @@ export async function predict(
         path,
         ref: src.sha,
       });
-    } catch {
-      // Private, deleted, bad ref, rate limit, network: all one answer here.
-      // The caller turns it into an `unknown` entry rather than throwing.
+    } catch (e) {
+      // Only a 404 means the file is absent; 403, 429, 5xx and network failures
+      // mean "could not read", which `null` would cache and read back as a verdict.
+      if (errorStatus(e) !== 404) {
+        throw e;
+      }
+      console.warn(`willfire: no file at ${key} (${String(e)})`);
       content = null;
     }
     cache.set(key, content);

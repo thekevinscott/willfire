@@ -158,6 +158,27 @@ describe("makeGithubClient", () => {
     );
   });
 
+  it("carries the status as a field, so a caller can tell 404 from 503 (#177)", async () => {
+    stage(new Response("nope", { status: 503 }));
+    await expect(
+      client().getContent({ ...REPO, path: ".github/workflows/w.yml", ref: "abc" }),
+    ).rejects.toMatchObject({ status: 503 });
+  });
+
+  it("names the repo, the path and the ref, which lands as a consumer's gate text", async () => {
+    stage(new Response("nope", { status: 403 }));
+    await expect(
+      client().getContent({ ...REPO, path: ".github/workflows/w.yml", ref: "abc" }),
+    ).rejects.toThrow("GitHub API 403 for /repos/o/r/contents/.github/workflows/w.yml?ref=abc");
+  });
+
+  it("carries the response headers, so a rate limit stays tellable from a 403", async () => {
+    stage(new Response("nope", { status: 403, headers: { "X-RateLimit-Remaining": "0" } }));
+    await expect(client().getPull({ ...REPO, pull_number: 5 })).rejects.toMatchObject({
+      response: { headers: { "x-ratelimit-remaining": "0" } },
+    });
+  });
+
   it("keeps asking for pages until one comes back short", async () => {
     const full = Array.from({ length: 100 }, (_, i) => ({ filename: `f${i}` }));
     stage(json(full), json([{ filename: "last" }]));

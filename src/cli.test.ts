@@ -64,7 +64,8 @@ function fakeGithub(f: Fixture): GithubClient {
     }),
     getContent: async ({ path }: { path: string }) => {
       if (!(path in contents)) {
-        throw new Error(`404 ${path}`);
+        // The shape the real client throws: a 404 in a field, not only in text.
+        throw Object.assign(new Error(`GitHub API 404 for ${path}`), { status: 404 });
       }
       return contents[path];
     },
