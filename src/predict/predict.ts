@@ -211,7 +211,6 @@ export async function predict(
     }
     const jobs = await expandJobs({
       wf,
-      ctx,
       reader,
       site: { path, source: readSource },
       scope: prFacts,

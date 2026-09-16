@@ -15,7 +15,6 @@ import { evalIf } from "./evalIf.js";
 import { neededJobIds } from "./neededJobIds.js";
 import { prScope } from "./prScope.js";
 import type {
-  Ctx,
   ExpandedJob,
   JobSite,
   Workflow,
@@ -40,7 +39,6 @@ const isSha = (ref: string): boolean => SHA_RE.test(ref);
 
 export interface ExpandJobsArgs {
   wf: Workflow;
-  ctx: Ctx;
   reader: WorkflowReader;
   site: JobSite;
   depth?: number;
