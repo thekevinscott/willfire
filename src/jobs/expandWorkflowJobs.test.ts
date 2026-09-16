@@ -55,6 +55,24 @@ describe("expandWorkflowJobs", () => {
     );
     expect(vi.mocked(expandJobs).mock.calls[0]?.[0].site).toEqual({ path: "", source: SOURCE });
   });
+
+  it("hands expansion nothing job expansion does not read", async () => {
+    vi.mocked(expandJobs).mockClear();
+    const wf = { on: { pull_request: null }, jobs: { build: { "runs-on": "ubuntu-latest" } } };
+    await expandWorkflowJobs(
+      wf as never,
+      { action: "opened", baseRef: "main", files: ["src/app.txt"] },
+      readerOf(async () => null),
+      SOURCE,
+    );
+    expect(Object.keys(vi.mocked(expandJobs).mock.calls[0]?.[0] ?? {})).toEqual([
+      "wf",
+      "reader",
+      "site",
+      "scope",
+      "executor",
+    ]);
+  });
 });
 
 // The check-name readout for an empty matrix: it has to produce no entries,
