@@ -1,54 +1,28 @@
 // Real subprocesses, no docker: `runDocker` is a plain spawn wrapper, so bash
-// stands in for the docker client and exercises every exit path for real.
+// stands in for the docker client. Stream capture, stdin and signal handling
+// belong to `spawnCollect` and are pinned there.
 
 import { describe, expect, it } from "vitest";
 import { runDocker } from "./runDocker.js";
 
 describe("runDocker", () => {
-  it("hands back the exit code and captured stderr", async () => {
-    const r = await runDocker("bash", ["-c", "echo boom >&2; exit 3"]);
-    expect(r.code).toBe(3);
-    expect(r.stderr).toBe("boom\n");
+  it("hands back the exit code and both streams", async () => {
+    const r = await runDocker("bash", ["-c", "echo spoken; echo boom >&2; exit 3"]);
+    expect(r).toEqual({ code: 3, stdout: "spoken\n", stderr: "boom\n" });
   });
 
-  it("hands back captured stdout", async () => {
-    const r = await runDocker("bash", ["-c", "echo spoken; exit 3"]);
-    expect(r.code).toBe(3);
-    expect(r.stdout).toBe("spoken\n");
+  it("reports a binary that cannot spawn as exit 127, with nothing said", async () => {
+    const r = await runDocker("/nonexistent/docker", ["info"]);
+    expect(r).toEqual({ code: 127, stdout: "", stderr: "" });
   });
 
-  it("pipes stdin to the child when given", async () => {
+  it("forwards its third argument as the child's stdin", async () => {
     const r = await runDocker("bash", ["-c", "cat >&2"], "from-stdin");
-    expect(r.code).toBe(0);
     expect(r.stderr).toBe("from-stdin");
   });
 
-  it("reports a binary that cannot spawn as exit 127", async () => {
-    const r = await runDocker("/nonexistent/docker", ["info"]);
-    expect(r.code).toBe(127);
-  });
-
-  it("reports a signal death as exit 1", async () => {
-    const r = await runDocker("bash", ["-c", 'kill -9 "$$"']);
-    expect(r.code).toBe(1);
-  });
-
-  it("caps captured stderr at its tail", async () => {
-    const r = await runDocker("bash", ["-c", 'printf "%05000d" 0 >&2; echo END >&2']);
-    // Exactly the cap: the stream is over 4096, so the tail is all of it.
-    expect(r.stderr.length).toBe(4096);
-    expect(r.stderr).toContain("END");
-  });
-
-  it("caps captured stdout at its tail", async () => {
-    const r = await runDocker("bash", ["-c", 'printf "%05000d" 0; echo END']);
-    // Exactly the cap: the stream is over 4096, so the tail is all of it.
-    expect(r.stdout.length).toBe(4096);
-    expect(r.stdout).toContain("END");
-  });
-
-  it("gives the child no stdin when none is passed — a read sees EOF, not an open pipe", async () => {
-    const r = await runDocker("bash", ["-c", "cat"]);
-    expect(r.code).toBe(0);
+  it("runs the client with the host environment, so it can find the daemon", async () => {
+    const r = await runDocker("bash", ["-c", "echo ${PATH:+found}"]);
+    expect(r.stdout).toBe("found\n");
   });
 });
