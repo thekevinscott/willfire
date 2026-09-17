@@ -91,8 +91,8 @@ export async function predict(
   sources.set(sourceKey(readSource), readSource);
 
   // A `uses:` naming a tag is the same lookup from every caller that writes it,
-  // so resolve each `owner/repo@ref` once. Misses are cached too: a ref that
-  // cannot be resolved will not start resolving on the second ask.
+  // so resolve each `owner/repo@ref` once. Only a 404 miss is cached: a
+  // transient failure must not be remembered as unresolvable for every caller.
   const refCache = new Map<string, string | null>();
   const resolveRef: ResolveRef = async (src) => {
     const key = sourceKey(src);
@@ -100,7 +100,7 @@ export async function predict(
     if (hit !== undefined) {
       return hit;
     }
-    let sha: string | null;
+    let sha: string;
     try {
       const commit = await github.getCommit({
         owner: src.owner,
@@ -108,15 +108,18 @@ export async function predict(
         ref: src.ref,
       });
       sha = commit.sha;
-    } catch {
-      // Deleted tag, private repo, rate limit, network: all one answer here.
-      // The caller turns it into an `unknown` entry rather than throwing.
-      sha = null;
+    } catch (e) {
+      // Both answers are `null` — the caller turns either into an `unknown`
+      // entry. Only a 404 is settled (a deleted tag, or a private repo GitHub
+      // masks as one); a 403, 429 or network failure goes uncached so a later
+      // caller in the same prediction asks again.
+      if (errorStatus(e) === 404) {
+        refCache.set(key, null);
+      }
+      return null;
     }
     refCache.set(key, sha);
-    if (sha !== null) {
-      sources.set(key, { ...src, sha });
-    }
+    sources.set(key, { ...src, sha });
     return sha;
   };
 
