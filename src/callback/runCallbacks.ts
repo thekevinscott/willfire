@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { tailLine } from "../tailLine.js";
+import { failureTail } from "../failureTail.js";
 import { parseCallbackMap, type CallbackMap } from "./parseCallbackMap.js";
 
 export type CallbacksOutcome = { ok: true; map: CallbackMap } | { ok: false; reason: string };
@@ -50,10 +50,7 @@ export async function runCallbacks(commands: string[][]): Promise<CallbacksOutco
       return { ok: false, reason: `callback '${label}' failed to start: ${r.failed}` };
     }
     if (r.code !== 0) {
-      // pnpm prints fatal errors such as ERR_PNPM_NO_PKG_MANIFEST to stdout,
-      // so stderr alone can leave a failure quoting no cause at all.
-      const fromStderr = tailLine(r.stderr);
-      const tail = fromStderr === "" ? tailLine(r.stdout) : fromStderr;
+      const tail = failureTail(r);
       return {
         ok: false,
         reason: `callback '${label}' exited ${r.code}${tail === "" ? "" : ` (${tail})`}`,

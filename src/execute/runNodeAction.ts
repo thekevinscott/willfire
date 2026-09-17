@@ -4,9 +4,9 @@ import { join } from "node:path";
 import type { Scope } from "../expr/val.js";
 import { bindActionInputs } from "./bindActionInputs.js";
 import { err } from "./err.js";
+import { failureTail } from "../failureTail.js";
 import { parseGithubOutput } from "./parseGithubOutput.js";
 import { renderEnvLayer } from "./renderEnvLayer.js";
-import { tailLine } from "../tailLine.js";
 import type { ActionModel, Res, StepModel, WalkCtx } from "./types.js";
 
 /**
@@ -82,9 +82,7 @@ export async function runNodeAction(
     ],
   });
   if (r.code !== 0) {
-    // `core.setFailed`, how a JS action fails, routes its message to stdout.
-    const fromStderr = tailLine(r.stderr);
-    const tail = fromStderr === "" ? tailLine(r.stdout) : fromStderr;
+    const tail = failureTail(r);
     return err(`${label}: exited ${r.code}${tail === "" ? "" : ` (${tail})`}`);
   }
   const outputs = parseGithubOutput(await readFile(outFile, "utf8"));

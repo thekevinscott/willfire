@@ -3,10 +3,10 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import type { Scope } from "../expr/val.js";
 import { err } from "./err.js";
+import { failureTail } from "../failureTail.js";
 import { parseGithubOutput } from "./parseGithubOutput.js";
 import { renderEnvLayer } from "./renderEnvLayer.js";
 import { renderTemplate } from "./renderTemplate.js";
-import { tailLine } from "../tailLine.js";
 import type { Res, StepModel, WalkCtx } from "./types.js";
 
 /** A `run:` step, executed under its declared shell with its declared env. */
@@ -72,9 +72,7 @@ export async function runRun(
     ],
   });
   if (r.code !== 0) {
-    // A step's tooling may put its fatal error on stdout; pnpm does.
-    const fromStderr = tailLine(r.stderr);
-    const tail = fromStderr === "" ? tailLine(r.stdout) : fromStderr;
+    const tail = failureTail(r);
     return err(`${label}: exited ${r.code}${tail === "" ? "" : ` (${tail})`}`);
   }
   const outputs = parseGithubOutput(await readFile(outFile, "utf8"));

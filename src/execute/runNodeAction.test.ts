@@ -92,21 +92,6 @@ describe("runNodeAction", () => {
     });
   });
 
-  it("falls back to stdout when the program failed the way core.setFailed does", async () => {
-    const fail: RunCommand = async () => ({
-      code: 1,
-      stdout: "::error::no lockfile\n",
-      stderr: "",
-    });
-    const action = { runs: { using: "node24", main: "index.js" } };
-    expect(
-      await runNodeAction({}, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(fail)),
-    ).toEqual({
-      ok: false,
-      reason: "step '#1': exited 1 (::error::no lockfile)",
-    });
-  });
-
   it("omits the parenthetical when both streams are blank", async () => {
     const fail: RunCommand = async () => ({ code: 2, stdout: " \n ", stderr: "" });
     const action = { runs: { using: "node24", main: "index.js" } };

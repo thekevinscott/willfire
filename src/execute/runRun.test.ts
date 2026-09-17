@@ -52,22 +52,6 @@ describe("runRun", () => {
     });
   });
 
-  it("falls back to the last stdout line when a failing step wrote nothing to stderr", async () => {
-    const fail: RunCommand = async () => ({ code: 1, stdout: "one\nboom-out\n", stderr: "" });
-    expect(await runRun({ run: "true" }, "step 's'", {}, ctxOf(fail))).toEqual({
-      ok: false,
-      reason: "step 's': exited 1 (boom-out)",
-    });
-  });
-
-  it("prefers the stderr tail when a failing step wrote to both streams", async () => {
-    const fail: RunCommand = async () => ({ code: 3, stdout: "chatter\n", stderr: "one\nboom\n" });
-    expect(await runRun({ run: "true" }, "step 's'", {}, ctxOf(fail))).toEqual({
-      ok: false,
-      reason: "step 's': exited 3 (boom)",
-    });
-  });
-
   afterEach(() => {
     vi.unstubAllEnvs();
   });
