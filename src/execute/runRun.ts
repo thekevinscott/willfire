@@ -1,8 +1,7 @@
-import { mkdtemp, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { resolve } from "node:path";
 import type { Scope } from "../expr/val.js";
 import { err } from "./err.js";
+import { outputSink } from "./outputSink.js";
 import { renderTemplate } from "./renderTemplate.js";
 import { stepEnv } from "./stepEnv.js";
 import { stepOutcome } from "./stepOutcome.js";
@@ -42,11 +41,7 @@ export async function runRun(
     }
     cwd = resolve(ctx.tree, wd);
   }
-  const outDir = await mkdtemp(join(tmpdir(), "willfire-out-"));
-  const outFile = join(outDir, "output");
-  await writeFile(outFile, "");
-  // After the layers, so no `env:` block can redirect where outputs land.
-  env.GITHUB_OUTPUT = outFile;
+  const { dir: outDir, file: outFile } = await outputSink(env);
   const r = await ctx.deps.runCommand({
     script,
     shell,

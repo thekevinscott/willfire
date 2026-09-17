@@ -1,6 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { dirname } from "node:path";
+import { describe, expect, it, vi } from "vitest";
 import { runNodeAction } from "./runNodeAction.js";
 import type { ActionModel, RunCommand, RunSpec, WalkCtx } from "./types.js";
+
+// Only to read the sink's path back out of a spec; the real join is what
+// produced it, so the mock passes the real module through.
+vi.mock("node:path", async () => await vi.importActual<typeof import("node:path")>("node:path"));
 
 const ctxOf = (runCommand: RunCommand): WalkCtx => ({
   tree: "/nonexistent-tree",
@@ -106,5 +111,20 @@ describe("runNodeAction", () => {
     await runNodeAction(step, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(cmd));
     expect(specs[0].env.INPUT_WHO).toBe("bound");
     expect(specs[0].env.WILLFIRE_ACTION_MAIN).toBe("/d/index.js");
+  });
+
+  it("mounts the directory holding GITHUB_OUTPUT writable", async () => {
+    const specs: RunSpec[] = [];
+    const cmd: RunCommand = async (spec) => {
+      specs.push(spec);
+      return { code: 0, stdout: "", stderr: "" };
+    };
+    const action = { runs: { using: "node24", main: "index.js" } };
+    await runNodeAction({}, "step '#1'", "./a", action, "/d", "/root", 24, {}, ctxOf(cmd));
+    expect(specs[0].mounts).toEqual([
+      { path: "/nonexistent-tree", writable: true },
+      { path: "/root", writable: false },
+      { path: dirname(specs[0].env.GITHUB_OUTPUT), writable: true },
+    ]);
   });
 });
