@@ -4,7 +4,7 @@ import { join } from "node:path";
 import type { Scope } from "../expr/val.js";
 import { bindActionInputs } from "./bindActionInputs.js";
 import { err } from "./err.js";
-import { renderEnvLayer } from "./renderEnvLayer.js";
+import { stepEnv } from "./stepEnv.js";
 import { stepOutcome } from "./stepOutcome.js";
 import type { ActionModel, Res, StepModel, WalkCtx } from "./types.js";
 
@@ -37,24 +37,11 @@ export async function runNodeAction(
   if (typeof main !== "string") {
     return err(`${label}: action ${uses} has no runs.main`);
   }
-  const env: Record<string, string> = {
-    PATH: process.env.PATH ?? "",
-    HOME: process.env.HOME ?? "",
-    GITHUB_WORKSPACE: ctx.tree,
-  };
-  if (scope.github?.repository !== undefined) {
-    env.GITHUB_REPOSITORY = scope.github.repository;
+  const built = stepEnv(step, scope, ctx, label);
+  if (!built.ok) {
+    return built;
   }
-  if (scope.github?.event_name !== undefined) {
-    env.GITHUB_EVENT_NAME = scope.github.event_name;
-  }
-  for (const layer of [...ctx.envLayers, step.env]) {
-    const rendered = renderEnvLayer(layer, scope);
-    if (!rendered.ok) {
-      return err(`${label}: ${rendered.reason}`);
-    }
-    Object.assign(env, rendered.v);
-  }
+  const env = built.v;
   // Unlike a composite's, a node action's input reads are opaque, so every
   // binding must be concrete up front.
   for (const [name, val] of Object.entries(bindActionInputs(action, step.with, scope))) {

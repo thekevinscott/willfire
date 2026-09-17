@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { runNodeAction } from "./runNodeAction.js";
-import type { ActionModel, RunCommand, WalkCtx } from "./types.js";
+import type { ActionModel, RunCommand, RunSpec, WalkCtx } from "./types.js";
 
 const ctxOf = (runCommand: RunCommand): WalkCtx => ({
   tree: "/nonexistent-tree",
@@ -79,5 +79,32 @@ describe("runNodeAction", () => {
       ok: false,
       reason: "step '#1': action ./a has no runs.main",
     });
+  });
+
+  it("stops on an env: layer it cannot render", async () => {
+    const step = { env: { K: "${{ env.nope }}" } };
+    const action = { runs: { using: "node24", main: "index.js" } };
+    expect(
+      await runNodeAction(step, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(ok)),
+    ).toEqual({
+      ok: false,
+      reason: "step '#1': cannot resolve env 'K'",
+    });
+  });
+
+  it("binds inputs over the env layers — an INPUT_* is not a step's to override", async () => {
+    const specs: RunSpec[] = [];
+    const cmd: RunCommand = async (spec) => {
+      specs.push(spec);
+      return { code: 0, stdout: "", stderr: "" };
+    };
+    const step = { with: { who: "bound" }, env: { INPUT_WHO: "layered" } };
+    const action = {
+      inputs: { who: { default: "" } },
+      runs: { using: "node24", main: "index.js" },
+    };
+    await runNodeAction(step, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(cmd));
+    expect(specs[0].env.INPUT_WHO).toBe("bound");
+    expect(specs[0].env.WILLFIRE_ACTION_MAIN).toBe("/d/index.js");
   });
 });

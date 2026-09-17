@@ -3,8 +3,8 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import type { Scope } from "../expr/val.js";
 import { err } from "./err.js";
-import { renderEnvLayer } from "./renderEnvLayer.js";
 import { renderTemplate } from "./renderTemplate.js";
+import { stepEnv } from "./stepEnv.js";
 import { stepOutcome } from "./stepOutcome.js";
 import type { Res, StepModel, WalkCtx } from "./types.js";
 
@@ -23,29 +23,17 @@ export async function runRun(
   if (script === null) {
     return err(`${label}: cannot resolve \${{ }} in run`);
   }
-  const env: Record<string, string> = {
-    // Everything else a step sees, it declared. A sandboxed runner swaps PATH
-    // and HOME for its own.
-    PATH: process.env.PATH ?? "",
-    HOME: process.env.HOME ?? "",
-    GITHUB_WORKSPACE: ctx.tree,
-  };
-  if (scope.github?.repository !== undefined) {
-    env.GITHUB_REPOSITORY = scope.github.repository;
+  const built = stepEnv(
+    step,
+    scope,
+    ctx,
+    label,
+    ctx.actionPath === undefined ? {} : { GITHUB_ACTION_PATH: ctx.actionPath },
+  );
+  if (!built.ok) {
+    return built;
   }
-  if (scope.github?.event_name !== undefined) {
-    env.GITHUB_EVENT_NAME = scope.github.event_name;
-  }
-  if (ctx.actionPath !== undefined) {
-    env.GITHUB_ACTION_PATH = ctx.actionPath;
-  }
-  for (const layer of [...ctx.envLayers, step.env]) {
-    const rendered = renderEnvLayer(layer, scope);
-    if (!rendered.ok) {
-      return err(`${label}: ${rendered.reason}`);
-    }
-    Object.assign(env, rendered.v);
-  }
+  const env = built.v;
   let cwd = ctx.tree;
   if (step["working-directory"] !== undefined && step["working-directory"] !== null) {
     const wd = renderTemplate(String(step["working-directory"]), scope);

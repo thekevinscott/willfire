@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { runRun } from "./runRun.js";
 import type { RunCommand, RunSpec, WalkCtx } from "./types.js";
 
@@ -36,10 +36,6 @@ describe("runRun", () => {
     expect(await runRun({ run: "true" }, "step 's'", {}, ctxOf(ok))).toEqual({ ok: true, v: {} });
   });
 
-  afterEach(() => {
-    vi.unstubAllEnvs();
-  });
-
   const capture = (): { specs: RunSpec[]; cmd: RunCommand } => {
     const specs: RunSpec[] = [];
     const cmd: RunCommand = async (spec) => {
@@ -49,17 +45,11 @@ describe("runRun", () => {
     return { specs, cmd };
   };
 
-  it("hands the runner the github env and exactly the tree and output mounts", async () => {
+  it("mounts the tree and the output sink, and nothing else", async () => {
     const { specs, cmd } = capture();
-    const scope = { github: { repository: "o/r", event_name: "pull_request" } };
-    await runRun({ run: "true" }, "step 's'", scope, ctxOf(cmd));
-    const spec = specs[0];
-    expect(spec.env.GITHUB_REPOSITORY).toBe("o/r");
-    expect(spec.env.GITHUB_EVENT_NAME).toBe("pull_request");
-    expect(spec.env).not.toHaveProperty("GITHUB_ACTION_PATH");
-    expect(spec.env.PATH).toBe(process.env.PATH);
-    expect(spec.env.HOME).toBe(process.env.HOME);
-    expect(spec.mounts).toEqual([
+    await runRun({ run: "true" }, "step 's'", {}, ctxOf(cmd));
+    expect(specs[0].env).not.toHaveProperty("GITHUB_ACTION_PATH");
+    expect(specs[0].mounts).toEqual([
       { path: "/nonexistent-tree", writable: true },
       { path: expect.stringContaining("willfire-out-"), writable: true },
     ]);
@@ -77,12 +67,9 @@ describe("runRun", () => {
     ]);
   });
 
-  it("gives PATH and HOME empty values when the host has neither", async () => {
-    vi.stubEnv("PATH", undefined);
-    vi.stubEnv("HOME", undefined);
-    const { specs, cmd } = capture();
-    await runRun({ run: "true" }, "step 's'", {}, ctxOf(cmd));
-    expect(specs[0].env.PATH).toBe("");
-    expect(specs[0].env.HOME).toBe("");
+  it("stops on an env: layer it cannot render", async () => {
+    expect(
+      await runRun({ run: "true", env: { K: "${{ env.nope }}" } }, "step 's'", {}, ctxOf(ok)),
+    ).toEqual({ ok: false, reason: "step 's': cannot resolve env 'K'" });
   });
 });
