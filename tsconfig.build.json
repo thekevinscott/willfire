@@ -4,6 +4,8 @@
   "compilerOptions": {
     "noEmit": false,
     "declaration": true,
+    // TypeScript 6 errors (TS5011) unless rootDir is explicit alongside outDir.
+    "rootDir": "src",
     "outDir": "dist"
   }
 }
