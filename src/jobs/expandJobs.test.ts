@@ -16,7 +16,6 @@ vi.mock(
 import type { CallbackMap } from "../callback/parseCallbackMap.js";
 import type { JobExecutor } from "../execute/types.js";
 import type {
-  Ctx,
   FetchWorkflow,
   JobSite,
   ResolveRef,
@@ -40,7 +39,6 @@ const REMOTE_SHA = "b".repeat(40);
 
 const SOURCE: WorkflowSource = { owner: "o", repo: "r", ref: SHA, sha: SHA };
 const SITE: JobSite = { path: ".github/workflows/caller.yml", source: SOURCE };
-const CTX: Ctx = { action: "opened", baseRef: "main", files: ["src/app.ts"] };
 
 /**
  * Bundle a bare fetch as the reader expansion takes. The default resolver is
@@ -59,7 +57,6 @@ const readerFor = (files: Record<string, string>) =>
 const expand = (jobs: YamlMap, reader: WorkflowReader = readerFor({})) =>
   expandJobs({
     wf: { on: { pull_request: null }, jobs } as Workflow,
-    ctx: CTX,
     reader,
     site: SITE,
   });
@@ -72,7 +69,6 @@ const expandWith = (
 ) =>
   expandJobs({
     wf: { on: { pull_request: null }, jobs } as Workflow,
-    ctx: CTX,
     reader,
     site: SITE,
     scope: {},
@@ -85,7 +81,6 @@ describe("job expansion", () => {
     const scope: Scope = { inputs: { x: { kind: "value", v: "v" } } };
     const entries = await expandJobs({
       wf: { on: { pull_request: null }, jobs: { a: { if: "inputs.x == 'v'" } } } as Workflow,
-      ctx: CTX,
       reader: readerFor({}),
       site: SITE,
       scope,
@@ -96,7 +91,6 @@ describe("job expansion", () => {
   it("expands a workflow with no jobs block to no entries", async () => {
     const entries = await expandJobs({
       wf: { on: { pull_request: null } } as Workflow,
-      ctx: CTX,
       reader: readerFor({}),
       site: SITE,
     });
@@ -662,7 +656,6 @@ describe("callback answers", () => {
   ) =>
     expandJobs({
       wf: { on: { pull_request: null }, jobs } as Workflow,
-      ctx: CTX,
       reader,
       site: SITE,
       scope,
@@ -1000,7 +993,6 @@ describe("inputs the event never supplied", () => {
   it("decides a guard on an input a pull_request never carried", async () => {
     const entries = await expandJobs({
       wf: withDispatchInput({ gate: { if: "inputs.version == ''" } }),
-      ctx: CTX,
       reader: readerFor({}),
       site: SITE,
     });
@@ -1011,7 +1003,6 @@ describe("inputs the event never supplied", () => {
     const scope: Scope = { inputs: { version: { kind: "value", v: "1.2.3" } } };
     const entries = await expandJobs({
       wf: withDispatchInput({ gate: { if: "inputs.version == '1.2.3'" } }),
-      ctx: CTX,
       reader: readerFor({}),
       site: SITE,
       scope,
@@ -1036,7 +1027,6 @@ describe("inputs the event never supplied", () => {
           with: { version: "${{ inputs.version }}" },
         },
       }),
-      ctx: CTX,
       reader: readerFor({
         [CALLEE]: JSON.stringify({
           on: { workflow_call: { inputs: { version: { type: "string" } } } },

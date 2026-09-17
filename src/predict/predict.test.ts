@@ -623,6 +623,19 @@ describe("the commit workflow files are read at", () => {
     });
   });
 
+  it("hands expansion nothing job expansion does not read", async () => {
+    vi.mocked(expandJobs).mockClear();
+    await run(AT_HEAD, { mergeSha: null });
+    expect(Object.keys(vi.mocked(expandJobs).mock.calls[0]?.[0] ?? {})).toEqual([
+      "wf",
+      "reader",
+      "site",
+      "scope",
+      "executor",
+      "callbacks",
+    ]);
+  });
+
   it("claims no merge commit on the skip path, which never reads one", async () => {
     const f = { mergeSha: MERGE_SHA, message: "chore: docs [skip ci]" };
     expect(await run(AT_HEAD, f)).toEqual({

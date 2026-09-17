@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*(willfire#34|putitoutthere))\"",
+  "ran_at": 1789596036,
+  "exit_code": 0,
+  "commit": "3bfc7c38eee94bde5157326212ce1e62afe38a05",
+  "branch": "fix/expandjobs-drop-unused-ctx"
+}
