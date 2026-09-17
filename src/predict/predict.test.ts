@@ -54,6 +54,11 @@ interface Fixture {
    */
   refs?: Record<string, string>;
   /**
+   * Status `getCommit` throws for a `owner/repo@ref` rather than resolving it.
+   * `null` is an error carrying no status: a network failure.
+   */
+  refErrors?: Record<string, number | null>;
+  /**
    * Tarball bytes by `owner/repo@ref`, for the executor's tree downloads. A
    * missing key throws, which is what the tarball endpoint does for anything
    * it will not serve.
@@ -122,9 +127,14 @@ function fakeGithub(f: Fixture): GithubClient {
       if (ref === HEAD_SHA) {
         return { sha: ref, commit: { message: f.message ?? "chore: routine" } };
       }
-      const sha = (f.refs ?? {})[`${owner}/${repo}@${ref}`];
+      const at = `${owner}/${repo}@${ref}`;
+      const status = (f.refErrors ?? {})[at];
+      if (status !== undefined) {
+        throw status === null ? new Error(`network failure for ${at}`) : apiError(status, at);
+      }
+      const sha = (f.refs ?? {})[at];
       if (sha === undefined) {
-        throw new Error(`404 ${owner}/${repo}@${ref}`);
+        throw apiError(404, at);
       }
       const parents = ((f.parents ?? {})[sha] ?? []).map((p) => ({ sha: p }));
       return { sha, commit: { message: "" }, parents };
@@ -673,6 +683,12 @@ describe("the commits a prediction was read from", () => {
 
   const CALLEE = "on:\n  workflow_call:\njobs:\n  inner:\n    runs-on: ubuntu-latest\n";
 
+  /** Two jobs naming one cross-repo ref, so the second consults the cache. */
+  const TWICE_NAMED =
+    "on: pull_request\njobs:\n" +
+    "  a:\n    uses: octo/repo/.github/workflows/x.yml@v1\n" +
+    "  b:\n    uses: octo/repo/.github/workflows/x.yml@v1\n";
+
   it("names only the head when nothing else is read", async () => {
     const { sources } = await run("on: pull_request\njobs:\n  a: {}\n");
     expect(sources).toEqual([HEAD_SOURCE]);
@@ -723,12 +739,8 @@ describe("the commits a prediction was read from", () => {
   });
 
   it("resolves a ref once however many jobs name it", async () => {
-    const body =
-      "on: pull_request\njobs:\n" +
-      "  a:\n    uses: octo/repo/.github/workflows/x.yml@v1\n" +
-      "  b:\n    uses: octo/repo/.github/workflows/x.yml@v1\n";
     const github = fakeGithub({
-      contents: { [WF]: body, ".github/workflows/x.yml": CALLEE },
+      contents: { [WF]: TWICE_NAMED, ".github/workflows/x.yml": CALLEE },
       refs: { "octo/repo@v1": REMOTE_SHA },
     });
     const getCommit = vi.spyOn(github, "getCommit");
@@ -739,15 +751,37 @@ describe("the commits a prediction was read from", () => {
     expect(sources).toHaveLength(2);
   });
 
-  it("remembers a ref that would not resolve rather than asking again", async () => {
-    const body =
-      "on: pull_request\njobs:\n" +
-      "  a:\n    uses: octo/repo/.github/workflows/x.yml@v1\n" +
-      "  b:\n    uses: octo/repo/.github/workflows/x.yml@v1\n";
-    const github = fakeGithub({ contents: { [WF]: body } });
+  it("remembers a ref that 404s rather than asking again", async () => {
+    // A deleted tag, or a private repo GitHub masks as one. Neither starts
+    // resolving mid-prediction, so the miss is worth keeping.
+    const github = fakeGithub({ contents: { [WF]: TWICE_NAMED } });
     const getCommit = vi.spyOn(github, "getCommit");
     const { entries } = await predict(github, "o/r", 1);
     expect(getCommit).toHaveBeenCalledTimes(2);
+    expect(entries.map((e) => e.status)).toEqual(["unknown", "unknown"]);
+  });
+
+  it("asks again after a transient failure to resolve a ref", async () => {
+    // One 403 cached is eight workflows told the ref is unresolvable.
+    const github = fakeGithub({
+      contents: { [WF]: TWICE_NAMED, ".github/workflows/x.yml": CALLEE },
+      refErrors: { "octo/repo@v1": 403 },
+    });
+    const getCommit = vi.spyOn(github, "getCommit");
+    const { entries } = await predict(github, "o/r", 1);
+    // The head commit, then `v1` once per job: the second is a retry, not a hit.
+    expect(getCommit).toHaveBeenCalledTimes(3);
+    expect(entries.map((e) => e.status)).toEqual(["unknown", "unknown"]);
+  });
+
+  it("asks again after a resolution failure that carries no status", async () => {
+    const github = fakeGithub({
+      contents: { [WF]: TWICE_NAMED, ".github/workflows/x.yml": CALLEE },
+      refErrors: { "octo/repo@v1": null },
+    });
+    const getCommit = vi.spyOn(github, "getCommit");
+    const { entries } = await predict(github, "o/r", 1);
+    expect(getCommit).toHaveBeenCalledTimes(3);
     expect(entries.map((e) => e.status)).toEqual(["unknown", "unknown"]);
   });
 
