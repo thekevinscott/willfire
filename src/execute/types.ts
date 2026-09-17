@@ -57,9 +57,6 @@ export interface JobExecutor {
   executeJob(jobId: string, job: Workflow, wf: Workflow, scope: Scope): Promise<ExecOutcome>;
 }
 
-/** The step walk's internal result: a value, or the reason there is none. */
-export type Res<T> = { ok: true; v: T } | { ok: false; reason: string };
-
 /** The step keys the walker reads. Values stay YAML-shaped until a runtime
  * guard narrows them. */
 export interface StepModel {

@@ -1,3 +1,4 @@
+import { err, type Res } from "../result.js";
 import { isPlainObject } from "./isPlainObject.js";
 
 /** One recorded answer: outputs to use when `inputs` is a subset of an invocation's. */
@@ -10,10 +11,6 @@ export interface CallbackEntry {
 export type CallbackMap = Record<string, CallbackEntry[]>;
 
 export type ParsedMap = { ok: true; map: CallbackMap } | { ok: false; reason: string };
-
-type Res<T> = { ok: true; v: T } | { ok: false; reason: string };
-
-const err = (reason: string): { ok: false; reason: string } => ({ ok: false, reason });
 
 /**
  * Strict, because a shape error silently dropped here would surface later as a

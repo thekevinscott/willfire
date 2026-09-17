@@ -3,11 +3,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Scope } from "../expr/val.js";
 import { bindActionInputs } from "./bindActionInputs.js";
-import { err } from "./err.js";
 import { parseGithubOutput } from "./parseGithubOutput.js";
 import { renderEnvLayer } from "./renderEnvLayer.js";
+import { err, type Res } from "../result.js";
 import { tailLine } from "../tailLine.js";
-import type { ActionModel, Res, StepModel, WalkCtx } from "./types.js";
+import type { ActionModel, StepModel, WalkCtx } from "./types.js";
 
 /**
  * `node <main>` with inputs bound as `INPUT_*` env vars. What lands in

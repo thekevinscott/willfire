@@ -1,8 +1,7 @@
 import type { Scope } from "../expr/val.js";
+import { err, type Res } from "../result.js";
 import type { YamlValue } from "../yamlValue.js";
-import { err } from "./err.js";
 import { renderTemplate } from "./renderTemplate.js";
-import type { Res } from "./types.js";
 
 /** An `env:` block rendered to concrete strings, every key or nothing. */
 export function renderEnvLayer(

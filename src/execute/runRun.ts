@@ -2,12 +2,12 @@ import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import type { Scope } from "../expr/val.js";
-import { err } from "./err.js";
 import { parseGithubOutput } from "./parseGithubOutput.js";
 import { renderEnvLayer } from "./renderEnvLayer.js";
 import { renderTemplate } from "./renderTemplate.js";
+import { err, type Res } from "../result.js";
 import { tailLine } from "../tailLine.js";
-import type { Res, StepModel, WalkCtx } from "./types.js";
+import type { StepModel, WalkCtx } from "./types.js";
 
 /** A `run:` step, executed under its declared shell with its declared env. */
 export async function runRun(

@@ -4,14 +4,14 @@ import type { Scope } from "../expr/val.js";
 import type { WorkflowSource } from "../types.js";
 import type { YamlMap, YamlValue } from "../yamlValue.js";
 import { bindActionInputs } from "./bindActionInputs.js";
-import { err } from "./err.js";
 import { isCheckout } from "./isCheckout.js";
 import { parseActionUses } from "./parseActionUses.js";
 import { readActionManifest } from "./readActionManifest.js";
 import { renderTemplate } from "./renderTemplate.js";
+import { err, type Res } from "../result.js";
 import { runNodeAction } from "./runNodeAction.js";
 import { runSteps } from "./runSteps.js";
-import type { ActionModel, Res, StepModel, WalkCtx } from "./types.js";
+import type { ActionModel, StepModel, WalkCtx } from "./types.js";
 
 /** A cycle guard, not a fidelity claim — a self-including composite would recurse forever. */
 const MAX_ACTION_DEPTH = 4;

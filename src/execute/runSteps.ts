@@ -1,9 +1,9 @@
 import { evaluate } from "../expr/evaluate.js";
 import type { Scope } from "../expr/val.js";
-import { err } from "./err.js";
+import { err, type Res } from "../result.js";
 import { runRun } from "./runRun.js";
 import { runUses } from "./runUses.js";
-import type { Res, StepModel, WalkCtx } from "./types.js";
+import type { StepModel, WalkCtx } from "./types.js";
 
 export async function runSteps(
   steps: StepModel[],
