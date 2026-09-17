@@ -80,26 +80,4 @@ describe("runNodeAction", () => {
       reason: "step '#1': action ./a has no runs.main",
     });
   });
-
-  it("reports a non-zero exit with the last stderr line only", async () => {
-    const fail: RunCommand = async () => ({ code: 2, stdout: "", stderr: "one\nboom\n" });
-    const action = { runs: { using: "node24", main: "index.js" } };
-    expect(
-      await runNodeAction({}, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(fail)),
-    ).toEqual({
-      ok: false,
-      reason: "step '#1': exited 2 (boom)",
-    });
-  });
-
-  it("omits the parenthetical when both streams are blank", async () => {
-    const fail: RunCommand = async () => ({ code: 2, stdout: " \n ", stderr: "" });
-    const action = { runs: { using: "node24", main: "index.js" } };
-    expect(
-      await runNodeAction({}, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(fail)),
-    ).toEqual({
-      ok: false,
-      reason: "step '#1': exited 2",
-    });
-  });
 });

@@ -1,12 +1,11 @@
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Scope } from "../expr/val.js";
 import { bindActionInputs } from "./bindActionInputs.js";
 import { err } from "./err.js";
-import { failureTail } from "../failureTail.js";
-import { parseGithubOutput } from "./parseGithubOutput.js";
 import { renderEnvLayer } from "./renderEnvLayer.js";
+import { stepOutcome } from "./stepOutcome.js";
 import type { ActionModel, Res, StepModel, WalkCtx } from "./types.js";
 
 /**
@@ -81,13 +80,5 @@ export async function runNodeAction(
       { path: outDir, writable: true },
     ],
   });
-  if (r.code !== 0) {
-    const tail = failureTail(r);
-    return err(`${label}: exited ${r.code}${tail === "" ? "" : ` (${tail})`}`);
-  }
-  const outputs = parseGithubOutput(await readFile(outFile, "utf8"));
-  if (outputs === null) {
-    return err(`${label}: malformed GITHUB_OUTPUT`);
-  }
-  return { ok: true, v: outputs };
+  return stepOutcome(r, outFile, label);
 }

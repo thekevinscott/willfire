@@ -36,22 +36,6 @@ describe("runRun", () => {
     expect(await runRun({ run: "true" }, "step 's'", {}, ctxOf(ok))).toEqual({ ok: true, v: {} });
   });
 
-  it("reports a non-zero exit with the last stderr line", async () => {
-    const fail: RunCommand = async () => ({ code: 3, stdout: "", stderr: "one\nboom\n" });
-    expect(await runRun({ run: "true" }, "step 's'", {}, ctxOf(fail))).toEqual({
-      ok: false,
-      reason: "step 's': exited 3 (boom)",
-    });
-  });
-
-  it("omits the parenthetical when stderr trims to nothing", async () => {
-    const fail: RunCommand = async () => ({ code: 3, stdout: "", stderr: " \n " });
-    expect(await runRun({ run: "true" }, "step 's'", {}, ctxOf(fail))).toEqual({
-      ok: false,
-      reason: "step 's': exited 3",
-    });
-  });
-
   afterEach(() => {
     vi.unstubAllEnvs();
   });

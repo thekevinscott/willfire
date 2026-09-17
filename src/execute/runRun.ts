@@ -1,12 +1,11 @@
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import type { Scope } from "../expr/val.js";
 import { err } from "./err.js";
-import { failureTail } from "../failureTail.js";
-import { parseGithubOutput } from "./parseGithubOutput.js";
 import { renderEnvLayer } from "./renderEnvLayer.js";
 import { renderTemplate } from "./renderTemplate.js";
+import { stepOutcome } from "./stepOutcome.js";
 import type { Res, StepModel, WalkCtx } from "./types.js";
 
 /** A `run:` step, executed under its declared shell with its declared env. */
@@ -71,13 +70,5 @@ export async function runRun(
       { path: outDir, writable: true },
     ],
   });
-  if (r.code !== 0) {
-    const tail = failureTail(r);
-    return err(`${label}: exited ${r.code}${tail === "" ? "" : ` (${tail})`}`);
-  }
-  const outputs = parseGithubOutput(await readFile(outFile, "utf8"));
-  if (outputs === null) {
-    return err(`${label}: malformed GITHUB_OUTPUT`);
-  }
-  return { ok: true, v: outputs };
+  return stepOutcome(r, outFile, label);
 }
