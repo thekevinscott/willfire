@@ -1,12 +1,10 @@
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Scope } from "../expr/val.js";
 import { bindActionInputs } from "./bindActionInputs.js";
 import { err } from "./err.js";
-import { parseGithubOutput } from "./parseGithubOutput.js";
-import { renderEnvLayer } from "./renderEnvLayer.js";
-import { tailLine } from "../tailLine.js";
+import { outputSink } from "./outputSink.js";
+import { stepEnv } from "./stepEnv.js";
+import { stepOutcome } from "./stepOutcome.js";
 import type { ActionModel, Res, StepModel, WalkCtx } from "./types.js";
 
 /**
@@ -38,24 +36,11 @@ export async function runNodeAction(
   if (typeof main !== "string") {
     return err(`${label}: action ${uses} has no runs.main`);
   }
-  const env: Record<string, string> = {
-    PATH: process.env.PATH ?? "",
-    HOME: process.env.HOME ?? "",
-    GITHUB_WORKSPACE: ctx.tree,
-  };
-  if (scope.github?.repository !== undefined) {
-    env.GITHUB_REPOSITORY = scope.github.repository;
+  const built = stepEnv(step, scope, ctx, label);
+  if (!built.ok) {
+    return built;
   }
-  if (scope.github?.event_name !== undefined) {
-    env.GITHUB_EVENT_NAME = scope.github.event_name;
-  }
-  for (const layer of [...ctx.envLayers, step.env]) {
-    const rendered = renderEnvLayer(layer, scope);
-    if (!rendered.ok) {
-      return err(`${label}: ${rendered.reason}`);
-    }
-    Object.assign(env, rendered.v);
-  }
+  const env = built.v;
   // Unlike a composite's, a node action's input reads are opaque, so every
   // binding must be concrete up front.
   for (const [name, val] of Object.entries(bindActionInputs(action, step.with, scope))) {
@@ -64,11 +49,8 @@ export async function runNodeAction(
     }
     env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] = String(val.v);
   }
-  const outDir = await mkdtemp(join(tmpdir(), "willfire-out-"));
-  const outFile = join(outDir, "output");
-  await writeFile(outFile, "");
-  // After the layers, so no `env:` block can redirect either one.
-  env.GITHUB_OUTPUT = outFile;
+  const { dir: outDir, file: outFile } = await outputSink(env);
+  // After the layers, so no `env:` block can point the runner at another file.
   env.WILLFIRE_ACTION_MAIN = join(actionDir, main);
   const r = await ctx.deps.runCommand({
     script: 'exec node "$WILLFIRE_ACTION_MAIN"',
@@ -81,15 +63,5 @@ export async function runNodeAction(
       { path: outDir, writable: true },
     ],
   });
-  if (r.code !== 0) {
-    // `core.setFailed`, how a JS action fails, routes its message to stdout.
-    const fromStderr = tailLine(r.stderr);
-    const tail = fromStderr === "" ? tailLine(r.stdout) : fromStderr;
-    return err(`${label}: exited ${r.code}${tail === "" ? "" : ` (${tail})`}`);
-  }
-  const outputs = parseGithubOutput(await readFile(outFile, "utf8"));
-  if (outputs === null) {
-    return err(`${label}: malformed GITHUB_OUTPUT`);
-  }
-  return { ok: true, v: outputs };
+  return stepOutcome(r, outFile, label);
 }

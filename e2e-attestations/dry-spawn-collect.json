@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*(willfire#34|putitoutthere))\"",
+  "ran_at": 1789680491,
+  "exit_code": 0,
+  "commit": "07a70879871793f8b001a9ea7fea5c7f58778055",
+  "branch": "dry/spawn-collect"
+}

@@ -1,10 +1,8 @@
-import { spawn } from "node:child_process";
-import { tailLine } from "../tailLine.js";
+import { failureTail } from "../failureTail.js";
+import { spawnCollect } from "../spawnCollect.js";
 import { parseCallbackMap, type CallbackMap } from "./parseCallbackMap.js";
 
 export type CallbacksOutcome = { ok: true; map: CallbackMap } | { ok: false; reason: string };
-
-type Exit = { code: number; stdout: string; stderr: string } | { failed: string };
 
 /**
  * Run every callback once and merge what they printed. Any failure is fatal to
@@ -22,38 +20,20 @@ export async function runCallbacks(commands: string[][]): Promise<CallbacksOutco
     delete env.GITHUB_TOKEN;
     return env;
   };
-  const runOne = (argv: string[]): Promise<Exit> =>
-    new Promise((resolve) => {
-      const child = spawn(argv[0], argv.slice(1), {
-        env: callbackEnv(),
-        stdio: ["ignore", "pipe", "pipe"],
-      });
-      let stdout = "";
-      let stderr = "";
-      child.stdout.on("data", (d: Buffer) => {
-        stdout += String(d);
-      });
-      child.stderr.on("data", (d: Buffer) => {
-        // Capped unconditionally: only the tail is ever quoted, and slice is
-        // a no-op below the cap.
-        stderr = (stderr + String(d)).slice(-4096);
-      });
-      child.on("error", (e: Error) => resolve({ failed: e.message }));
-      child.on("close", (code) => resolve({ code: code ?? 1, stdout, stderr }));
-    });
-
   const collected: { label: string; map: CallbackMap }[] = [];
   for (const argv of commands) {
     const label = argv.join(" ");
-    const r = await runOne(argv);
+    // stdout carries the whole map, so the tail cap that guards the other
+    // streams would silently truncate it into a parse failure.
+    const r = await spawnCollect(argv[0], argv.slice(1), {
+      env: callbackEnv(),
+      wholeStdout: true,
+    });
     if ("failed" in r) {
       return { ok: false, reason: `callback '${label}' failed to start: ${r.failed}` };
     }
     if (r.code !== 0) {
-      // pnpm prints fatal errors such as ERR_PNPM_NO_PKG_MANIFEST to stdout,
-      // so stderr alone can leave a failure quoting no cause at all.
-      const fromStderr = tailLine(r.stderr);
-      const tail = fromStderr === "" ? tailLine(r.stdout) : fromStderr;
+      const tail = failureTail(r);
       return {
         ok: false,
         reason: `callback '${label}' exited ${r.code}${tail === "" ? "" : ` (${tail})`}`,
