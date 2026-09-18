@@ -1,9 +1,8 @@
-import { mkdtemp, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Scope } from "../expr/val.js";
 import { bindActionInputs } from "./bindActionInputs.js";
 import { err } from "./err.js";
+import { outputSink } from "./outputSink.js";
 import { stepEnv } from "./stepEnv.js";
 import { stepOutcome } from "./stepOutcome.js";
 import type { ActionModel, Res, StepModel, WalkCtx } from "./types.js";
@@ -50,11 +49,8 @@ export async function runNodeAction(
     }
     env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] = String(val.v);
   }
-  const outDir = await mkdtemp(join(tmpdir(), "willfire-out-"));
-  const outFile = join(outDir, "output");
-  await writeFile(outFile, "");
-  // After the layers, so no `env:` block can redirect either one.
-  env.GITHUB_OUTPUT = outFile;
+  const { dir: outDir, file: outFile } = await outputSink(env);
+  // After the layers, so no `env:` block can point the runner at another file.
   env.WILLFIRE_ACTION_MAIN = join(actionDir, main);
   const r = await ctx.deps.runCommand({
     script: 'exec node "$WILLFIRE_ACTION_MAIN"',

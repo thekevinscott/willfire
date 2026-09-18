@@ -1,6 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { dirname } from "node:path";
+import { describe, expect, it, vi } from "vitest";
 import { runRun } from "./runRun.js";
 import type { RunCommand, RunSpec, WalkCtx } from "./types.js";
+
+// Only to read the sink's path back out of a spec; the real join is what
+// produced it, so the mock passes the real module through.
+vi.mock("node:path", async () => await vi.importActual<typeof import("node:path")>("node:path"));
 
 const ctxOf = (runCommand: RunCommand): WalkCtx => ({
   tree: "/nonexistent-tree",
@@ -51,7 +56,7 @@ describe("runRun", () => {
     expect(specs[0].env).not.toHaveProperty("GITHUB_ACTION_PATH");
     expect(specs[0].mounts).toEqual([
       { path: "/nonexistent-tree", writable: true },
-      { path: expect.stringContaining("willfire-out-"), writable: true },
+      { path: dirname(specs[0].env.GITHUB_OUTPUT), writable: true },
     ]);
   });
 
@@ -63,7 +68,7 @@ describe("runRun", () => {
     expect(specs[0].mounts).toEqual([
       { path: "/nonexistent-tree", writable: true },
       { path: "/root", writable: false },
-      { path: expect.stringContaining("willfire-out-"), writable: true },
+      { path: dirname(specs[0].env.GITHUB_OUTPUT), writable: true },
     ]);
   });
 
