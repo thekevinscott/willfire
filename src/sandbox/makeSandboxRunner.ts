@@ -14,10 +14,10 @@ import { sandboxArgv } from "./sandboxArgv.js";
 import { sandboxConfig, type SandboxConfig } from "./sandboxConfig.js";
 
 /**
- * Wall clock one step gets — orders of magnitude above a detect step, since a
- * false deadline costs exactness while a hung one only costs the run.
+ * Ten minutes of wall clock per step — orders of magnitude above a detect
+ * step, since a false deadline costs exactness while a hung one costs a run.
  */
-const DEADLINE_MS = 10 * 60 * 1000;
+const DEADLINE_MS = 600_000;
 
 /** `timeout(1)`'s exit code, so a deadline reads as one through the failure tail. */
 const TIMED_OUT = 124;
