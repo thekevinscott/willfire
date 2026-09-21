@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*(willfire#34|putitoutthere))\"",
+  "ran_at": 1790006486,
+  "exit_code": 0,
+  "commit": "87ebc6fe76eedac128c47b951f2b07058cc0f5fd",
+  "branch": "sandbox/resource-limits"
+}

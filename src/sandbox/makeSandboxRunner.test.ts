@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { RunSpec } from "../execute/types.js";
 import { imageTag } from "./imageTag.js";
 import { makeSandboxRunner } from "./makeSandboxRunner.js";
@@ -36,6 +36,8 @@ interface Behavior {
   close?: number | null;
   /** Fire the spawn-failure path (no binary) instead of running. */
   error?: true;
+  /** Never exit on its own; `h.release` holds the death this child is waiting for. */
+  hang?: true;
 }
 
 /** What the fake hands a listener: a spawn error, a stderr chunk, or an exit code. */
@@ -43,7 +45,8 @@ type HandlerArg = Error | string | number | null;
 
 const h = vi.hoisted(() => ({
   calls: [] as { bin: string; argv: string[]; stdin: string }[],
-  script: [] as { stderr?: string[]; close?: number | null; error?: true }[],
+  script: [] as { stderr?: string[]; close?: number | null; error?: true; hang?: true }[],
+  release: [] as (() => void)[],
 }));
 
 vi.mock("node:child_process", async () => {
@@ -74,6 +77,11 @@ vi.mock("node:child_process", async () => {
       for (const chunk of behavior.stderr ?? []) {
         handlers.get("stderr:data")?.(chunk);
       }
+      if (behavior.hang === true) {
+        // 137 is what an attached client really reports once `docker kill` lands.
+        h.release.push(() => handlers.get("close")?.(137));
+        return;
+      }
       handlers.get("close")?.(behavior.close === undefined ? 0 : behavior.close);
     });
     return child as unknown as ReturnType<typeof actual.spawn>;
@@ -91,10 +99,20 @@ const spec = (over: Partial<RunSpec> = {}): RunSpec => ({
 
 const kinds = (): string[] => h.calls.map((c) => c.argv[0]);
 
+/** The container name a recorded `docker run` was given. */
+const nameOf = (argv: string[]): string => argv[argv.indexOf("--name") + 1];
+
+const DEADLINE_MS = 10 * 60 * 1000;
+
 beforeEach(() => {
   h.calls.length = 0;
   h.script.length = 0;
+  h.release.length = 0;
   vi.mocked(spawn).mockClear();
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe("makeSandboxRunner", () => {
@@ -115,7 +133,11 @@ describe("makeSandboxRunner", () => {
     expect(h.calls[1].stdin).toBe("FROM x\n");
     expect(h.calls[0].stdin).toBe("");
     expect(h.calls[2].argv).toEqual(
-      sandboxArgv(spec({ env: { FOO: "bar" } }), sandboxConfig({ dockerfile: "FROM x\n" })),
+      sandboxArgv(
+        spec({ env: { FOO: "bar" } }),
+        sandboxConfig({ dockerfile: "FROM x\n" }),
+        nameOf(h.calls[2].argv),
+      ),
     );
   });
 
@@ -125,6 +147,9 @@ describe("makeSandboxRunner", () => {
     await run(spec());
     await run(spec());
     expect(kinds()).toEqual(["image", "build", "run", "run"]);
+    // A shared name would have one step's deadline kill another's container.
+    expect(nameOf(h.calls[2].argv)).not.toBe(nameOf(h.calls[3].argv));
+    expect(nameOf(h.calls[2].argv)).toMatch(/^willfire-/);
   });
 
   it("skips the build when the image already exists", async () => {
@@ -167,6 +192,30 @@ describe("makeSandboxRunner", () => {
     h.script = [{ close: 0 }, { close: null }];
     const run = makeSandboxRunner({ dockerBin: "dkr", dockerfile: "FROM x\n" });
     expect((await run(spec())).code).toBe(1);
+  });
+
+  it("kills a container that outruns the deadline and reports 124 with the reason", async () => {
+    vi.useFakeTimers();
+    h.script = [{ close: 0 }, { hang: true }, {}];
+    const run = makeSandboxRunner({ dockerBin: "dkr", dockerfile: "FROM x\n" });
+    const r = run(spec());
+    await vi.advanceTimersByTimeAsync(0);
+    expect(kinds()).toEqual(["image", "run"]);
+    await vi.advanceTimersByTimeAsync(DEADLINE_MS);
+    expect(h.calls[2].argv).toEqual(["kill", nameOf(h.calls[1].argv)]);
+    h.release.shift()?.();
+    expect(await r).toEqual({ code: 124, stdout: "", stderr: "killed after 600s" });
+  });
+
+  it("leaves a container that finishes inside the deadline alone", async () => {
+    vi.useFakeTimers();
+    h.script = [{ close: 0 }, { close: 3 }];
+    const run = makeSandboxRunner({ dockerBin: "dkr", dockerfile: "FROM x\n" });
+    const r = run(spec());
+    await vi.advanceTimersByTimeAsync(0);
+    expect((await r).code).toBe(3);
+    await vi.advanceTimersByTimeAsync(DEADLINE_MS);
+    expect(kinds()).toEqual(["image", "run"]);
   });
 
   it("caps captured stderr at its tail", async () => {

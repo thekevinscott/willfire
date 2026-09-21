@@ -6,11 +6,21 @@
  * default instead of configured.
  */
 
+import { randomUUID } from "node:crypto";
 import type { RunCommand } from "../execute/types.js";
 import { imageTag } from "./imageTag.js";
 import { runDocker } from "./runDocker.js";
 import { sandboxArgv } from "./sandboxArgv.js";
 import { sandboxConfig, type SandboxConfig } from "./sandboxConfig.js";
+
+/**
+ * Ten minutes of wall clock per step — orders of magnitude above a detect
+ * step, since a false deadline costs exactness while a hung one costs a run.
+ */
+const DEADLINE_MS = 600_000;
+
+/** `timeout(1)`'s exit code, so a deadline reads as one through the failure tail. */
+const TIMED_OUT = 124;
 
 /**
  * Provisions the image lazily, once, and remembers a failure: every later
@@ -42,6 +52,21 @@ export function makeSandboxRunner(opts: Partial<SandboxConfig> = {}): RunCommand
     if (failure !== null) {
       return { code: 125, stdout: "", stderr: failure };
     }
-    return runDocker(cfg.dockerBin, sandboxArgv(spec, cfg));
+    const name = `willfire-${randomUUID()}`;
+    let expired = false;
+    // The daemon owns the container, not the client, so killing the `docker
+    // run` process would orphan it: the deadline kills by name instead.
+    const deadline = setTimeout(() => {
+      expired = true;
+      void runDocker(cfg.dockerBin, ["kill", name]);
+    }, DEADLINE_MS);
+    try {
+      const r = await runDocker(cfg.dockerBin, sandboxArgv(spec, cfg, name));
+      return expired
+        ? { code: TIMED_OUT, stdout: "", stderr: `killed after ${DEADLINE_MS / 1000}s` }
+        : r;
+    } finally {
+      clearTimeout(deadline);
+    }
   };
 }

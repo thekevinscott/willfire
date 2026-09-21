@@ -34,10 +34,13 @@ describe("sandboxArgv", () => {
         ],
       }),
       cfg,
+      "box",
     );
     expect(argv).toEqual([
       "run",
       "--rm",
+      "--name",
+      "box",
       "--network",
       "none",
       "--cap-drop",
@@ -45,8 +48,14 @@ describe("sandboxArgv", () => {
       "--security-opt",
       "no-new-privileges",
       "--read-only",
+      "--memory",
+      "2g",
+      "--pids-limit",
+      "512",
+      "--cpus",
+      "2",
       "--tmpfs",
-      "/tmp",
+      "/tmp:size=1g",
       "--user",
       "7:9",
       "-v",
@@ -73,7 +82,7 @@ describe("sandboxArgv", () => {
   });
 
   it("mirrors runShell's sh invocation and mounts nothing unasked", () => {
-    const argv = sandboxArgv(spec({ shell: "sh" }), cfg);
+    const argv = sandboxArgv(spec({ shell: "sh" }), cfg, "box");
     expect(argv).not.toContain("-v");
     expect(argv.slice(-4)).toEqual(["sh", "-e", "-c", "true"]);
   });

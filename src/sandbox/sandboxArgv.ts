@@ -5,12 +5,14 @@ import type { SandboxConfig } from "./sandboxConfig.js";
 /**
  * The complete `docker run` argv for one step. `PATH` and `HOME` in
  * `spec.env` are host facts; the container gets its image's PATH and a
- * writable `HOME=/tmp` instead.
+ * writable `HOME=/tmp` instead. `name` is what a deadline kills by.
  */
-export function sandboxArgv(spec: RunSpec, cfg: SandboxConfig): string[] {
+export function sandboxArgv(spec: RunSpec, cfg: SandboxConfig, name: string): string[] {
   const argv = [
     "run",
     "--rm",
+    "--name",
+    name,
     "--network",
     "none",
     "--cap-drop",
@@ -18,8 +20,18 @@ export function sandboxArgv(spec: RunSpec, cfg: SandboxConfig): string[] {
     "--security-opt",
     "no-new-privileges",
     "--read-only",
+    // Ceilings far above any detect-shaped step: too tight turns a legitimate
+    // job into a false `unknown`, which costs exactness.
+    "--memory",
+    "2g",
+    "--pids-limit",
+    "512",
+    "--cpus",
+    "2",
+    // A tmpfs write is host memory, and `/tmp` is the container's HOME. Docker
+    // keeps its nosuid/nodev/noexec defaults when an option is added.
     "--tmpfs",
-    "/tmp",
+    "/tmp:size=1g",
     "--user",
     `${cfg.uid}:${cfg.gid}`,
   ];
