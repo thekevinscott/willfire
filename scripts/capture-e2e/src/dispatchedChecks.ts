@@ -7,7 +7,7 @@ import type { DispatchedCheck } from "../../../tests/fixtures/pinned/capture.js"
  * an unfinished dispatch is not ground truth yet.
  */
 export async function dispatchedChecks(
-  github: GithubClient,
+  github: Pick<GithubClient, "listWorkflowRuns" | "listRunJobs">,
   owner: string,
   repo: string,
   headSha: string,

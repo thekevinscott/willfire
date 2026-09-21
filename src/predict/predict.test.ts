@@ -63,7 +63,7 @@ interface Fixture {
    * missing key throws, which is what the tarball endpoint does for anything
    * it will not serve.
    */
-  tarballs?: Record<string, Uint8Array>;
+  tarballs?: Record<string, Uint8Array<ArrayBuffer>>;
   /** The PR's `merge_commit_sha` — its test merge. Absent means null. */
   mergeSha?: string | null;
   /** Parent shas by commit sha, via `getCommit`. Unlisted: no parents. */
@@ -97,10 +97,17 @@ const MERGE_SOURCE = { owner: "o", repo: "r", ref: MERGE_SHA, sha: MERGE_SHA };
  */
 const REMOTE_SHA = "b".repeat(40);
 
+/** A route this suite never exercises. Reaching one is the failure, not a stub. */
+const unserved = (route: string) => (): never => {
+  throw new Error(`predict reached ${route}`);
+};
+
 function fakeGithub(f: Fixture): GithubClient {
   const contents = f.contents ?? {};
-  const api = {
-    getPull: async ({ pull_number }: { pull_number: number }) => {
+  return {
+    listWorkflowRuns: unserved("listWorkflowRuns"),
+    listRunJobs: unserved("listRunJobs"),
+    getPull: async ({ pull_number }) => {
       if (pull_number !== 1) {
         throw new Error(`404 pull ${pull_number}`);
       }
@@ -111,21 +118,21 @@ function fakeGithub(f: Fixture): GithubClient {
         merge_commit_sha: f.mergeSha ?? null,
       };
     },
-    listPulls: async ({ head }: { head: string }) =>
+    listPulls: async ({ head }) =>
       (f.openPrs ?? [])
         .filter((p) => `o:${p.headRef}` === head)
         .map((p) => ({ base: { ref: p.baseRef }, merge_commit_sha: p.mergeSha })),
-    listPullFiles: async ({ pull_number }: { pull_number: number }) => {
+    listPullFiles: async ({ pull_number }) => {
       if (pull_number !== 1) {
         throw new Error(`404 pull ${pull_number}`);
       }
       return (f.files ?? ["src/app.ts"]).map((filename) => ({ filename }));
     },
-    getCommit: async ({ owner, repo, ref }: { owner: string; repo: string; ref: string }) => {
+    getCommit: async ({ owner, repo, ref }) => {
       // Two callers share this route: the head-commit read that looks for a
       // skip instruction, and ref resolution. Only the first has a message.
       if (ref === HEAD_SHA) {
-        return { sha: ref, commit: { message: f.message ?? "chore: routine" } };
+        return { sha: ref, commit: { message: f.message ?? "chore: routine" }, parents: [] };
       }
       const at = `${owner}/${repo}@${ref}`;
       const status = (f.refErrors ?? {})[at];
@@ -139,14 +146,14 @@ function fakeGithub(f: Fixture): GithubClient {
       const parents = ((f.parents ?? {})[sha] ?? []).map((p) => ({ sha: p }));
       return { sha, commit: { message: "" }, parents };
     },
-    getContent: async ({ path, ref }: { path: string; ref: string }) => {
+    getContent: async ({ path, ref }) => {
       const at = f.mergeContents !== undefined && ref === f.mergeSha ? f.mergeContents : contents;
       if (!(path in at)) {
         throw apiError(404, path);
       }
       return at[path];
     },
-    downloadTarball: async ({ owner, repo, ref }: Record<string, string>) => {
+    downloadTarball: async ({ owner, repo, ref }) => {
       const bytes = (f.tarballs ?? {})[`${owner}/${repo}@${ref}`];
       if (bytes === undefined) {
         throw new Error(`404 tarball ${owner}/${repo}@${ref}`);
@@ -155,7 +162,6 @@ function fakeGithub(f: Fixture): GithubClient {
     },
     listWorkflows: async () => f.workflows ?? [{ path: WF, state: "active" }],
   };
-  return api as unknown as GithubClient;
 }
 
 /** Predict against a repo whose only workflow is `body` at `.github/workflows/w.yml`. */
@@ -1016,7 +1022,7 @@ describe("the executor seam through predict", () => {
 
 describe("a workflow file that cannot be read", () => {
   /** A client whose every content read fails with `err`. */
-  const rejecting = (err: unknown): GithubClient => {
+  const rejecting = (err: Error): GithubClient => {
     const github = fakeGithub({});
     vi.spyOn(github, "getContent").mockRejectedValue(err);
     return github;

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import type { GithubClient } from "./makeGithubClient.js";
 import { stackTargetRef } from "./stackTargetRef.js";
 import type { StackNode } from "../types.js";
 
@@ -12,21 +11,20 @@ interface Fake {
   openPrs?: { headRef: string; baseRef: string; mergeSha: string | null }[];
 }
 
-const fakeGithub = (f: Fake) =>
-  ({
-    getCommit: async ({ owner, repo, ref }: Record<string, string>) => {
-      const sha = (f.refs ?? {})[`${owner}/${repo}@${ref}`];
-      if (sha === undefined) {
-        throw new Error(`404 ${owner}/${repo}@${ref}`);
-      }
-      const parents = ((f.parents ?? {})[sha] ?? []).map((p) => ({ sha: p }));
-      return { sha, parents };
-    },
-    listPulls: async ({ head }: { head: string }) =>
-      (f.openPrs ?? [])
-        .filter((p) => `o:${p.headRef}` === head)
-        .map((p) => ({ base: { ref: p.baseRef }, merge_commit_sha: p.mergeSha })),
-  }) as unknown as GithubClient;
+const fakeGithub = (f: Fake): Parameters<typeof stackTargetRef>[0] => ({
+  getCommit: async ({ owner, repo, ref }) => {
+    const sha = (f.refs ?? {})[`${owner}/${repo}@${ref}`];
+    if (sha === undefined) {
+      throw new Error(`404 ${owner}/${repo}@${ref}`);
+    }
+    const parents = ((f.parents ?? {})[sha] ?? []).map((p) => ({ sha: p }));
+    return { sha, commit: { message: "" }, parents };
+  },
+  listPulls: async ({ head }) =>
+    (f.openPrs ?? [])
+      .filter((p) => `o:${p.headRef}` === head)
+      .map((p) => ({ base: { ref: p.baseRef }, merge_commit_sha: p.mergeSha })),
+});
 
 const walk = (pr: StackNode, f: Fake) => stackTargetRef(fakeGithub(f), "o", "r", pr);
 

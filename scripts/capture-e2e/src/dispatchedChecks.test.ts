@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import type { GithubClient } from "willfire";
 import { dispatchedChecks } from "./dispatchedChecks.js";
 
@@ -9,21 +9,26 @@ interface RunFixture {
   jobs: { name: string; conclusion: string | null }[];
 }
 
-/** Every request the caller made, in order, so a case can assert the shape. */
-const asked: [string, Record<string, unknown>][] = [];
+type Routes = Pick<GithubClient, "listWorkflowRuns" | "listRunJobs">;
 
-function githubOf(runs: RunFixture[]): GithubClient {
-  const api = {
-    listWorkflowRuns: vi.fn(async (params: Record<string, unknown>) => {
+/** Every request the caller made, in order, so a case can assert the shape. */
+type Ask =
+  | ["listWorkflowRuns", Parameters<Routes["listWorkflowRuns"]>[0]]
+  | ["listRunJobs", Parameters<Routes["listRunJobs"]>[0]];
+
+const asked: Ask[] = [];
+
+function githubOf(runs: RunFixture[]): Routes {
+  return {
+    listWorkflowRuns: async (params) => {
       asked.push(["listWorkflowRuns", params]);
       return runs.map(({ id, path, status }) => ({ id, path, status: status ?? "completed" }));
-    }),
-    listRunJobs: vi.fn(async (params: Record<string, unknown>) => {
+    },
+    listRunJobs: async (params) => {
       asked.push(["listRunJobs", params]);
       return runs.find((r) => r.id === params.run_id)?.jobs ?? [];
-    }),
+    },
   };
-  return api as unknown as GithubClient;
 }
 
 describe("dispatchedChecks", () => {
