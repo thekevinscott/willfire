@@ -18,6 +18,11 @@ type _NoDispatchLivesOnTheWorkflow = Assert<
   Eq<Extract<WorkflowEntry["status"], "no-dispatch">, "no-dispatch">
 >;
 
+// The sentinel is refused at the parameter, which is the only way a branded
+// `"*"` could be minted. A plain name still goes through.
+type _StarHasNoArgument = Assert<Eq<Parameters<typeof jobName<"*">>[0], never>>;
+type _AnyOtherNameDoesNot = Assert<Eq<Parameters<typeof jobName<"build">>[0], "build">>;
+
 describe("jobName", () => {
   it("brands a job name without changing the string", () => {
     expect(jobName("build")).toBe("build");
