@@ -12,7 +12,7 @@ export async function stepOutcome(
 ): Promise<Res<Record<string, string>>> {
   if (r.code !== 0) {
     const tail = failureTail(r);
-    return err(`${label}: exited ${r.code}${tail === "" ? "" : ` (${tail})`}`);
+    return err(`${label}: exited ${r.code}${tail === "" ? "" : `\n${tail}`}`);
   }
   const outputs = parseGithubOutput(await readFile(outFile, "utf8"));
   if (outputs === null) {

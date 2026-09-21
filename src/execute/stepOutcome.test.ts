@@ -42,11 +42,11 @@ describe("stepOutcome", () => {
     const r = { code: 2, stdout: "", stderr: "boom\n" };
     expect(await stepOutcome(r, outFile, "step")).toEqual({
       ok: false,
-      reason: "step: exited 2 (boom)",
+      reason: "step: exited 2\nboom",
     });
   });
 
-  it("omits the parenthetical when neither stream said anything", async () => {
+  it("omits the quote when neither stream said anything", async () => {
     const r = { code: 2, stdout: "", stderr: "" };
     expect(await stepOutcome(r, outFile, "step")).toEqual({
       ok: false,

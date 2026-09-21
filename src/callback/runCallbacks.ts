@@ -36,7 +36,7 @@ export async function runCallbacks(commands: string[][]): Promise<CallbacksOutco
       const tail = failureTail(r);
       return {
         ok: false,
-        reason: `callback '${label}' exited ${r.code}${tail === "" ? "" : ` (${tail})`}`,
+        reason: `callback '${label}' exited ${r.code}${tail === "" ? "" : `\n${tail}`}`,
       };
     }
     const parsed = parseCallbackMap(r.stdout);

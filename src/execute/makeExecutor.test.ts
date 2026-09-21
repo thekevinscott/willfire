@@ -294,9 +294,9 @@ describe("executing run steps", () => {
     expect(failure(o)).toBe("cannot decide if: for step 's'");
   });
 
-  it("stops when a step exits non-zero, keeping the last stderr line", async () => {
+  it("stops when a step exits non-zero, quoting stderr", async () => {
     const o = await execute({ steps: [{ run: "echo boom >&2; exit 3" }] });
-    expect(failure(o)).toBe("step '#1': exited 3 (boom)");
+    expect(failure(o)).toBe("step '#1': exited 3\nboom");
   });
 
   it("layers workflow, job and step env, rendering each", async () => {
@@ -1250,7 +1250,7 @@ describe("node actions", () => {
     });
     const ex = executorOf({ [`o/r@${SHA}`]: tree });
     const o1 = await ex.executeJob("detect", { steps: [{ uses: "./a1" }] }, {}, {});
-    expect(failure(o1)).toBe("step '#1': exited 2 (kaboom)");
+    expect(failure(o1)).toBe("step '#1': exited 2\nkaboom");
     const o2 = await ex.executeJob("detect", { steps: [{ uses: "./a2" }] }, {}, {});
     expect(failure(o2)).toBe("step '#1': exited 3");
   });
