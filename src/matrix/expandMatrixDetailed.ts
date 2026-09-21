@@ -4,7 +4,10 @@ import type { YamlMap, YamlValue } from "../yamlValue.js";
 import { axisValues } from "./axisValues.js";
 import { comboList } from "./comboList.js";
 
-export function expandMatrixDetailed(strategy: unknown, scope: Scope = {}): DetailedCombos {
+export function expandMatrixDetailed(
+  strategy: YamlValue | undefined,
+  scope: Scope = {},
+): DetailedCombos {
   const matrix =
     strategy !== null && typeof strategy === "object"
       ? (strategy as YamlMap)["matrix"]

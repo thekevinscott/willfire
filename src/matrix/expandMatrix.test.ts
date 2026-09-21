@@ -1,10 +1,11 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 import type { Scope } from "../expr/val.js";
 import { expandMatrix } from "./expandMatrix.js";
+import type { YamlValue } from "../yamlValue.js";
 
 describe("expandMatrix", () => {
-  it("takes an undecided strategy, not `any`", () => {
-    expectTypeOf(expandMatrix).parameter(0).not.toBeAny();
+  it("takes a value read out of a workflow, not `unknown`", () => {
+    expectTypeOf(expandMatrix).parameter(0).toEqualTypeOf<YamlValue | undefined>();
   });
 
   it("returns a single null combination when there is no strategy", () => {

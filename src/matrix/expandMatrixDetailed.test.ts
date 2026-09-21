@@ -1,6 +1,7 @@
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
 import type { Scope } from "../expr/val.js";
 import { expandMatrixDetailed } from "./expandMatrixDetailed.js";
+import type { YamlValue } from "../yamlValue.js";
 
 // The isolation gate wants collaborators mocked; axis and include/exclude
 // resolution are part of the expansion this suite pins, so the mocks pass the
@@ -15,8 +16,8 @@ vi.mock(
 );
 
 describe("expandMatrixDetailed", () => {
-  it("takes an undecided strategy, not `any`", () => {
-    expectTypeOf(expandMatrixDetailed).parameter(0).not.toBeAny();
+  it("takes a value read out of a workflow, not `unknown`", () => {
+    expectTypeOf(expandMatrixDetailed).parameter(0).toEqualTypeOf<YamlValue | undefined>();
   });
 
   it("returns a single null combination when there is no matrix", () => {

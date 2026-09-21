@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
 import { comboList } from "./comboList.js";
 import type { Scope } from "../expr/val.js";
+import type { YamlValue } from "../yamlValue.js";
 
 // The isolation gate wants collaborators mocked; what an include list resolves
 // to is what this suite pins, so the mock passes the real module through.
@@ -11,6 +12,10 @@ vi.mock(
 );
 
 describe("comboList", () => {
+  it("takes a value read out of a workflow, not `unknown`", () => {
+    expectTypeOf(comboList).parameter(0).toEqualTypeOf<YamlValue | undefined>();
+  });
+
   it("treats an absent block as empty", () => {
     expect(comboList(null, {})).toEqual([]);
     expect(comboList(undefined, {})).toEqual([]);

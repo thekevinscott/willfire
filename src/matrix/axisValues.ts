@@ -12,7 +12,7 @@ import { interpolateValue } from "./interpolateValue.js";
  * carries that job's outputs. Anything else stays null, which is what makes
  * the whole job `unknown` rather than a guess at how many checks it creates.
  */
-export function axisValues(v: unknown, scope: Scope): YamlValue[] | null {
+export function axisValues(v: YamlValue | undefined, scope: Scope): YamlValue[] | null {
   if (Array.isArray(v)) {
     const interpolated = interpolateValue(v, scope);
     return interpolated === null ? null : (interpolated.v as YamlValue[]);
