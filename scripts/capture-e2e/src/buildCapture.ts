@@ -1,4 +1,4 @@
-import type { E2ECapture, DispatchedCheck } from "../../../tests/fixtures/pinned/capture.js";
+import type { E2ECapture, DispatchedCheck } from "willfire/internal";
 
 /**
  * Assembles one capture. `dispatched` is sorted here, so re-recording an

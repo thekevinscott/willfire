@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { expect, test } from "vitest";
 import { isJobEntry, makeGithubClient, predict, type Prediction } from "../../src/index.js";
-import type { E2ECapture } from "../fixtures/pinned/capture.js";
+import type { E2ECapture } from "../../src/internal.js";
 
 const exec = promisify(execFile);
 const root = fileURLToPath(new URL("../..", import.meta.url));

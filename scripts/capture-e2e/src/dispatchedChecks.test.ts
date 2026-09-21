@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
 import type { GithubClient } from "willfire";
+import type { DispatchedCheck } from "willfire/internal";
 import { dispatchedChecks } from "./dispatchedChecks.js";
 
 interface RunFixture {
   id: number;
   path: string;
   status?: string;
-  jobs: { name: string; conclusion: string | null }[];
+  // A job is a check minus the workflow the run names, so the fixture derives
+  // from the capture type rather than restating it.
+  jobs: Omit<DispatchedCheck, "workflow">[];
 }
 
 type Routes = Pick<GithubClient, "listWorkflowRuns" | "listRunJobs">;

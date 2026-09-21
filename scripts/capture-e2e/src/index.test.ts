@@ -3,7 +3,7 @@
 // module and reads back what it wrote, printed, and exited with.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { DispatchedCheck } from "../../../tests/fixtures/pinned/capture.js";
+import type { DispatchedCheck } from "willfire/internal";
 
 const hoisted = vi.hoisted(() => ({
   writeFile: vi.fn(),

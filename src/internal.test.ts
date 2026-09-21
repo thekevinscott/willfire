@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import * as barrel from "./internal.js";
-import type { GithubPullSummary } from "./internal.js";
+import type { E2ECapture, GithubPullSummary } from "./internal.js";
 
 describe("internal barrel", () => {
   it("exposes exactly the unpublished seams", () => {
@@ -16,5 +16,15 @@ describe("internal barrel", () => {
     // Type-only, erased at runtime — compiling this assignment is the assertion.
     const summary: GithubPullSummary = { base: { ref: "main" }, merge_commit_sha: null };
     expect(summary.base.ref).toBe("main");
+  });
+
+  it("re-exports the pinned-capture types", () => {
+    const capture: E2ECapture = {
+      repo: "o/r",
+      pr: 1,
+      commits: { head: "abc", merge: null },
+      dispatched: [{ workflow: "ci.yml", name: "build", conclusion: "success" }],
+    };
+    expect(capture.dispatched[0]?.name).toBe("build");
   });
 });
