@@ -3,14 +3,26 @@ import { imageTag } from "./imageTag.js";
 import type { SandboxConfig } from "./sandboxConfig.js";
 
 /**
+ * Consumption ceilings, deliberately far above any detect-shaped step: too
+ * tight turns a legitimate job into a false `unknown`, which costs exactness.
+ */
+const MEMORY = "2g";
+const PIDS = "512";
+const CPUS = "2";
+/** A tmpfs write is host memory, so `/tmp` — the container's `HOME` — needs its own. */
+const TMPFS_SIZE = "1g";
+
+/**
  * The complete `docker run` argv for one step. `PATH` and `HOME` in
  * `spec.env` are host facts; the container gets its image's PATH and a
- * writable `HOME=/tmp` instead.
+ * writable `HOME=/tmp` instead. `name` is what a deadline kills by.
  */
-export function sandboxArgv(spec: RunSpec, cfg: SandboxConfig): string[] {
+export function sandboxArgv(spec: RunSpec, cfg: SandboxConfig, name: string): string[] {
   const argv = [
     "run",
     "--rm",
+    "--name",
+    name,
     "--network",
     "none",
     "--cap-drop",
@@ -18,8 +30,15 @@ export function sandboxArgv(spec: RunSpec, cfg: SandboxConfig): string[] {
     "--security-opt",
     "no-new-privileges",
     "--read-only",
+    "--memory",
+    MEMORY,
+    "--pids-limit",
+    PIDS,
+    "--cpus",
+    CPUS,
+    // Docker keeps its nosuid/nodev/noexec defaults when an option is added.
     "--tmpfs",
-    "/tmp",
+    `/tmp:size=${TMPFS_SIZE}`,
     "--user",
     `${cfg.uid}:${cfg.gid}`,
   ];
