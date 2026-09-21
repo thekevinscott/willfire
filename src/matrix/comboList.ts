@@ -1,13 +1,13 @@
 import { evaluateValue } from "../expr/evaluateValue.js";
 import type { Scope } from "../expr/val.js";
-import type { YamlMap } from "../yamlValue.js";
+import type { YamlMap, YamlValue } from "../yamlValue.js";
 import { interpolateValue } from "./interpolateValue.js";
 
 /**
  * An `include:`/`exclude:` block: a literal list or an expression evaluating
  * to one. Absent means empty; anything unresolvable fails the expansion.
  */
-export function comboList(v: unknown, scope: Scope): YamlMap[] | null {
+export function comboList(v: YamlValue | undefined, scope: Scope): YamlMap[] | null {
   if (v === null || v === undefined) {
     return [];
   }

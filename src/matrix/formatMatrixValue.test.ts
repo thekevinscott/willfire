@@ -1,7 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { formatMatrixValue } from "./formatMatrixValue.js";
+import type { YamlValue } from "../yamlValue.js";
 
 describe("formatMatrixValue", () => {
+  it("takes a value read out of a workflow, not `unknown`", () => {
+    expectTypeOf(formatMatrixValue).parameter(0).toEqualTypeOf<YamlValue | undefined>();
+  });
+
   it("renders null and undefined as nothing", () => {
     expect(formatMatrixValue(null)).toBe("");
     expect(formatMatrixValue(undefined)).toBe("");

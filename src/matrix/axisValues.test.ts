@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
 import { axisValues } from "./axisValues.js";
 import type { Scope } from "../expr/val.js";
+import type { YamlValue } from "../yamlValue.js";
 
 // The isolation gate wants collaborators mocked; what an axis resolves to is
 // what this suite pins, so the mock passes the real module through.
@@ -11,6 +12,10 @@ vi.mock(
 );
 
 describe("axisValues", () => {
+  it("takes a value read out of a workflow, not `unknown`", () => {
+    expectTypeOf(axisValues).parameter(0).toEqualTypeOf<YamlValue | undefined>();
+  });
+
   it("returns a literal list as itself", () => {
     expect(axisValues(["a", "b"], {})).toEqual(["a", "b"]);
   });
