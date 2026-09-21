@@ -1,7 +1,7 @@
+import { cachedByKey } from "./cachedByKey.js";
 import { materialize } from "./materialize.js";
-import { removeAll } from "./removeAll.js";
 import type { WorkflowSource } from "../types.js";
-import type { ProvidedTree, RunCommand, TreeSource } from "./types.js";
+import type { RunCommand, TreeSource } from "./types.js";
 
 /**
  * Materialize repo trees from tarballs, one download per commit. GitHub wraps
@@ -11,21 +11,15 @@ export function makeTreeProvider(
   download: (source: WorkflowSource) => Promise<Uint8Array | null>,
   runCommand: RunCommand,
 ): TreeSource {
-  const cache = new Map<string, Promise<ProvidedTree | null>>();
+  const cached = cachedByKey((source) => materialize(source, download, runCommand));
   return {
     provide: async (source, opts) => {
       // A tarball has no history to give.
       if (opts?.history === true) {
         return null;
       }
-      const key = `${source.owner}/${source.repo}@${source.sha}`;
-      let p = cache.get(key);
-      if (p === undefined) {
-        p = materialize(source, download, runCommand);
-        cache.set(key, p);
-      }
-      return (await p)?.tree ?? null;
+      return await cached.provide(source);
     },
-    remove: () => removeAll(cache.values()),
+    remove: cached.remove,
   };
 }
