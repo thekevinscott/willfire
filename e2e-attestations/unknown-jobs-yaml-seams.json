@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*(willfire#34|putitoutthere))\"",
+  "ran_at": 1790006696,
+  "exit_code": 0,
+  "commit": "a2f49b7b44f959bfc41ddefdb6c3caeef1b06f83",
+  "branch": "unknown/jobs-yaml-seams"
+}

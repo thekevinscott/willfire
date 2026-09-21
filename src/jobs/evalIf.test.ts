@@ -1,10 +1,11 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 import type { Scope } from "../expr/val.js";
 import { evalIf } from "./evalIf.js";
+import type { YamlValue } from "../yamlValue.js";
 
 describe("evalIf", () => {
-  it("takes an undecided condition, not `any`", () => {
-    expectTypeOf(evalIf).parameter(0).not.toBeAny();
+  it("takes a value read out of a workflow, not `unknown`", () => {
+    expectTypeOf(evalIf).parameter(0).toEqualTypeOf<YamlValue | undefined>();
   });
 
   it.each([
