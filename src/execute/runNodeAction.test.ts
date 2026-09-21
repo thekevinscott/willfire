@@ -2,7 +2,7 @@ import { stat } from "node:fs/promises";
 import { dirname } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { runNodeAction } from "./runNodeAction.js";
-import type { ActionModel, RunCommand, RunSpec, WalkCtx } from "./types.js";
+import type { RunCommand, RunSpec, WalkCtx } from "./types.js";
 
 // Only to read the sink's path back out of a spec, and to see whether it
 // survived; the real modules are what produced it, so the mocks pass through.
@@ -82,7 +82,7 @@ describe("runNodeAction", () => {
   });
 
   it("refuses a null action — YAML parses an empty manifest to null", async () => {
-    const action = null as unknown as ActionModel;
+    const action = null;
     expect(
       await runNodeAction({}, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(ok)),
     ).toEqual({

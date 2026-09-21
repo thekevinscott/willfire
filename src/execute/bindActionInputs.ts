@@ -9,7 +9,7 @@ import type { ActionModel } from "./types.js";
  * stays unknown; it only fails if a step reads it.
  */
 export function bindActionInputs(
-  action: ActionModel,
+  action: ActionModel | null,
   withBlock: YamlValue | undefined,
   scope: Scope,
 ): Record<string, Val> {

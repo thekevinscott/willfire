@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { bindActionInputs } from "./bindActionInputs.js";
-import type { ActionModel } from "./types.js";
 
 describe("bindActionInputs", () => {
   it("binds declared defaults, the caller's with: winning", () => {
@@ -26,7 +25,7 @@ describe("bindActionInputs", () => {
   });
 
   it("binds a null action's with: entries — YAML parses an empty manifest to null", () => {
-    expect(bindActionInputs(null as unknown as ActionModel, { a: "x" }, {})).toEqual({
+    expect(bindActionInputs(null, { a: "x" }, {})).toEqual({
       a: { kind: "value", v: "x" },
     });
   });

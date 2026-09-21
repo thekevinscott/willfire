@@ -1,11 +1,15 @@
 import { describe, expectTypeOf, it } from "vitest";
-import type { SourceRef } from "../types.js";
+import type { SourceRef, Workflow } from "../types.js";
 import type { ActionTarget, JobExecutor } from "./types.js";
 
 describe("the JobExecutor contract", () => {
   it("takes job and workflow documents, not `any`", () => {
     expectTypeOf<JobExecutor["executeJob"]>().parameter(1).not.toBeAny();
     expectTypeOf<JobExecutor["executeJob"]>().parameter(2).not.toBeAny();
+  });
+
+  it("admits the null workflow document an empty file parses to", () => {
+    expectTypeOf<JobExecutor["executeJob"]>().parameter(2).toEqualTypeOf<Workflow | null>();
   });
 });
 
