@@ -27,6 +27,9 @@ export async function materialize(
       WILLFIRE_ARCHIVE: archive,
       WILLFIRE_DEST: dest,
     },
+    // The bytes are attacker-chosen on a fork PR, so `tar` reads them inside
+    // the sandbox. The scratch holds both the archive and the destination.
+    mounts: [{ path: dir, writable: true }],
   });
   if (r.code !== 0) {
     await remove();

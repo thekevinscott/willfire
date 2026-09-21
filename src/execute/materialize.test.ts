@@ -2,6 +2,7 @@ import { stat } from "node:fs/promises";
 import { describe, expect, it, vi } from "vitest";
 import { materialize } from "./materialize.js";
 import type { WorkflowSource } from "../types.js";
+import type { RunSpec } from "./types.js";
 
 // The isolation gate wants collaborators mocked; whether the scratch survives
 // is what this suite pins, so the mocks pass the real modules through.
@@ -22,6 +23,18 @@ describe("materialize", () => {
     expect(
       await materialize(SOURCE, async () => null, async () => ({ code: 0, stdout: "", stderr: "" })),
     ).toBe(null);
+  });
+
+  it("gives the extraction one writable mount holding both the archive and the destination", async () => {
+    const specs: RunSpec[] = [];
+    await materialize(SOURCE, async () => new Uint8Array([1, 2, 3]), async (s) => {
+      specs.push(s);
+      return { code: 1, stdout: "", stderr: "" };
+    });
+    const [seen] = specs;
+    expect(seen.mounts).toEqual([{ path: seen.cwd, writable: true }]);
+    expect(seen.env.WILLFIRE_ARCHIVE).toBe(`${seen.cwd}/tree.tar.gz`);
+    expect(seen.env.WILLFIRE_DEST).toBe(`${seen.cwd}/tree`);
   });
 
   it("hands a failed extraction through as null, leaving no scratch behind", async () => {

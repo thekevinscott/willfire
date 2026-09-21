@@ -22,6 +22,17 @@ vi.mock("../jobs/expandJobs.js", async () => {
   return { ...actual, expandJobs: vi.fn(actual.expandJobs) };
 });
 
+// The default executor now extracts tarballs in the sandbox as well as running
+// steps there, and a unit suite must not build an image or start a container.
+// The host shell stands in; that the real one is sandboxed is pinned in
+// `makeLiveExecutor.test.ts`.
+vi.mock("../sandbox/makeSandboxRunner.js", async () => {
+  const { runShell } = await vi.importActual<typeof import("../execute/runShell.js")>(
+    "../execute/runShell.js",
+  );
+  return { makeSandboxRunner: () => runShell };
+});
+
 // A spy over the real resolution, so callback tests can answer a map or fail
 // without spawning anything. The real thing resolves `[]` to no map at all.
 vi.mock("../callback/resolveCallbackMap.js", async () => {
