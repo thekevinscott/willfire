@@ -1,16 +1,15 @@
-import { mkdtemp } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { scratch } from "./scratch.js";
 import type { WorkflowSource } from "../types.js";
-import type { RunCommand } from "./types.js";
+import type { ProvidedTree, RunCommand } from "./types.js";
 
 export async function cloneAt(
   source: WorkflowSource,
   remote: string,
   token: string | null,
   runCommand: RunCommand,
-): Promise<string | null> {
-  const dir = await mkdtemp(join(tmpdir(), "willfire-clone-"));
+): Promise<ProvidedTree | null> {
+  const { dir, remove } = await scratch("willfire-clone-");
   const dest = join(dir, "tree");
   const env: Record<string, string> = {
     PATH: process.env.PATH ?? "",
@@ -44,5 +43,9 @@ export async function cloneAt(
     cwd: dir,
     env,
   });
-  return r.code === 0 ? dest : null;
+  if (r.code !== 0) {
+    await remove();
+    return null;
+  }
+  return { tree: dest, remove };
 }

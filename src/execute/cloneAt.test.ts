@@ -1,27 +1,43 @@
-import { describe, expect, it } from "vitest";
+import { stat } from "node:fs/promises";
+import { describe, expect, it, vi } from "vitest";
 import { cloneAt } from "./cloneAt.js";
 import type { RunSpec } from "./types.js";
 import type { WorkflowSource } from "../types.js";
+
+// The isolation gate wants collaborators mocked; whether the scratch survives
+// is what this suite pins, so the mocks pass the real modules through.
+vi.mock(
+  "node:fs/promises",
+  async () => await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises"),
+);
+vi.mock(
+  "./scratch.js",
+  async () => await vi.importActual<typeof import("./scratch.js")>("./scratch.js"),
+);
 
 const SHA = "c".repeat(40);
 const SOURCE: WorkflowSource = { owner: "o", repo: "r", ref: SHA, sha: SHA };
 
 describe("cloneAt", () => {
-  it("hands a failed clone through as null", async () => {
-    expect(
-      await cloneAt(SOURCE, "https://example.invalid/o/r.git", null, async () => ({
-        code: 1,
-        stdout: "", stderr: "",
-      })),
-    ).toBe(null);
+  it("hands a failed clone through as null, leaving no scratch behind", async () => {
+    let scratchDir = "";
+    const r = await cloneAt(SOURCE, "https://example.invalid/o/r.git", null, async (spec) => {
+      scratchDir = spec.cwd;
+      return { code: 1, stdout: "", stderr: "" };
+    });
+    expect(r).toBe(null);
+    await expect(stat(scratchDir)).rejects.toThrow();
   });
 
-  it("yields the tree path on success", async () => {
-    const dest = await cloneAt(SOURCE, "https://example.invalid/o/r.git", null, async () => ({
+  it("yields the tree path on success, and removes the scratch on request", async () => {
+    const r = await cloneAt(SOURCE, "https://example.invalid/o/r.git", null, async () => ({
       code: 0,
-      stdout: "", stderr: "",
+      stdout: "",
+      stderr: "",
     }));
-    expect(dest).toMatch(/\/tree$/);
+    expect(r?.tree).toMatch(/\/tree$/);
+    await r?.remove();
+    await expect(stat(r!.tree)).rejects.toThrow();
   });
 
   it("omits the auth header machinery when there is no token", async () => {

@@ -1291,7 +1291,7 @@ describe("the whole path, tarball to job outputs", () => {
     // the *caller's* workspace, outputs coalescing past the skipped step.
     const download = async (src: WorkflowSource) =>
       tarball(src.repo === "r" ? WORKSPACE_TB : CALLEE_TB);
-    const provide = makeTreeProvider(download, runShell);
+    const { provide } = makeTreeProvider(download, runShell);
     const ex = makeExecutor({
       workspace: WORKSPACE,
       deps: {

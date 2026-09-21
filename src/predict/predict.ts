@@ -230,10 +230,16 @@ export async function predict(
   };
 
   const entries: DraftEntry[] = [];
-  for (const w of workflows) {
-    if (w.path.startsWith(".github/workflows/")) {
-      entries.push(...(await workflowEntries(w.path, w.state)));
+  // Expansion is the only thing that materializes a tree, so this is the whole
+  // window in which scratch exists — and it must go even when a fetch throws.
+  try {
+    for (const w of workflows) {
+      if (w.path.startsWith(".github/workflows/")) {
+        entries.push(...(await workflowEntries(w.path, w.state)));
+      }
     }
+  } finally {
+    await executor?.cleanup?.();
   }
   return finalizePrediction(entries, null, sources);
 }

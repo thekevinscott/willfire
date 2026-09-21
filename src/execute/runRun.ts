@@ -41,17 +41,21 @@ export async function runRun(
     }
     cwd = resolve(ctx.tree, wd);
   }
-  const { dir: outDir, file: outFile } = await outputSink(env);
-  const r = await ctx.deps.runCommand({
-    script,
-    shell,
-    cwd,
-    env,
-    mounts: [
-      { path: ctx.tree, writable: true },
-      ...(ctx.actionRoot !== undefined ? [{ path: ctx.actionRoot, writable: false }] : []),
-      { path: outDir, writable: true },
-    ],
-  });
-  return stepOutcome(r, outFile, label);
+  const sink = await outputSink(env);
+  try {
+    const r = await ctx.deps.runCommand({
+      script,
+      shell,
+      cwd,
+      env,
+      mounts: [
+        { path: ctx.tree, writable: true },
+        ...(ctx.actionRoot !== undefined ? [{ path: ctx.actionRoot, writable: false }] : []),
+        { path: sink.dir, writable: true },
+      ],
+    });
+    return await stepOutcome(r, sink.file, label);
+  } finally {
+    await sink.remove();
+  }
 }

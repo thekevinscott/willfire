@@ -44,6 +44,17 @@ async function fileIs(path: string, want: string): Promise<boolean> {
   return r.code === 0;
 }
 
+/** True when `path` is a directory — read through `runShell`. */
+async function isDir(path: string): Promise<boolean> {
+  const r = await runShell({
+    script: '[ -d "$D" ]',
+    shell: "bash",
+    cwd: TMP,
+    env: { ...SH_ENV, D: path },
+  });
+  return r.code === 0;
+}
+
 afterEach(() => {
   vi.unstubAllEnvs();
 });
@@ -106,7 +117,7 @@ describe("makeCloneProvider", () => {
 
   it("clones once per commit and detaches at a sha a branch reaches", async () => {
     const { repo, main } = await gitFixture();
-    const provide = makeCloneProvider(runShell, null, { remoteUrl: () => `file://${repo}` });
+    const { provide } = makeCloneProvider(runShell, null, { remoteUrl: () => `file://${repo}` });
     const tree = await provide(sourceAt(main), { history: true });
     expect(tree).not.toBe(null);
     expect(await fileIs(`${tree}/f.txt`, "a")).toBe(true);
@@ -115,7 +126,7 @@ describe("makeCloneProvider", () => {
 
   it("falls back to fetching a sha parked under refs/pull", async () => {
     const { repo, parked } = await gitFixture();
-    const provide = makeCloneProvider(runShell, null, { remoteUrl: () => `file://${repo}` });
+    const { provide } = makeCloneProvider(runShell, null, { remoteUrl: () => `file://${repo}` });
     const tree = await provide(sourceAt(parked));
     expect(tree).not.toBe(null);
     expect(await fileIs(`${tree}/f.txt`, "b")).toBe(true);
@@ -123,13 +134,13 @@ describe("makeCloneProvider", () => {
 
   it("yields null for a sha the remote does not have", async () => {
     const { repo } = await gitFixture();
-    const provide = makeCloneProvider(runShell, null, { remoteUrl: () => `file://${repo}` });
+    const { provide } = makeCloneProvider(runShell, null, { remoteUrl: () => `file://${repo}` });
     expect(await provide(sourceAt("e".repeat(40)))).toBe(null);
   });
 
   it("passes auth as an ephemeral header env var, never in the remote URL", async () => {
     const specs: RunSpec[] = [];
-    const provide = makeCloneProvider(async (spec) => {
+    const { provide } = makeCloneProvider(async (spec) => {
       specs.push(spec);
       return { code: 1, stdout: "", stderr: "" };
     }, "tok-123");
@@ -148,10 +159,27 @@ describe("makeCloneProvider", () => {
     expect(spec.env.HOME).not.toBe(process.env.HOME);
   });
 
+  it("keeps a cached clone on disk until remove, then takes it with it", async () => {
+    const { repo, main } = await gitFixture();
+    const src = makeCloneProvider(runShell, null, { remoteUrl: () => `file://${repo}` });
+    const tree = await src.provide(sourceAt(main), { history: true });
+    expect(await src.provide(sourceAt(main))).toBe(tree);
+    expect(await fileIs(`${tree}/f.txt`, "a")).toBe(true);
+    await src.remove();
+    expect(await isDir(tree!)).toBe(false);
+  });
+
+  it("has nothing to remove when no clone succeeded", async () => {
+    const { repo } = await gitFixture();
+    const src = makeCloneProvider(runShell, null, { remoteUrl: () => `file://${repo}` });
+    expect(await src.provide(sourceAt("e".repeat(40)))).toBe(null);
+    await expect(src.remove()).resolves.toBeUndefined();
+  });
+
   it("hands the clone an empty PATH when the parent has none", async () => {
     vi.stubEnv("PATH", undefined);
     const seen: string[] = [];
-    const provide = makeCloneProvider(async (spec) => {
+    const { provide } = makeCloneProvider(async (spec) => {
       seen.push(spec.env.PATH);
       return { code: 1, stdout: "", stderr: "" };
     }, null);

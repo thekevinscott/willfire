@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import { basename, dirname } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { outputSink } from "./outputSink.js";
@@ -11,6 +11,10 @@ vi.mock(
 );
 vi.mock("node:os", async () => await vi.importActual<typeof import("node:os")>("node:os"));
 vi.mock("node:path", async () => await vi.importActual<typeof import("node:path")>("node:path"));
+vi.mock(
+  "./scratch.js",
+  async () => await vi.importActual<typeof import("./scratch.js")>("./scratch.js"),
+);
 
 describe("outputSink", () => {
   it("creates the file empty, inside a directory of its own", async () => {
@@ -37,5 +41,12 @@ describe("outputSink", () => {
     const a = await outputSink({});
     const b = await outputSink({});
     expect(a.dir).not.toBe(b.dir);
+  });
+
+  it("removes the directory, file included, on request", async () => {
+    const { dir, file, remove } = await outputSink({});
+    await remove();
+    await expect(stat(dir)).rejects.toThrow();
+    await expect(stat(file)).rejects.toThrow();
   });
 });

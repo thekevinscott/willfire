@@ -1010,6 +1010,41 @@ describe("the executor seam through predict", () => {
     expect(executed).toEqual(["detect"]);
     expect(checkNames).toEqual(["Coverage (py)", "Coverage (ts)", "detect"]);
   });
+
+  it("cleans the executor up once, after the last workflow", async () => {
+    const order: string[] = [];
+    await predict(fakeGithub({ contents: { [WF]: DYNAMIC } }), "o/r", 1, {
+      executor: {
+        executeJob: async (jobId) => {
+          order.push(jobId);
+          return { ok: true, outputs: { langs: "[]" } };
+        },
+        cleanup: async () => {
+          order.push("cleanup");
+        },
+      },
+    });
+    expect(order).toEqual(["detect", "cleanup"]);
+  });
+
+  it("cleans the executor up even when expansion throws", async () => {
+    let cleaned = 0;
+    const github = fakeGithub({ contents: { [WF]: DYNAMIC } });
+    github.getContent = async () => {
+      throw new Error("503 from contents");
+    };
+    await expect(
+      predict(github, "o/r", 1, {
+        executor: {
+          executeJob: async () => ({ ok: true, outputs: { langs: "[]" } }),
+          cleanup: async () => {
+            cleaned++;
+          },
+        },
+      }),
+    ).rejects.toThrow("503 from contents");
+    expect(cleaned).toBe(1);
+  });
 });
 
 // ------------------------------------------------------- unreadable workflows

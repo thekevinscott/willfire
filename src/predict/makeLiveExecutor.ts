@@ -55,8 +55,8 @@ export function makeLiveExecutor(
     opts.remoteUrl === undefined ? {} : { remoteUrl: opts.remoteUrl },
   );
   const provideTree: ProvideTree = (src, o) =>
-    o?.history === true ? clones(src, o) : tarballs(src, o);
-  return makeExecutor({
+    o?.history === true ? clones.provide(src, o) : tarballs.provide(src, o);
+  const executor = makeExecutor({
     workspace,
     deps: {
       provideTree,
@@ -65,4 +65,11 @@ export function makeLiveExecutor(
       nodeMajor: SANDBOX_NODE_MAJOR,
     },
   });
+  return {
+    ...executor,
+    cleanup: async () => {
+      await tarballs.remove();
+      await clones.remove();
+    },
+  };
 }
