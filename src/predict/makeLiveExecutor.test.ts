@@ -10,6 +10,7 @@ import type { WorkflowSource } from "../types.js";
 
 const hoisted = vi.hoisted(() => ({
   makeCloneProvider: vi.fn(),
+  cloneProvide: vi.fn(),
   makeExecutor: vi.fn(),
   makeSandboxRunner: vi.fn(),
 }));
@@ -22,12 +23,19 @@ vi.mock(
     await vi.importActual<typeof import("../execute/runShell.js")>("../execute/runShell.js"),
 );
 
-// The real module, with a spy on `makeCloneProvider` to observe the token.
+// The real module, with spies on `makeCloneProvider` to observe the token and
+// on the provider it returns to observe what gets routed to it.
 vi.mock("../execute/makeCloneProvider.js", async () => {
   const actual = await vi.importActual<typeof import("../execute/makeCloneProvider.js")>(
     "../execute/makeCloneProvider.js",
   );
-  hoisted.makeCloneProvider.mockImplementation(actual.makeCloneProvider);
+  hoisted.makeCloneProvider.mockImplementation(
+    (...args: Parameters<typeof actual.makeCloneProvider>) => {
+      const source = actual.makeCloneProvider(...args);
+      hoisted.cloneProvide.mockImplementation(source.provide);
+      return { ...source, provide: hoisted.cloneProvide };
+    },
+  );
   return { makeCloneProvider: hoisted.makeCloneProvider };
 });
 
@@ -94,6 +102,33 @@ describe("makeLiveExecutor", () => {
     expect(o).toEqual({ ok: true, outputs: { f: "content" } });
   });
 
+  it("removes the materialized tree, but only once every job has had it", async () => {
+    const ex = makeLiveExecutor(githubOf({ [`o/r@${SHA}`]: WRAPPED_TB }), WORKSPACE, resolveRef, {
+      runCommand: runShell,
+      token: null,
+    });
+    // `$PWD` is the materialized tree, so a job reports back where it ran.
+    const job = {
+      steps: [{ id: "s", run: 'echo "d=$PWD" >> "$GITHUB_OUTPUT"' }],
+      outputs: { d: "${{ steps.s.outputs.d }}" },
+    };
+    const first = await ex.executeJob("detect", job, {}, {});
+    const second = await ex.executeJob("detect", job, {}, {});
+    expect(second).toEqual(first);
+    expect(first).toMatchObject({ ok: true });
+    const tree = first.ok ? first.outputs.d : "";
+    await ex.cleanup!();
+    const gone = await runShell({
+      script: '[ ! -d "$D" ]',
+      shell: "bash",
+      cwd: "/",
+      env: { PATH: process.env.PATH ?? "", D: tree },
+    });
+    expect(gone.code).toBe(0);
+    // The clone provider materialized nothing; cleanup still reaches it.
+    await expect(ex.cleanup!()).resolves.toBeUndefined();
+  });
+
   it("fails the job when the tarball is not served", async () => {
     const ex = makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef, {
       runCommand: runShell,
@@ -105,6 +140,7 @@ describe("makeLiveExecutor", () => {
 
   it("routes a history request to the clone provider, not the tarball", async () => {
     // The tarball exists but the clone remote does not: failing proves routing.
+    hoisted.cloneProvide.mockClear();
     const ex = makeLiveExecutor(githubOf({ [`o/r@${SHA}`]: WRAPPED_TB }), WORKSPACE, resolveRef, {
       runCommand: runShell,
       token: null,
@@ -117,6 +153,19 @@ describe("makeLiveExecutor", () => {
       {},
     );
     expect(o).toEqual({ ok: false, reason: `cannot materialize workspace o/r@${SHA}` });
+    expect(hoisted.cloneProvide).toHaveBeenCalledWith(WORKSPACE, { history: true });
+  });
+
+  it("routes a request that wants no history to the tarball provider", async () => {
+    hoisted.cloneProvide.mockClear();
+    const ex = makeLiveExecutor(githubOf({ [`o/r@${SHA}`]: WRAPPED_TB }), WORKSPACE, resolveRef, {
+      runCommand: runShell,
+      token: null,
+    });
+    expect(await ex.executeJob("detect", { steps: [{ run: "true" }] }, {}, {})).toMatchObject({
+      ok: true,
+    });
+    expect(hoisted.cloneProvide).not.toHaveBeenCalled();
   });
 
   it("defaults the run command to the docker sandbox", () => {

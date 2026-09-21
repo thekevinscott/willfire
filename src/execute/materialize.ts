@@ -1,19 +1,19 @@
-import { mkdir, mkdtemp, readdir, stat, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { mkdir, readdir, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { scratch } from "./scratch.js";
 import type { WorkflowSource } from "../types.js";
-import type { RunCommand } from "./types.js";
+import type { ProvidedTree, RunCommand } from "./types.js";
 
 export async function materialize(
   source: WorkflowSource,
   download: (source: WorkflowSource) => Promise<Uint8Array | null>,
   runCommand: RunCommand,
-): Promise<string | null> {
+): Promise<ProvidedTree | null> {
   const bytes = await download(source);
   if (bytes === null) {
     return null;
   }
-  const dir = await mkdtemp(join(tmpdir(), "willfire-tree-"));
+  const { dir, remove } = await scratch("willfire-tree-");
   const archive = join(dir, "tree.tar.gz");
   await writeFile(archive, bytes);
   const dest = join(dir, "tree");
@@ -29,14 +29,15 @@ export async function materialize(
     },
   });
   if (r.code !== 0) {
+    await remove();
     return null;
   }
   const entries = await readdir(dest);
   if (entries.length === 1) {
     const sub = join(dest, entries[0]);
     if ((await stat(sub)).isDirectory()) {
-      return sub;
+      return { tree: sub, remove };
     }
   }
-  return dest;
+  return { tree: dest, remove };
 }

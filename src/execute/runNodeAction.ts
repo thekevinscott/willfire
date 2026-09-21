@@ -49,19 +49,23 @@ export async function runNodeAction(
     }
     env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] = String(val.v);
   }
-  const { dir: outDir, file: outFile } = await outputSink(env);
+  const sink = await outputSink(env);
   // After the layers, so no `env:` block can point the runner at another file.
   env.WILLFIRE_ACTION_MAIN = join(actionDir, main);
-  const r = await ctx.deps.runCommand({
-    script: 'exec node "$WILLFIRE_ACTION_MAIN"',
-    shell: "bash",
-    cwd: ctx.tree,
-    env,
-    mounts: [
-      { path: ctx.tree, writable: true },
-      ...(actionRoot !== undefined ? [{ path: actionRoot, writable: false }] : []),
-      { path: outDir, writable: true },
-    ],
-  });
-  return stepOutcome(r, outFile, label);
+  try {
+    const r = await ctx.deps.runCommand({
+      script: 'exec node "$WILLFIRE_ACTION_MAIN"',
+      shell: "bash",
+      cwd: ctx.tree,
+      env,
+      mounts: [
+        { path: ctx.tree, writable: true },
+        ...(actionRoot !== undefined ? [{ path: actionRoot, writable: false }] : []),
+        { path: sink.dir, writable: true },
+      ],
+    });
+    return await stepOutcome(r, sink.file, label);
+  } finally {
+    await sink.remove();
+  }
 }

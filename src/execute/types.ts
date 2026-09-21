@@ -37,6 +37,22 @@ export type ProvideTree = (
   opts?: { history?: boolean },
 ) => Promise<string | null>;
 
+/** A materialized tree, and the removal of the scratch directory holding it. */
+export interface ProvidedTree {
+  tree: string;
+  remove: () => Promise<void>;
+}
+
+/**
+ * A `ProvideTree` and the removal of every tree it materialized. Cached trees
+ * are shared across jobs, so removal is the provider's to do once the whole
+ * prediction is over — never a single use's.
+ */
+export interface TreeSource {
+  provide: ProvideTree;
+  remove: () => Promise<void>;
+}
+
 export interface ExecDeps {
   provideTree: ProvideTree;
   runCommand: RunCommand;
@@ -55,6 +71,12 @@ export type ExecOutcome =
  */
 export interface JobExecutor {
   executeJob(jobId: string, job: Workflow, wf: Workflow, scope: Scope): Promise<ExecOutcome>;
+  /**
+   * Remove the scratch this executor materialized. Whoever built the executor
+   * calls it once, after the last job; an executor that owns no scratch of its
+   * own omits it.
+   */
+  cleanup?: () => Promise<void>;
 }
 
 /** The step walk's internal result: a value, or the reason there is none. */

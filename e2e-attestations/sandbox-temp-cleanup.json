@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*(willfire#34|putitoutthere))\"",
+  "ran_at": 1790006354,
+  "exit_code": 0,
+  "commit": "dfe6b9e14663434b99e6d474a5c2177371fae837",
+  "branch": "sandbox/temp-cleanup"
+}

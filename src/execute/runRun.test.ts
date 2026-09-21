@@ -1,11 +1,16 @@
+import { stat } from "node:fs/promises";
 import { dirname } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { runRun } from "./runRun.js";
 import type { RunCommand, RunSpec, WalkCtx } from "./types.js";
 
-// Only to read the sink's path back out of a spec; the real join is what
-// produced it, so the mock passes the real module through.
+// Only to read the sink's path back out of a spec, and to see whether it
+// survived; the real modules are what produced it, so the mocks pass through.
 vi.mock("node:path", async () => await vi.importActual<typeof import("node:path")>("node:path"));
+vi.mock(
+  "node:fs/promises",
+  async () => await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises"),
+);
 
 const ctxOf = (runCommand: RunCommand): WalkCtx => ({
   tree: "/nonexistent-tree",
@@ -76,5 +81,21 @@ describe("runRun", () => {
     expect(
       await runRun({ run: "true", env: { K: "${{ env.nope }}" } }, "step 's'", {}, ctxOf(ok)),
     ).toEqual({ ok: false, reason: "step 's': cannot resolve env 'K'" });
+  });
+
+  it("removes the output sink once the outputs are read back", async () => {
+    const { specs, cmd } = capture();
+    await runRun({ run: "true" }, "step 's'", {}, ctxOf(cmd));
+    await expect(stat(dirname(specs[0].env.GITHUB_OUTPUT))).rejects.toThrow();
+  });
+
+  it("removes the output sink even when the command throws", async () => {
+    const specs: RunSpec[] = [];
+    const cmd: RunCommand = async (spec) => {
+      specs.push(spec);
+      throw new Error("docker died");
+    };
+    await expect(runRun({ run: "true" }, "step 's'", {}, ctxOf(cmd))).rejects.toThrow("docker died");
+    await expect(stat(dirname(specs[0].env.GITHUB_OUTPUT))).rejects.toThrow();
   });
 });
