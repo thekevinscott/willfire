@@ -64,6 +64,11 @@ prediction that is wrong in the over-predicting direction hangs a gate; one that
 is wrong in the under-predicting direction opens a silent hole. Treat a change to
 verdict logic as a change to every gated repo.
 
+A PR body claiming the consumer is unaffected cites the command that
+established it — a `gh api` read of its call sites, or a grep. Reasoning from
+how the API is constructed is not a check; #174 reasoned that way and missed a
+live call site.
+
 ## Conventions
 
 - Never pin in workflow YAML — not by SHA, not by tag. Moving tags (`@v0`,
