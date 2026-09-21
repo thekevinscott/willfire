@@ -79,11 +79,11 @@ describe("runCallbacks", () => {
     });
   });
 
-  it("is fatal on a non-zero exit, quoting the last stderr line", async () => {
+  it("is fatal on a non-zero exit, quoting stderr", async () => {
     script({ code: 2, stdout: "", stderr: "warning: setup\nfatal: no lockfile\n" });
     expect(await runCallbacks([["npx", "resolver"]])).toEqual({
       ok: false,
-      reason: "callback 'npx resolver' exited 2 (fatal: no lockfile)",
+      reason: "callback 'npx resolver' exited 2\nwarning: setup\nfatal: no lockfile",
     });
   });
 

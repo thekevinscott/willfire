@@ -184,8 +184,17 @@ entries that needed the outputs stay `unknown`, with the reason threaded
 through:
 
 ```
-dynamic matrix; executing 'detect' failed: step 'scan': exited 1 (...)
+dynamic matrix; executing 'detect' failed: step 'scan': exited 1
+[ERR_PNPM_NO_PKG_MANIFEST] No package.json found in /work
+[ERROR] Command failed with exit code 1: 'pnpm' install
+... 8 lines elided ...
+at runDepsStatusCheck (file:///.../pnpm.mjs:249560:7)
 ```
+
+The quote is a block — the head and tail of the failing command's stderr, or
+its stdout when stderr said nothing — capped at 4096 characters. Which line
+carries the cause is not decidable from an arbitrary tool's output, so willfire
+quotes both ends rather than guessing one.
 
 ## Answering with a callback
 
