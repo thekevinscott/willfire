@@ -12,6 +12,7 @@ const hoisted = vi.hoisted(() => ({
   cloneProvide: vi.fn(),
   makeExecutor: vi.fn(),
   makeSandboxRunner: vi.fn(),
+  makeTreeProvider: vi.fn(),
 }));
 
 // Real subprocesses are what the end-to-end cases below pin, so this mock
@@ -45,6 +46,15 @@ vi.mock("../execute/makeExecutor.js", async () => {
   );
   hoisted.makeExecutor.mockImplementation(actual.makeExecutor);
   return { makeExecutor: hoisted.makeExecutor };
+});
+
+// Likewise, a spy on `makeTreeProvider` to observe the runner extraction gets.
+vi.mock("../execute/makeTreeProvider.js", async () => {
+  const actual = await vi.importActual<typeof import("../execute/makeTreeProvider.js")>(
+    "../execute/makeTreeProvider.js",
+  );
+  hoisted.makeTreeProvider.mockImplementation(actual.makeTreeProvider);
+  return { makeTreeProvider: hoisted.makeTreeProvider };
 });
 
 // Likewise, a spy on `makeSandboxRunner` to observe the default run command.
@@ -167,10 +177,25 @@ describe("makeLiveExecutor", () => {
 
   it("defaults the run command to the docker sandbox", () => {
     hoisted.makeSandboxRunner.mockClear();
+    hoisted.makeTreeProvider.mockClear();
     makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef, { token: null });
     expect(hoisted.makeSandboxRunner).toHaveBeenCalledTimes(1);
+    // A fork PR chooses the tarball bytes, so extraction must not reach the
+    // host shell either (#135).
+    expect(hoisted.makeTreeProvider).not.toHaveBeenCalledWith(expect.anything(), runShell);
     makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef, { token: null, runCommand: runShell });
     expect(hoisted.makeSandboxRunner).toHaveBeenCalledTimes(1);
+  });
+
+  it("builds one runner and hands it to both extraction and the step walk", () => {
+    hoisted.makeTreeProvider.mockClear();
+    hoisted.makeExecutor.mockClear();
+    const runCommand: RunCommand = async () => ({ code: 0, stdout: "", stderr: "" });
+    makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef, { token: null, runCommand });
+    expect(hoisted.makeTreeProvider).toHaveBeenCalledWith(expect.any(Function), runCommand);
+    expect(hoisted.makeExecutor).toHaveBeenCalledWith(
+      expect.objectContaining({ deps: expect.objectContaining({ runCommand }) }),
+    );
   });
 
   it("hands makeExecutor the caller's workspace", () => {

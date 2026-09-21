@@ -9,7 +9,7 @@ import { SANDBOX_NODE_MAJOR } from "../sandbox/sandboxConfig.js";
 import type { ResolveRef, WorkflowSource } from "../types.js";
 
 export interface LiveExecutorOpts {
-  /** How steps run; the hermetic docker sandbox by default. */
+  /** How steps and tarball extraction run; the hermetic docker sandbox by default. */
   runCommand?: RunCommand;
   /**
    * Auth for history clones. `undefined` reads `GH_TOKEN` / `GITHUB_TOKEN`
@@ -21,9 +21,9 @@ export interface LiveExecutorOpts {
 }
 
 /**
- * The executor `predict` uses by default. Repo-authored steps run in the
- * docker sandbox; infrastructure subprocesses (`tar`, `git`) run on the host,
- * since the clone needs the network the sandbox denies.
+ * The executor `predict` uses by default. Repo-authored steps and the `tar`
+ * that unpacks a downloaded repo both run in the docker sandbox; `git clone`
+ * still runs on the host, since it needs the network the sandbox denies.
  */
 export function makeLiveExecutor(
   github: Pick<GithubClient, "downloadTarball">,
@@ -48,7 +48,10 @@ export function makeLiveExecutor(
     opts.token !== undefined
       ? opts.token
       : (process.env.GH_TOKEN ?? process.env.GITHUB_TOKEN ?? null);
-  const tarballs = makeTreeProvider(download, runShell);
+  // One runner, so the image is provisioned once and extraction gets the same
+  // isolation as the steps.
+  const runCommand = opts.runCommand ?? makeSandboxRunner();
+  const tarballs = makeTreeProvider(download, runCommand);
   const clones = makeCloneProvider(
     runShell,
     token,
@@ -60,7 +63,7 @@ export function makeLiveExecutor(
     workspace,
     deps: {
       provideTree,
-      runCommand: opts.runCommand ?? makeSandboxRunner(),
+      runCommand,
       resolveRef,
       nodeMajor: SANDBOX_NODE_MAJOR,
     },
