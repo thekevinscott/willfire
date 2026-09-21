@@ -116,12 +116,15 @@ describe("makeCloneProvider", () => {
   const sourceAt = (sha: string): WorkflowSource => ({ owner: "o", repo: "r", ref: sha, sha });
 
   it("clones once per commit and detaches at a sha a branch reaches", async () => {
-    const { repo, main } = await gitFixture();
+    const { repo, main, parked } = await gitFixture();
     const { provide } = makeCloneProvider(runShell, null, { remoteUrl: () => `file://${repo}` });
     const tree = await provide(sourceAt(main), { history: true });
     expect(tree).not.toBe(null);
     expect(await fileIs(`${tree}/f.txt`, "a")).toBe(true);
     expect(await provide(sourceAt(main))).toBe(tree);
+    const other = await provide(sourceAt(parked));
+    expect(other).not.toBe(tree);
+    expect(await fileIs(`${other}/f.txt`, "b")).toBe(true);
   });
 
   it("falls back to fetching a sha parked under refs/pull", async () => {
