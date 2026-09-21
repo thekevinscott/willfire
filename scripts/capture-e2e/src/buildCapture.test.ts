@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { E2ECapture } from "../../../tests/fixtures/pinned/capture.js";
+import type { E2ECapture } from "willfire/internal";
 import { buildCapture } from "./buildCapture.js";
 
 const check = (workflow: string, name: string) => ({ workflow, name, conclusion: "success" });
