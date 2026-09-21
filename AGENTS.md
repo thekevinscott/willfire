@@ -78,6 +78,39 @@ verdict logic as a change to every gated repo.
   - a rebase could plausibly turn a check green,
   - commits are unsigned and need re-signing.
 
+## Session handoff doc
+
+Maintain one ongoing handoff doc per working session and deliver it to the user
+as a downloadable markdown file at every **stopping point**: after each major
+unit of work lands (a push, an observed red or green CI run, a merged PR, a
+finished investigation) or when blocked on user input. A stopping point marks a
+checkpoint, not the end — send the doc, then keep working.
+
+The doc is conversation-scoped: keep it in the session scratchpad or `/tmp`
+(e.g. `<scratchpad>/handoff.md`), outside the repo tree, and keep it out of
+every commit. Update the same doc in place and re-send it at each checkpoint
+(in hosted sessions, attach it via the file-delivery tool; locally, print its
+path), so the freshest copy sits near the bottom of the conversation.
+
+Write it standalone, so a brand-new session with zero context resumes from it
+alone:
+
+- Task and current status (done / in progress / next)
+- Branches, PRs, and issues with numbers and CI state
+- Key decisions and discovered constraints, with one-line reasons
+- Exact next steps, including commands to run
+- Anything waiting on the user
+- Every claim labelled **measured** (you ran it and read the output) or
+  **agent-reported** (a subagent told you)
+- Corrections to the previous handoff, first in the doc — handoffs here have
+  propagated wrong "verified" claims before
+
+Purpose: the prompt cache survives at most an hour of inactivity, so resuming a
+long conversation after hours away reprocesses the entire history at full cost.
+A current handoff doc near the end of the transcript lets the user scroll up,
+grab it, and start a cheap fresh session from the doc instead of resuming the
+stale one.
+
 ## Out of scope
 
 - Don't add unsolicited refactors or hypothetical-future abstractions.
