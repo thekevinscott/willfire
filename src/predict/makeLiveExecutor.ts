@@ -26,7 +26,7 @@ export interface LiveExecutorOpts {
  * since the clone needs the network the sandbox denies.
  */
 export function makeLiveExecutor(
-  github: GithubClient,
+  github: Pick<GithubClient, "downloadTarball">,
   workspace: WorkflowSource,
   resolveRef: ResolveRef,
   opts: LiveExecutorOpts = {},

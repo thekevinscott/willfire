@@ -58,8 +58,8 @@ describe("the dispatch recorder", () => {
   const argv = process.argv;
   let out: string[];
   let err: string[];
-  let client: unknown;
   let pullsGet: ReturnType<typeof vi.fn>;
+  let client: { getPull: typeof pullsGet };
 
   beforeEach(() => {
     out = [];

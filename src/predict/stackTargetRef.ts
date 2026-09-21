@@ -16,7 +16,7 @@ const MAX_STACK_DEPTH = 10;
  * walk at the last proven hop; never throws.
  */
 export async function stackTargetRef(
-  github: GithubClient,
+  github: Pick<GithubClient, "getCommit" | "listPulls">,
   owner: string,
   repo: string,
   pr: StackNode,

@@ -48,9 +48,18 @@ const HEAD_SHA = "deadbeef";
 
 const HEAD_SOURCE = { owner: "o", repo: "r", ref: HEAD_SHA, sha: HEAD_SHA };
 
+/** A route this suite never exercises. Reaching one is the failure, not a stub. */
+const unserved = (route: string) => (): never => {
+  throw new Error(`the CLI reached ${route}`);
+};
+
 function fakeGithub(f: Fixture): GithubClient {
   const contents = f.contents ?? {};
-  const api = {
+  return {
+    listPulls: unserved("listPulls"),
+    downloadTarball: unserved("downloadTarball"),
+    listWorkflowRuns: unserved("listWorkflowRuns"),
+    listRunJobs: unserved("listRunJobs"),
     getPull: async () => ({
       commits: f.commits ?? 1,
       base: { ref: "main" },
@@ -61,8 +70,9 @@ function fakeGithub(f: Fixture): GithubClient {
     getCommit: async () => ({
       sha: HEAD_SHA,
       commit: { message: f.message ?? "chore: routine" },
+      parents: [],
     }),
-    getContent: async ({ path }: { path: string }) => {
+    getContent: async ({ path }) => {
       if (!(path in contents)) {
         // The shape the real client throws: a 404 in a field, not only in text.
         throw Object.assign(new Error(`GitHub API 404 for ${path}`), { status: 404 });
@@ -71,7 +81,6 @@ function fakeGithub(f: Fixture): GithubClient {
     },
     listWorkflows: async () => [{ path: WF, state: "active" }],
   };
-  return api as unknown as GithubClient;
 }
 
 describe("the CLI entrypoint", () => {

@@ -1,7 +1,6 @@
 // The live executor is wiring; these tests pin the wiring — which provider a
 // request routes to, where clone auth comes from — not the pieces themselves.
 
-import type { GithubClient } from "./makeGithubClient.js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { runShell } from "../execute/runShell.js";
 import type { RunCommand } from "../execute/types.js";
@@ -65,10 +64,9 @@ const resolveRef = async (): Promise<string | null> => null;
 /** A real gzipped tarball, `o-r-ccccccc/file.txt` = "content". */
 const WRAPPED_TB = "H4sIAAAAAAAAA+3S0QrCIBSA4fMovsCcw6nPE2ODICaYQY/fqqvGWAQzqP3fzRH0QvnVtRRnJiG4x5zM58I6eNeKcuWvJnI550NSSlKMee3cu/0fpetYpap7KvQXPu7fNKGx9P+G1/7D8dTrfN34ofeo3rcr/cOsv7XBiDLbXmPZzvt3ccz9+I8vAwAAAAAAAAAAAAAA2IcbvGawBgAoAAA=";
 
-/** A GitHub client whose only implemented route is the tarball download. */
-function githubOf(tarballs: Record<string, string>): GithubClient {
-  const api = {
-    downloadTarball: async ({ owner, repo, ref }: Record<string, string>) => {
+function githubOf(tarballs: Record<string, string>): Parameters<typeof makeLiveExecutor>[0] {
+  return {
+    downloadTarball: async ({ owner, repo, ref }) => {
       const b64 = tarballs[`${owner}/${repo}@${ref}`];
       if (b64 === undefined) {
         throw new Error(`404 tarball ${owner}/${repo}@${ref}`);
@@ -76,7 +74,6 @@ function githubOf(tarballs: Record<string, string>): GithubClient {
       return new Uint8Array(Buffer.from(b64, "base64")).buffer;
     },
   };
-  return api as unknown as GithubClient;
 }
 
 afterEach(() => {
