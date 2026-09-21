@@ -22,11 +22,13 @@ describe("runSteps", () => {
     expect(await runSteps([], {}, ctxOf())).toEqual({ ok: true, v: {} });
   });
 
-  it("stops on a step with neither uses nor run", async () => {
-    expect(await runSteps([{}], {}, ctxOf())).toEqual({
-      ok: false,
-      reason: "step '#1' has neither uses nor run",
-    });
+  it("stops on a step with neither uses nor run, a null entry included", async () => {
+    for (const step of [{}, null]) {
+      expect(await runSteps([step], {}, ctxOf())).toEqual({
+        ok: false,
+        reason: "step '#1' has neither uses nor run",
+      });
+    }
   });
 
   it("stops on an if it cannot decide", async () => {

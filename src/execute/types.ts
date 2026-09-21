@@ -70,7 +70,8 @@ export type ExecOutcome =
  * running it yields.
  */
 export interface JobExecutor {
-  executeJob(jobId: string, job: Workflow, wf: Workflow, scope: Scope): Promise<ExecOutcome>;
+  /** `wf` is null for a workflow file that parses to nothing — an empty document. */
+  executeJob(jobId: string, job: Workflow, wf: Workflow | null, scope: Scope): Promise<ExecOutcome>;
   /**
    * Remove the scratch this executor materialized. Whoever built the executor
    * calls it once, after the last job; an executor that owns no scratch of its

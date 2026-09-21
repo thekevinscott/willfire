@@ -94,7 +94,7 @@ async function execute(
   job: YamlMap,
   files: Record<string, string> = {},
   overrides: Partial<ExecDeps> = {},
-  wf: YamlMap = {},
+  wf: YamlMap | null = {},
   scope = {},
 ): Promise<ExecOutcome> {
   const tree = await tempTree(files);
@@ -513,12 +513,12 @@ describe("executing run steps", () => {
   });
 
   it("layers env from a null workflow document without reading through it", async () => {
-    const o = await execute({ steps: [{ run: "true" }] }, {}, {}, null as unknown as YamlMap);
+    const o = await execute({ steps: [{ run: "true" }] }, {}, {}, null);
     expect(success(o)).toEqual({});
   });
 
-  it("walks over step entries that are not objects in the history pre-scan", async () => {
-    const o = await execute({ steps: [null, undefined] as unknown as YamlValue });
+  it("walks over a null step entry in the history pre-scan", async () => {
+    const o = await execute({ steps: [null] });
     expect(failure(o)).toBe("step '#1' has neither uses nor run");
   });
 

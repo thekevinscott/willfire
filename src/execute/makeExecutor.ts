@@ -41,13 +41,13 @@ export function makeExecutor(opts: {
       if (!Array.isArray(job.steps)) {
         return fail(`job '${jobId}' has no steps`);
       }
-      const steps = job.steps as StepModel[];
+      // A sequence entry can be null — `- ` with nothing after it.
+      const steps = job.steps as (StepModel | null)[];
       // Any checkout input might be the `fetch-depth: 0` form. Over-asking for
       // one the walk will refuse anyway costs a clone, never correctness.
       const needsHistory = steps.some(
         (s) =>
           s !== null &&
-          s !== undefined &&
           typeof s.uses === "string" &&
           isCheckout(s.uses) &&
           Object.keys(s.with ?? {}).length > 0,

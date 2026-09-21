@@ -16,7 +16,7 @@ export async function runNodeAction(
   step: StepModel,
   label: string,
   uses: string,
-  action: ActionModel,
+  action: ActionModel | null,
   actionDir: string,
   actionRoot: string | undefined,
   usingMajor: number,

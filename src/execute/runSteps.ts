@@ -6,7 +6,7 @@ import { runUses } from "./runUses.js";
 import type { Res, StepModel, WalkCtx } from "./types.js";
 
 export async function runSteps(
-  steps: StepModel[],
+  steps: (StepModel | null)[],
   scope: Scope,
   ctx: WalkCtx,
 ): Promise<Res<Record<string, { outputs: Record<string, string> }>>> {
