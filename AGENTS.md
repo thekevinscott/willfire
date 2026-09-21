@@ -70,6 +70,11 @@ verdict logic as a change to every gated repo.
   `@v1`) are the distribution channel for fleet CI conventions; consuming them
   is the point. When a tag move breaks CI, adopt the change or fix forward.
   Freezing the ref is never the fix (ruled on PR #145).
+- A change to the published API surface carries a bump-level trailer.
+  putitoutthere reads `release: <patch|minor|major|skip>` from the merge
+  commit, falling back to the merged branch's tip commit — so write it into
+  the last commit on the branch. Without it every release is a patch, and at
+  `0.x` a breaking change ships inside the consumer's caret range.
 - Smallest reviewable PRs. One concern per PR; split by default.
 - Rebase proactively; never ask first. Getting a PR to green is the job, and a
   rebase is not a decision to bring back. Rebase onto the updated base whenever:
