@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*(willfire#34|putitoutthere))\"",
+  "ran_at": 1790022105,
+  "exit_code": 0,
+  "commit": "76a88dd15b8f1ea7601250480ad74fd9cc530fa3",
+  "branch": "sandbox/tarball-extraction"
+}
