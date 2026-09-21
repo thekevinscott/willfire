@@ -84,9 +84,9 @@ vi.mock("node:child_process", async () => {
       }
       handlers.get("close")?.(behavior.close === undefined ? 0 : behavior.close);
     });
-    return child as unknown as ReturnType<typeof actual.spawn>;
+    return child;
   });
-  return { ...actual, spawn: fakeSpawn as unknown as typeof actual.spawn };
+  return { ...actual, spawn: fakeSpawn };
 });
 
 const spec = (over: Partial<RunSpec> = {}): RunSpec => ({

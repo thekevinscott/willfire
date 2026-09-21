@@ -37,15 +37,16 @@ interface RunFixture {
 }
 
 /** Every request the script made, in order, so a case can assert the shape. */
-type Call = [string, Record<string, unknown>];
+type Params = Record<string, string | number>;
+type Call = [string, Params];
 
 function fakeGithub(runs: RunFixture[], calls: Call[] = []) {
   return {
-    getPull: async (params: Record<string, unknown>) => {
+    getPull: async (params: Params) => {
       calls.push(["getPull", params]);
       return { head: { sha: "deadbeef" } };
     },
-    listWorkflowRuns: async (params: Record<string, unknown>) => {
+    listWorkflowRuns: async (params: Params) => {
       calls.push(["listWorkflowRuns", params]);
       return runs.map(({ id, path, status }) => ({ id, path, status: status ?? "completed" }));
     },

@@ -67,6 +67,17 @@ const oneFunctionPerFile = {
   },
 };
 
+// Issue #98: `unknown` must not launder a type. Exempt as a whole binding
+// annotation, where TS forces narrowing at every use and a ban would push code
+// toward `any`; the predicate clause is what lets a recognizer state
+// `v is Record<string, unknown>`. The domain verdict `'unknown'` is a string
+// literal, not TSUnknownKeyword, and neither selector can reach it.
+const UNKNOWN_ALLOWED = [
+  'Identifier > TSTypeAnnotation > TSUnknownKeyword',
+  'TSTypePredicate TSUnknownKeyword',
+  'TSAsExpression > TSUnknownKeyword',
+].join(', ');
+
 export default [
   {
     ignores: ['**/dist/', '**/coverage/'],
@@ -87,6 +98,19 @@ export default [
       'no-continue': 'error',
       semi: ['error', 'always'],
       '@typescript-eslint/no-explicit-any': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'TSAsExpression > TSUnknownKeyword',
+          message:
+            '`as unknown as` launders the type. Name the type, or recognize the value at runtime.',
+        },
+        {
+          selector: `TSUnknownKeyword:not(${UNKNOWN_ALLOWED})`,
+          message:
+            '`unknown` erases the type here. It is allowed only as a whole binding annotation (parameter, catch, or variable) or inside a type predicate.',
+        },
+      ],
     },
   },
   {

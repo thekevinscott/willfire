@@ -981,7 +981,7 @@ describe("with: values across the call boundary", () => {
 describe("inputs the event never supplied", () => {
   const CALLEE = ".github/workflows/callee.yml";
 
-  const withDispatchInput = (jobs: Record<string, unknown>): Workflow =>
+  const withDispatchInput = (jobs: YamlMap): Workflow =>
     ({
       on: {
         pull_request: null,
