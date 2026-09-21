@@ -2,9 +2,8 @@ import { join } from "node:path";
 import type { Scope } from "../expr/val.js";
 import { bindActionInputs } from "./bindActionInputs.js";
 import { err } from "./err.js";
-import { outputSink } from "./outputSink.js";
+import { runStepCommand } from "./runStepCommand.js";
 import { stepEnv } from "./stepEnv.js";
-import { stepOutcome } from "./stepOutcome.js";
 import type { ActionModel, Res, StepModel, WalkCtx } from "./types.js";
 
 /**
@@ -49,23 +48,16 @@ export async function runNodeAction(
     }
     env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] = String(val.v);
   }
-  const sink = await outputSink(env);
   // After the layers, so no `env:` block can point the runner at another file.
   env.WILLFIRE_ACTION_MAIN = join(actionDir, main);
-  try {
-    const r = await ctx.deps.runCommand({
-      script: 'exec node "$WILLFIRE_ACTION_MAIN"',
-      shell: "bash",
-      cwd: ctx.tree,
-      env,
-      mounts: [
-        { path: ctx.tree, writable: true },
-        ...(actionRoot !== undefined ? [{ path: actionRoot, writable: false }] : []),
-        { path: sink.dir, writable: true },
-      ],
-    });
-    return await stepOutcome(r, sink.file, label);
-  } finally {
-    await sink.remove();
-  }
+  return await runStepCommand({
+    runCommand: ctx.deps.runCommand,
+    script: 'exec node "$WILLFIRE_ACTION_MAIN"',
+    shell: "bash",
+    cwd: ctx.tree,
+    env,
+    tree: ctx.tree,
+    actionRoot,
+    label,
+  });
 }

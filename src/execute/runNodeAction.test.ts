@@ -1,16 +1,6 @@
-import { stat } from "node:fs/promises";
-import { dirname } from "node:path";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { runNodeAction } from "./runNodeAction.js";
 import type { RunCommand, RunSpec, WalkCtx } from "./types.js";
-
-// Only to read the sink's path back out of a spec, and to see whether it
-// survived; the real modules are what produced it, so the mocks pass through.
-vi.mock("node:path", async () => await vi.importActual<typeof import("node:path")>("node:path"));
-vi.mock(
-  "node:fs/promises",
-  async () => await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises"),
-);
 
 const ctxOf = (runCommand: RunCommand): WalkCtx => ({
   tree: "/nonexistent-tree",
@@ -118,7 +108,7 @@ describe("runNodeAction", () => {
     expect(specs[0].env.WILLFIRE_ACTION_MAIN).toBe("/d/index.js");
   });
 
-  it("mounts the directory holding GITHUB_OUTPUT writable", async () => {
+  it("runs node on the manifest's main, in the tree, with the action root to mount", async () => {
     const specs: RunSpec[] = [];
     const cmd: RunCommand = async (spec) => {
       specs.push(spec);
@@ -126,34 +116,8 @@ describe("runNodeAction", () => {
     };
     const action = { runs: { using: "node24", main: "index.js" } };
     await runNodeAction({}, "step '#1'", "./a", action, "/d", "/root", 24, {}, ctxOf(cmd));
-    expect(specs[0].mounts).toEqual([
-      { path: "/nonexistent-tree", writable: true },
-      { path: "/root", writable: false },
-      { path: dirname(specs[0].env.GITHUB_OUTPUT), writable: true },
-    ]);
-  });
-
-  it("removes the output sink once the outputs are read back", async () => {
-    const specs: RunSpec[] = [];
-    const cmd: RunCommand = async (spec) => {
-      specs.push(spec);
-      return { code: 0, stdout: "", stderr: "" };
-    };
-    const action = { runs: { using: "node24", main: "index.js" } };
-    await runNodeAction({}, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(cmd));
-    await expect(stat(dirname(specs[0].env.GITHUB_OUTPUT))).rejects.toThrow();
-  });
-
-  it("removes the output sink even when the command throws", async () => {
-    const specs: RunSpec[] = [];
-    const cmd: RunCommand = async (spec) => {
-      specs.push(spec);
-      throw new Error("docker died");
-    };
-    const action = { runs: { using: "node24", main: "index.js" } };
-    await expect(
-      runNodeAction({}, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctxOf(cmd)),
-    ).rejects.toThrow("docker died");
-    await expect(stat(dirname(specs[0].env.GITHUB_OUTPUT))).rejects.toThrow();
+    expect(specs[0].script).toBe('exec node "$WILLFIRE_ACTION_MAIN"');
+    expect(specs[0].cwd).toBe("/nonexistent-tree");
+    expect(specs[0].mounts).toContainEqual({ path: "/root", writable: false });
   });
 });
