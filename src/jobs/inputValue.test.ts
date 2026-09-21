@@ -1,7 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { evaluateValue } from "../expr/evaluateValue.js";
 import { renderTemplate } from "../execute/renderTemplate.js";
 import { inputValue } from "./inputValue.js";
+import type { YamlValue } from "../yamlValue.js";
 
 // Spies over the real modules: which collaborator a value is handed to, and in
 // what form, is part of what this suite pins.
@@ -21,6 +22,10 @@ vi.mock("../execute/renderTemplate.js", async () => {
 describe("inputValue", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it("takes a value read out of a workflow, not `unknown`", () => {
+    expectTypeOf(inputValue).parameter(0).toEqualTypeOf<YamlValue | undefined>();
   });
 
   it("settles an absent value to the empty string", () => {

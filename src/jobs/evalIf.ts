@@ -1,6 +1,7 @@
 import { evaluate } from "../expr/evaluate.js";
 import type { Scope } from "../expr/val.js";
 import { prScope } from "./prScope.js";
+import type { YamlValue } from "../yamlValue.js";
 
 /**
  * Return run|skipped|unknown for a job-level `if:`.
@@ -10,7 +11,10 @@ import { prScope } from "./prScope.js";
  * unknown, because every one of them is written against `inputs.*` or
  * `needs.*`.
  */
-export function evalIf(cond: unknown, scope: Scope = {}): "run" | "skipped" | "unknown" {
+export function evalIf(
+  cond: YamlValue | undefined,
+  scope: Scope = {},
+): "run" | "skipped" | "unknown" {
   if (cond === null || cond === undefined) {
     return "run";
   }
