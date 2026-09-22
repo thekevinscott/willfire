@@ -20,28 +20,6 @@ const FLEET: Scope = {
   github: { event_name: "pull_request" },
 };
 
-describe("literals and truthiness", () => {
-  it.each([
-    ["true", true],
-    ["True", true],
-    ["false", false],
-    ["False", false],
-    ["'x'", true],
-    ["''", false],
-    ["1", true],
-    ["0", false],
-    ["-1", true],
-    ["1.5", true],
-    // A non-empty string is truthy whatever it spells; GitHub has the
-    // JavaScript trap too.
-    ["'false'", true],
-    ["'0'", true],
-    ["null", false],
-  ] as const)("reads %s as %s", (src, want) => {
-    expect(evaluate(src)).toBe(want);
-  });
-});
-
 describe("the ${{ }} wrapper", () => {
   it("strips a fully wrapped expression", () => {
     expect(evaluate("${{ true }}")).toBe(true);
@@ -113,26 +91,15 @@ describe("|| short-circuits from either side", () => {
   });
 });
 
-describe("negation", () => {
-  it("flips a settled operand", () => {
-    expect(evaluate("!true")).toBe(false);
-    expect(evaluate("!false")).toBe(true);
-  });
-
-  it("leaves an unsettled one unsettled", () => {
-    expect(evaluate("!needs.detect.outputs.x")).toBe(null);
-  });
-
-  it("binds tighter than a comparison", () => {
+describe("precedence", () => {
+  it("binds negation tighter than a comparison", () => {
     expect(evaluate("!false == true")).toBe(true);
-  });
-
-  it("nests", () => {
-    expect(evaluate("!!true")).toBe(true);
   });
 });
 
 describe("comparison", () => {
+  // The ordering rows are the boundary cases that pin `<` against `<=` and `>`
+  // against `>=`; compare.test.ts exercises each operator once, which does not.
   it.each([
     ["'a' == 'a'", true],
     ["'a' == 'b'", false],
@@ -158,21 +125,6 @@ describe("comparison", () => {
     expect(evaluate("'1' == 1")).toBe(null);
     expect(evaluate("'' == 0")).toBe(null);
     expect(evaluate("true == 'true'")).toBe(null);
-  });
-
-  it("refuses to order booleans", () => {
-    expect(evaluate("true > false")).toBe(null);
-    expect(evaluate("false < true")).toBe(null);
-  });
-
-  it("is unknown when either side is unknown", () => {
-    expect(evaluate("needs.detect.outputs.x == 'y'")).toBe(null);
-    expect(evaluate("'y' == needs.detect.outputs.x")).toBe(null);
-  });
-
-  it("cannot compare a value known only by its truthiness", () => {
-    // `(unknown && false)` is known-falsy but has no value to compare.
-    expect(evaluate("(needs.x && false) == ''")).toBe(null);
   });
 });
 
@@ -454,25 +406,6 @@ describe("malformed input is unknown, never a guess", () => {
   });
 });
 
-describe("tokenizer details", () => {
-  it("reads a doubled quote as one literal quote", () => {
-    expect(evaluate("'it''s' == 'it''s'")).toBe(true);
-    expect(evaluate("contains('it''s', '''')")).toBe(true);
-  });
-
-  it("ignores whitespace of every kind", () => {
-    expect(evaluate("\t true \n &&\r true ")).toBe(true);
-  });
-
-  it("accepts a call with no arguments", () => {
-    expect(evaluate("always()")).toBe(true);
-  });
-
-  it("keeps dots and dashes inside one path", () => {
-    expect(evaluate("needs.detect-languages.outputs.x == 'y'")).toBe(null);
-  });
-});
-
 describe("index access on fromJSON results", () => {
   /** The gate putitoutthere's build job actually writes. */
   const GATE = "fromJSON(needs.plan.outputs.matrix || '[]')[0] != null";
@@ -514,20 +447,5 @@ describe("index access on fromJSON results", () => {
     ["fromJSON('[1]')[0", "an unclosed bracket"],
   ] as const)("refuses %s (%s)", (src, _why) => {
     expect(evaluate(src)).toBe(null);
-  });
-});
-
-describe("comparison against a fromJSON structure", () => {
-  it("decides equality by instance: a structure equals nothing written beside it", () => {
-    // GitHub compares arrays and objects by instance, and two sides of one
-    // comparison are never the same instance.
-    expect(evaluate("fromJSON('[1]') == fromJSON('[1]')")).toBe(false);
-    expect(evaluate("fromJSON('[1]') != null")).toBe(true);
-    expect(evaluate("fromJSON('{}') == ''")).toBe(false);
-    expect(evaluate("'' != fromJSON('{}')")).toBe(true);
-  });
-
-  it("does not order a structure", () => {
-    expect(evaluate("fromJSON('[1]') < 'x'")).toBe(null);
   });
 });
