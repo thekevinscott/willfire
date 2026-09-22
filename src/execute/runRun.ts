@@ -1,10 +1,9 @@
 import { resolve } from "node:path";
 import type { Scope } from "../expr/val.js";
 import { err } from "./err.js";
-import { outputSink } from "./outputSink.js";
 import { renderTemplate } from "./renderTemplate.js";
+import { runStepCommand } from "./runStepCommand.js";
 import { stepEnv } from "./stepEnv.js";
-import { stepOutcome } from "./stepOutcome.js";
 import type { Res, StepModel, WalkCtx } from "./types.js";
 
 /** A `run:` step, executed under its declared shell with its declared env. */
@@ -41,21 +40,14 @@ export async function runRun(
     }
     cwd = resolve(ctx.tree, wd);
   }
-  const sink = await outputSink(env);
-  try {
-    const r = await ctx.deps.runCommand({
-      script,
-      shell,
-      cwd,
-      env,
-      mounts: [
-        { path: ctx.tree, writable: true },
-        ...(ctx.actionRoot !== undefined ? [{ path: ctx.actionRoot, writable: false }] : []),
-        { path: sink.dir, writable: true },
-      ],
-    });
-    return await stepOutcome(r, sink.file, label);
-  } finally {
-    await sink.remove();
-  }
+  return await runStepCommand({
+    runCommand: ctx.deps.runCommand,
+    script,
+    shell,
+    cwd,
+    env,
+    tree: ctx.tree,
+    actionRoot: ctx.actionRoot,
+    label,
+  });
 }

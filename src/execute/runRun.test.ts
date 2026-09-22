@@ -1,16 +1,6 @@
-import { stat } from "node:fs/promises";
-import { dirname } from "node:path";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { runRun } from "./runRun.js";
 import type { RunCommand, RunSpec, WalkCtx } from "./types.js";
-
-// Only to read the sink's path back out of a spec, and to see whether it
-// survived; the real modules are what produced it, so the mocks pass through.
-vi.mock("node:path", async () => await vi.importActual<typeof import("node:path")>("node:path"));
-vi.mock(
-  "node:fs/promises",
-  async () => await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises"),
-);
 
 const ctxOf = (runCommand: RunCommand): WalkCtx => ({
   tree: "/nonexistent-tree",
@@ -55,26 +45,26 @@ describe("runRun", () => {
     return { specs, cmd };
   };
 
-  it("mounts the tree and the output sink, and nothing else", async () => {
+  it("leaves GITHUB_ACTION_PATH unset outside a composite action", async () => {
     const { specs, cmd } = capture();
     await runRun({ run: "true" }, "step 's'", {}, ctxOf(cmd));
     expect(specs[0].env).not.toHaveProperty("GITHUB_ACTION_PATH");
-    expect(specs[0].mounts).toEqual([
-      { path: "/nonexistent-tree", writable: true },
-      { path: dirname(specs[0].env.GITHUB_OUTPUT), writable: true },
-    ]);
   });
 
-  it("mounts the action root read-only and points GITHUB_ACTION_PATH at the action", async () => {
+  it("points GITHUB_ACTION_PATH at the action and hands the root on to be mounted", async () => {
     const { specs, cmd } = capture();
     const ctx = { ...ctxOf(cmd), actionPath: "/root/a", actionRoot: "/root" };
     await runRun({ run: "true" }, "step 's'", {}, ctx);
     expect(specs[0].env.GITHUB_ACTION_PATH).toBe("/root/a");
-    expect(specs[0].mounts).toEqual([
-      { path: "/nonexistent-tree", writable: true },
-      { path: "/root", writable: false },
-      { path: dirname(specs[0].env.GITHUB_OUTPUT), writable: true },
-    ]);
+    expect(specs[0].mounts).toContainEqual({ path: "/root", writable: false });
+  });
+
+  it("runs in the tree by default, and in working-directory resolved against it", async () => {
+    const { specs, cmd } = capture();
+    await runRun({ run: "true" }, "step 's'", {}, ctxOf(cmd));
+    expect(specs[0].cwd).toBe("/nonexistent-tree");
+    await runRun({ run: "true", "working-directory": "sub" }, "step 's'", {}, ctxOf(cmd));
+    expect(specs[1].cwd).toBe("/nonexistent-tree/sub");
   });
 
   it("stops on an env: layer it cannot render", async () => {
@@ -83,19 +73,11 @@ describe("runRun", () => {
     ).toEqual({ ok: false, reason: "step 's': cannot resolve env 'K'" });
   });
 
-  it("removes the output sink once the outputs are read back", async () => {
-    const { specs, cmd } = capture();
-    await runRun({ run: "true" }, "step 's'", {}, ctxOf(cmd));
-    await expect(stat(dirname(specs[0].env.GITHUB_OUTPUT))).rejects.toThrow();
-  });
-
-  it("removes the output sink even when the command throws", async () => {
-    const specs: RunSpec[] = [];
-    const cmd: RunCommand = async (spec) => {
-      specs.push(spec);
-      throw new Error("docker died");
-    };
-    await expect(runRun({ run: "true" }, "step 's'", {}, ctxOf(cmd))).rejects.toThrow("docker died");
-    await expect(stat(dirname(specs[0].env.GITHUB_OUTPUT))).rejects.toThrow();
+  it("stops on a working-directory it cannot render", async () => {
+    const step = { run: "true", "working-directory": "${{ env.nope }}" };
+    expect(await runRun(step, "step 's'", {}, ctxOf(ok))).toEqual({
+      ok: false,
+      reason: "step 's': cannot resolve working-directory",
+    });
   });
 });
