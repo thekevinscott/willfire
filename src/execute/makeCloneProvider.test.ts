@@ -115,15 +115,13 @@ async function gitFixture(): Promise<{ repo: string; main: string; parked: strin
 describe("makeCloneProvider", () => {
   const sourceAt = (sha: string): WorkflowSource => ({ owner: "o", repo: "r", ref: sha, sha });
 
-  it("clones once per commit and detaches at a sha a branch reaches", async () => {
+  it("detaches at a sha a branch reaches", async () => {
     const { repo, main, parked } = await gitFixture();
     const { provide } = makeCloneProvider(runShell, null, { remoteUrl: () => `file://${repo}` });
     const tree = await provide(sourceAt(main), { history: true });
     expect(tree).not.toBe(null);
     expect(await fileIs(`${tree}/f.txt`, "a")).toBe(true);
-    expect(await provide(sourceAt(main))).toBe(tree);
     const other = await provide(sourceAt(parked));
-    expect(other).not.toBe(tree);
     expect(await fileIs(`${other}/f.txt`, "b")).toBe(true);
   });
 
@@ -162,11 +160,10 @@ describe("makeCloneProvider", () => {
     expect(spec.env.HOME).not.toBe(process.env.HOME);
   });
 
-  it("keeps a cached clone on disk until remove, then takes it with it", async () => {
+  it("keeps a clone on disk until remove, then takes it with it", async () => {
     const { repo, main } = await gitFixture();
     const src = makeCloneProvider(runShell, null, { remoteUrl: () => `file://${repo}` });
     const tree = await src.provide(sourceAt(main), { history: true });
-    expect(await src.provide(sourceAt(main))).toBe(tree);
     expect(await fileIs(`${tree}/f.txt`, "a")).toBe(true);
     await src.remove();
     expect(await isDir(tree!)).toBe(false);

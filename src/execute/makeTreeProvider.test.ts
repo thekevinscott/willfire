@@ -62,18 +62,11 @@ const ONE_TB = "H4sIAAAAAAAAA+3RTQqAIBCG4TmKJ7Ck1PO0j4QyqNv3s4kiCgKJ6H02M6CLb/h0
 const TWO_DIRS_TB = "H4sIAAAAAAAAA+3UQQqDMBCF4RwlJ6iZaMx5LNkLNoUev6PQjQW7aYzi/20mkCwmPHhJGlOaUzGGZar1/D6Lc741NhTfTD0feZisNdM45q13v+5PKkkz3PKr6NfmUPu+28hf1vnHqPm7kkt9XDx/qb0Aqkr+oP3f0f970Pzvh+z/QP/vwddeAAAAAAAAAAAAAADwF29Gl9pOACgAAA==";
 
 describe("makeTreeProvider", () => {
-  it("downloads once per commit and unwraps the single wrapping directory", async () => {
+  it("unwraps the single wrapping directory", async () => {
     // GitHub tarballs wrap the tree in one `owner-repo-shortsha/` directory.
-    let downloads = 0;
-    const { provide } = makeTreeProvider(async () => {
-      downloads++;
-      return tarball(WRAPPED_TB);
-    }, runShell);
-    const first = await provide(WORKSPACE);
-    const second = await provide(WORKSPACE);
-    expect(second).toBe(first);
-    expect(downloads).toBe(1);
-    expect(await fileIs(`${first}/file.txt`, "content")).toBe(true);
+    const { provide } = makeTreeProvider(async () => tarball(WRAPPED_TB), runShell);
+    const tree = await provide(WORKSPACE);
+    expect(await fileIs(`${tree}/file.txt`, "content")).toBe(true);
   });
 
   it("returns the extraction root when there is no single wrapping directory", async () => {
@@ -126,17 +119,12 @@ describe("makeTreeProvider", () => {
     expect(await provide(WORKSPACE, { history: true })).toBe(null);
   });
 
-  it("keeps a cached tree on disk until remove, then takes the whole cache with it", async () => {
-    const other: WorkflowSource = { ...WORKSPACE, owner: "o2" };
+  it("keeps an extracted tree on disk until remove, then takes it with it", async () => {
     const src = makeTreeProvider(async () => tarball(WRAPPED_TB), runShell);
-    const a = await src.provide(WORKSPACE);
-    const b = await src.provide(other);
-    // A second use of the cache must still find the first tree there.
-    expect(await src.provide(WORKSPACE)).toBe(a);
-    expect(await fileIs(`${a}/file.txt`, "content")).toBe(true);
+    const tree = await src.provide(WORKSPACE);
+    expect(await fileIs(`${tree}/file.txt`, "content")).toBe(true);
     await src.remove();
-    expect(await isDir(a!)).toBe(false);
-    expect(await isDir(b!)).toBe(false);
+    expect(await isDir(tree!)).toBe(false);
   });
 
   it("has nothing to remove when nothing was materialized", async () => {
