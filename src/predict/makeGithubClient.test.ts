@@ -128,6 +128,16 @@ describe("makeGithubClient", () => {
     );
   });
 
+  it("lists the workflow files at a ref, unwrapped from the directory entries", async () => {
+    const entry = { name: "w.yml", path: ".github/workflows/w.yml", type: "file" };
+    stage(json([entry]));
+    expect(await client().listWorkflowFiles({ ...REPO, ref: "abc" })).toEqual([entry]);
+    expect(calls[0].url).toBe(
+      "https://api.github.com/repos/o/r/contents/.github/workflows?ref=abc",
+    );
+    expect(calls[0].headers.accept).toBe("application/vnd.github+json");
+  });
+
   it("unwraps the workflow-runs envelope", async () => {
     const run = { id: 1, path: ".github/workflows/w.yml", status: "completed" };
     stage(json({ total_count: 1, workflow_runs: [run] }));

@@ -80,6 +80,10 @@ function fakeGithub(f: Fixture): GithubClient {
       return contents[path];
     },
     listWorkflows: async () => [{ path: WF, state: "active" }],
+    listWorkflowFiles: async () =>
+      Object.keys(contents)
+        .filter((path) => path.startsWith(".github/workflows/"))
+        .map((path) => ({ path, type: "file" })),
   };
 }
 
