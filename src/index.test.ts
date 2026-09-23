@@ -95,6 +95,7 @@ describe("root barrel", () => {
       getContent: async () => "content",
       downloadTarball: async () => new ArrayBuffer(0),
       listWorkflows: async () => [{ path: ".github/workflows/x.yml", state: "active" }],
+      listWorkflowFiles: async () => [{ path: ".github/workflows/x.yml", type: "file" }],
       listWorkflowRuns: async () => [{ id: 1, path: ".github/workflows/x.yml", status: "completed" }],
       listRunJobs: async () => [{ name: "test", conclusion: "success" }],
     };
@@ -127,6 +128,9 @@ describe("root barrel", () => {
     await expect(client.listWorkflows({ owner: "o", repo: "r" })).resolves.toEqual([
       { path: ".github/workflows/x.yml", state: "active" },
     ]);
+    await expect(
+      client.listWorkflowFiles({ owner: "o", repo: "r", ref: "abc" }),
+    ).resolves.toEqual([{ path: ".github/workflows/x.yml", type: "file" }]);
     await expect(
       client.listWorkflowRuns({ owner: "o", repo: "r", head_sha: "abc", event: "pull_request" }),
     ).resolves.toEqual([{ id: 1, path: ".github/workflows/x.yml", status: "completed" }]);
