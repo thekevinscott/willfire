@@ -14,7 +14,7 @@ import type { Scope } from "../expr/val.js";
 import { expandJobs } from "../jobs/expandJobs.js";
 import { workflowDispatches } from "../triggers/workflowDispatches.js";
 import { finalizePrediction } from "./finalizePrediction.js";
-import type { GithubClient, GithubWorkflowFile } from "./makeGithubClient.js";
+import type { GithubClient } from "./makeGithubClient.js";
 import { makeLiveExecutor } from "./makeLiveExecutor.js";
 import { sourceKey } from "./sourceKey.js";
 import { stackTargetRef } from "./stackTargetRef.js";
@@ -177,20 +177,20 @@ export async function predict(
   // read ref so the two halves agree on one commit. GitHub cannot have disabled
   // a workflow it has never listed, so a tree-only path is always `active`.
   const knownPaths = new Set(workflows.map((w) => w.path));
-  let treeFiles: GithubWorkflowFile[];
+  let treeOnly: { path: string; state: string }[];
   try {
-    treeFiles = await github.listWorkflowFiles({ ...base, ref: readSource.sha });
+    const treeFiles = await github.listWorkflowFiles({ ...base, ref: readSource.sha });
+    treeOnly = treeFiles
+      .filter((f) => f.type === "file" && /\.ya?ml$/i.test(f.path) && !knownPaths.has(f.path))
+      .map((f) => ({ path: f.path, state: "active" }));
   } catch (e) {
     // No `.github/workflows` directory at this ref reads the same as an empty
     // one; anything else is "could not read", not "nothing there".
     if (errorStatus(e) !== 404) {
       throw e;
     }
-    treeFiles = [];
+    treeOnly = [];
   }
-  const treeOnly = treeFiles
-    .filter((f) => f.type === "file" && /\.ya?ml$/i.test(f.path) && !knownPaths.has(f.path))
-    .map((f) => ({ path: f.path, state: "active" }));
 
   // `github.repository` is fixed for everything predicted here: reusable
   // workflows and composite actions all run in the repo the PR is against.

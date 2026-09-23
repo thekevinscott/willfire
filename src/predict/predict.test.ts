@@ -602,12 +602,15 @@ describe("predict", () => {
     ]);
   });
 
-  it("ignores a non-file entry when reading the tree", async () => {
+  it("ignores a non-file entry when reading the tree, even one named like a workflow", async () => {
+    // The path alone would pass the extension filter — a directory named
+    // `sub.yml` is exotic but representable, so the type check must be doing
+    // real work here, not just riding along with the extension check.
     const github = fakeGithub({
       contents: { [WF]: "on: pull_request\njobs:\n  a: {}\n" },
       treeFiles: [
         { path: WF, type: "file" },
-        { path: ".github/workflows/nested", type: "dir" },
+        { path: ".github/workflows/sub.yml", type: "dir" },
       ],
     });
     expect((await predict(github, "o/r", 1)).entries).toHaveLength(1);
@@ -637,6 +640,29 @@ describe("predict", () => {
     await expect(predict(github, "o/r", 1)).rejects.toThrow(
       "GitHub API 503 for .github/workflows",
     );
+  });
+
+  it("asks the tree for the same ref workflow contents are read from", async () => {
+    const body = "on: pull_request\njobs:\n  a: {}\n";
+    const github = fakeGithub({
+      contents: { [WF]: body },
+      mergeSha: MERGE_SHA,
+      mergeContents: { [WF]: body },
+    });
+    const listWorkflowFiles = vi.spyOn(github, "listWorkflowFiles");
+    await predict(github, "o/r", 1);
+    expect(listWorkflowFiles).toHaveBeenCalledWith({ owner: "o", repo: "r", ref: MERGE_SHA });
+  });
+
+  it("requires the workflow extension at the end of the path, not merely present in it", async () => {
+    const github = fakeGithub({
+      contents: { [WF]: "on: pull_request\njobs:\n  a: {}\n" },
+      treeFiles: [
+        { path: WF, type: "file" },
+        { path: ".github/workflows/w.yml.bak", type: "file" },
+      ],
+    });
+    expect((await predict(github, "o/r", 1)).entries).toHaveLength(1);
   });
 
   it.each([
