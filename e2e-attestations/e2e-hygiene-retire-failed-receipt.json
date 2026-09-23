@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*(willfire#34|putitoutthere))\"",
+  "ran_at": 1790171841,
+  "exit_code": 0,
+  "commit": "595d368ccbd4ec81893db9b94a8299ae1ff60ff9",
+  "branch": "e2e-hygiene/retire-failed-receipt"
+}
