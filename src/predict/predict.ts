@@ -171,6 +171,27 @@ export async function predict(
 
   const workflows = await github.listWorkflows(base);
 
+  // The API list reflects the repo's current state, not the ref workflow
+  // *contents* are read from below. A workflow the PR adds or renames is at
+  // `readSource` but is not in that list yet (#215) — union in the tree at the
+  // read ref so the two halves agree on one commit. GitHub cannot have disabled
+  // a workflow it has never listed, so a tree-only path is always `active`.
+  const knownPaths = new Set(workflows.map((w) => w.path));
+  let treeOnly: { path: string; state: string }[];
+  try {
+    const treeFiles = await github.listWorkflowFiles({ ...base, ref: readSource.sha });
+    treeOnly = treeFiles
+      .filter((f) => f.type === "file" && /\.ya?ml$/i.test(f.path) && !knownPaths.has(f.path))
+      .map((f) => ({ path: f.path, state: "active" }));
+  } catch (e) {
+    // No `.github/workflows` directory at this ref reads the same as an empty
+    // one; anything else is "could not read", not "nothing there".
+    if (errorStatus(e) !== 404) {
+      throw e;
+    }
+    treeOnly = [];
+  }
+
   // `github.repository` is fixed for everything predicted here: reusable
   // workflows and composite actions all run in the repo the PR is against.
   // Seeding it once makes guards like the fleet's hermetic-vs-published
@@ -233,7 +254,7 @@ export async function predict(
   // Expansion is the only thing that materializes a tree, so this is the whole
   // window in which scratch exists — and it must go even when a fetch throws.
   try {
-    for (const w of workflows) {
+    for (const w of [...workflows, ...treeOnly]) {
       if (w.path.startsWith(".github/workflows/")) {
         entries.push(...(await workflowEntries(w.path, w.state)));
       }

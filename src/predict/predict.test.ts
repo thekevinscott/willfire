@@ -55,6 +55,20 @@ interface Fixture {
   /** Head commit message — the surface the skip instructions are read from. */
   message?: string;
   workflows?: { path: string; state: string }[];
+  /**
+   * Entries `listWorkflowFiles` returns for the read ref. Defaults to
+   * mirroring `workflows` (so the tree agrees with the API list by default) —
+   * set this to test a path the API list does not know about, or a tree entry
+   * the enumeration should ignore. Left to mirror `contents`, a cross-repo or
+   * local-`./` callee's path (also served from that same map, by a different
+   * route) would misread as the caller's own tree file.
+   */
+  treeFiles?: { path: string; type: string }[];
+  /**
+   * Status `listWorkflowFiles` throws instead of listing the tree. `null` is a
+   * status-less network failure.
+   */
+  treeError?: number | null;
   /** Repo contents at head, keyed by path. A missing key is a 404. */
   contents?: Record<string, string>;
   /** Contents at `mergeSha`, served instead of `contents`. Missing key: 404. */
@@ -172,6 +186,20 @@ function fakeGithub(f: Fixture): GithubClient {
       return bytes.buffer;
     },
     listWorkflows: async () => f.workflows ?? [{ path: WF, state: "active" }],
+    listWorkflowFiles: async () => {
+      if (f.treeError !== undefined) {
+        throw f.treeError === null
+          ? new Error("network failure listing .github/workflows")
+          : apiError(f.treeError, ".github/workflows");
+      }
+      if (f.treeFiles !== undefined) {
+        return f.treeFiles;
+      }
+      return (f.workflows ?? [{ path: WF, state: "active" }]).map(({ path }) => ({
+        path,
+        type: "file",
+      }));
+    },
   };
 }
 
@@ -538,6 +566,103 @@ describe("predict", () => {
       skip: null,
       sources: [HEAD_SOURCE],
     });
+  });
+
+  it("enumerates a workflow present at the read ref but missing from the Actions API's list (#215)", async () => {
+    // The API list reflects the repo's current state, not the read ref; a
+    // workflow the PR adds is at the ref before the API has ever registered it.
+    const body = "on: pull_request\njobs:\n  a: {}\n";
+    const github = fakeGithub({
+      contents: { [WF]: body, [SUB]: body },
+      treeFiles: [
+        { path: WF, type: "file" },
+        { path: SUB, type: "file" },
+      ],
+    });
+    const { entries } = await predict(github, "o/r", 1);
+    expect(entries).toEqual([
+      { workflow: WF, job: "a", checkName: "a", status: "run", reason: "trigger matched" },
+      { workflow: SUB, job: "a", checkName: "a", status: "run", reason: "trigger matched" },
+    ]);
+  });
+
+  it("treats a ref-only workflow as active, since the API cannot have disabled one it has never listed", async () => {
+    const github = fakeGithub({
+      workflows: [{ path: WF, state: "disabled_manually" }],
+      contents: { [SUB]: "on: pull_request\njobs:\n  a: {}\n" },
+      treeFiles: [
+        { path: WF, type: "file" },
+        { path: SUB, type: "file" },
+      ],
+    });
+    const { entries } = await predict(github, "o/r", 1);
+    expect(entries).toEqual([
+      { workflow: WF, job: "*", checkName: null, status: "no-dispatch", reason: "workflow state: disabled_manually" },
+      { workflow: SUB, job: "a", checkName: "a", status: "run", reason: "trigger matched" },
+    ]);
+  });
+
+  it("ignores a non-file entry when reading the tree, even one named like a workflow", async () => {
+    // The path alone would pass the extension filter — a directory named
+    // `sub.yml` is exotic but representable, so the type check must be doing
+    // real work here, not just riding along with the extension check.
+    const github = fakeGithub({
+      contents: { [WF]: "on: pull_request\njobs:\n  a: {}\n" },
+      treeFiles: [
+        { path: WF, type: "file" },
+        { path: ".github/workflows/sub.yml", type: "dir" },
+      ],
+    });
+    expect((await predict(github, "o/r", 1)).entries).toHaveLength(1);
+  });
+
+  it("ignores a non-YAML file sitting in .github/workflows", async () => {
+    const github = fakeGithub({
+      contents: { [WF]: "on: pull_request\njobs:\n  a: {}\n" },
+      treeFiles: [
+        { path: WF, type: "file" },
+        { path: ".github/workflows/README.md", type: "file" },
+      ],
+    });
+    expect((await predict(github, "o/r", 1)).entries).toHaveLength(1);
+  });
+
+  it("treats a missing .github/workflows directory at the read ref as an empty tree", async () => {
+    const github = fakeGithub({
+      contents: { [WF]: "on: pull_request\njobs:\n  a: {}\n" },
+      treeError: 404,
+    });
+    expect((await predict(github, "o/r", 1)).entries).toHaveLength(1);
+  });
+
+  it("fails the prediction when listing the workflow tree fails with anything but a 404", async () => {
+    const github = fakeGithub({ treeError: 503 });
+    await expect(predict(github, "o/r", 1)).rejects.toThrow(
+      "GitHub API 503 for .github/workflows",
+    );
+  });
+
+  it("asks the tree for the same ref workflow contents are read from", async () => {
+    const body = "on: pull_request\njobs:\n  a: {}\n";
+    const github = fakeGithub({
+      contents: { [WF]: body },
+      mergeSha: MERGE_SHA,
+      mergeContents: { [WF]: body },
+    });
+    const listWorkflowFiles = vi.spyOn(github, "listWorkflowFiles");
+    await predict(github, "o/r", 1);
+    expect(listWorkflowFiles).toHaveBeenCalledWith({ owner: "o", repo: "r", ref: MERGE_SHA });
+  });
+
+  it("requires the workflow extension at the end of the path, not merely present in it", async () => {
+    const github = fakeGithub({
+      contents: { [WF]: "on: pull_request\njobs:\n  a: {}\n" },
+      treeFiles: [
+        { path: WF, type: "file" },
+        { path: ".github/workflows/w.yml.bak", type: "file" },
+      ],
+    });
+    expect((await predict(github, "o/r", 1)).entries).toHaveLength(1);
   });
 
   it.each([

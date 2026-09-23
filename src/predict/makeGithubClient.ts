@@ -36,6 +36,11 @@ export interface GithubWorkflow {
   state: string;
 }
 
+export interface GithubWorkflowFile {
+  path: string;
+  type: string;
+}
+
 export interface GithubWorkflowRun {
   id: number;
   path: string;
@@ -55,6 +60,7 @@ export interface GithubClient {
   getContent(params: RepoParams & { path: string; ref: string }): Promise<string>;
   downloadTarball(params: RepoParams & { ref: string }): Promise<ArrayBuffer>;
   listWorkflows(params: RepoParams): Promise<GithubWorkflow[]>;
+  listWorkflowFiles(params: RepoParams & { ref: string }): Promise<GithubWorkflowFile[]>;
   listWorkflowRuns(
     params: RepoParams & { head_sha: string; event: string },
   ): Promise<GithubWorkflowRun[]>;
@@ -152,6 +158,12 @@ export function makeGithubClient(): GithubClient {
         `/repos/${owner}/${repo}/actions/workflows`,
         (b: { workflows: GithubWorkflow[] }) => b.workflows,
       ),
+    // A directory listing, not paginated like the routes above: `pages` would
+    // ask for the same page twice past 100 entries, since this endpoint has no
+    // `page` param and ignores it. GitHub caps a directory at 1,000 entries and
+    // has no more for this one anyway — `.github/workflows/` isn't paginated.
+    listWorkflowFiles: ({ owner, repo, ref }) =>
+      json<GithubWorkflowFile[]>(`/repos/${owner}/${repo}/contents/.github/workflows`, { ref }),
     listWorkflowRuns: ({ owner, repo, head_sha, event }) =>
       pages(
         `/repos/${owner}/${repo}/actions/runs`,
