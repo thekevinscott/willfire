@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*(willfire#34|putitoutthere))\"",
+  "ran_at": 1790171509,
+  "exit_code": 0,
+  "commit": "289e045fcb3971bcd5917cef911e2c26519d19d0",
+  "branch": "fix/workflow-enum-at-ref"
+}
