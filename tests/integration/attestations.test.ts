@@ -17,7 +17,7 @@ interface Receipt {
   branch: string;
 }
 
-const dir = fileURLToPath(new URL("../e2e-attestations", import.meta.url));
+const dir = fileURLToPath(new URL("../../e2e-attestations", import.meta.url));
 const files = readdirSync(dir).filter((name) => name.endsWith(".json"));
 
 describe.each(files)("%s", (file) => {
