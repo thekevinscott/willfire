@@ -40,7 +40,6 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "capture-e2e": "pnpm --filter capture-e2e record",
     "lint": "eslint .",
     "predict": "tsx src/cli.ts",
     "prepare": "pnpm build",
@@ -48,7 +47,7 @@
     "test:e2e": "pnpm build && vitest run --config tests/e2e/vitest.config.mts",
     "test:integration": "pnpm build && vitest run tests/integration",
     "test:unit": "vitest run --coverage src",
-    "typecheck": "tsc -p tsconfig.json && pnpm --filter capture-e2e typecheck && pnpm --filter verify typecheck",
+    "typecheck": "tsc -p tsconfig.json && pnpm --filter verify typecheck",
     "verify": "pnpm --filter verify verify"
   },
   "dependencies": {
