@@ -2,9 +2,6 @@
 
 Recorded responses in, the check list GitHub dispatched out. No network.
 
-Both sides are frozen, so this suite gates every PR and cannot go red for a
-reason outside the repo.
-
 ## Layout
 
 One directory per case: `fixtures/<owner>/<repo>/<pr>/`. Its `README.md` says
