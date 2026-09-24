@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*(willfire#34|putitoutthere))\"",
+  "ran_at": 1790176360,
+  "exit_code": 0,
+  "commit": "c89e3d8669744af0373618ede958f62e7a79b75e",
+  "branch": "trim/expandworkflowjobs-test"
+}

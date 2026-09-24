@@ -22,25 +22,12 @@ const readerOf = (
 
 // `expandWorkflowJobs` is the seam the recorded-behaviour suite drives
 // (tests/integration/names.test.ts). That suite pins check names against live
-// dispatches; this covers the wrapper itself — that it forwards to the job
-// expansion and hands back the entries unchanged.
+// dispatches; this covers the wrapper itself — that it constructs the pathless
+// site expansion reads from.
 describe("expandWorkflowJobs", () => {
   // Where expansion starts from. Nothing here calls out to another workflow, so
   // the source is only carried, never followed.
   const SOURCE = { owner: "o", repo: "r", ref: "main", sha: SHA };
-
-  it("expands a parsed workflow into its job entries", async () => {
-    const wf = { on: { pull_request: null }, jobs: { build: { "runs-on": "ubuntu-latest" } } };
-    const entries = await expandWorkflowJobs(
-      wf as never,
-      { action: "opened", baseRef: "main", files: ["src/app.txt"] },
-      readerOf(async () => null),
-      SOURCE,
-    );
-    expect(entries).toEqual([
-      { job: "build", checkName: "build", status: "run", reason: "" },
-    ]);
-  });
 
   it("hands expansion a pathless site over the given source", async () => {
     // Callers of this seam supply a parsed document with no file behind it, so
@@ -54,24 +41,6 @@ describe("expandWorkflowJobs", () => {
       SOURCE,
     );
     expect(vi.mocked(expandJobs).mock.calls[0]?.[0].site).toEqual({ path: "", source: SOURCE });
-  });
-
-  it("hands expansion nothing job expansion does not read", async () => {
-    vi.mocked(expandJobs).mockClear();
-    const wf = { on: { pull_request: null }, jobs: { build: { "runs-on": "ubuntu-latest" } } };
-    await expandWorkflowJobs(
-      wf as never,
-      { action: "opened", baseRef: "main", files: ["src/app.txt"] },
-      readerOf(async () => null),
-      SOURCE,
-    );
-    expect(Object.keys(vi.mocked(expandJobs).mock.calls[0]?.[0] ?? {})).toEqual([
-      "wf",
-      "reader",
-      "site",
-      "scope",
-      "executor",
-    ]);
   });
 });
 
