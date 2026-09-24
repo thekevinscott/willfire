@@ -1,0 +1,904 @@
+{
+  "dispatched": [
+    {
+      "workflow": ".github/workflows/pr-monitor.yml",
+      "name": "CI Gate",
+      "conclusion": "success"
+    }
+  ],
+  "calls": [
+    {
+      "method": "getPull",
+      "params": {
+        "owner": "thekevinscott",
+        "repo": "repo-name-checker",
+        "pull_number": 15
+      },
+      "result": {
+        "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/pulls/15",
+        "id": 4324922688,
+        "node_id": "PR_kwDOSZa1MM8AAAABAckVQA",
+        "html_url": "https://github.com/thekevinscott/repo-name-checker/pull/15",
+        "diff_url": "https://github.com/thekevinscott/repo-name-checker/pull/15.diff",
+        "patch_url": "https://github.com/thekevinscott/repo-name-checker/pull/15.patch",
+        "issue_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/issues/15",
+        "number": 15,
+        "state": "closed",
+        "locked": false,
+        "title": "ci: cancel superseded CI Gate runs, normalize the timeout",
+        "user": {
+          "login": "thekevinbot",
+          "id": 248217931,
+          "node_id": "U_kgDODsuBSw",
+          "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinbot",
+          "html_url": "https://github.com/thekevinbot",
+          "followers_url": "https://api.github.com/users/thekevinbot/followers",
+          "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+          "repos_url": "https://api.github.com/users/thekevinbot/repos",
+          "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "body": "Adds a `concurrency:` group to the `CI Gate` workflow, and normalizes\n`timeout-minutes`.\n\n**Concurrency.** Push a new commit to a PR and the running gate job keeps going.\nIt resolved its target SHA at startup, so it spends the rest of its life polling\nfor runs on a commit nobody cares about any more, holding a runner the whole\ntime. `cancel-in-progress` kills it when its replacement starts. The group keys\non `github.ref`, which for a `pull_request` event is `refs/pull/N/merge` — so\nit scopes per PR and never cancels across PRs.\n\nThree repos (dirsql, willfire, github-data-file-fetcher) already had this from\nan earlier rollout. This brings the other eleven in line.\n\n**Timeout.** Settling the fleet on a single rule: 20 minutes, raised only where\nthe measured slowest non-gate `pull_request` run gets close. The only repo that\nqualifies is putitoutthere at 16 minutes, which stays at 30. dirsql, willfire\nand github-data-file-fetcher drop from 45 to 20 — their slowest observed runs\nare 7 minutes, under 1 minute, and none-at-all respectively, so 45 just meant a\nwedged gate burned twice as long before anyone noticed.\n\nNo change to gating behavior.\n",
+        "created_at": "2026-08-20T16:56:23Z",
+        "updated_at": "2026-08-20T17:00:00Z",
+        "closed_at": "2026-08-20T16:59:59Z",
+        "merged_at": "2026-08-20T16:59:58Z",
+        "merge_commit_sha": "e7c1be0e43082590e882b86436ac6f2a91c6384c",
+        "assignees": [],
+        "requested_reviewers": [],
+        "requested_teams": [],
+        "labels": [],
+        "milestone": null,
+        "draft": false,
+        "commits_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/pulls/15/commits",
+        "review_comments_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/pulls/15/comments",
+        "review_comment_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/pulls/comments{/number}",
+        "comments_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/issues/15/comments",
+        "statuses_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/statuses/dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2",
+        "head": {
+          "label": "thekevinscott:ci/gate-concurrency",
+          "ref": "ci/gate-concurrency",
+          "sha": "dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2",
+          "user": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "repo": {
+            "id": 1234613552,
+            "node_id": "R_kgDOSZa1MA",
+            "name": "repo-name-checker",
+            "full_name": "thekevinscott/repo-name-checker",
+            "private": false,
+            "owner": {
+              "login": "thekevinscott",
+              "id": 151596,
+              "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+              "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+              "gravatar_id": "",
+              "url": "https://api.github.com/users/thekevinscott",
+              "html_url": "https://github.com/thekevinscott",
+              "followers_url": "https://api.github.com/users/thekevinscott/followers",
+              "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+              "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+              "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+              "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+              "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+              "repos_url": "https://api.github.com/users/thekevinscott/repos",
+              "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+              "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+              "type": "User",
+              "user_view_type": "public",
+              "site_admin": false
+            },
+            "html_url": "https://github.com/thekevinscott/repo-name-checker",
+            "description": null,
+            "fork": false,
+            "url": "https://api.github.com/repos/thekevinscott/repo-name-checker",
+            "forks_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/forks",
+            "keys_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/keys{/key_id}",
+            "collaborators_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/collaborators{/collaborator}",
+            "teams_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/teams",
+            "hooks_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/hooks",
+            "issue_events_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/issues/events{/number}",
+            "events_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/events",
+            "assignees_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/assignees{/user}",
+            "branches_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/branches{/branch}",
+            "tags_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/tags",
+            "blobs_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/blobs{/sha}",
+            "git_tags_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/tags{/sha}",
+            "git_refs_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/refs{/sha}",
+            "trees_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/trees{/sha}",
+            "statuses_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/statuses/{sha}",
+            "languages_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/languages",
+            "stargazers_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/stargazers",
+            "contributors_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/contributors",
+            "subscribers_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/subscribers",
+            "subscription_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/subscription",
+            "commits_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/commits{/sha}",
+            "git_commits_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/commits{/sha}",
+            "comments_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/comments{/number}",
+            "issue_comment_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/issues/comments{/number}",
+            "contents_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/contents/{+path}",
+            "compare_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/compare/{base}...{head}",
+            "merges_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/merges",
+            "archive_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/{archive_format}{/ref}",
+            "downloads_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/downloads",
+            "issues_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/issues{/number}",
+            "pulls_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/pulls{/number}",
+            "milestones_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/milestones{/number}",
+            "notifications_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/notifications{?since,all,participating}",
+            "labels_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/labels{/name}",
+            "releases_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/releases{/id}",
+            "deployments_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/deployments",
+            "created_at": "2026-05-10T12:17:43Z",
+            "updated_at": "2026-08-20T17:07:55Z",
+            "pushed_at": "2026-08-20T17:00:00Z",
+            "git_url": "git://github.com/thekevinscott/repo-name-checker.git",
+            "ssh_url": "git@github.com:thekevinscott/repo-name-checker.git",
+            "clone_url": "https://github.com/thekevinscott/repo-name-checker.git",
+            "svn_url": "https://github.com/thekevinscott/repo-name-checker",
+            "homepage": null,
+            "size": 61,
+            "stargazers_count": 0,
+            "watchers_count": 0,
+            "language": "Python",
+            "has_issues": true,
+            "has_projects": true,
+            "has_downloads": false,
+            "has_wiki": true,
+            "has_pages": false,
+            "has_discussions": false,
+            "forks_count": 0,
+            "mirror_url": null,
+            "archived": false,
+            "disabled": false,
+            "open_issues_count": 1,
+            "license": null,
+            "allow_forking": true,
+            "is_template": false,
+            "web_commit_signoff_required": false,
+            "has_pull_requests": true,
+            "pull_request_creation_policy": "all",
+            "topics": [],
+            "visibility": "public",
+            "forks": 0,
+            "open_issues": 1,
+            "watchers": 0,
+            "default_branch": "main"
+          }
+        },
+        "base": {
+          "label": "thekevinscott:main",
+          "ref": "main",
+          "sha": "495fdc0d05d75f7b0478a3ace6f4ac6409a2f2c1",
+          "user": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "repo": {
+            "id": 1234613552,
+            "node_id": "R_kgDOSZa1MA",
+            "name": "repo-name-checker",
+            "full_name": "thekevinscott/repo-name-checker",
+            "private": false,
+            "owner": {
+              "login": "thekevinscott",
+              "id": 151596,
+              "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+              "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+              "gravatar_id": "",
+              "url": "https://api.github.com/users/thekevinscott",
+              "html_url": "https://github.com/thekevinscott",
+              "followers_url": "https://api.github.com/users/thekevinscott/followers",
+              "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+              "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+              "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+              "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+              "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+              "repos_url": "https://api.github.com/users/thekevinscott/repos",
+              "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+              "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+              "type": "User",
+              "user_view_type": "public",
+              "site_admin": false
+            },
+            "html_url": "https://github.com/thekevinscott/repo-name-checker",
+            "description": null,
+            "fork": false,
+            "url": "https://api.github.com/repos/thekevinscott/repo-name-checker",
+            "forks_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/forks",
+            "keys_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/keys{/key_id}",
+            "collaborators_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/collaborators{/collaborator}",
+            "teams_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/teams",
+            "hooks_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/hooks",
+            "issue_events_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/issues/events{/number}",
+            "events_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/events",
+            "assignees_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/assignees{/user}",
+            "branches_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/branches{/branch}",
+            "tags_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/tags",
+            "blobs_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/blobs{/sha}",
+            "git_tags_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/tags{/sha}",
+            "git_refs_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/refs{/sha}",
+            "trees_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/trees{/sha}",
+            "statuses_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/statuses/{sha}",
+            "languages_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/languages",
+            "stargazers_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/stargazers",
+            "contributors_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/contributors",
+            "subscribers_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/subscribers",
+            "subscription_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/subscription",
+            "commits_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/commits{/sha}",
+            "git_commits_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/commits{/sha}",
+            "comments_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/comments{/number}",
+            "issue_comment_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/issues/comments{/number}",
+            "contents_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/contents/{+path}",
+            "compare_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/compare/{base}...{head}",
+            "merges_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/merges",
+            "archive_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/{archive_format}{/ref}",
+            "downloads_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/downloads",
+            "issues_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/issues{/number}",
+            "pulls_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/pulls{/number}",
+            "milestones_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/milestones{/number}",
+            "notifications_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/notifications{?since,all,participating}",
+            "labels_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/labels{/name}",
+            "releases_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/releases{/id}",
+            "deployments_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/deployments",
+            "created_at": "2026-05-10T12:17:43Z",
+            "updated_at": "2026-08-20T17:07:55Z",
+            "pushed_at": "2026-08-20T17:00:00Z",
+            "git_url": "git://github.com/thekevinscott/repo-name-checker.git",
+            "ssh_url": "git@github.com:thekevinscott/repo-name-checker.git",
+            "clone_url": "https://github.com/thekevinscott/repo-name-checker.git",
+            "svn_url": "https://github.com/thekevinscott/repo-name-checker",
+            "homepage": null,
+            "size": 61,
+            "stargazers_count": 0,
+            "watchers_count": 0,
+            "language": "Python",
+            "has_issues": true,
+            "has_projects": true,
+            "has_downloads": false,
+            "has_wiki": true,
+            "has_pages": false,
+            "has_discussions": false,
+            "forks_count": 0,
+            "mirror_url": null,
+            "archived": false,
+            "disabled": false,
+            "open_issues_count": 1,
+            "license": null,
+            "allow_forking": true,
+            "is_template": false,
+            "web_commit_signoff_required": false,
+            "has_pull_requests": true,
+            "pull_request_creation_policy": "all",
+            "topics": [],
+            "visibility": "public",
+            "forks": 0,
+            "open_issues": 1,
+            "watchers": 0,
+            "default_branch": "main"
+          }
+        },
+        "_links": {
+          "self": {
+            "href": "https://api.github.com/repos/thekevinscott/repo-name-checker/pulls/15"
+          },
+          "html": {
+            "href": "https://github.com/thekevinscott/repo-name-checker/pull/15"
+          },
+          "issue": {
+            "href": "https://api.github.com/repos/thekevinscott/repo-name-checker/issues/15"
+          },
+          "comments": {
+            "href": "https://api.github.com/repos/thekevinscott/repo-name-checker/issues/15/comments"
+          },
+          "review_comments": {
+            "href": "https://api.github.com/repos/thekevinscott/repo-name-checker/pulls/15/comments"
+          },
+          "review_comment": {
+            "href": "https://api.github.com/repos/thekevinscott/repo-name-checker/pulls/comments{/number}"
+          },
+          "commits": {
+            "href": "https://api.github.com/repos/thekevinscott/repo-name-checker/pulls/15/commits"
+          },
+          "statuses": {
+            "href": "https://api.github.com/repos/thekevinscott/repo-name-checker/statuses/dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2"
+          }
+        },
+        "author_association": "COLLABORATOR",
+        "auto_merge": null,
+        "assignee": null,
+        "active_lock_reason": null,
+        "merged": true,
+        "mergeable": null,
+        "rebaseable": null,
+        "mergeable_state": "unknown",
+        "merged_by": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "comments": 0,
+        "review_comments": 0,
+        "maintainer_can_modify": false,
+        "commits": 1,
+        "additions": 5,
+        "deletions": 0,
+        "changed_files": 1
+      }
+    },
+    {
+      "method": "listPullFiles",
+      "params": {
+        "owner": "thekevinscott",
+        "repo": "repo-name-checker",
+        "pull_number": 15
+      },
+      "result": [
+        {
+          "sha": "225f22a7eb479eaa26a132d472db766262b0083f",
+          "filename": ".github/workflows/pr-monitor.yml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/thekevinscott/repo-name-checker/blob/dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2/.github%2Fworkflows%2Fpr-monitor.yml",
+          "raw_url": "https://github.com/thekevinscott/repo-name-checker/raw/dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2/.github%2Fworkflows%2Fpr-monitor.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/contents/.github%2Fworkflows%2Fpr-monitor.yml?ref=dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2",
+          "patch": "@@ -3,6 +3,11 @@ name: PR Monitor\n on:\n   pull_request:\n \n+concurrency:\n+  # A superseded gate run polls a stale SHA until it finishes. Cancel it.\n+  group: ${{ github.workflow }}-${{ github.ref }}\n+  cancel-in-progress: true\n+\n permissions:\n   actions: read\n   contents: read"
+        }
+      ]
+    },
+    {
+      "method": "getCommit",
+      "params": {
+        "owner": "thekevinscott",
+        "repo": "repo-name-checker",
+        "ref": "e7c1be0e43082590e882b86436ac6f2a91c6384c"
+      },
+      "result": {
+        "sha": "e7c1be0e43082590e882b86436ac6f2a91c6384c",
+        "node_id": "C_kwDOSZa1MNoAKGU3YzFiZTBlNDMwODI1OTBlODgyYjg2NDM2YWM2ZjJhOTFjNjM4NGM",
+        "commit": {
+          "author": {
+            "name": "Kevin Scott",
+            "email": "151596+thekevinscott@users.noreply.github.com",
+            "date": "2026-08-20T16:59:58Z"
+          },
+          "committer": {
+            "name": "GitHub",
+            "email": "noreply@github.com",
+            "date": "2026-08-20T16:59:58Z"
+          },
+          "message": "Merge pull request #15 from thekevinscott/ci/gate-concurrency\n\nci: cancel superseded CI Gate runs, normalize the timeout",
+          "tree": {
+            "sha": "59255ea69917406b6f0961bc8e928449e8779b5c",
+            "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/trees/59255ea69917406b6f0961bc8e928449e8779b5c"
+          },
+          "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/commits/e7c1be0e43082590e882b86436ac6f2a91c6384c",
+          "comment_count": 0,
+          "verification": {
+            "verified": true,
+            "reason": "valid",
+            "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqhzKOCRC1aQ7uu5UhlAAAnkAQAHMFwTaNuVe7x5I5IgvSF+jW\nUpKcyIuOtnVsHOVzwsus6u3P6Nj20UeZi98I6/xzoNogQmIbgYPsieY+Svv+3VL8\nTAIXjaoCCGw8pZk1WD+e095gBb0Je7Zr2/aAbY0D+FDUcN6VauE8OIuocSQEZLk0\nuBhdTgPjkdVmUvFv8ht9kLqQUI0efesamjVFpjIqRGmLWZTB/9QxRg7XabMoff7x\nKQWrRKcBYCl8hhAlutZNDDnHCHov+GOtmIqS20GHC9HOy5Np6Bu3Le/x/9KmOIua\nFRfFLsMadSVySrQHllSvNpYTT3AW/5hMGY0zbJQ/ANojTIjW8heZtzZl2Gzvdd9h\nobK8/01+N6FSUOr8RVcq4qDBGIle7v+M8pXFIwXF7szxS2ZtG9ORzCOynw2yQoCv\nB4vc4XEzInhZdRbZks4N+QbgVmnx1g4KEe1whzJtDLV4YtyML2A8KR9+/KrcuKyv\n/N7HM+vD/3UIMxJNYb7x8ycNCOZ5prQiPvbZqe6Z+AjSjgNlThWs4TCTSYvvk2B+\nG9XHrWLC50XO3mFdSVEm1K8Wzkvqnpjw0IOkK5G5xr04iPVGIjem0CQW1PjC1FIv\nwZ7fvU61c/ENHQTHfH43QnnIu9lUqho940svXZ4oPw4+YIa8kTzdIUca9EZBJDOe\ni2ICHMlzppoore/R6RGs\n=bGij\n-----END PGP SIGNATURE-----\n",
+            "payload": "tree 59255ea69917406b6f0961bc8e928449e8779b5c\nparent 495fdc0d05d75f7b0478a3ace6f4ac6409a2f2c1\nparent dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2\nauthor Kevin Scott <151596+thekevinscott@users.noreply.github.com> 1787245198 -0400\ncommitter GitHub <noreply@github.com> 1787245198 -0400\n\nMerge pull request #15 from thekevinscott/ci/gate-concurrency\n\nci: cancel superseded CI Gate runs, normalize the timeout",
+            "verified_at": "2026-08-20T16:59:59Z"
+          }
+        },
+        "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/commits/e7c1be0e43082590e882b86436ac6f2a91c6384c",
+        "html_url": "https://github.com/thekevinscott/repo-name-checker/commit/e7c1be0e43082590e882b86436ac6f2a91c6384c",
+        "comments_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/commits/e7c1be0e43082590e882b86436ac6f2a91c6384c/comments",
+        "author": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "committer": {
+          "login": "web-flow",
+          "id": 19864447,
+          "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+          "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/web-flow",
+          "html_url": "https://github.com/web-flow",
+          "followers_url": "https://api.github.com/users/web-flow/followers",
+          "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+          "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+          "organizations_url": "https://api.github.com/users/web-flow/orgs",
+          "repos_url": "https://api.github.com/users/web-flow/repos",
+          "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/web-flow/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "parents": [
+          {
+            "sha": "495fdc0d05d75f7b0478a3ace6f4ac6409a2f2c1",
+            "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/commits/495fdc0d05d75f7b0478a3ace6f4ac6409a2f2c1",
+            "html_url": "https://github.com/thekevinscott/repo-name-checker/commit/495fdc0d05d75f7b0478a3ace6f4ac6409a2f2c1"
+          },
+          {
+            "sha": "dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2",
+            "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/commits/dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2",
+            "html_url": "https://github.com/thekevinscott/repo-name-checker/commit/dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2"
+          }
+        ],
+        "stats": {
+          "total": 5,
+          "additions": 5,
+          "deletions": 0
+        },
+        "files": [
+          {
+            "sha": "225f22a7eb479eaa26a132d472db766262b0083f",
+            "filename": ".github/workflows/pr-monitor.yml",
+            "status": "modified",
+            "additions": 5,
+            "deletions": 0,
+            "changes": 5,
+            "blob_url": "https://github.com/thekevinscott/repo-name-checker/blob/e7c1be0e43082590e882b86436ac6f2a91c6384c/.github%2Fworkflows%2Fpr-monitor.yml",
+            "raw_url": "https://github.com/thekevinscott/repo-name-checker/raw/e7c1be0e43082590e882b86436ac6f2a91c6384c/.github%2Fworkflows%2Fpr-monitor.yml",
+            "contents_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/contents/.github%2Fworkflows%2Fpr-monitor.yml?ref=e7c1be0e43082590e882b86436ac6f2a91c6384c",
+            "patch": "@@ -3,6 +3,11 @@ name: PR Monitor\n on:\n   pull_request:\n \n+concurrency:\n+  # A superseded gate run polls a stale SHA until it finishes. Cancel it.\n+  group: ${{ github.workflow }}-${{ github.ref }}\n+  cancel-in-progress: true\n+\n permissions:\n   actions: read\n   contents: read"
+          }
+        ]
+      }
+    },
+    {
+      "method": "getCommit",
+      "params": {
+        "owner": "thekevinscott",
+        "repo": "repo-name-checker",
+        "ref": "main"
+      },
+      "result": {
+        "sha": "e7c1be0e43082590e882b86436ac6f2a91c6384c",
+        "node_id": "C_kwDOSZa1MNoAKGU3YzFiZTBlNDMwODI1OTBlODgyYjg2NDM2YWM2ZjJhOTFjNjM4NGM",
+        "commit": {
+          "author": {
+            "name": "Kevin Scott",
+            "email": "151596+thekevinscott@users.noreply.github.com",
+            "date": "2026-08-20T16:59:58Z"
+          },
+          "committer": {
+            "name": "GitHub",
+            "email": "noreply@github.com",
+            "date": "2026-08-20T16:59:58Z"
+          },
+          "message": "Merge pull request #15 from thekevinscott/ci/gate-concurrency\n\nci: cancel superseded CI Gate runs, normalize the timeout",
+          "tree": {
+            "sha": "59255ea69917406b6f0961bc8e928449e8779b5c",
+            "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/trees/59255ea69917406b6f0961bc8e928449e8779b5c"
+          },
+          "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/commits/e7c1be0e43082590e882b86436ac6f2a91c6384c",
+          "comment_count": 0,
+          "verification": {
+            "verified": true,
+            "reason": "valid",
+            "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqhzKOCRC1aQ7uu5UhlAAAnkAQAHMFwTaNuVe7x5I5IgvSF+jW\nUpKcyIuOtnVsHOVzwsus6u3P6Nj20UeZi98I6/xzoNogQmIbgYPsieY+Svv+3VL8\nTAIXjaoCCGw8pZk1WD+e095gBb0Je7Zr2/aAbY0D+FDUcN6VauE8OIuocSQEZLk0\nuBhdTgPjkdVmUvFv8ht9kLqQUI0efesamjVFpjIqRGmLWZTB/9QxRg7XabMoff7x\nKQWrRKcBYCl8hhAlutZNDDnHCHov+GOtmIqS20GHC9HOy5Np6Bu3Le/x/9KmOIua\nFRfFLsMadSVySrQHllSvNpYTT3AW/5hMGY0zbJQ/ANojTIjW8heZtzZl2Gzvdd9h\nobK8/01+N6FSUOr8RVcq4qDBGIle7v+M8pXFIwXF7szxS2ZtG9ORzCOynw2yQoCv\nB4vc4XEzInhZdRbZks4N+QbgVmnx1g4KEe1whzJtDLV4YtyML2A8KR9+/KrcuKyv\n/N7HM+vD/3UIMxJNYb7x8ycNCOZ5prQiPvbZqe6Z+AjSjgNlThWs4TCTSYvvk2B+\nG9XHrWLC50XO3mFdSVEm1K8Wzkvqnpjw0IOkK5G5xr04iPVGIjem0CQW1PjC1FIv\nwZ7fvU61c/ENHQTHfH43QnnIu9lUqho940svXZ4oPw4+YIa8kTzdIUca9EZBJDOe\ni2ICHMlzppoore/R6RGs\n=bGij\n-----END PGP SIGNATURE-----\n",
+            "payload": "tree 59255ea69917406b6f0961bc8e928449e8779b5c\nparent 495fdc0d05d75f7b0478a3ace6f4ac6409a2f2c1\nparent dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2\nauthor Kevin Scott <151596+thekevinscott@users.noreply.github.com> 1787245198 -0400\ncommitter GitHub <noreply@github.com> 1787245198 -0400\n\nMerge pull request #15 from thekevinscott/ci/gate-concurrency\n\nci: cancel superseded CI Gate runs, normalize the timeout",
+            "verified_at": "2026-08-20T16:59:59Z"
+          }
+        },
+        "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/commits/e7c1be0e43082590e882b86436ac6f2a91c6384c",
+        "html_url": "https://github.com/thekevinscott/repo-name-checker/commit/e7c1be0e43082590e882b86436ac6f2a91c6384c",
+        "comments_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/commits/e7c1be0e43082590e882b86436ac6f2a91c6384c/comments",
+        "author": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "committer": {
+          "login": "web-flow",
+          "id": 19864447,
+          "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+          "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/web-flow",
+          "html_url": "https://github.com/web-flow",
+          "followers_url": "https://api.github.com/users/web-flow/followers",
+          "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+          "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+          "organizations_url": "https://api.github.com/users/web-flow/orgs",
+          "repos_url": "https://api.github.com/users/web-flow/repos",
+          "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/web-flow/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "parents": [
+          {
+            "sha": "495fdc0d05d75f7b0478a3ace6f4ac6409a2f2c1",
+            "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/commits/495fdc0d05d75f7b0478a3ace6f4ac6409a2f2c1",
+            "html_url": "https://github.com/thekevinscott/repo-name-checker/commit/495fdc0d05d75f7b0478a3ace6f4ac6409a2f2c1"
+          },
+          {
+            "sha": "dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2",
+            "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/commits/dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2",
+            "html_url": "https://github.com/thekevinscott/repo-name-checker/commit/dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2"
+          }
+        ],
+        "stats": {
+          "total": 5,
+          "additions": 5,
+          "deletions": 0
+        },
+        "files": [
+          {
+            "sha": "225f22a7eb479eaa26a132d472db766262b0083f",
+            "filename": ".github/workflows/pr-monitor.yml",
+            "status": "modified",
+            "additions": 5,
+            "deletions": 0,
+            "changes": 5,
+            "blob_url": "https://github.com/thekevinscott/repo-name-checker/blob/e7c1be0e43082590e882b86436ac6f2a91c6384c/.github%2Fworkflows%2Fpr-monitor.yml",
+            "raw_url": "https://github.com/thekevinscott/repo-name-checker/raw/e7c1be0e43082590e882b86436ac6f2a91c6384c/.github%2Fworkflows%2Fpr-monitor.yml",
+            "contents_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/contents/.github%2Fworkflows%2Fpr-monitor.yml?ref=e7c1be0e43082590e882b86436ac6f2a91c6384c",
+            "patch": "@@ -3,6 +3,11 @@ name: PR Monitor\n on:\n   pull_request:\n \n+concurrency:\n+  # A superseded gate run polls a stale SHA until it finishes. Cancel it.\n+  group: ${{ github.workflow }}-${{ github.ref }}\n+  cancel-in-progress: true\n+\n permissions:\n   actions: read\n   contents: read"
+          }
+        ]
+      }
+    },
+    {
+      "method": "listPulls",
+      "params": {
+        "owner": "thekevinscott",
+        "repo": "repo-name-checker",
+        "state": "open",
+        "head": "thekevinscott:main"
+      },
+      "result": []
+    },
+    {
+      "method": "getCommit",
+      "params": {
+        "owner": "thekevinscott",
+        "repo": "repo-name-checker",
+        "ref": "dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2"
+      },
+      "result": {
+        "sha": "dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2",
+        "node_id": "C_kwDOSZa1MNoAKGRkMTE1ZDBiYjNiN2ZiNTM1YWFmNzNiMjQ1NmZjZGFhNDIzNWM5YjI",
+        "commit": {
+          "author": {
+            "name": "thekevinbot",
+            "email": "248217931+thekevinbot@users.noreply.github.com",
+            "date": "2026-08-20T16:56:21Z"
+          },
+          "committer": {
+            "name": "thekevinbot",
+            "email": "248217931+thekevinbot@users.noreply.github.com",
+            "date": "2026-08-20T16:56:21Z"
+          },
+          "message": "ci: cancel superseded CI Gate runs, normalize the timeout\n\nA gate job resolves its target SHA at startup, so once a new commit\nlands on the PR the old run just polls for runs on a commit nobody\ncares about, holding a runner until it finishes. The concurrency group\ncancels it when the replacement starts. Keyed on github.ref, which for\npull_request is refs/pull/N/merge, so it scopes per PR.\n\nTimeout settles on one fleet rule: 20 minutes, raised only where the\nmeasured slowest non-gate pull_request run gets close. putitoutthere is\nthe only repo that qualifies (16 min observed, stays at 30).\n\nSkip-Changelog: true\nSkip-Migration: true\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01GGUxA1SfkcFh4VbuQ9UExQ",
+          "tree": {
+            "sha": "59255ea69917406b6f0961bc8e928449e8779b5c",
+            "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/trees/59255ea69917406b6f0961bc8e928449e8779b5c"
+          },
+          "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/commits/dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2",
+          "comment_count": 0,
+          "verification": {
+            "verified": true,
+            "reason": "valid",
+            "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCgAdFiEEnU3Dh/cnWdmpxUeIBqUoxO3sGUIFAmqHMbUACgkQBqUoxO3s\nGULRzg//a2+7sxuOpxbbsPfXHTOkkTeVe/yBFzgWWUw4lfk6mpInfD+YmXhRrOVb\nYFUd3vUdLjF3oHAU1DRWr7zXP8v6B/OIkl2uIzWPyBudHu7sMvYHcmZsbJ5c7qhS\nNZAF7fPrcOgODBtLHsoshQi8GGHLHg4GuuSjm3hNs8ws9WQtUEq8vF9AmIt3Tk3x\nso/Eb3wacjTTH/PEcx0ePSk1rPhZyc6/I8MuBJ/mPCcliwdRsK7KVrijR6Vrbvip\nG9wns3okpNdnc/HoQ7Hhy8ltpViyZvjYRkFnls8j0VAyWNrkKVnC5vR6PPenurWP\n32ccNozDfOzf5Cz6+GN251vatUSFNA612ogQkNfYkc0NXJHsjLQUMm6eP0C8OesF\nOEdOxOG4PAm0QwhdtujpTOfZbTTNqJm+w5Aw/8sj7Vyu5OZBNZzuTQ4z5Jt8KAVy\ndvMgAVORRPPb4HjZXkmlP68IHoKrLTiNWzKExJDgP2nis7O1ea66GDfA/kPaRtNm\nFMKcmdfGWLpmV/uBY+VPP95qQlceb+qeD/HhlXzeuo8krvvQGebMzo10Cqd4NNJr\nxE9aMdHWf16ueNGUUabbMVxF/e8O1ghBp8phsFwxZgSVmv7BNzO/WLlTH9HsaLNL\n2zGj4lv5UdLFjLcZ4OR8EqnOgHmsQoro0vZ04ewfYu+ghYZ56Jc=\n=5vhK\n-----END PGP SIGNATURE-----",
+            "payload": "tree 59255ea69917406b6f0961bc8e928449e8779b5c\nparent 495fdc0d05d75f7b0478a3ace6f4ac6409a2f2c1\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1787244981 -0400\ncommitter thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1787244981 -0400\n\nci: cancel superseded CI Gate runs, normalize the timeout\n\nA gate job resolves its target SHA at startup, so once a new commit\nlands on the PR the old run just polls for runs on a commit nobody\ncares about, holding a runner until it finishes. The concurrency group\ncancels it when the replacement starts. Keyed on github.ref, which for\npull_request is refs/pull/N/merge, so it scopes per PR.\n\nTimeout settles on one fleet rule: 20 minutes, raised only where the\nmeasured slowest non-gate pull_request run gets close. putitoutthere is\nthe only repo that qualifies (16 min observed, stays at 30).\n\nSkip-Changelog: true\nSkip-Migration: true\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01GGUxA1SfkcFh4VbuQ9UExQ\n",
+            "verified_at": "2026-08-20T16:56:23Z"
+          }
+        },
+        "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/commits/dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2",
+        "html_url": "https://github.com/thekevinscott/repo-name-checker/commit/dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2",
+        "comments_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/commits/dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2/comments",
+        "author": {
+          "login": "thekevinbot",
+          "id": 248217931,
+          "node_id": "U_kgDODsuBSw",
+          "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinbot",
+          "html_url": "https://github.com/thekevinbot",
+          "followers_url": "https://api.github.com/users/thekevinbot/followers",
+          "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+          "repos_url": "https://api.github.com/users/thekevinbot/repos",
+          "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "committer": {
+          "login": "thekevinbot",
+          "id": 248217931,
+          "node_id": "U_kgDODsuBSw",
+          "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinbot",
+          "html_url": "https://github.com/thekevinbot",
+          "followers_url": "https://api.github.com/users/thekevinbot/followers",
+          "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+          "repos_url": "https://api.github.com/users/thekevinbot/repos",
+          "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "parents": [
+          {
+            "sha": "495fdc0d05d75f7b0478a3ace6f4ac6409a2f2c1",
+            "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/commits/495fdc0d05d75f7b0478a3ace6f4ac6409a2f2c1",
+            "html_url": "https://github.com/thekevinscott/repo-name-checker/commit/495fdc0d05d75f7b0478a3ace6f4ac6409a2f2c1"
+          }
+        ],
+        "stats": {
+          "total": 5,
+          "additions": 5,
+          "deletions": 0
+        },
+        "files": [
+          {
+            "sha": "225f22a7eb479eaa26a132d472db766262b0083f",
+            "filename": ".github/workflows/pr-monitor.yml",
+            "status": "modified",
+            "additions": 5,
+            "deletions": 0,
+            "changes": 5,
+            "blob_url": "https://github.com/thekevinscott/repo-name-checker/blob/dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2/.github%2Fworkflows%2Fpr-monitor.yml",
+            "raw_url": "https://github.com/thekevinscott/repo-name-checker/raw/dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2/.github%2Fworkflows%2Fpr-monitor.yml",
+            "contents_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/contents/.github%2Fworkflows%2Fpr-monitor.yml?ref=dd115d0bb3b7fb535aaf73b2456fcdaa4235c9b2",
+            "patch": "@@ -3,6 +3,11 @@ name: PR Monitor\n on:\n   pull_request:\n \n+concurrency:\n+  # A superseded gate run polls a stale SHA until it finishes. Cancel it.\n+  group: ${{ github.workflow }}-${{ github.ref }}\n+  cancel-in-progress: true\n+\n permissions:\n   actions: read\n   contents: read"
+          }
+        ]
+      }
+    },
+    {
+      "method": "listWorkflows",
+      "params": {
+        "owner": "thekevinscott",
+        "repo": "repo-name-checker"
+      },
+      "result": [
+        {
+          "id": 274135127,
+          "node_id": "W_kwDOSZa1MM4QVvhX",
+          "name": "CI",
+          "path": ".github/workflows/ci.yml",
+          "state": "active",
+          "created_at": "2026-05-10T08:47:39.000-04:00",
+          "updated_at": "2026-05-10T08:50:13.000-04:00",
+          "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/actions/workflows/274135127",
+          "html_url": "https://github.com/thekevinscott/repo-name-checker/blob/main/.github/workflows/ci.yml",
+          "badge_url": "https://github.com/thekevinscott/repo-name-checker/workflows/CI/badge.svg"
+        },
+        {
+          "id": 274135128,
+          "node_id": "W_kwDOSZa1MM4QVvhY",
+          "name": "PR Monitor",
+          "path": ".github/workflows/pr-monitor.yml",
+          "state": "active",
+          "created_at": "2026-05-10T08:47:39.000-04:00",
+          "updated_at": "2026-05-10T08:50:13.000-04:00",
+          "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/actions/workflows/274135128",
+          "html_url": "https://github.com/thekevinscott/repo-name-checker/blob/main/.github/workflows/pr-monitor.yml",
+          "badge_url": "https://github.com/thekevinscott/repo-name-checker/workflows/PR%20Monitor/badge.svg"
+        },
+        {
+          "id": 274182875,
+          "node_id": "W_kwDOSZa1MM4QV7Lb",
+          "name": "Release",
+          "path": ".github/workflows/release.yml",
+          "state": "active",
+          "created_at": "2026-05-10T11:13:54.000-04:00",
+          "updated_at": "2026-05-10T11:13:54.000-04:00",
+          "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/actions/workflows/274182875",
+          "html_url": "https://github.com/thekevinscott/repo-name-checker/blob/main/.github/workflows/release.yml",
+          "badge_url": "https://github.com/thekevinscott/repo-name-checker/workflows/Release/badge.svg"
+        },
+        {
+          "id": 274128301,
+          "node_id": "W_kwDOSZa1MM4QVt2t",
+          "name": "Dependency Graph",
+          "path": "dynamic/dependabot/update-graph",
+          "state": "active",
+          "created_at": "2026-05-10T08:24:15.000-04:00",
+          "updated_at": "2026-05-10T08:24:15.000-04:00",
+          "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/actions/workflows/274128301",
+          "html_url": "https://github.com/thekevinscott/repo-name-checker/actions/workflows/dependabot/update-graph",
+          "badge_url": "https://github.com/thekevinscott/repo-name-checker/actions/workflows/dependabot/update-graph/badge.svg"
+        }
+      ]
+    },
+    {
+      "method": "listWorkflowFiles",
+      "params": {
+        "owner": "thekevinscott",
+        "repo": "repo-name-checker",
+        "ref": "e7c1be0e43082590e882b86436ac6f2a91c6384c"
+      },
+      "result": [
+        {
+          "name": "ci.yml",
+          "path": ".github/workflows/ci.yml",
+          "sha": "8cc46d77a250d4391f3f8fd5e0a4e6b8d7b2c214",
+          "size": 748,
+          "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/contents/.github/workflows/ci.yml?ref=e7c1be0e43082590e882b86436ac6f2a91c6384c",
+          "html_url": "https://github.com/thekevinscott/repo-name-checker/blob/e7c1be0e43082590e882b86436ac6f2a91c6384c/.github/workflows/ci.yml",
+          "git_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/blobs/8cc46d77a250d4391f3f8fd5e0a4e6b8d7b2c214",
+          "download_url": "https://raw.githubusercontent.com/thekevinscott/repo-name-checker/e7c1be0e43082590e882b86436ac6f2a91c6384c/.github/workflows/ci.yml",
+          "type": "file",
+          "_links": {
+            "self": "https://api.github.com/repos/thekevinscott/repo-name-checker/contents/.github/workflows/ci.yml?ref=e7c1be0e43082590e882b86436ac6f2a91c6384c",
+            "git": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/blobs/8cc46d77a250d4391f3f8fd5e0a4e6b8d7b2c214",
+            "html": "https://github.com/thekevinscott/repo-name-checker/blob/e7c1be0e43082590e882b86436ac6f2a91c6384c/.github/workflows/ci.yml"
+          }
+        },
+        {
+          "name": "pr-monitor.yml",
+          "path": ".github/workflows/pr-monitor.yml",
+          "sha": "225f22a7eb479eaa26a132d472db766262b0083f",
+          "size": 678,
+          "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/contents/.github/workflows/pr-monitor.yml?ref=e7c1be0e43082590e882b86436ac6f2a91c6384c",
+          "html_url": "https://github.com/thekevinscott/repo-name-checker/blob/e7c1be0e43082590e882b86436ac6f2a91c6384c/.github/workflows/pr-monitor.yml",
+          "git_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/blobs/225f22a7eb479eaa26a132d472db766262b0083f",
+          "download_url": "https://raw.githubusercontent.com/thekevinscott/repo-name-checker/e7c1be0e43082590e882b86436ac6f2a91c6384c/.github/workflows/pr-monitor.yml",
+          "type": "file",
+          "_links": {
+            "self": "https://api.github.com/repos/thekevinscott/repo-name-checker/contents/.github/workflows/pr-monitor.yml?ref=e7c1be0e43082590e882b86436ac6f2a91c6384c",
+            "git": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/blobs/225f22a7eb479eaa26a132d472db766262b0083f",
+            "html": "https://github.com/thekevinscott/repo-name-checker/blob/e7c1be0e43082590e882b86436ac6f2a91c6384c/.github/workflows/pr-monitor.yml"
+          }
+        },
+        {
+          "name": "release.yml",
+          "path": ".github/workflows/release.yml",
+          "sha": "b603a70e30f38e7d1c0ee344bc8957c96e29d361",
+          "size": 739,
+          "url": "https://api.github.com/repos/thekevinscott/repo-name-checker/contents/.github/workflows/release.yml?ref=e7c1be0e43082590e882b86436ac6f2a91c6384c",
+          "html_url": "https://github.com/thekevinscott/repo-name-checker/blob/e7c1be0e43082590e882b86436ac6f2a91c6384c/.github/workflows/release.yml",
+          "git_url": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/blobs/b603a70e30f38e7d1c0ee344bc8957c96e29d361",
+          "download_url": "https://raw.githubusercontent.com/thekevinscott/repo-name-checker/e7c1be0e43082590e882b86436ac6f2a91c6384c/.github/workflows/release.yml",
+          "type": "file",
+          "_links": {
+            "self": "https://api.github.com/repos/thekevinscott/repo-name-checker/contents/.github/workflows/release.yml?ref=e7c1be0e43082590e882b86436ac6f2a91c6384c",
+            "git": "https://api.github.com/repos/thekevinscott/repo-name-checker/git/blobs/b603a70e30f38e7d1c0ee344bc8957c96e29d361",
+            "html": "https://github.com/thekevinscott/repo-name-checker/blob/e7c1be0e43082590e882b86436ac6f2a91c6384c/.github/workflows/release.yml"
+          }
+        }
+      ]
+    },
+    {
+      "method": "getContent",
+      "params": {
+        "owner": "thekevinscott",
+        "repo": "repo-name-checker",
+        "path": ".github/workflows/ci.yml",
+        "ref": "e7c1be0e43082590e882b86436ac6f2a91c6384c"
+      },
+      "result": "name: CI\non:\n  pull_request:\n    paths-ignore:\n      - '**.md'\n      - 'LICENSE'\n      - '.gitignore'\n      - '.github/workflows/release.yml'\n      - '.github/workflows/pr-monitor.yml'\n      - 'putitoutthere.toml'\npermissions: { contents: read }\njobs:\n  test:\n    strategy:\n      fail-fast: false\n      matrix:\n        os: [ubuntu-latest, macos-latest, windows-latest]\n        python-version: ['3.12', '3.13']\n    runs-on: ${{ matrix.os }}\n    steps:\n      - uses: actions/checkout@v4\n      - uses: astral-sh/setup-uv@v5\n        with:\n          enable-cache: true\n      - run: uv python install ${{ matrix.python-version }}\n      - run: uv sync --python ${{ matrix.python-version }}\n      - run: uv run --python ${{ matrix.python-version }} pytest\n"
+    },
+    {
+      "method": "getContent",
+      "params": {
+        "owner": "thekevinscott",
+        "repo": "repo-name-checker",
+        "path": ".github/workflows/pr-monitor.yml",
+        "ref": "e7c1be0e43082590e882b86436ac6f2a91c6384c"
+      },
+      "result": "name: PR Monitor\n\non:\n  pull_request:\n\nconcurrency:\n  # A superseded gate run polls a stale SHA until it finishes. Cancel it.\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  actions: read\n  contents: read\n  # willfire reads the PR and its changed files to predict which workflows dispatch.\n  pull-requests: read\n\njobs:\n  monitor:\n    name: 'CI Gate'\n    runs-on: ubuntu-latest\n    # The action has no timeout of its own (see monitor.ts) -- this is the\n    # backstop. If a predicted run never dispatches, the gate waits here\n    # until the job is killed.\n    timeout-minutes: 20\n    steps:\n      - uses: thekevinscott/pr-monitor@v1\n"
+    },
+    {
+      "method": "getContent",
+      "params": {
+        "owner": "thekevinscott",
+        "repo": "repo-name-checker",
+        "path": ".github/workflows/release.yml",
+        "ref": "e7c1be0e43082590e882b86436ac6f2a91c6384c"
+      },
+      "result": "name: Release\n\non:\n  push:\n    branches: [main]\n  workflow_dispatch:\n\njobs:\n  release:\n    uses: thekevinscott/putitoutthere/.github/workflows/release.yml@v0\n    permissions:\n      contents: write\n      id-token: write\n\n  pypi-publish:\n    needs: release\n    if: needs.release.outputs.has_pypi == 'true'\n    runs-on: ubuntu-latest\n    environment: release\n    permissions:\n      id-token: write\n    steps:\n      - uses: actions/download-artifact@v8\n        with:\n          pattern: '*-sdist'\n          path: dist/\n          merge-multiple: true\n      - uses: actions/download-artifact@v8\n        with:\n          pattern: '*-wheel-*'\n          path: dist/\n          merge-multiple: true\n      - uses: pypa/gh-action-pypi-publish@release/v1\n"
+    }
+  ]
+}
