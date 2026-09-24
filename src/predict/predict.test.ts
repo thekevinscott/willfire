@@ -7,7 +7,7 @@
 // `tests/fixtures/willrun-probe/` are the record. Changing one of these
 // assertions means claiming GitHub changed.
 
-import type { GithubClient } from "./makeGithubClient.js";
+import type { GithubClient, GithubPullFile } from "./makeGithubClient.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resolveCallbackMap } from "../callback/resolveCallbackMap.js";
 import { expandJobs } from "../jobs/expandJobs.js";
@@ -51,7 +51,7 @@ interface Fixture {
   /** >1 makes the inferred event action `synchronize` rather than `opened`. */
   commits?: number;
   baseRef?: string;
-  files?: string[];
+  files?: (string | GithubPullFile)[];
   /** Head commit message — the surface the skip instructions are read from. */
   message?: string;
   workflows?: { path: string; state: string }[];
@@ -151,7 +151,7 @@ function fakeGithub(f: Fixture): GithubClient {
       if (pull_number !== 1) {
         throw new Error(`404 pull ${pull_number}`);
       }
-      return (f.files ?? ["src/app.ts"]).map((filename) => ({ filename }));
+      return (f.files ?? ["src/app.ts"]).map((f) => (typeof f === "string" ? { filename: f } : f));
     },
     getCommit: async ({ owner, repo, ref }) => {
       // Two callers share this route: the head-commit read that looks for a
@@ -404,6 +404,18 @@ describe("workflow-level verdicts", () => {
     expect(await only(wf, { files: ["src/app.ts", "docs/a.md"] })).toMatchObject({
       job: "a",
     });
+  });
+
+  it("accepts when a renamed file's previous path matches `paths` (#237)", async () => {
+    const wf = "on:\n  pull_request:\n    paths: ['docs/**']\njobs:\n  a: {}\n";
+    const renamed = { filename: "README.md", previous_filename: "docs/README.md" };
+    expect(await only(wf, { files: [renamed] })).toMatchObject({ job: "a" });
+  });
+
+  it("accepts when a renamed file's previous path escapes `paths-ignore` (#237)", async () => {
+    const wf = "on:\n  pull_request:\n    paths-ignore: ['docs/**']\njobs:\n  a: {}\n";
+    const renamed = { filename: "docs/a.md", previous_filename: "src/a.ts" };
+    expect(await only(wf, { files: [renamed] })).toMatchObject({ job: "a" });
   });
 
   it("declines when every changed file matches `paths-ignore`", async () => {

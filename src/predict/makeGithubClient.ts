@@ -23,6 +23,7 @@ export interface GithubPull extends GithubPullSummary {
 
 export interface GithubPullFile {
   filename: string;
+  previous_filename?: string;
 }
 
 export interface GithubCommit {

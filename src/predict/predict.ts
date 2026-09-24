@@ -51,7 +51,9 @@ export async function predict(
     action: opts.action ?? (pr.commits > 1 ? "synchronize" : "opened"),
     baseRef: pr.base.ref,
     ...(stackTarget !== null ? { stackTarget } : {}),
-    files: files.map((f) => f.filename),
+    files: files.flatMap((f) =>
+      f.previous_filename === undefined ? [f.filename] : [f.filename, f.previous_filename],
+    ),
   };
   const headSha = pr.head.sha;
 
