@@ -54,6 +54,19 @@ const readerOf = (
 const readerFor = (files: Record<string, string>) =>
   readerOf(async (path) => files[path] ?? null);
 
+/**
+ * `levels` reusable workflows below the caller, each calling the next through a
+ * job named `j`, the last holding a single `leaf` job.
+ */
+const chainOf = (levels: number): Record<string, string> => {
+  const files: Record<string, string> = {};
+  for (let i = 1; i <= levels; i++) {
+    const jobs = i === levels ? { leaf: {} } : { j: { uses: `./.github/workflows/n${i + 1}.yml` } };
+    files[`.github/workflows/n${i}.yml`] = JSON.stringify({ on: { workflow_call: null }, jobs });
+  }
+  return files;
+};
+
 const expand = (jobs: YamlMap, reader: WorkflowReader = readerFor({})) =>
   expandJobs({
     wf: { on: { pull_request: null }, jobs } as Workflow,
@@ -304,34 +317,29 @@ describe("reusable workflows", () => {
     ]);
   });
 
-  it("gives up past the four-level call chain GitHub allows", async () => {
-    // Not a self-imposed budget: a fifth level fails the run outright, so
-    // there is no check name to predict. Level five is the first `uses:` we
-    // decline to follow, and the entry stops at the caller that made it.
-    const link = (next: string) =>
-      JSON.stringify({
-        on: { workflow_call: null },
-        jobs: { j: { uses: `./.github/workflows/${next}` } },
-      });
+  it("follows the nine reusable levels GitHub.com allows", async () => {
     const entries = await expand(
       { call: { uses: "./.github/workflows/n1.yml" } },
-      readerFor({
-        ".github/workflows/n1.yml": link("n2.yml"),
-        ".github/workflows/n2.yml": link("n3.yml"),
-        ".github/workflows/n3.yml": link("n4.yml"),
-        ".github/workflows/n4.yml": link("n5.yml"),
-        ".github/workflows/n5.yml": JSON.stringify({
-          on: { workflow_call: null },
-          jobs: { leaf: {} },
-        }),
-      }),
+      readerFor(chainOf(9)),
+    );
+    const name = `call / ${"j / ".repeat(8)}leaf`;
+    expect(entries).toEqual([{ job: name, checkName: name, status: "run", reason: "" }]);
+  });
+
+  it("gives up past the ninth reusable level", async () => {
+    // Not a self-imposed budget: a tenth level fails the run outright, so
+    // there is no check name to predict. That level is the first `uses:` we
+    // decline to follow, and the entry stops at the caller that made it.
+    const entries = await expand(
+      { call: { uses: "./.github/workflows/n1.yml" } },
+      readerFor(chainOf(10)),
     );
     expect(entries).toEqual([
       {
-        job: "call / j / j / j / j",
+        job: `call${" / j".repeat(9)}`,
         checkName: null,
         status: "unknown",
-        reason: "reusable workflow nested deeper than 4 levels",
+        reason: "reusable workflow nested deeper than 9 levels",
       },
     ]);
   });
