@@ -8,10 +8,16 @@ const github = makeGithubClient();
 
 const CASES = discoverCases(new URL("./responses/", import.meta.url));
 
-test.each(CASES)("$owner/$repo#$pr still predicts the committed list", async (c) => {
-  const expected = JSON.parse(readFileSync(join(c.dir, "fixture.json"), "utf8")) as string[];
+const getResponse = (dir: string): string[] =>
+  JSON.parse(readFileSync(join(dir, "fixture.json"), "utf8")) as string[];
 
-  const { checkNames } = await predict(github, `${c.owner}/${c.repo}`, c.pr);
+test.each(CASES)(
+  "$owner/$repo#$pr still predicts the committed list",
+  async ({ owner, repo, pr, dir }) => {
+    const expected = getResponse(dir);
 
-  expect(checkNames).toEqual(expected);
-});
+    const { checkNames } = await predict(github, `${owner}/${repo}`, pr);
+
+    expect(checkNames).toEqual(expected);
+  },
+);

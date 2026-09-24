@@ -36,14 +36,16 @@ function replayClient(calls: RecordedCall[]): GithubClient {
 
 const CASES = discoverCases(new URL("./fixtures/", import.meta.url));
 
-test.each(CASES)("$owner/$repo#$pr predicts the dispatched check list exactly", async (c) => {
-  const fixture = JSON.parse(readFileSync(join(c.dir, "fixture.json"), "utf8")) as Fixture;
+const getFixture = (dir: string): Fixture =>
+  JSON.parse(readFileSync(join(dir, "fixture.json"), "utf8")) as Fixture;
 
-  const { checkNames } = await predict(
-    replayClient(fixture.calls),
-    `${c.owner}/${c.repo}`,
-    c.pr,
-  );
+test.each(CASES)(
+  "$owner/$repo#$pr predicts the dispatched check list exactly",
+  async ({ owner, repo, pr, dir }) => {
+    const { calls, dispatched } = getFixture(dir);
 
-  expect(checkNames).toEqual([...new Set(fixture.dispatched.map((d) => d.name))].sort());
-});
+    const { checkNames } = await predict(replayClient(calls), `${owner}/${repo}`, pr);
+
+    expect(checkNames).toEqual([...new Set(dispatched.map((d) => d.name))].sort());
+  },
+);
