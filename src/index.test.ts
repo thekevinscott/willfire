@@ -139,6 +139,44 @@ describe("root barrel", () => {
     ]);
   });
 
+  it("pins GithubClient exactly, so a widened field cannot slip past the literal above", () => {
+    // The literal implementation catches a field dropped, renamed or added.
+    // It cannot catch a field *widened* — `sha: string` to `string | null`
+    // still accepts `"abc"`, and still breaks a consumer reading it as a
+    // string. Only an exact comparison sees that, so the shape is spelled out
+    // here rather than derived from `GithubClient`.
+    type Repo = { owner: string; repo: string };
+    expectTypeOf<GithubClient>().toEqualTypeOf<{
+      getPull(
+        params: Repo & { pull_number: number },
+      ): Promise<{
+        base: { ref: string };
+        merge_commit_sha: string | null;
+        commits: number;
+        head: { sha: string };
+      }>;
+      listPulls(
+        params: Repo & { state: string; head: string },
+      ): Promise<{ base: { ref: string }; merge_commit_sha: string | null }[]>;
+      listPullFiles(
+        params: Repo & { pull_number: number },
+      ): Promise<{ filename: string; previous_filename?: string }[]>;
+      getCommit(
+        params: Repo & { ref: string },
+      ): Promise<{ sha: string; commit: { message: string }; parents: { sha: string }[] }>;
+      getContent(params: Repo & { path: string; ref: string }): Promise<string>;
+      downloadTarball(params: Repo & { ref: string }): Promise<ArrayBuffer>;
+      listWorkflows(params: Repo): Promise<{ path: string; state: string }[]>;
+      listWorkflowFiles(params: Repo & { ref: string }): Promise<{ path: string; type: string }[]>;
+      listWorkflowRuns(
+        params: Repo & { head_sha: string; event: string },
+      ): Promise<{ id: number; path: string; status: string | null }[]>;
+      listRunJobs(
+        params: Repo & { run_id: number },
+      ): Promise<{ name: string; conclusion: string | null }[]>;
+    }>();
+  });
+
   it("pins the workflow-reader seam: FetchWorkflow, ResolveRef, WorkflowReader", () => {
     // Independent of WorkflowReader's own declaration, which just aliases
     // these two — comparing WorkflowReader["fetchWorkflow"] to FetchWorkflow
