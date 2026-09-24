@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1790281926,
+  "exit_code": 0,
+  "commit": "58973700faa666b5fdc9070e8fe1c1d27e4dde75",
+  "branch": "chore/drop-scripts"
+}
