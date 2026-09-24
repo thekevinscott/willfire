@@ -13,17 +13,17 @@ Run it with `pnpm test:e2e`. It needs `GH_TOKEN`.
 ## The expectation is committed
 
 Each test reads one committed file from `fixtures/` — the repo, the pull
-request, the head commit and the check list — and asserts twice against it:
-that willfire still predicts that list, and that GitHub still dispatches it.
-Tests write nothing.
+request, the head commit and the check list recorded from a real dispatch —
+and asserts that willfire, run live, still produces that list. Tests write
+nothing.
 
-Two assertions rather than one because they fail for different reasons. A red
-on the first says willfire moved; a red on the second says GitHub moved.
+The recorded list is the only frozen half. willfire re-reads the repo and
+resolves moving tags on every run, so a change on GitHub's side reaches the
+prediction and shows up as a red.
 
-Comparing the two live sides against each other instead would miss the case
-this suite exists for: if GitHub changes and willfire correctly tracks the
-change, both sides move together and a live-against-live assertion stays green.
-The committed list is what makes the move visible.
+Reading the live dispatch back would add nothing. These pull requests are
+settled, so their runs are immutable history; asserting against them asserts
+that history is still history.
 
 Updating a file is a deliberate commit that acknowledges the move.
 
