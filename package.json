@@ -23,10 +23,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "./internal": {
-      "types": "./dist/internal.d.ts",
-      "default": "./dist/internal.js"
     }
   },
   "bin": {
@@ -47,8 +43,7 @@
     "test:e2e": "pnpm build && vitest run --config tests/e2e/vitest.config.mts",
     "test:integration": "pnpm build && vitest run tests/integration",
     "test:unit": "vitest run --coverage src",
-    "typecheck": "tsc -p tsconfig.json && pnpm --filter verify typecheck",
-    "verify": "pnpm --filter verify verify"
+    "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
     "arg": "^5.0.2",
