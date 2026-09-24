@@ -2,26 +2,7 @@
   "repo": "thekevinscott/github-data-file-fetcher",
   "pr": 3,
   "headSha": "9b34c8ebc84b886b8f75e315e9a5056e175d62bb",
-  "predicted": [
+  "checkNames": [
     "CI Gate"
-  ],
-  "dispatched": [
-    "CI Gate"
-  ],
-  "entries": [
-    {
-      "workflow": ".github/workflows/docs.yml",
-      "job": "*",
-      "status": "no-dispatch",
-      "reason": "no pull_request trigger",
-      "checkName": null
-    },
-    {
-      "workflow": ".github/workflows/pr-monitor.yml",
-      "job": "CI Gate",
-      "checkName": "CI Gate",
-      "status": "run",
-      "reason": "trigger matched"
-    }
   ]
 }

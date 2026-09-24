@@ -10,15 +10,22 @@ that is what the integration suite is for.
 
 Run it with `pnpm test:e2e`. It needs `GH_TOKEN`.
 
-## The fixture files are records, not expectations
+## The expectation is committed
 
-Each test writes what it observed to `fixtures/`: the repo, the pull request,
-the head commit, the predicted names and the dispatched names. Nothing reads
-these files back as an assertion — the assertion is live against live.
+Each test reads one committed file from `fixtures/` — the repo, the pull
+request, the head commit and the check list — and asserts twice against it:
+that willfire still predicts that list, and that GitHub still dispatches it.
+Tests write nothing.
 
-They exist so drift arrives as a diff in version control that someone reads.
-When a run changes one, the change is the signal; committing it is how you
-acknowledge the move.
+Two assertions rather than one because they fail for different reasons. A red
+on the first says willfire moved; a red on the second says GitHub moved.
+
+Comparing the two live sides against each other instead would miss the case
+this suite exists for: if GitHub changes and willfire correctly tracks the
+change, both sides move together and a live-against-live assertion stays green.
+The committed list is what makes the move visible.
+
+Updating a file is a deliberate commit that acknowledges the move.
 
 ## Why the pull requests are fixed
 
