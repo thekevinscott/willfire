@@ -2,9 +2,6 @@
 
 `willfire` runs live against a committed answer. Nothing is mocked.
 
-Gates nothing, runs on a schedule. A red means GitHub moved — that is the
-finding, not a flake.
-
 ## Layout
 
 One directory per case: `responses/<owner>/<repo>/<pr>/`. Its `fixture.json` is exactly
