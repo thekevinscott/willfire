@@ -1,14 +1,13 @@
 name: test
 
-# The repo's own suite: typecheck, then Vitest at the 100% coverage floor.
-# `conventions.yml` enforces the same floor through testing-conventions; this
-# workflow is the fast, direct signal and the one a contributor reproduces
-# locally with `pnpm typecheck` and `pnpm test:coverage`.
+# The repo's own suite, one job per kind so a red names the kind. Only the unit
+# job carries the coverage floor: `src/` reaches 100% from its colocated tests
+# alone, so the integration suite is not propping the number up.
 #
 # The suites are not a set of opinions about how GitHub *should* behave: every
-# expectation in `tests/integration/names.test.ts` and every workflow-level
-# verdict in `src/predict.test.ts` was read back off a live dispatch on
-# thekevinbot/willrun-probe. See `tests/fixtures/willrun-probe/README.md`.
+# workflow-level verdict in `src/predict.test.ts` was read back off a live
+# dispatch on thekevinbot/willrun-probe. See
+# `tests/fixtures/willrun-probe/README.md`.
 
 on:
   pull_request: {}
@@ -37,8 +36,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
 
-  test:
-    name: tests (100% coverage)
+  unit:
+    name: unit (100% coverage)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -49,4 +48,32 @@ jobs:
           node-version: '22'
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm test:coverage
+      - run: pnpm test:unit
+
+  integration:
+    name: integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:integration
+
+  scripts:
+    name: scripts packages (capture-e2e, verify)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:scripts

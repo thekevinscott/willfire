@@ -44,10 +44,11 @@
     "lint": "eslint .",
     "predict": "tsx src/cli.ts",
     "prepare": "pnpm build",
-    "test": "pnpm build && vitest run && pnpm --filter capture-e2e test && pnpm --filter verify test",
-    "test:coverage": "pnpm build && vitest run --coverage && pnpm --filter capture-e2e test:coverage && pnpm --filter verify test:coverage",
+    "test:coverage": "pnpm test:unit && pnpm test:integration && pnpm test:scripts",
     "test:e2e": "pnpm build && vitest run --config tests/e2e/vitest.config.mts",
     "test:integration": "pnpm build && vitest run tests/integration",
+    "test:scripts": "pnpm --filter capture-e2e test:coverage && pnpm --filter verify test:coverage",
+    "test:unit": "vitest run --coverage src",
     "typecheck": "tsc -p tsconfig.json && pnpm --filter capture-e2e typecheck && pnpm --filter verify typecheck",
     "verify": "pnpm --filter verify verify"
   },
