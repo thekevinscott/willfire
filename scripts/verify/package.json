@@ -8,7 +8,7 @@
   "type": "module",
   "files": [],
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "scripts": {
     "lint": "eslint src",
