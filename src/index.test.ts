@@ -12,6 +12,7 @@ import {
   parseUses,
   patternToRegex,
   predict,
+  willfire,
 } from "./index.js";
 import type {
   Ctx,
@@ -54,6 +55,7 @@ describe("root barrel", () => {
       "parseUses",
       "patternToRegex",
       "predict",
+      "willfire",
     ]);
     // Each name is re-exported from the module that defines it, so the
     // function's own name is what catches a re-export bound to the wrong one.
@@ -305,7 +307,10 @@ describe("root barrel", () => {
       repo: string,
       prNumber: number,
       opts?: PredictOptions,
-    ) => Promise<Prediction> = predict;
+    ) => Promise<Prediction> = willfire;
     expect(typeof run).toBe("function");
+
+    const deprecated: typeof willfire = predict;
+    expect(typeof deprecated).toBe("function");
   });
 });

@@ -17,11 +17,11 @@ pnpm add willfire
 ## Library
 
 ```ts
-import { makeGithubClient, predict } from "willfire";
+import { makeGithubClient, willfire } from "willfire";
 
 // makeGithubClient reads GH_TOKEN or GITHUB_TOKEN from the environment; any
 // object satisfying the exported GithubClient interface works in its place.
-const { entries, checkNames, skip, sources } = await predict(
+const { entries, checkNames, skip, sources } = await willfire(
   makeGithubClient(),
   "owner/repo",
   123,
