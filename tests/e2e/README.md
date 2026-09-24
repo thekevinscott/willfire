@@ -1,38 +1,32 @@
 # E2e tests
 
-Both sides are live: predict against GitHub now, read what GitHub dispatched
-now, compare. Nothing frozen is compared against anything current, so the drift
-that turns a stale expectation red cannot reach this suite.
+willfire runs live against a committed answer. Nothing is mocked.
 
-**This suite gates nothing.** It runs on a schedule. A red means GitHub moved,
-which is the finding rather than a flake, and it must never block a merge —
-that is what the integration suite is for.
+**This suite gates nothing.** It runs on a schedule. A red means GitHub moved.
 
 Run it with `pnpm test:e2e`. It needs `GH_TOKEN`.
 
-## The expectation is committed
+## Layout
 
-Each test reads one committed file from `fixtures/` — the repo, the pull
-request, the head commit and the check list recorded from a real dispatch —
-and asserts that willfire, run live, still produces that list. Tests write
-nothing.
+One directory per case: `responses/<repo>/<pr>/`. Its `fixture.json` is exactly
+what willfire returns — the list of check names — recorded from a real
+dispatch. Repo and pull request live in the path, so the file is the answer and
+nothing else. Its `README.md` says why the case is here.
 
-The recorded list is the only frozen half. willfire re-reads the repo and
-resolves moving tags on every run, so a change on GitHub's side reaches the
-prediction and shows up as a red.
+Tests write nothing. Updating a file is a deliberate commit acknowledging a
+move.
 
-Reading the live dispatch back would add nothing. These pull requests are
-settled, so their runs are immutable history; asserting against them asserts
-that history is still history.
+## Why the answer is frozen and willfire is not
 
-Updating a file is a deliberate commit that acknowledges the move.
+Comparing two live reads would miss the case this suite exists for: when GitHub
+moves and willfire tracks the move, both sides change together and the test
+stays green.
+
+Reading the live dispatch back adds nothing either — these pull requests are
+settled, so their runs are immutable history. Drift reaches the prediction
+instead, which resolves moving tags on every run.
 
 ## Why the pull requests are fixed
 
-Each test names one pull request and keeps it. Chasing the newest PR shrinks
-the window in which GitHub can move without shrinking it to nothing, and it
-makes a red unreproducible. Once a suite stops gating, a stable subject is
-worth more than a fresh one.
-
-A handful of tests, not a mirror of the integration suite. Each earns its place
-by carrying a signal the others do not.
+Chasing the newest PR shrinks the window GitHub can move in, and makes a red
+unreproducible.
