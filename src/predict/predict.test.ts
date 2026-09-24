@@ -51,7 +51,8 @@ interface Fixture {
   /** >1 makes the inferred event action `synchronize` rather than `opened`. */
   commits?: number;
   baseRef?: string;
-  files?: string[];
+  /** A changed path, or a rename spelled as both of its sides. */
+  files?: (string | { filename: string; previous_filename: string })[];
   /** Head commit message — the surface the skip instructions are read from. */
   message?: string;
   workflows?: { path: string; state: string }[];
@@ -151,7 +152,9 @@ function fakeGithub(f: Fixture): GithubClient {
       if (pull_number !== 1) {
         throw new Error(`404 pull ${pull_number}`);
       }
-      return (f.files ?? ["src/app.ts"]).map((filename) => ({ filename }));
+      return (f.files ?? ["src/app.ts"]).map((file) =>
+        typeof file === "string" ? { filename: file } : file,
+      );
     },
     getCommit: async ({ owner, repo, ref }) => {
       // Two callers share this route: the head-commit read that looks for a
@@ -404,6 +407,14 @@ describe("workflow-level verdicts", () => {
     expect(await only(wf, { files: ["src/app.ts", "docs/a.md"] })).toMatchObject({
       job: "a",
     });
+  });
+
+  // telelux#67 moved `packages/component/pnpm-lock.yaml` to the root and the
+  // workflow filtered on the old directory ran; willfire had dropped that side.
+  it("accepts when only a renamed file's previous path matches `paths` (#237)", async () => {
+    const wf = "on:\n  pull_request:\n    paths: ['docs/**']\njobs:\n  a: {}\n";
+    const files = [{ filename: "src/app.ts", previous_filename: "docs/a.md" }];
+    expect(await only(wf, { files })).toMatchObject({ job: "a" });
   });
 
   it("declines when every changed file matches `paths-ignore`", async () => {

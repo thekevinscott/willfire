@@ -23,6 +23,8 @@ export interface GithubPull extends GithubPullSummary {
 
 export interface GithubPullFile {
   filename: string;
+  /** Set only for a rename. GitHub matches `paths` against both sides (#237). */
+  previous_filename?: string;
 }
 
 export interface GithubCommit {
