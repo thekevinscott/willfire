@@ -1,9 +1,10 @@
 # Agent contract
 
-willfire is one package: `src/predict.ts` (the prediction engine and its CLI)
-and `src/expr/` (a tri-state evaluator for the slice of the GitHub expression
-language that job `if:` conditions use). `README.md` describes the model; this
-file is the operating contract for working in the repo.
+willfire is one package: `src/willfire.ts` (the prediction engine and public
+entry point), `src/cli.ts` (its CLI) and `src/expr/` (a tri-state evaluator for
+the slice of the GitHub expression language that job `if:` conditions use).
+`README.md` describes the model; this file is the operating contract for
+working in the repo.
 
 willfire predicts a list of strings and nothing else. A tool that diffs, reports
 on, or otherwise consumes that list belongs to the caller.
@@ -19,7 +20,7 @@ Unit tests are **colocated** with their source (`foo.ts` ↔ `foo.test.ts`) at
 [testing-conventions](https://github.com/thekevinscott/testing-conventions)
 standard, enforced by `.github/workflows/conventions.yml`.
 
-The expectations in `src/predict.test.ts` are **not** opinions about how GitHub
+The expectations in `src/willfire.test.ts` are **not** opinions about how GitHub
 ought to behave. Every workflow-level verdict was read off a live dispatch on
 [willrun-probe](https://github.com/thekevinbot/willrun-probe); the workflows
 under `tests/fixtures/willrun-probe/` are the record, and `setup-probe.sh` pushes

@@ -5,12 +5,12 @@
 import { parseArgs } from "./cli/parseArgs.js";
 import { isWorkflowEntry } from "./entries/isWorkflowEntry.js";
 import { makeGithubClient } from "./predict/makeGithubClient.js";
-import { predict } from "./predict/predict.js";
+import { willfire } from "./willfire.js";
 
 const isMain = /cli\.(ts|js)$|\/willfire$/.test(process.argv[1] ?? "");
 if (isMain) {
   const args = parseArgs(process.argv.slice(2));
-  const prediction = await predict(makeGithubClient(), args.repo, args.pr, {
+  const prediction = await willfire(makeGithubClient(), args.repo, args.pr, {
     action: args.action,
     callbacks: args.callbacks,
   });
