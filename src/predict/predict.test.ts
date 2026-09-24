@@ -3,7 +3,10 @@ import type { GithubClient } from "./makeGithubClient.js";
 import { predict } from "./predict.js";
 import { willfire } from "../willfire.js";
 
-vi.mock("../willfire.js", () => ({ willfire: vi.fn(async () => "prediction") }));
+vi.mock("../willfire.js", async () => {
+  const actual = await vi.importActual<typeof import("../willfire.js")>("../willfire.js");
+  return { ...actual, willfire: vi.fn(async () => "prediction") };
+});
 
 describe("predict", () => {
   it("forwards every argument to willfire", async () => {

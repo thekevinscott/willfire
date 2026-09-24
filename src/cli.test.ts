@@ -4,6 +4,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { GithubClient } from "./predict/makeGithubClient.js";
+import { predict } from "./predict/predict.js";
 
 // `makeGithubClient` is the seam the entrypoint reaches the network through.
 // Replacing the module lets the CLI be driven without a token or a network.
@@ -12,6 +13,7 @@ import type { GithubClient } from "./predict/makeGithubClient.js";
 const hoisted = vi.hoisted(() => ({
   github: undefined as GithubClient | undefined,
   resolved: [] as (readonly string[])[],
+  entered: [] as string[],
 }));
 
 vi.mock("./predict/makeGithubClient.js", async () => {
@@ -19,6 +21,25 @@ vi.mock("./predict/makeGithubClient.js", async () => {
     "./predict/makeGithubClient.js",
   );
   return { ...actual, makeGithubClient: () => hoisted.github as GithubClient };
+});
+
+// `predict` forwards to `willfire`, so a spy on `willfire` alone fires on both
+// routes and cannot tell them apart. The deprecated alias is the discriminator:
+// it is untouched when the CLI enters directly.
+vi.mock("./willfire.js", async () => {
+  const actual = await vi.importActual<typeof import("./willfire.js")>("./willfire.js");
+  const recording: typeof actual.willfire = (github, repo, prNumber, opts) => {
+    hoisted.entered.push(repo);
+    return actual.willfire(github, repo, prNumber, opts);
+  };
+  return { ...actual, willfire: recording };
+});
+
+vi.mock("./predict/predict.js", async () => {
+  const actual = await vi.importActual<typeof import("./predict/predict.js")>(
+    "./predict/predict.js",
+  );
+  return { ...actual, predict: vi.fn(actual.predict) };
 });
 
 // Records what the prediction was asked to resolve, without spawning anything.
@@ -101,6 +122,7 @@ describe("the CLI entrypoint", () => {
     process.argv = argv;
     hoisted.github = undefined;
     hoisted.resolved.length = 0;
+    hoisted.entered.length = 0;
     vi.restoreAllMocks();
   });
 
@@ -122,6 +144,12 @@ describe("the CLI entrypoint", () => {
     vi.resetModules();
     await import("./cli.js");
     expect(out).toEqual([]);
+  });
+
+  it("predicts through willfire, not the deprecated predict alias", async () => {
+    await invoke(["--repo", "o/r", "--pr", "1"], { contents: { [WF]: WORKFLOW } });
+    expect(hoisted.entered).toEqual(["o/r"]);
+    expect(predict).not.toHaveBeenCalled();
   });
 
   it("prints one line per entry", async () => {
