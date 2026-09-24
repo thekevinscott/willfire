@@ -1,6 +1,8 @@
 import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { expect, test } from "vitest";
-import { predict, type GithubClient } from "../../src/index.js";
+import { predict, type GithubClient } from "willfire";
+import { discoverCases } from "../cases.js";
 
 interface RecordedCall {
   method: string;
@@ -9,8 +11,6 @@ interface RecordedCall {
 }
 
 interface Fixture {
-  repo: string;
-  pr: number;
   dispatched: { workflow: string; name: string; conclusion: string | null }[];
   calls: RecordedCall[];
 }
@@ -34,14 +34,16 @@ function replayClient(calls: RecordedCall[]): GithubClient {
   });
 }
 
-const CASES = ["github-data-file-fetcher/3"];
+const CASES = discoverCases(new URL("./fixtures/", import.meta.url));
 
-test.each(CASES)("%s predicts the dispatched check list exactly", async (name) => {
-  const fixture = JSON.parse(
-    readFileSync(new URL(`./fixtures/${name}/fixture.json`, import.meta.url), "utf8"),
-  ) as Fixture;
+test.each(CASES)("$owner/$repo#$pr predicts the dispatched check list exactly", async (c) => {
+  const fixture = JSON.parse(readFileSync(join(c.dir, "fixture.json"), "utf8")) as Fixture;
 
-  const { checkNames } = await predict(replayClient(fixture.calls), fixture.repo, fixture.pr);
+  const { checkNames } = await predict(
+    replayClient(fixture.calls),
+    `${c.owner}/${c.repo}`,
+    c.pr,
+  );
 
-  expect(checkNames).toEqual([...new Set(fixture.dispatched.map((c) => c.name))].sort());
+  expect(checkNames).toEqual([...new Set(fixture.dispatched.map((d) => d.name))].sort());
 });

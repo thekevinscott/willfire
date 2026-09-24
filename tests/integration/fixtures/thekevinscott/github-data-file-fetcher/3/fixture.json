@@ -1,6 +1,4 @@
 {
-  "repo": "thekevinscott/github-data-file-fetcher",
-  "pr": 3,
   "dispatched": [
     {
       "workflow": ".github/workflows/pr-monitor.yml",
@@ -49,7 +47,7 @@
           "user_view_type": "public",
           "site_admin": false
         },
-        "body": "Adds a `concurrency:` group to the `CI Gate` workflow, and normalizes\n`timeout-minutes`.\n\n**Concurrency.** Push a new commit to a PR and the running gate job keeps going.\nIt resolved its target SHA at startup, so it spends the rest of its life polling\nfor runs on a commit nobody cares about any more, holding a runner the whole\ntime. `cancel-in-progress` kills it when its replacement starts. The group keys\non `github.ref`, which for a `pull_request` event is `refs/pull/N/merge` \u2014 so\nit scopes per PR and never cancels across PRs.\n\nThree repos (dirsql, willfire, github-data-file-fetcher) already had this from\nan earlier rollout. This brings the other eleven in line.\n\n**Timeout.** Settling the fleet on a single rule: 20 minutes, raised only where\nthe measured slowest non-gate `pull_request` run gets close. The only repo that\nqualifies is putitoutthere at 16 minutes, which stays at 30. dirsql, willfire\nand github-data-file-fetcher drop from 45 to 20 \u2014 their slowest observed runs\nare 7 minutes, under 1 minute, and none-at-all respectively, so 45 just meant a\nwedged gate burned twice as long before anyone noticed.\n\nNo change to gating behavior.\n",
+        "body": "Adds a `concurrency:` group to the `CI Gate` workflow, and normalizes\n`timeout-minutes`.\n\n**Concurrency.** Push a new commit to a PR and the running gate job keeps going.\nIt resolved its target SHA at startup, so it spends the rest of its life polling\nfor runs on a commit nobody cares about any more, holding a runner the whole\ntime. `cancel-in-progress` kills it when its replacement starts. The group keys\non `github.ref`, which for a `pull_request` event is `refs/pull/N/merge` — so\nit scopes per PR and never cancels across PRs.\n\nThree repos (dirsql, willfire, github-data-file-fetcher) already had this from\nan earlier rollout. This brings the other eleven in line.\n\n**Timeout.** Settling the fleet on a single rule: 20 minutes, raised only where\nthe measured slowest non-gate `pull_request` run gets close. The only repo that\nqualifies is putitoutthere at 16 minutes, which stays at 30. dirsql, willfire\nand github-data-file-fetcher drop from 45 to 20 — their slowest observed runs\nare 7 minutes, under 1 minute, and none-at-all respectively, so 45 just meant a\nwedged gate burned twice as long before anyone noticed.\n\nNo change to gating behavior.\n",
         "created_at": "2026-08-20T16:56:14Z",
         "updated_at": "2026-08-20T17:00:36Z",
         "closed_at": "2026-08-20T17:00:36Z",
@@ -406,7 +404,7 @@
           "blob_url": "https://github.com/thekevinscott/github-data-file-fetcher/blob/9b34c8ebc84b886b8f75e315e9a5056e175d62bb/.github%2Fworkflows%2Fpr-monitor.yml",
           "raw_url": "https://github.com/thekevinscott/github-data-file-fetcher/raw/9b34c8ebc84b886b8f75e315e9a5056e175d62bb/.github%2Fworkflows%2Fpr-monitor.yml",
           "contents_url": "https://api.github.com/repos/thekevinscott/github-data-file-fetcher/contents/.github%2Fworkflows%2Fpr-monitor.yml?ref=9b34c8ebc84b886b8f75e315e9a5056e175d62bb",
-          "patch": "@@ -19,6 +19,6 @@ jobs:\n     # The action has no timeout of its own (see monitor.ts) \u2014 this is the\n     # backstop. If a predicted run never dispatches, the gate waits here\n     # until the job is killed.\n-    timeout-minutes: 45\n+    timeout-minutes: 20\n     steps:\n       - uses: thekevinscott/pr-monitor@v1"
+          "patch": "@@ -19,6 +19,6 @@ jobs:\n     # The action has no timeout of its own (see monitor.ts) — this is the\n     # backstop. If a predicted run never dispatches, the gate waits here\n     # until the job is killed.\n-    timeout-minutes: 45\n+    timeout-minutes: 20\n     steps:\n       - uses: thekevinscott/pr-monitor@v1"
         }
       ]
     },
@@ -519,7 +517,7 @@
             "blob_url": "https://github.com/thekevinscott/github-data-file-fetcher/blob/892499b7f1b14eb1f0dc2ae5daee948911e4d655/.github%2Fworkflows%2Fpr-monitor.yml",
             "raw_url": "https://github.com/thekevinscott/github-data-file-fetcher/raw/892499b7f1b14eb1f0dc2ae5daee948911e4d655/.github%2Fworkflows%2Fpr-monitor.yml",
             "contents_url": "https://api.github.com/repos/thekevinscott/github-data-file-fetcher/contents/.github%2Fworkflows%2Fpr-monitor.yml?ref=892499b7f1b14eb1f0dc2ae5daee948911e4d655",
-            "patch": "@@ -19,6 +19,6 @@ jobs:\n     # The action has no timeout of its own (see monitor.ts) \u2014 this is the\n     # backstop. If a predicted run never dispatches, the gate waits here\n     # until the job is killed.\n-    timeout-minutes: 45\n+    timeout-minutes: 20\n     steps:\n       - uses: thekevinscott/pr-monitor@v1"
+            "patch": "@@ -19,6 +19,6 @@ jobs:\n     # The action has no timeout of its own (see monitor.ts) — this is the\n     # backstop. If a predicted run never dispatches, the gate waits here\n     # until the job is killed.\n-    timeout-minutes: 45\n+    timeout-minutes: 20\n     steps:\n       - uses: thekevinscott/pr-monitor@v1"
           }
         ]
       }
@@ -633,7 +631,7 @@
             "blob_url": "https://github.com/thekevinscott/github-data-file-fetcher/blob/892499b7f1b14eb1f0dc2ae5daee948911e4d655/.github%2Fworkflows%2Fpr-monitor.yml",
             "raw_url": "https://github.com/thekevinscott/github-data-file-fetcher/raw/892499b7f1b14eb1f0dc2ae5daee948911e4d655/.github%2Fworkflows%2Fpr-monitor.yml",
             "contents_url": "https://api.github.com/repos/thekevinscott/github-data-file-fetcher/contents/.github%2Fworkflows%2Fpr-monitor.yml?ref=892499b7f1b14eb1f0dc2ae5daee948911e4d655",
-            "patch": "@@ -19,6 +19,6 @@ jobs:\n     # The action has no timeout of its own (see monitor.ts) \u2014 this is the\n     # backstop. If a predicted run never dispatches, the gate waits here\n     # until the job is killed.\n-    timeout-minutes: 45\n+    timeout-minutes: 20\n     steps:\n       - uses: thekevinscott/pr-monitor@v1"
+            "patch": "@@ -19,6 +19,6 @@ jobs:\n     # The action has no timeout of its own (see monitor.ts) — this is the\n     # backstop. If a predicted run never dispatches, the gate waits here\n     # until the job is killed.\n-    timeout-minutes: 45\n+    timeout-minutes: 20\n     steps:\n       - uses: thekevinscott/pr-monitor@v1"
           }
         ]
       }
@@ -752,7 +750,7 @@
             "blob_url": "https://github.com/thekevinscott/github-data-file-fetcher/blob/9b34c8ebc84b886b8f75e315e9a5056e175d62bb/.github%2Fworkflows%2Fpr-monitor.yml",
             "raw_url": "https://github.com/thekevinscott/github-data-file-fetcher/raw/9b34c8ebc84b886b8f75e315e9a5056e175d62bb/.github%2Fworkflows%2Fpr-monitor.yml",
             "contents_url": "https://api.github.com/repos/thekevinscott/github-data-file-fetcher/contents/.github%2Fworkflows%2Fpr-monitor.yml?ref=9b34c8ebc84b886b8f75e315e9a5056e175d62bb",
-            "patch": "@@ -19,6 +19,6 @@ jobs:\n     # The action has no timeout of its own (see monitor.ts) \u2014 this is the\n     # backstop. If a predicted run never dispatches, the gate waits here\n     # until the job is killed.\n-    timeout-minutes: 45\n+    timeout-minutes: 20\n     steps:\n       - uses: thekevinscott/pr-monitor@v1"
+            "patch": "@@ -19,6 +19,6 @@ jobs:\n     # The action has no timeout of its own (see monitor.ts) — this is the\n     # backstop. If a predicted run never dispatches, the gate waits here\n     # until the job is killed.\n-    timeout-minutes: 45\n+    timeout-minutes: 20\n     steps:\n       - uses: thekevinscott/pr-monitor@v1"
           }
         ]
       }
@@ -850,7 +848,7 @@
         "path": ".github/workflows/pr-monitor.yml",
         "ref": "892499b7f1b14eb1f0dc2ae5daee948911e4d655"
       },
-      "result": "name: PR Monitor\n\non:\n  pull_request:\n\nconcurrency:\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  actions: read\n  contents: read\n  pull-requests: read\n\njobs:\n  monitor:\n    name: 'CI Gate'\n    runs-on: ubuntu-latest\n    # The action has no timeout of its own (see monitor.ts) \u2014 this is the\n    # backstop. If a predicted run never dispatches, the gate waits here\n    # until the job is killed.\n    timeout-minutes: 20\n    steps:\n      - uses: thekevinscott/pr-monitor@v1\n"
+      "result": "name: PR Monitor\n\non:\n  pull_request:\n\nconcurrency:\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  actions: read\n  contents: read\n  pull-requests: read\n\njobs:\n  monitor:\n    name: 'CI Gate'\n    runs-on: ubuntu-latest\n    # The action has no timeout of its own (see monitor.ts) — this is the\n    # backstop. If a predicted run never dispatches, the gate waits here\n    # until the job is killed.\n    timeout-minutes: 20\n    steps:\n      - uses: thekevinscott/pr-monitor@v1\n"
     }
   ]
 }
