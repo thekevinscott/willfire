@@ -80,10 +80,11 @@ describe("makeGithubClient", () => {
     );
   });
 
-  it("lists a pull request's files", async () => {
-    stage(json([{ filename: "src/app.ts" }]));
+  it("lists a pull request's files, keeping a rename's previous path (#237)", async () => {
+    stage(json([{ filename: "src/app.ts" }, { filename: "b.ts", previous_filename: "a/b.ts" }]));
     expect(await client().listPullFiles({ ...REPO, pull_number: 5 })).toEqual([
       { filename: "src/app.ts" },
+      { filename: "b.ts", previous_filename: "a/b.ts" },
     ]);
     expect(calls[0].url).toBe(
       "https://api.github.com/repos/o/r/pulls/5/files?per_page=100&page=1",
