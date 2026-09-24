@@ -80,6 +80,13 @@ describe("makeGithubClient", () => {
     );
   });
 
+  it("keeps a renamed file's previous path (#237)", async () => {
+    stage(json([{ filename: "pnpm-lock.yaml", previous_filename: "packages/component/pnpm-lock.yaml" }]));
+    expect(await client().listPullFiles({ ...REPO, pull_number: 5 })).toEqual([
+      { filename: "pnpm-lock.yaml", previous_filename: "packages/component/pnpm-lock.yaml" },
+    ]);
+  });
+
   it("lists a pull request's files", async () => {
     stage(json([{ filename: "src/app.ts" }]));
     expect(await client().listPullFiles({ ...REPO, pull_number: 5 })).toEqual([
