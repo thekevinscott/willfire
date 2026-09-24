@@ -1,15 +1,11 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { expect, test } from "vitest";
 import { makeGithubClient, predict } from "willfire";
 import { discoverCases } from "../cases.js";
+import { getResponse } from "./getResponse.js";
 
 const github = makeGithubClient();
 
 const CASES = discoverCases(new URL("./responses/", import.meta.url));
-
-const getResponse = (dir: string): string[] =>
-  JSON.parse(readFileSync(join(dir, "fixture.json"), "utf8")) as string[];
 
 test.each(CASES)(
   "$owner/$repo#$pr still predicts the committed list",
