@@ -1,6 +1,29 @@
-import { describe, expect, it } from "vitest";
+import { mkdir, mkdtemp, symlink, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { describe, expect, it, vi } from "vitest";
 import { runUses } from "./runUses.js";
 import type { WalkCtx } from "./types.js";
+
+// The isolation gate wants collaborators mocked; a real tree on disk is what
+// the containment cases pin, so the mocks pass the real modules through.
+vi.mock(
+  "node:fs/promises",
+  async () => await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises"),
+);
+vi.mock("node:os", async () => await vi.importActual<typeof import("node:os")>("node:os"));
+vi.mock("node:path", async () => await vi.importActual<typeof import("node:path")>("node:path"));
+
+/** A tree with a sibling directory holding a composite action outside it. */
+const escapeFixture = async (): Promise<{ tree: string; outside: string }> => {
+  const base = await mkdtemp(join(tmpdir(), "wf-uses-escape-"));
+  const tree = join(base, "tree");
+  const outside = join(base, "outside");
+  await mkdir(tree);
+  await mkdir(outside);
+  await writeFile(join(outside, "action.yml"), "runs:\n  using: composite\n  steps: []\n");
+  return { tree, outside };
+};
 
 const ctxOf = (over: Partial<WalkCtx> = {}, deps: Partial<WalkCtx["deps"]> = {}): WalkCtx => ({
   tree: "/nonexistent-tree",
@@ -94,6 +117,32 @@ describe("runUses", () => {
     expect(await runUses({ uses: "docker://alpine:3" }, "step '#1'", {}, ctxOf())).toEqual({
       ok: false,
       reason: "step '#1': unresolvable uses: docker://alpine:3",
+    });
+  });
+
+  it("refuses a local uses that climbs out of the workspace tree", async () => {
+    const { tree } = await escapeFixture();
+    expect(await runUses({ uses: "./../outside" }, "step '#1'", {}, ctxOf({ tree }))).toEqual({
+      ok: false,
+      reason: "step '#1': ./../outside resolves outside its repo tree",
+    });
+  });
+
+  it("refuses a local uses that leaves the workspace tree through a symlink", async () => {
+    const { tree, outside } = await escapeFixture();
+    await symlink(outside, join(tree, "link"));
+    expect(await runUses({ uses: "./link" }, "step '#1'", {}, ctxOf({ tree }))).toEqual({
+      ok: false,
+      reason: "step '#1': ./link resolves outside its repo tree",
+    });
+  });
+
+  it("refuses a remote uses whose path climbs out of the action repo", async () => {
+    const { tree } = await escapeFixture();
+    const ctx = ctxOf({}, { provideTree: async () => tree });
+    expect(await runUses({ uses: "o/r/../outside@v1" }, "step '#1'", {}, ctx)).toEqual({
+      ok: false,
+      reason: "step '#1': o/r/../outside@v1 resolves outside its repo tree",
     });
   });
 });
