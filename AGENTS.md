@@ -50,6 +50,23 @@ in order to make an entry look decided. It is job-level only: `Entry` is a
 closed union and the workflow-level variant has no `unknown`, because every
 workflow-level verdict is decidable. Do not widen it back.
 
+## e2e attestations
+
+A PR touching `src/**` lands a receipt in `e2e-attestations/` recording the
+command actually run and its real exit code.
+`tests/integration/attestations.test.ts` fails the suite on a nonzero one. Run
+it unpiped: `| tail` makes the shell report the pipe's status, and a receipt
+recording `exit_code: 0` for a run that printed `3 failed` defeats that check
+outright.
+
+Never copy the previous receipt's `-t` exclusion forward unexamined. An
+exclusion is a standing claim that the excluded case still fails for a known
+reason, and that claim decays: the `willfire#34` term rode 45 receipts over
+three weeks while the reason recorded for it was superseded and no open issue
+tracked it. Re-run each excluded case and drop the term if it passes. If it
+still fails, name the open issue tracking it in the commit that adds the
+receipt — an exclusion with no open issue is how they accumulate (#181).
+
 ## Comments
 
 A comment earns its place by stating what the code cannot: a constraint, a
