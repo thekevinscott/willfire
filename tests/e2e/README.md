@@ -8,12 +8,7 @@ One directory per case: `responses/<owner>/<repo>/<pr>/`. Its `fixture.json` is 
 what willfire returns — the list of check names — recorded from a real
 dispatch. Its `README.md` says why the case is here.
 
-The pull requests are fixed, not the newest. Chasing a fresh one shrinks the
-drift window without closing it.
-
 ## Cases
-
-Each earns its place by carrying a signal the others do not.
 
 | Repo | The signal a red gives |
 | --- | --- |
