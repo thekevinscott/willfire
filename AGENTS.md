@@ -22,9 +22,10 @@ loose file so `conventions.yml` reaches it. Every package's sources live at
 | | |
 |---|---|
 | `pnpm typecheck` | `tsc` over every package's sources, tests included |
-| `pnpm test:coverage` | Vitest at the 100% floor CI enforces, every package |
-| `pnpm test:integration` | the integration suite alone |
-| `pnpm test:e2e` | the e2e suite alone, live against GitHub |
+| `pnpm test:unit` | the unit suite at the 100% floor CI enforces |
+| `pnpm test:integration` | the integration suite |
+| `pnpm test:e2e` | the e2e suite, live against GitHub |
+| `pnpm test:coverage` | unit and integration together |
 | `pnpm lint` | ESLint over every package |
 | `pnpm build` | emit `dist/` (tests excluded) |
 | `pnpm predict --repo owner/name --pr N` | run the CLI against a live PR |
