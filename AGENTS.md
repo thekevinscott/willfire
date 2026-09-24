@@ -7,7 +7,7 @@ slice of the GitHub expression language that job `if:` conditions use).
 in the repo.
 
 Each development tool under `scripts/` is its own private workspace package —
-`scripts/capture-e2e/` and `scripts/verify/` today. A tool goes there rather
+`scripts/verify/` today. A tool goes there rather
 than in `src/` because it is not library surface; it is a package rather than a
 loose file so `conventions.yml` reaches it. Every package's sources live at
 `<package>/src/` with colocated tests, and every package gets its own
