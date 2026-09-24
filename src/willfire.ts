@@ -29,9 +29,7 @@ import type {
   WorkflowReader,
   WorkflowSource,
 } from "./types.js";
-
-const SKIP_RE = /\[(skip ci|ci skip|no ci|skip actions|actions skip)\]/i;
-const SKIP_TRAILER_RE = /^skip-checks:\s*true/im;
+import { hasSkipInstruction } from "./hasSkipInstruction.js";
 
 export async function willfire(
   github: GithubClient,
@@ -82,7 +80,7 @@ export async function willfire(
   const headCommit = await github.getCommit({ ...base, ref: headSha });
   const headMsg = headCommit.commit.message;
 
-  if (SKIP_RE.test(headMsg) || SKIP_TRAILER_RE.test(headMsg)) {
+  if (hasSkipInstruction(headMsg)) {
     return finalizePrediction(
       [],
       "head commit message contains a skip instruction",
