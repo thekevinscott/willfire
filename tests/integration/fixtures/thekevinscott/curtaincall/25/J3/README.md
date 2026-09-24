@@ -1,0 +1,1 @@
+Single-axis static matrix.
