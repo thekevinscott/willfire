@@ -18,11 +18,13 @@ Two families of workflow live here:
   does a `owner/repo/path@ref` call actually read?"
 - **Secrets-in-if probe** — `secrets-if.yml`, deliberately invalid: `secrets`
   is not a recognized context in a job-level `if:` ("Unrecognized
-  named-value: 'secrets'"). Observed on PR #16: every push gets a zero-job
-  failure run named by the file's path, and the PR gets no check from the
-  workflow at all — not even a failed one. A job `if:` referencing `secrets`
-  invalidates the whole file, and an invalid file contributes nothing to a
-  PR's check set.
+  named-value: 'secrets'"). Observed on willrun-probe PR #16 (head
+  `a0a2984`, runs 36127810178, 36127839116, 36127978130): every push gets a
+  zero-job failure run named by the file's path, and the PR gets no check
+  from the workflow at all — not even a failed one. A job `if:` referencing
+  `secrets` invalidates the whole file, and an invalid file contributes
+  nothing to a PR's check set. The file was deleted from willrun-probe main
+  because it red-runs every push there; this fixture is the record.
 - **Step-level action probe** — `action-decline.yml`, the only workflow here
   that uses an action at all. It answers "what does GitHub run when willfire's
   executor refuses a step?" Observed on PR #15: GitHub ran `action-gen`,
