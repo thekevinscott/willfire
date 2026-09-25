@@ -4,20 +4,20 @@
     "params": {
       "owner": "thekevinscott",
       "repo": "pr-monitor",
-      "pull_number": 93
+      "pull_number": 98
     },
     "result": {
-      "url": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/93",
-      "id": 4543312633,
-      "node_id": "PR_kwDOQnAsWM8AAAABDs1y-Q",
-      "html_url": "https://github.com/thekevinscott/pr-monitor/pull/93",
-      "diff_url": "https://github.com/thekevinscott/pr-monitor/pull/93.diff",
-      "patch_url": "https://github.com/thekevinscott/pr-monitor/pull/93.patch",
-      "issue_url": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/93",
-      "number": 93,
-      "state": "closed",
+      "url": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/98",
+      "id": 4637645945,
+      "node_id": "PR_kwDOQnAsWM8AAAABFGzceQ",
+      "html_url": "https://github.com/thekevinscott/pr-monitor/pull/98",
+      "diff_url": "https://github.com/thekevinscott/pr-monitor/pull/98.diff",
+      "patch_url": "https://github.com/thekevinscott/pr-monitor/pull/98.patch",
+      "issue_url": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/98",
+      "number": 98,
+      "state": "open",
       "locked": false,
-      "title": "Fail fast on a predicted run GitHub never starts",
+      "title": "Throwaway probe: trailing README newline",
       "user": {
         "login": "thekevinbot",
         "id": 248217931,
@@ -39,27 +39,27 @@
         "user_view_type": "public",
         "site_admin": false
       },
-      "body": "Fixes https://github.com/thekevinscott/pr-monitor/issues/92\n\n## What\n\nA predicted workflow run that GitHub never starts now fails the gate ~60s after\nevery other predicted run has finished, naming the workflow. Before, the monitor\npolled until the consumer job's external `timeout-minutes` killed it — in the\ncase that prompted the issue, 10m37s of polling with nothing left that could\nchange the verdict.\n\nThe verdict is decidable exactly when no predicted run is still in progress and\none has never registered. Nothing observed later can settle it, so the gate\nstops there instead of waiting on the clock.\n\n## Grace period: 60s, and why that is enough\n\nNumbers from the affected run\n(https://github.com/thekevinscott/lamp-the-djinn/issues/113, head `49733eb`):\n\n| Run | created | updated | conclusion |\n|---|---|---|---|\n| Lint Dockerfile | 01:23:22 | 01:23:33 | success |\n| Lint Python | 01:23:22 | 01:23:34 | success |\n| Lint Shell | 01:23:22 | 01:23:37 | success |\n| Test CLI | 01:23:22 | 01:23:35 | success |\n| Test Container | 01:23:22 | 01:25:37 | success |\n| Testing Conventions | 01:23:22 | 01:33:19 | success |\n| PR Monitor | 01:23:22 | 01:43:56 | cancelled (external timeout) |\n\nGitHub created every run matching the event in the same second, and\n`run_started_at` equalled `created_at` for all of them. Runs do not trickle in;\nthe variance is in how long they take to *finish* (11s to 9m57s), not in how\nlong they take to become visible. So the grace is not protecting against a slow\nstart — it is protecting against GitHub being briefly inconsistent about a run\nit already created. The absent workflow was absent for the entire window, every\ntime, going back nine months.\n\nThe grace is keyed off \"every other predicted run is terminal\", not off\nPR-open time, since that is the condition that makes the verdict decidable.\nA run going in progress restarts it.\n\n## Not building the escape hatch\n\nThe issue's second half floats an input downgrading a never-started run from\nfatal to a warning. Deliberately not here.\n\nThe root cause in lamp-the-djinn turned out to be real\n(https://github.com/thekevinscott/lamp-the-djinn/issues/117): `docker-publish.yml`'s\nserver-side workflow record was in a bad state — healthy file, byte-identical\ntrigger block to a workflow that fires fine on the same commits, but GitHub\ndelivered no `push` or `pull_request` events to it for nine months. Renaming the\nfile forced a fresh record and it fired on `pull_request` immediately. An escape\nhatch would have let a nine-month-dead publish lane be marked \"warning\" and\nmoved past, with the cage image silently never rebuilding from a PR. What fixed\nit was the gate going red and staying red until someone looked.\n\nThat is a separate concern anyway, and it can be filed if a case for it shows up\nthat is not a repo defect.\n\n## Changes\n\n- `src/checks/isStalled.ts` — the decidable shape: a predicted run missing with\n  nothing still in progress\n- `src/messages/formatNeverStarted.ts` — the failure message, naming the\n  workflows and pointing at the two things it can mean\n- `src/monitor.ts` — counts consecutive stalled polls, fails once the stall has\n  outlived the grace\n- Test harness now caps poll count, so a gate that never settles fails instead\n  of spinning\n- README: the new red condition, and the `timeout-minutes` and \"over-prediction\n  hangs\" notes that this makes false\n\n## Not done\n\n- Reconciliation does not run on a stall. It re-predicts only when a source ref\n  moved, and re-predicting executes jobs, so wiring it into the stall path is a\n  bigger change than this fix. Called out in the README limitation.\n- `README.md` step 4 says the monitor polls \"every 5 seconds\"; it has been 30s\n  since https://github.com/thekevinscott/pr-monitor/pull/61. Left alone — an\n  unrelated doc repair belongs in its own PR.\n",
-      "created_at": "2026-09-16T02:19:11Z",
-      "updated_at": "2026-09-16T02:28:26Z",
-      "closed_at": "2026-09-16T02:25:47Z",
-      "merged_at": "2026-09-16T02:25:47Z",
-      "merge_commit_sha": "6bc702d251fc4f0ff1cf77809308e31afa7fe251",
+      "body": "Throwaway PR to capture a contemporaneous willfire integration fixture (case P1). Will be closed without merging once the capture lands.",
+      "created_at": "2026-09-25T11:53:56Z",
+      "updated_at": "2026-09-25T11:53:56Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
       "assignees": [],
       "requested_reviewers": [],
       "requested_teams": [],
       "labels": [],
       "milestone": null,
       "draft": false,
-      "commits_url": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/93/commits",
-      "review_comments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/93/comments",
+      "commits_url": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/98/commits",
+      "review_comments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/98/comments",
       "review_comment_url": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/comments{/number}",
-      "comments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/93/comments",
-      "statuses_url": "https://api.github.com/repos/thekevinscott/pr-monitor/statuses/d363fa23b78250a37fdafd63d5961359fff93faf",
+      "comments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/98/comments",
+      "statuses_url": "https://api.github.com/repos/thekevinscott/pr-monitor/statuses/c7131f1ef99e18a845395c6af6e4816203f5c321",
       "head": {
-        "label": "thekevinscott:fix/fail-fast-on-never-started-run",
-        "ref": "fix/fail-fast-on-never-started-run",
-        "sha": "d363fa23b78250a37fdafd63d5961359fff93faf",
+        "label": "thekevinscott:chore/willfire-p1-probe",
+        "ref": "chore/willfire-p1-probe",
+        "sha": "c7131f1ef99e18a845395c6af6e4816203f5c321",
         "user": {
           "login": "thekevinscott",
           "id": 151596,
@@ -150,7 +150,7 @@
           "deployments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/deployments",
           "created_at": "2025-12-11T17:15:11Z",
           "updated_at": "2026-09-24T17:47:08Z",
-          "pushed_at": "2026-09-24T17:51:23Z",
+          "pushed_at": "2026-09-25T11:53:49Z",
           "git_url": "git://github.com/thekevinscott/pr-monitor.git",
           "ssh_url": "git@github.com:thekevinscott/pr-monitor.git",
           "clone_url": "https://github.com/thekevinscott/pr-monitor.git",
@@ -170,7 +170,7 @@
           "mirror_url": null,
           "archived": false,
           "disabled": false,
-          "open_issues_count": 6,
+          "open_issues_count": 7,
           "license": {
             "key": "mit",
             "name": "MIT License",
@@ -186,7 +186,7 @@
           "topics": [],
           "visibility": "public",
           "forks": 0,
-          "open_issues": 6,
+          "open_issues": 7,
           "watchers": 0,
           "default_branch": "main"
         }
@@ -194,7 +194,7 @@
       "base": {
         "label": "thekevinscott:main",
         "ref": "main",
-        "sha": "0ac042fc27021172c8bc0d84d553008f1ac128fc",
+        "sha": "7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
         "user": {
           "login": "thekevinscott",
           "id": 151596,
@@ -285,7 +285,7 @@
           "deployments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/deployments",
           "created_at": "2025-12-11T17:15:11Z",
           "updated_at": "2026-09-24T17:47:08Z",
-          "pushed_at": "2026-09-24T17:51:23Z",
+          "pushed_at": "2026-09-25T11:53:49Z",
           "git_url": "git://github.com/thekevinscott/pr-monitor.git",
           "ssh_url": "git@github.com:thekevinscott/pr-monitor.git",
           "clone_url": "https://github.com/thekevinscott/pr-monitor.git",
@@ -305,7 +305,7 @@
           "mirror_url": null,
           "archived": false,
           "disabled": false,
-          "open_issues_count": 6,
+          "open_issues_count": 7,
           "license": {
             "key": "mit",
             "name": "MIT License",
@@ -321,98 +321,53 @@
           "topics": [],
           "visibility": "public",
           "forks": 0,
-          "open_issues": 6,
+          "open_issues": 7,
           "watchers": 0,
           "default_branch": "main"
         }
       },
       "_links": {
         "self": {
-          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/93"
+          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/98"
         },
         "html": {
-          "href": "https://github.com/thekevinscott/pr-monitor/pull/93"
+          "href": "https://github.com/thekevinscott/pr-monitor/pull/98"
         },
         "issue": {
-          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/93"
+          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/98"
         },
         "comments": {
-          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/93/comments"
+          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/98/comments"
         },
         "review_comments": {
-          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/93/comments"
+          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/98/comments"
         },
         "review_comment": {
           "href": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/comments{/number}"
         },
         "commits": {
-          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/93/commits"
+          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/98/commits"
         },
         "statuses": {
-          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/statuses/d363fa23b78250a37fdafd63d5961359fff93faf"
+          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/statuses/c7131f1ef99e18a845395c6af6e4816203f5c321"
         }
       },
       "author_association": "COLLABORATOR",
-      "auto_merge": {
-        "enabled_by": {
-          "login": "thekevinscott",
-          "id": 151596,
-          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
-          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
-          "gravatar_id": "",
-          "url": "https://api.github.com/users/thekevinscott",
-          "html_url": "https://github.com/thekevinscott",
-          "followers_url": "https://api.github.com/users/thekevinscott/followers",
-          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
-          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
-          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
-          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
-          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
-          "repos_url": "https://api.github.com/users/thekevinscott/repos",
-          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
-          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
-          "type": "User",
-          "user_view_type": "public",
-          "site_admin": false
-        },
-        "merge_method": "merge",
-        "commit_title": "Merge pull request #93 from thekevinscott/fix/fail-fast-on-never-started-run",
-        "commit_message": "Fail fast on a predicted run GitHub never starts"
-      },
+      "auto_merge": null,
       "assignee": null,
       "active_lock_reason": null,
-      "merged": true,
-      "mergeable": null,
-      "rebaseable": null,
-      "mergeable_state": "unknown",
-      "merged_by": {
-        "login": "thekevinscott",
-        "id": 151596,
-        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
-        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
-        "gravatar_id": "",
-        "url": "https://api.github.com/users/thekevinscott",
-        "html_url": "https://github.com/thekevinscott",
-        "followers_url": "https://api.github.com/users/thekevinscott/followers",
-        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
-        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
-        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
-        "repos_url": "https://api.github.com/users/thekevinscott/repos",
-        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
-        "type": "User",
-        "user_view_type": "public",
-        "site_admin": false
-      },
+      "merged": false,
+      "mergeable": true,
+      "rebaseable": true,
+      "mergeable_state": "clean",
+      "merged_by": null,
       "comments": 0,
       "review_comments": 0,
       "maintainer_can_modify": false,
-      "commits": 3,
-      "additions": 137,
-      "deletions": 4,
-      "changed_files": 7
+      "commits": 1,
+      "additions": 1,
+      "deletions": 0,
+      "changed_files": 1
     }
   },
   {
@@ -420,92 +375,20 @@
     "params": {
       "owner": "thekevinscott",
       "repo": "pr-monitor",
-      "pull_number": 93
+      "pull_number": 98
     },
     "result": [
       {
-        "sha": "a12b19178a0c355dcf7aa765ed82af2dd3993c6b",
+        "sha": "01fa4eaa29228881cd5731d1224f4b8d090e962a",
         "filename": "README.md",
         "status": "modified",
-        "additions": 10,
-        "deletions": 4,
-        "changes": 14,
-        "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/d363fa23b78250a37fdafd63d5961359fff93faf/README.md",
-        "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/d363fa23b78250a37fdafd63d5961359fff93faf/README.md",
-        "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/README.md?ref=d363fa23b78250a37fdafd63d5961359fff93faf",
-        "patch": "@@ -12,6 +12,7 @@ It no longer guesses. [willfire](https://github.com/thekevinscott/willfire) eval\n \n - Stay yellow until every predicted run exists and has finished\n - Go red if a predicted run finishes badly\n+- Go red if a predicted run never starts — GitHub created no run for it, so nothing observed later can settle the verdict\n - Go red if a predicted check name never reports — a renamed job, a deleted one, or a matrix that stopped expanding to a combination\n - Go red if a check name reports that nothing predicted — the prediction and reality disagree, so the gate cannot vouch for the check set\n \n@@ -53,7 +54,7 @@ Keep this in its own workflow with no other jobs — the action excludes its own\n \n **`permissions`** — if you set an explicit block, it needs all three of `actions: read`, `contents: read`, and `pull-requests: read`. The last one is new: willfire reads the PR and its changed files.\n \n-**`timeout-minutes`** — the action has no timeout of its own. This is the backstop. If a predicted run never dispatches, the gate waits until the job is killed.\n+**`timeout-minutes`** — the action has no timeout of its own. This is the backstop for a run that is slow, not for one that never starts. A predicted run GitHub never creates goes red about a minute after the last other predicted run finishes, so this only catches a lane that genuinely runs long.\n \n ## Inputs\n \n@@ -113,8 +114,9 @@ The map is keyed by `owner/repo/.github/workflows/file.yml:job-id` — repo-qual\n 5. Logs the commits the prediction was read from — the PR head, and every repo a `uses:` reached\n 6. Fails immediately on a run or a check name outside the expected set\n 7. Waits while a predicted run is missing or unfinished — a check name has no existence before the run that creates its job\n-8. Fails on a predicted check name that never reported once every run has finished\n-9. Passes when every run concluded `success`, `skipped`, `neutral`, or `stale`; fails otherwise\n+8. Fails on a predicted run that never started, once every other predicted run has finished and 60 seconds have passed\n+9. Fails on a predicted check name that never reported once every run has finished\n+10. Passes when every run concluded `success`, `skipped`, `neutral`, or `stale`; fails otherwise\n \n A `[skip ci]` commit predicts nothing, so nothing is required and the gate passes.\n \n@@ -126,6 +128,10 @@ Runs still drive the waiting and the pass/fail conclusion. A run stays non-termi\n \n **Unresolvable check names.** A matrix computed at runtime from another job's output cannot be expanded statically, so willfire returns the job with no name. The gate fails and names it. That is deliberate: with a hole in the predicted set, a name that never reported is indistinguishable from a leg that was never predicted, and an extra name from a leg that was — so the gate cannot honour its contract. Nothing observed later settles it, so it fails up front rather than exempting the workflow and hiding real divergence inside it. In practice this arises when willfire's sandbox cannot run the job that computes the matrix — the execution failed, or the job needs something the sandbox denies.\n \n+**A run that never starts.** GitHub creates every run an event matches in the same second — `run_started_at` equals `created_at`, and the variance between lanes is in how long they take to finish, not in how long they take to appear. So a predicted run still absent once every other predicted run has finished is not late. The gate waits 60 seconds past that point for the API to stop disagreeing with itself about a run it already created, then goes red naming the workflow. Another run going in progress restarts that clock.\n+\n+Waiting longer buys nothing: no run exists, so no check name from it can ever report. The verdict is ambiguous in one direction — it can mean the repo's workflow is not receiving the events its triggers ask for, or it can mean the prediction should not have expected it to dispatch — and both are a defect worth a human look, which is why there is no input to downgrade it to a warning.\n+\n **A callee tag that moved.** A `uses:` naming a moving tag — `owner/repo/.github/workflows/x.yml@v0` — can resolve to one commit when GitHub schedules the run and another when the gate predicts. The observed checks then come from one program and the predicted checks from another, with nothing wrong on either side.\n \n So the gate records which commits each prediction was read from, and on divergence re-resolves those refs **once**. If any moved, it predicts again at the new commits and judges the same observation against the fresh expectation; the move is named in the log. If nothing moved, the divergence is real and stands — and no second prediction runs, so jobs are never executed twice to confirm a tag that held still. A move that still does not explain the observation is red, and so is a ref that stopped resolving: the gate will not vouch for a check set whose commits it cannot name.\n@@ -135,7 +141,7 @@ So the gate records which commits each prediction was read from, and on divergen\n - **Workflows willfire does not model.** `workflow_run` chains and `pull_request_target` are not predicted, so their runs read as unexpected. If you use them, this gate is not for you yet.\n - **Dynamic matrices.** A `matrix:` built from another job's output cannot be expanded ahead of time. willfire runs the job that computes it in its sandbox; when that execution fails, the gate fails naming the job.\n - **Event actions willfire does not model.** The gate hands willfire the real `pull_request` action when it is `opened`, `synchronize`, or `reopened`. Run it on any other type (`labeled`, `ready_for_review`, …) and willfire falls back to inferring the action from the PR's commit count ([willfire#2](https://github.com/thekevinscott/willfire/issues/2)), which can flip a dispatch verdict on workflows that narrow `types:`.\n-- **Over-prediction hangs.** A workflow predicted to dispatch that never does leaves the gate waiting for `timeout-minutes`. Reconciliation does not help here: it runs on divergence, and waiting is not divergence.\n+- **Over-prediction is red, not diagnosed.** A workflow predicted to dispatch that never does fails the gate, naming the workflow, but the gate cannot tell you which side is wrong. Reconciliation does not narrow it: that runs on divergence, and an absent run is not divergence.\n - **Reconciliation is a single attempt.** One re-resolve and at most one re-prediction per gate run. A tag that moves twice mid-flight, or moves after the reconciliation, stays red — repeating would be a search for a prediction that agrees rather than a gate on one.\n \n ## Upgrading from the check-count gate"
-      },
-      {
-        "sha": "48cfe74df51f3e94b6d9688bb25f995ee929ed91",
-        "filename": "src/checks/isStalled.test.ts",
-        "status": "added",
-        "additions": 29,
+        "additions": 1,
         "deletions": 0,
-        "changes": 29,
-        "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/d363fa23b78250a37fdafd63d5961359fff93faf/src%2Fchecks%2FisStalled.test.ts",
-        "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/d363fa23b78250a37fdafd63d5961359fff93faf/src%2Fchecks%2FisStalled.test.ts",
-        "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/src%2Fchecks%2FisStalled.test.ts?ref=d363fa23b78250a37fdafd63d5961359fff93faf",
-        "patch": "@@ -0,0 +1,29 @@\n+import { expect, test } from 'vitest';\n+import { isStalled } from './isStalled';\n+import type { GateComparison } from '../types';\n+\n+function comparison(over: Partial<GateComparison> = {}): GateComparison {\n+  return {\n+    unexpected: [],\n+    unexpectedNames: [],\n+    missing: [],\n+    missingNames: [],\n+    matchedNames: [],\n+    matched: [],\n+    inProgress: [],\n+    nonPassing: [],\n+    ...over,\n+  };\n+}\n+\n+test('a missing run with nothing still going is a stall', () => {\n+  expect(isStalled(comparison({ missing: ['a.yml'] }))).toBe(true);\n+});\n+\n+test('a missing run is not a stall while another is still going', () => {\n+  expect(isStalled(comparison({ missing: ['a.yml'], inProgress: ['b.yml'] }))).toBe(false);\n+});\n+\n+test('nothing missing is not a stall, however quiet', () => {\n+  expect(isStalled(comparison({ matched: ['a.yml'] }))).toBe(false);\n+});"
-      },
-      {
-        "sha": "6015e65469cdf4aa3f6cb1d52a00001c877e5f81",
-        "filename": "src/checks/isStalled.ts",
-        "status": "added",
-        "additions": 9,
-        "deletions": 0,
-        "changes": 9,
-        "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/d363fa23b78250a37fdafd63d5961359fff93faf/src%2Fchecks%2FisStalled.ts",
-        "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/d363fa23b78250a37fdafd63d5961359fff93faf/src%2Fchecks%2FisStalled.ts",
-        "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/src%2Fchecks%2FisStalled.ts?ref=d363fa23b78250a37fdafd63d5961359fff93faf",
-        "patch": "@@ -0,0 +1,9 @@\n+import type { GateComparison } from '../types';\n+\n+/**\n+ * The shape in which a never-started run becomes decidable: nothing is still running\n+ * that could yet create the absent ones.\n+ */\n+export function isStalled(comparison: GateComparison): boolean {\n+  return comparison.missing.length > 0 && comparison.inProgress.length === 0;\n+}"
-      },
-      {
-        "sha": "d1dce908d8db3fdb764a01d422ef93cf96497d0f",
-        "filename": "src/messages/formatNeverStarted.test.ts",
-        "status": "added",
-        "additions": 18,
-        "deletions": 0,
-        "changes": 18,
-        "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/d363fa23b78250a37fdafd63d5961359fff93faf/src%2Fmessages%2FformatNeverStarted.test.ts",
-        "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/d363fa23b78250a37fdafd63d5961359fff93faf/src%2Fmessages%2FformatNeverStarted.test.ts",
-        "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/src%2Fmessages%2FformatNeverStarted.test.ts?ref=d363fa23b78250a37fdafd63d5961359fff93faf",
-        "patch": "@@ -0,0 +1,18 @@\n+import { expect, test } from 'vitest';\n+import { formatNeverStarted } from './formatNeverStarted';\n+\n+test('names every workflow that never started and rules out lateness', () => {\n+  const msg = formatNeverStarted(['a.yml', 'b.yml'], 60_000);\n+  expect(msg).toContain('Predicted workflow runs GitHub never started: [\"a.yml\",\"b.yml\"]');\n+  expect(msg).toContain('GitHub created no run for them');\n+});\n+\n+test('reports the grace it waited out, in seconds', () => {\n+  expect(formatNeverStarted(['a.yml'], 60_000)).toContain('nothing appeared for 60s');\n+});\n+\n+test('offers both readings, since the gate cannot tell which side is wrong', () => {\n+  const msg = formatNeverStarted(['a.yml'], 60_000);\n+  expect(msg).toContain('not receiving the events its triggers ask for');\n+  expect(msg).toContain('the prediction is wrong to expect it to dispatch');\n+});"
-      },
-      {
-        "sha": "c0b650a6819102a1050fe1ac1e2f760c9d173376",
-        "filename": "src/messages/formatNeverStarted.ts",
-        "status": "added",
-        "additions": 9,
-        "deletions": 0,
-        "changes": 9,
-        "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/d363fa23b78250a37fdafd63d5961359fff93faf/src%2Fmessages%2FformatNeverStarted.ts",
-        "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/d363fa23b78250a37fdafd63d5961359fff93faf/src%2Fmessages%2FformatNeverStarted.ts",
-        "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/src%2Fmessages%2FformatNeverStarted.ts?ref=d363fa23b78250a37fdafd63d5961359fff93faf",
-        "patch": "@@ -0,0 +1,9 @@\n+export function formatNeverStarted(workflows: string[], graceMs: number): string {\n+  return (\n+    `Predicted workflow runs GitHub never started: ${JSON.stringify(workflows)}. ` +\n+    `Every other predicted run finished and nothing appeared for ${graceMs / 1000}s, ` +\n+    'so these are not late — GitHub created no run for them. Either the workflow ' +\n+    'is not receiving the events its triggers ask for, or the prediction is wrong ' +\n+    'to expect it to dispatch.'\n+  );\n+}"
-      },
-      {
-        "sha": "b9371c2de4b427937dea61ebf840da61cd1c1c5f",
-        "filename": "src/monitor.test.ts",
-        "status": "modified",
-        "additions": 46,
-        "deletions": 0,
-        "changes": 46,
-        "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/d363fa23b78250a37fdafd63d5961359fff93faf/src%2Fmonitor.test.ts",
-        "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/d363fa23b78250a37fdafd63d5961359fff93faf/src%2Fmonitor.test.ts",
-        "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/src%2Fmonitor.test.ts?ref=d363fa23b78250a37fdafd63d5961359fff93faf",
-        "patch": "@@ -35,6 +35,7 @@ const GATED = '.github/workflows/gated.yml';\n const PINNED = '.github/workflows/pinned.yml';\n const SCAN = '.github/workflows/scan.yml';\n const HEAD_SHA = 'head-sha';\n+const POLL_CAP = 50;\n \n const BASE_REF = 'main';\n const BASE_SHA = 'base-sha';\n@@ -149,6 +150,9 @@ function makeGithub(\n   const refShas = scenario.refShas ?? ['callee-a'];\n   let refReads = 0;\n   const list = async () => {\n+    // The last `polls` entry repeats forever, so a gate that never terminates would spin\n+    // here rather than fail. Cap it: not terminating is the bug class under test.\n+    if (counter.polls >= POLL_CAP) throw new Error('poll cap exceeded; the gate did not settle');\n     const runs = scenario.polls[Math.min(counter.polls, scenario.polls.length - 1)];\n     counter.polls++;\n     return { data: { total_count: runs.length, workflow_runs: runs } };\n@@ -502,6 +506,48 @@ describe('predicted check set', () => {\n   });\n });\n \n+describe('a predicted run GitHub never starts', () => {\n+  test('-> red naming it, instead of polling until the job is killed', async () => {\n+    const { failures } = await gate({ polls: [[self]] });\n+    expect(failures[0]).toMatch(/test\\.yml/);\n+    expect(failures[0]).toMatch(/never started/);\n+  });\n+\n+  test('the verdict waits out the grace period, then stops polling', async () => {\n+    const { polls } = await gate({ polls: [[self]] });\n+    expect(polls).toBe(3);\n+  });\n+\n+  test('a run that registers inside the grace period is not a stall', async () => {\n+    const { failures, polls } = await gate({ polls: [[self], [self], [self, run(TESTS)]] });\n+    expect(failures).toEqual([]);\n+    expect(polls).toBe(3);\n+  });\n+\n+  test('another run still going restarts the grace', async () => {\n+    const { failures, polls } = await gate({\n+      workflows: [SELF_PATH, TESTS, CONVENTIONS],\n+      polls: [\n+        [self],\n+        [self, run(TESTS, { status: 'in_progress', conclusion: null })],\n+        [self, run(TESTS)],\n+      ],\n+    });\n+    expect(failures[0]).toMatch(/conventions\\.yml/);\n+    expect(failures[0]).not.toMatch(/test\\.yml/);\n+    expect(polls).toBe(5);\n+  });\n+\n+  test('every predicted run absent -> red naming all of them', async () => {\n+    const { failures } = await gate({\n+      workflows: [SELF_PATH, TESTS, CONVENTIONS],\n+      polls: [[self]],\n+    });\n+    expect(failures[0]).toMatch(/conventions\\.yml/);\n+    expect(failures[0]).toMatch(/test\\.yml/);\n+  });\n+});\n+\n describe(\"a root workflow's own inputs\", () => {\n   test(\"an input the workflow declares itself decides its own job's `if:`\", async () => {\n     const { failures, log, polls } = await gate({"
-      },
-      {
-        "sha": "29b8786325ea3d8eed6601151c1f95ae9f97618b",
-        "filename": "src/monitor.ts",
-        "status": "modified",
-        "additions": 16,
-        "deletions": 0,
-        "changes": 16,
-        "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/d363fa23b78250a37fdafd63d5961359fff93faf/src%2Fmonitor.ts",
-        "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/d363fa23b78250a37fdafd63d5961359fff93faf/src%2Fmonitor.ts",
-        "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/src%2Fmonitor.ts?ref=d363fa23b78250a37fdafd63d5961359fff93faf",
-        "patch": "@@ -10,8 +10,10 @@ import { resolvePullNumber } from './github/resolvePullNumber';\n import { resolveSelfWorkflowPath } from './github/resolveSelfWorkflowPath';\n import { compareObserved } from './checks/compareObserved';\n import { describeDivergence } from './checks/describeDivergence';\n+import { isStalled } from './checks/isStalled';\n import { expectedChecks } from './predict/expectedChecks';\n import { reconcile } from './predict/reconcile';\n+import { formatNeverStarted } from './messages/formatNeverStarted';\n import { formatProgressLog } from './messages/formatProgressLog';\n import { formatSources } from './messages/formatSources';\n import { formatUnresolvedFailure } from './messages/formatUnresolvedFailure';\n@@ -20,6 +22,9 @@ import { reportFinalResult } from './messages/reportFinalResult';\n const POLL_INTERVAL_MS = 30_000;\n // Rate-limited reads don't cost quota to retry, so a fixed wait is cheap and needs no header math.\n const RATE_LIMIT_RETRY_MS = 60_000;\n+// GitHub creates every run an event matches in the same second, so an absent run is not a slow\n+// one — this only covers the API being briefly inconsistent about a run it already created.\n+const STALL_GRACE_MS = 60_000;\n \n export async function monitor({\n   github,\n@@ -67,6 +72,7 @@ export async function monitor({\n   console.log(`Expected runs: ${JSON.stringify(expected.workflows)}`);\n \n   let reconciled = false;\n+  let stalledPolls = 0;\n \n   while (true) {\n     let runs: WorkflowRunSummary[];\n@@ -121,6 +127,16 @@ export async function monitor({\n       return;\n     }\n \n+    if (isStalled(comparison)) {\n+      if (stalledPolls * POLL_INTERVAL_MS >= STALL_GRACE_MS) {\n+        core.setFailed(formatNeverStarted(comparison.missing, STALL_GRACE_MS));\n+        return;\n+      }\n+      stalledPolls++;\n+    } else {\n+      stalledPolls = 0;\n+    }\n+\n     console.log(formatProgressLog(comparison));\n     await sleep(POLL_INTERVAL_MS);\n   }"
+        "changes": 1,
+        "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/c7131f1ef99e18a845395c6af6e4816203f5c321/README.md",
+        "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/c7131f1ef99e18a845395c6af6e4816203f5c321/README.md",
+        "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/README.md?ref=c7131f1ef99e18a845395c6af6e4816203f5c321",
+        "patch": "@@ -181,3 +181,4 @@ CI enforces typecheck, lint, and coverage on every PR, plus a [testing-conventio\n ## License\n \n MIT\n+"
       }
     ]
   },
@@ -514,57 +397,57 @@
     "params": {
       "owner": "thekevinscott",
       "repo": "pr-monitor",
-      "ref": "6bc702d251fc4f0ff1cf77809308e31afa7fe251"
+      "ref": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4"
     },
     "result": {
-      "sha": "6bc702d251fc4f0ff1cf77809308e31afa7fe251",
-      "node_id": "C_kwDOQnAsWNoAKDZiYzcwMmQyNTFmYzRmMGZmMWNmNzc4MDkzMDhlMzFhZmE3ZmUyNTE",
+      "sha": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+      "node_id": "C_kwDOQnAsWNoAKGI0YTJmY2YzNmEyM2ZjOTBlMDQyY2UxYTdmZmRhMjc0OGM1YTk0ZDQ",
       "commit": {
         "author": {
-          "name": "Kevin Scott",
-          "email": "151596+thekevinscott@users.noreply.github.com",
-          "date": "2026-09-16T02:25:47Z"
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-25T11:53:57Z"
         },
         "committer": {
           "name": "GitHub",
           "email": "noreply@github.com",
-          "date": "2026-09-16T02:25:47Z"
+          "date": "2026-09-25T11:53:57Z"
         },
-        "message": "Merge pull request #93 from thekevinscott/fix/fail-fast-on-never-started-run\n\nFail fast on a predicted run GitHub never starts",
+        "message": "Merge c7131f1ef99e18a845395c6af6e4816203f5c321 into 7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
         "tree": {
-          "sha": "e3dace9780d5627ee28214d9d350eb3ef6df1de8",
-          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/trees/e3dace9780d5627ee28214d9d350eb3ef6df1de8"
+          "sha": "709d40b4fe65b6b0cf47e3a61ffc991ed3969f9b",
+          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/trees/709d40b4fe65b6b0cf47e3a61ffc991ed3969f9b"
         },
-        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/commits/6bc702d251fc4f0ff1cf77809308e31afa7fe251",
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/commits/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
         "comment_count": 0,
         "verification": {
           "verified": true,
           "reason": "valid",
-          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqqf4rCRC1aQ7uu5UhlAAANdMQADfIQ/3+tHImOAShKdvDsKuh\nrGWuHPEnx/rdQ+XWx2kEHW9bKfjH6fr9SQ6/uYQe7NNGIpDaQXXzExk9z42Ip5SS\n/x6GQ9/3ExTkDbrju6X8e2Nr8FEQylQrD7I6Ex6Q5FOB0XMZw1Uo65Db602RyyQg\nB0ukDR7DTXLa3S7JDz4Jfif1ZAGdsHl9vocRf7SUSoPAzStqhdAxMNIasMMhDBoJ\nrpC+5XrllrX2/Ufte7D0T1YgXDGpKQst7j+D2Ym+xVZ1yZllcJKp3HHAL/Yztp3Q\nrXyCBB7tNNJP1DOe2P3TORqy7ypxPrdtq/wSKUbrlEcLbCF7brH8KAeLNVjofo7e\n6Lw8T3IbxxkC8nE7A9REi7uQEGKeRCq6d01TX187AigxNGFo0UpoTWWFP4zB0xjN\nkJc/wAeHLS7wZqbah8L44Zhlo5RiNzzPfuCFAwX0nb5v5Lxv9ciz/3uMYKrhghr2\nfdZ49CVoy5j+GOzTAwz8T4+CsbKT8Dbl7La4ZTdTnqMSoYkAhQ3mQOvq4Z5YRRs3\nZiNyhM2b3EF4TAc9KZ9eQlH3ct/fAdMj3akgC02vyNhJBl4o779L15ep8WP90ADp\n7U3iL1KYG4AwVZqnYNyQhfFae6b2Q7Dh3letgLXysrALKddJ4J3Ebkz4o8KVjvJ6\nhq9ZTOTYgBj6ngrwN9gq\n=H8rz\n-----END PGP SIGNATURE-----\n",
-          "payload": "tree e3dace9780d5627ee28214d9d350eb3ef6df1de8\nparent 0ac042fc27021172c8bc0d84d553008f1ac128fc\nparent d363fa23b78250a37fdafd63d5961359fff93faf\nauthor Kevin Scott <151596+thekevinscott@users.noreply.github.com> 1789525547 -0400\ncommitter GitHub <noreply@github.com> 1789525547 -0400\n\nMerge pull request #93 from thekevinscott/fix/fail-fast-on-never-started-run\n\nFail fast on a predicted run GitHub never starts",
-          "verified_at": "2026-09-16T02:25:47Z"
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqtmDVCRC1aQ7uu5UhlAAA2HEQAAWlmukyQ1WcGVMtvp1Whzot\nR2KJVahMwl5kpSm3zZxx3lWZWYYxB7Sa/sFqjJcelt5+6EdRepq1YIgCvE2YIoiI\nSw9T93p9OYtZZTgs4I2/9GcAGnszyAhYaycHdWuC3cnH1dUSrwvcdPSTH4HRYwFZ\nS2xhsdlQaiLALPG6gVa8HiyoSXAPkVgjEvuj/2GfKkVvTeXUye2RWiRpUHqjgTUC\naXS0J5Mql0ZD7ChvN6/n1/UMl/DhdEtm7XIJT+8d9esz3ze98FPLFiMM6/rXev+F\ntMp/Kwi0Yqd95bdzInY5JQXQxxKiaJaZJ9vyor/2PQKKQBJydZ+EKGMoBE/Zyyyt\nmlZ+oSFxFfjndXQhDE6xDa8l27XtjvJlQ9hfBZyK/mzYRUl2xAR3vzi3SY02ZRNn\n3N3cdx0uXV0EEh3dVfpGV3Cj4uCWiBh+rQ6beErE2deHdv6K7jd4kSNbgv5up9Wf\nQcpHlhjD/+QNbLp+63Febc90+ZG+IpFAnWRyJubruKmk3fDKC6XQuQBnOabIVpaA\nXlgndBCWSVAcxsYgZO5pK34K3QJ8UZY0plVh6BIX41CFs3DlS9qHZYJO4y38NRkz\n11+QTHyYQgBoFOgCbr3+gnQ8ZmVhQIozBfUleAd5lYJSebfEWKum5uZdD0ksd0y6\nq1M7JShKHlcw6Gv7rpsU\n=dlx7\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 709d40b4fe65b6b0cf47e3a61ffc991ed3969f9b\nparent 7bb6c0f8c7a371537aaf830b3e700a9907ec2151\nparent c7131f1ef99e18a845395c6af6e4816203f5c321\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790337237 -0400\ncommitter GitHub <noreply@github.com> 1790337237 -0400\n\nMerge c7131f1ef99e18a845395c6af6e4816203f5c321 into 7bb6c0f8c7a371537aaf830b3e700a9907ec2151\n",
+          "verified_at": "2026-09-25T11:53:58Z"
         }
       },
-      "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/6bc702d251fc4f0ff1cf77809308e31afa7fe251",
-      "html_url": "https://github.com/thekevinscott/pr-monitor/commit/6bc702d251fc4f0ff1cf77809308e31afa7fe251",
-      "comments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/6bc702d251fc4f0ff1cf77809308e31afa7fe251/comments",
+      "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+      "html_url": "https://github.com/thekevinscott/pr-monitor/commit/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+      "comments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/comments",
       "author": {
-        "login": "thekevinscott",
-        "id": 151596,
-        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
-        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
         "gravatar_id": "",
-        "url": "https://api.github.com/users/thekevinscott",
-        "html_url": "https://github.com/thekevinscott",
-        "followers_url": "https://api.github.com/users/thekevinscott/followers",
-        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
-        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
-        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
-        "repos_url": "https://api.github.com/users/thekevinscott/repos",
-        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
         "type": "User",
         "user_view_type": "public",
         "site_admin": false
@@ -592,105 +475,33 @@
       },
       "parents": [
         {
-          "sha": "0ac042fc27021172c8bc0d84d553008f1ac128fc",
-          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/0ac042fc27021172c8bc0d84d553008f1ac128fc",
-          "html_url": "https://github.com/thekevinscott/pr-monitor/commit/0ac042fc27021172c8bc0d84d553008f1ac128fc"
+          "sha": "7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+          "html_url": "https://github.com/thekevinscott/pr-monitor/commit/7bb6c0f8c7a371537aaf830b3e700a9907ec2151"
         },
         {
-          "sha": "d363fa23b78250a37fdafd63d5961359fff93faf",
-          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/d363fa23b78250a37fdafd63d5961359fff93faf",
-          "html_url": "https://github.com/thekevinscott/pr-monitor/commit/d363fa23b78250a37fdafd63d5961359fff93faf"
+          "sha": "c7131f1ef99e18a845395c6af6e4816203f5c321",
+          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/c7131f1ef99e18a845395c6af6e4816203f5c321",
+          "html_url": "https://github.com/thekevinscott/pr-monitor/commit/c7131f1ef99e18a845395c6af6e4816203f5c321"
         }
       ],
       "stats": {
-        "total": 141,
-        "additions": 137,
-        "deletions": 4
+        "total": 1,
+        "additions": 1,
+        "deletions": 0
       },
       "files": [
         {
-          "sha": "a12b19178a0c355dcf7aa765ed82af2dd3993c6b",
+          "sha": "01fa4eaa29228881cd5731d1224f4b8d090e962a",
           "filename": "README.md",
           "status": "modified",
-          "additions": 10,
-          "deletions": 4,
-          "changes": 14,
-          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/6bc702d251fc4f0ff1cf77809308e31afa7fe251/README.md",
-          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/6bc702d251fc4f0ff1cf77809308e31afa7fe251/README.md",
-          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/README.md?ref=6bc702d251fc4f0ff1cf77809308e31afa7fe251",
-          "patch": "@@ -12,6 +12,7 @@ It no longer guesses. [willfire](https://github.com/thekevinscott/willfire) eval\n \n - Stay yellow until every predicted run exists and has finished\n - Go red if a predicted run finishes badly\n+- Go red if a predicted run never starts — GitHub created no run for it, so nothing observed later can settle the verdict\n - Go red if a predicted check name never reports — a renamed job, a deleted one, or a matrix that stopped expanding to a combination\n - Go red if a check name reports that nothing predicted — the prediction and reality disagree, so the gate cannot vouch for the check set\n \n@@ -53,7 +54,7 @@ Keep this in its own workflow with no other jobs — the action excludes its own\n \n **`permissions`** — if you set an explicit block, it needs all three of `actions: read`, `contents: read`, and `pull-requests: read`. The last one is new: willfire reads the PR and its changed files.\n \n-**`timeout-minutes`** — the action has no timeout of its own. This is the backstop. If a predicted run never dispatches, the gate waits until the job is killed.\n+**`timeout-minutes`** — the action has no timeout of its own. This is the backstop for a run that is slow, not for one that never starts. A predicted run GitHub never creates goes red about a minute after the last other predicted run finishes, so this only catches a lane that genuinely runs long.\n \n ## Inputs\n \n@@ -113,8 +114,9 @@ The map is keyed by `owner/repo/.github/workflows/file.yml:job-id` — repo-qual\n 5. Logs the commits the prediction was read from — the PR head, and every repo a `uses:` reached\n 6. Fails immediately on a run or a check name outside the expected set\n 7. Waits while a predicted run is missing or unfinished — a check name has no existence before the run that creates its job\n-8. Fails on a predicted check name that never reported once every run has finished\n-9. Passes when every run concluded `success`, `skipped`, `neutral`, or `stale`; fails otherwise\n+8. Fails on a predicted run that never started, once every other predicted run has finished and 60 seconds have passed\n+9. Fails on a predicted check name that never reported once every run has finished\n+10. Passes when every run concluded `success`, `skipped`, `neutral`, or `stale`; fails otherwise\n \n A `[skip ci]` commit predicts nothing, so nothing is required and the gate passes.\n \n@@ -126,6 +128,10 @@ Runs still drive the waiting and the pass/fail conclusion. A run stays non-termi\n \n **Unresolvable check names.** A matrix computed at runtime from another job's output cannot be expanded statically, so willfire returns the job with no name. The gate fails and names it. That is deliberate: with a hole in the predicted set, a name that never reported is indistinguishable from a leg that was never predicted, and an extra name from a leg that was — so the gate cannot honour its contract. Nothing observed later settles it, so it fails up front rather than exempting the workflow and hiding real divergence inside it. In practice this arises when willfire's sandbox cannot run the job that computes the matrix — the execution failed, or the job needs something the sandbox denies.\n \n+**A run that never starts.** GitHub creates every run an event matches in the same second — `run_started_at` equals `created_at`, and the variance between lanes is in how long they take to finish, not in how long they take to appear. So a predicted run still absent once every other predicted run has finished is not late. The gate waits 60 seconds past that point for the API to stop disagreeing with itself about a run it already created, then goes red naming the workflow. Another run going in progress restarts that clock.\n+\n+Waiting longer buys nothing: no run exists, so no check name from it can ever report. The verdict is ambiguous in one direction — it can mean the repo's workflow is not receiving the events its triggers ask for, or it can mean the prediction should not have expected it to dispatch — and both are a defect worth a human look, which is why there is no input to downgrade it to a warning.\n+\n **A callee tag that moved.** A `uses:` naming a moving tag — `owner/repo/.github/workflows/x.yml@v0` — can resolve to one commit when GitHub schedules the run and another when the gate predicts. The observed checks then come from one program and the predicted checks from another, with nothing wrong on either side.\n \n So the gate records which commits each prediction was read from, and on divergence re-resolves those refs **once**. If any moved, it predicts again at the new commits and judges the same observation against the fresh expectation; the move is named in the log. If nothing moved, the divergence is real and stands — and no second prediction runs, so jobs are never executed twice to confirm a tag that held still. A move that still does not explain the observation is red, and so is a ref that stopped resolving: the gate will not vouch for a check set whose commits it cannot name.\n@@ -135,7 +141,7 @@ So the gate records which commits each prediction was read from, and on divergen\n - **Workflows willfire does not model.** `workflow_run` chains and `pull_request_target` are not predicted, so their runs read as unexpected. If you use them, this gate is not for you yet.\n - **Dynamic matrices.** A `matrix:` built from another job's output cannot be expanded ahead of time. willfire runs the job that computes it in its sandbox; when that execution fails, the gate fails naming the job.\n - **Event actions willfire does not model.** The gate hands willfire the real `pull_request` action when it is `opened`, `synchronize`, or `reopened`. Run it on any other type (`labeled`, `ready_for_review`, …) and willfire falls back to inferring the action from the PR's commit count ([willfire#2](https://github.com/thekevinscott/willfire/issues/2)), which can flip a dispatch verdict on workflows that narrow `types:`.\n-- **Over-prediction hangs.** A workflow predicted to dispatch that never does leaves the gate waiting for `timeout-minutes`. Reconciliation does not help here: it runs on divergence, and waiting is not divergence.\n+- **Over-prediction is red, not diagnosed.** A workflow predicted to dispatch that never does fails the gate, naming the workflow, but the gate cannot tell you which side is wrong. Reconciliation does not narrow it: that runs on divergence, and an absent run is not divergence.\n - **Reconciliation is a single attempt.** One re-resolve and at most one re-prediction per gate run. A tag that moves twice mid-flight, or moves after the reconciliation, stays red — repeating would be a search for a prediction that agrees rather than a gate on one.\n \n ## Upgrading from the check-count gate"
-        },
-        {
-          "sha": "48cfe74df51f3e94b6d9688bb25f995ee929ed91",
-          "filename": "src/checks/isStalled.test.ts",
-          "status": "added",
-          "additions": 29,
+          "additions": 1,
           "deletions": 0,
-          "changes": 29,
-          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/6bc702d251fc4f0ff1cf77809308e31afa7fe251/src%2Fchecks%2FisStalled.test.ts",
-          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/6bc702d251fc4f0ff1cf77809308e31afa7fe251/src%2Fchecks%2FisStalled.test.ts",
-          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/src%2Fchecks%2FisStalled.test.ts?ref=6bc702d251fc4f0ff1cf77809308e31afa7fe251",
-          "patch": "@@ -0,0 +1,29 @@\n+import { expect, test } from 'vitest';\n+import { isStalled } from './isStalled';\n+import type { GateComparison } from '../types';\n+\n+function comparison(over: Partial<GateComparison> = {}): GateComparison {\n+  return {\n+    unexpected: [],\n+    unexpectedNames: [],\n+    missing: [],\n+    missingNames: [],\n+    matchedNames: [],\n+    matched: [],\n+    inProgress: [],\n+    nonPassing: [],\n+    ...over,\n+  };\n+}\n+\n+test('a missing run with nothing still going is a stall', () => {\n+  expect(isStalled(comparison({ missing: ['a.yml'] }))).toBe(true);\n+});\n+\n+test('a missing run is not a stall while another is still going', () => {\n+  expect(isStalled(comparison({ missing: ['a.yml'], inProgress: ['b.yml'] }))).toBe(false);\n+});\n+\n+test('nothing missing is not a stall, however quiet', () => {\n+  expect(isStalled(comparison({ matched: ['a.yml'] }))).toBe(false);\n+});"
-        },
-        {
-          "sha": "6015e65469cdf4aa3f6cb1d52a00001c877e5f81",
-          "filename": "src/checks/isStalled.ts",
-          "status": "added",
-          "additions": 9,
-          "deletions": 0,
-          "changes": 9,
-          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/6bc702d251fc4f0ff1cf77809308e31afa7fe251/src%2Fchecks%2FisStalled.ts",
-          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/6bc702d251fc4f0ff1cf77809308e31afa7fe251/src%2Fchecks%2FisStalled.ts",
-          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/src%2Fchecks%2FisStalled.ts?ref=6bc702d251fc4f0ff1cf77809308e31afa7fe251",
-          "patch": "@@ -0,0 +1,9 @@\n+import type { GateComparison } from '../types';\n+\n+/**\n+ * The shape in which a never-started run becomes decidable: nothing is still running\n+ * that could yet create the absent ones.\n+ */\n+export function isStalled(comparison: GateComparison): boolean {\n+  return comparison.missing.length > 0 && comparison.inProgress.length === 0;\n+}"
-        },
-        {
-          "sha": "d1dce908d8db3fdb764a01d422ef93cf96497d0f",
-          "filename": "src/messages/formatNeverStarted.test.ts",
-          "status": "added",
-          "additions": 18,
-          "deletions": 0,
-          "changes": 18,
-          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/6bc702d251fc4f0ff1cf77809308e31afa7fe251/src%2Fmessages%2FformatNeverStarted.test.ts",
-          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/6bc702d251fc4f0ff1cf77809308e31afa7fe251/src%2Fmessages%2FformatNeverStarted.test.ts",
-          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/src%2Fmessages%2FformatNeverStarted.test.ts?ref=6bc702d251fc4f0ff1cf77809308e31afa7fe251",
-          "patch": "@@ -0,0 +1,18 @@\n+import { expect, test } from 'vitest';\n+import { formatNeverStarted } from './formatNeverStarted';\n+\n+test('names every workflow that never started and rules out lateness', () => {\n+  const msg = formatNeverStarted(['a.yml', 'b.yml'], 60_000);\n+  expect(msg).toContain('Predicted workflow runs GitHub never started: [\"a.yml\",\"b.yml\"]');\n+  expect(msg).toContain('GitHub created no run for them');\n+});\n+\n+test('reports the grace it waited out, in seconds', () => {\n+  expect(formatNeverStarted(['a.yml'], 60_000)).toContain('nothing appeared for 60s');\n+});\n+\n+test('offers both readings, since the gate cannot tell which side is wrong', () => {\n+  const msg = formatNeverStarted(['a.yml'], 60_000);\n+  expect(msg).toContain('not receiving the events its triggers ask for');\n+  expect(msg).toContain('the prediction is wrong to expect it to dispatch');\n+});"
-        },
-        {
-          "sha": "c0b650a6819102a1050fe1ac1e2f760c9d173376",
-          "filename": "src/messages/formatNeverStarted.ts",
-          "status": "added",
-          "additions": 9,
-          "deletions": 0,
-          "changes": 9,
-          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/6bc702d251fc4f0ff1cf77809308e31afa7fe251/src%2Fmessages%2FformatNeverStarted.ts",
-          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/6bc702d251fc4f0ff1cf77809308e31afa7fe251/src%2Fmessages%2FformatNeverStarted.ts",
-          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/src%2Fmessages%2FformatNeverStarted.ts?ref=6bc702d251fc4f0ff1cf77809308e31afa7fe251",
-          "patch": "@@ -0,0 +1,9 @@\n+export function formatNeverStarted(workflows: string[], graceMs: number): string {\n+  return (\n+    `Predicted workflow runs GitHub never started: ${JSON.stringify(workflows)}. ` +\n+    `Every other predicted run finished and nothing appeared for ${graceMs / 1000}s, ` +\n+    'so these are not late — GitHub created no run for them. Either the workflow ' +\n+    'is not receiving the events its triggers ask for, or the prediction is wrong ' +\n+    'to expect it to dispatch.'\n+  );\n+}"
-        },
-        {
-          "sha": "b9371c2de4b427937dea61ebf840da61cd1c1c5f",
-          "filename": "src/monitor.test.ts",
-          "status": "modified",
-          "additions": 46,
-          "deletions": 0,
-          "changes": 46,
-          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/6bc702d251fc4f0ff1cf77809308e31afa7fe251/src%2Fmonitor.test.ts",
-          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/6bc702d251fc4f0ff1cf77809308e31afa7fe251/src%2Fmonitor.test.ts",
-          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/src%2Fmonitor.test.ts?ref=6bc702d251fc4f0ff1cf77809308e31afa7fe251",
-          "patch": "@@ -35,6 +35,7 @@ const GATED = '.github/workflows/gated.yml';\n const PINNED = '.github/workflows/pinned.yml';\n const SCAN = '.github/workflows/scan.yml';\n const HEAD_SHA = 'head-sha';\n+const POLL_CAP = 50;\n \n const BASE_REF = 'main';\n const BASE_SHA = 'base-sha';\n@@ -149,6 +150,9 @@ function makeGithub(\n   const refShas = scenario.refShas ?? ['callee-a'];\n   let refReads = 0;\n   const list = async () => {\n+    // The last `polls` entry repeats forever, so a gate that never terminates would spin\n+    // here rather than fail. Cap it: not terminating is the bug class under test.\n+    if (counter.polls >= POLL_CAP) throw new Error('poll cap exceeded; the gate did not settle');\n     const runs = scenario.polls[Math.min(counter.polls, scenario.polls.length - 1)];\n     counter.polls++;\n     return { data: { total_count: runs.length, workflow_runs: runs } };\n@@ -502,6 +506,48 @@ describe('predicted check set', () => {\n   });\n });\n \n+describe('a predicted run GitHub never starts', () => {\n+  test('-> red naming it, instead of polling until the job is killed', async () => {\n+    const { failures } = await gate({ polls: [[self]] });\n+    expect(failures[0]).toMatch(/test\\.yml/);\n+    expect(failures[0]).toMatch(/never started/);\n+  });\n+\n+  test('the verdict waits out the grace period, then stops polling', async () => {\n+    const { polls } = await gate({ polls: [[self]] });\n+    expect(polls).toBe(3);\n+  });\n+\n+  test('a run that registers inside the grace period is not a stall', async () => {\n+    const { failures, polls } = await gate({ polls: [[self], [self], [self, run(TESTS)]] });\n+    expect(failures).toEqual([]);\n+    expect(polls).toBe(3);\n+  });\n+\n+  test('another run still going restarts the grace', async () => {\n+    const { failures, polls } = await gate({\n+      workflows: [SELF_PATH, TESTS, CONVENTIONS],\n+      polls: [\n+        [self],\n+        [self, run(TESTS, { status: 'in_progress', conclusion: null })],\n+        [self, run(TESTS)],\n+      ],\n+    });\n+    expect(failures[0]).toMatch(/conventions\\.yml/);\n+    expect(failures[0]).not.toMatch(/test\\.yml/);\n+    expect(polls).toBe(5);\n+  });\n+\n+  test('every predicted run absent -> red naming all of them', async () => {\n+    const { failures } = await gate({\n+      workflows: [SELF_PATH, TESTS, CONVENTIONS],\n+      polls: [[self]],\n+    });\n+    expect(failures[0]).toMatch(/conventions\\.yml/);\n+    expect(failures[0]).toMatch(/test\\.yml/);\n+  });\n+});\n+\n describe(\"a root workflow's own inputs\", () => {\n   test(\"an input the workflow declares itself decides its own job's `if:`\", async () => {\n     const { failures, log, polls } = await gate({"
-        },
-        {
-          "sha": "29b8786325ea3d8eed6601151c1f95ae9f97618b",
-          "filename": "src/monitor.ts",
-          "status": "modified",
-          "additions": 16,
-          "deletions": 0,
-          "changes": 16,
-          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/6bc702d251fc4f0ff1cf77809308e31afa7fe251/src%2Fmonitor.ts",
-          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/6bc702d251fc4f0ff1cf77809308e31afa7fe251/src%2Fmonitor.ts",
-          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/src%2Fmonitor.ts?ref=6bc702d251fc4f0ff1cf77809308e31afa7fe251",
-          "patch": "@@ -10,8 +10,10 @@ import { resolvePullNumber } from './github/resolvePullNumber';\n import { resolveSelfWorkflowPath } from './github/resolveSelfWorkflowPath';\n import { compareObserved } from './checks/compareObserved';\n import { describeDivergence } from './checks/describeDivergence';\n+import { isStalled } from './checks/isStalled';\n import { expectedChecks } from './predict/expectedChecks';\n import { reconcile } from './predict/reconcile';\n+import { formatNeverStarted } from './messages/formatNeverStarted';\n import { formatProgressLog } from './messages/formatProgressLog';\n import { formatSources } from './messages/formatSources';\n import { formatUnresolvedFailure } from './messages/formatUnresolvedFailure';\n@@ -20,6 +22,9 @@ import { reportFinalResult } from './messages/reportFinalResult';\n const POLL_INTERVAL_MS = 30_000;\n // Rate-limited reads don't cost quota to retry, so a fixed wait is cheap and needs no header math.\n const RATE_LIMIT_RETRY_MS = 60_000;\n+// GitHub creates every run an event matches in the same second, so an absent run is not a slow\n+// one — this only covers the API being briefly inconsistent about a run it already created.\n+const STALL_GRACE_MS = 60_000;\n \n export async function monitor({\n   github,\n@@ -67,6 +72,7 @@ export async function monitor({\n   console.log(`Expected runs: ${JSON.stringify(expected.workflows)}`);\n \n   let reconciled = false;\n+  let stalledPolls = 0;\n \n   while (true) {\n     let runs: WorkflowRunSummary[];\n@@ -121,6 +127,16 @@ export async function monitor({\n       return;\n     }\n \n+    if (isStalled(comparison)) {\n+      if (stalledPolls * POLL_INTERVAL_MS >= STALL_GRACE_MS) {\n+        core.setFailed(formatNeverStarted(comparison.missing, STALL_GRACE_MS));\n+        return;\n+      }\n+      stalledPolls++;\n+    } else {\n+      stalledPolls = 0;\n+    }\n+\n     console.log(formatProgressLog(comparison));\n     await sleep(POLL_INTERVAL_MS);\n   }"
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/README.md",
+          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/README.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/README.md?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+          "patch": "@@ -181,3 +181,4 @@ CI enforces typecheck, lint, and coverage on every PR, plus a [testing-conventio\n ## License\n \n MIT\n+"
         }
       ]
     }
@@ -846,54 +657,44 @@
     }
   },
   {
-    "method": "listPulls",
-    "params": {
-      "owner": "thekevinscott",
-      "repo": "pr-monitor",
-      "state": "open",
-      "head": "thekevinscott:main"
-    },
-    "result": []
-  },
-  {
     "method": "getCommit",
     "params": {
       "owner": "thekevinscott",
       "repo": "pr-monitor",
-      "ref": "d363fa23b78250a37fdafd63d5961359fff93faf"
+      "ref": "c7131f1ef99e18a845395c6af6e4816203f5c321"
     },
     "result": {
-      "sha": "d363fa23b78250a37fdafd63d5961359fff93faf",
-      "node_id": "C_kwDOQnAsWNoAKGQzNjNmYTIzYjc4MjUwYTM3ZmRhZmQ2M2Q1OTYxMzU5ZmZmOTNmYWY",
+      "sha": "c7131f1ef99e18a845395c6af6e4816203f5c321",
+      "node_id": "C_kwDOQnAsWNoAKGM3MTMxZjFlZjk5ZTE4YTg0NTM5NWM2YWY2ZTQ4MTYyMDNmNWMzMjE",
       "commit": {
         "author": {
           "name": "thekevinbot",
           "email": "248217931+thekevinbot@users.noreply.github.com",
-          "date": "2026-09-16T02:24:22Z"
+          "date": "2026-09-25T11:53:44Z"
         },
         "committer": {
           "name": "thekevinbot",
           "email": "248217931+thekevinbot@users.noreply.github.com",
-          "date": "2026-09-16T02:24:22Z"
+          "date": "2026-09-25T11:53:44Z"
         },
-        "message": "Kill the surviving string mutants in formatNeverStarted\n\nStryker blanks each literal in the message; the assertions only covered\nthe two interpolated lines. Assert on the prose that carries the two\nreadings, which is the part a reader acts on.",
+        "message": "Add trailing blank line to README (throwaway capture probe)",
         "tree": {
-          "sha": "e3dace9780d5627ee28214d9d350eb3ef6df1de8",
-          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/trees/e3dace9780d5627ee28214d9d350eb3ef6df1de8"
+          "sha": "709d40b4fe65b6b0cf47e3a61ffc991ed3969f9b",
+          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/trees/709d40b4fe65b6b0cf47e3a61ffc991ed3969f9b"
         },
-        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/commits/d363fa23b78250a37fdafd63d5961359fff93faf",
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/commits/c7131f1ef99e18a845395c6af6e4816203f5c321",
         "comment_count": 0,
         "verification": {
           "verified": true,
           "reason": "valid",
-          "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCgAdFiEEnU3Dh/cnWdmpxUeIBqUoxO3sGUIFAmqp/dYACgkQBqUoxO3s\nGUJ7AA//SlUiWGl0c/Mj680H30xa8iL8WKU97JgjfIoyNsH/DUfImC3ltN4uBd8v\ni3EzqMeGV4tCetuV+sZXkZqzIwJc/7bD85sRjGh6Rnb3rlLhP2q8YJy52/Fyn1r4\neUPhsuqi9+dkM+pWx77LHFvUeMEjH+XRbxRB64VrD0TUZVBw1cD6yHpmeyBAslF/\nhlFM0wR5aK8s1I8w4GnDIfb0kSIk271KR8ll6A3iG5Bm9ELaB5jAy0rieU+hzUvn\n141GSi5/Z00iFyL5PAea4Vh5wVZYAcaAbsE1qoqOsg6wCeMWYnAJLNWZQZKXb6Be\nX8Vf0ML2eL5iRXEgMQxP4xrsAghdh0fdhnvYQmLkgzXJf/dUjHUhPiGgL12AI11s\nEmFKm4hUf/9gFjyw7y4XD13i4zCkPR1co6hyfPyVqaWSafx17WgPSG+Hjf8BrVd/\nRytbP3FXs0cAhCHoo79oryPJwGx2F7x69NoEQEbvp7K1qcUvUmxUdVoOmcAiARwd\nt0i+onrEOF7Ygj1Yh0pd+kIouYJ32+vLhRiFmC1/LkfPjFECHblZIGYIPiQogY/o\nlm8U9G1rCNqxDL3qdr/gOQs6U7+bUynEGLhz1N9ClfYefdL6jReUohPMX5hiamLE\nk+q7rW2X8ejaBdGlMwtVL2SeOFCEuzjIqSWe8jLHVq6DGoJdMmw=\n=nsrx\n-----END PGP SIGNATURE-----",
-          "payload": "tree e3dace9780d5627ee28214d9d350eb3ef6df1de8\nparent 9f69b3c18aea34be8dd5a004ed41c32a49d8a9b7\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1789525462 -0400\ncommitter thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1789525462 -0400\n\nKill the surviving string mutants in formatNeverStarted\n\nStryker blanks each literal in the message; the assertions only covered\nthe two interpolated lines. Assert on the prose that carries the two\nreadings, which is the part a reader acts on.\n",
-          "verified_at": "2026-09-16T02:24:24Z"
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCgAdFiEEnU3Dh/cnWdmpxUeIBqUoxO3sGUIFAmq2YMgACgkQBqUoxO3s\nGULm3xAAm7iULYMVWmbsN7sHyh0T5l9eAxbdKOsTOUtvQLBGkeKnQY7qryqNBcRy\nX8qB2fBaQlPjTVOg6ANuhu261DUTBWJ2L13+AMZjtGnEx+qVnfIRAsnX/gVC/M7t\nytY5XstF5tRs/acVwEyXrzMq4JfA2EGB3Rd5sVfS8ZW7Ms2QK1dHvamsIlJ3i2UK\nW2eOqvKefZA3PrfvyuVV0HwjSahfSJUEnuAXNGVou/1ZM9v8lKCGez4p1804TXum\nwuO2M5mSkQCyg4e5YV4GC+bTNrGPKqWhPSPyeL9ikMYZnc+vF1xObyRafNM15JIJ\nyKMtQgles866uPEdRJrwwEv3b2YcyNvAN6RC6A6iP1yuH2XnTbwnqSHS6Sq81H6P\nNvNF3KqwH6jbFszrSNmZJRxUF5lZ8aQes276Bjo4ZSVEu2wOhy44r4kPbLWY6nBJ\niDL109AYi0yEO+WkrmFMfjfftGkJktXdAgQxMp6Z9dKbyyoNmONLTHjVKlKMO/qD\nIF+v/x6QDTx1b1qx6vOZiA24PP3JAHE9x7zFZcjr9R4N6fL+CzRhW8zGNok1xrd/\nZz6RRzmu3L6NEBu8iVSRh3QW/tFaCGkquKuelw7EDiH34UAbfXYwWDON5tidgUms\nsvlOdE+nlze1zvnJexqcXf43Uc97K5Q03geugcmsfbG4JG6QBNk=\n=FfXT\n-----END PGP SIGNATURE-----",
+          "payload": "tree 709d40b4fe65b6b0cf47e3a61ffc991ed3969f9b\nparent 7bb6c0f8c7a371537aaf830b3e700a9907ec2151\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790337224 -0400\ncommitter thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790337224 -0400\n\nAdd trailing blank line to README (throwaway capture probe)\n",
+          "verified_at": "2026-09-25T11:53:50Z"
         }
       },
-      "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/d363fa23b78250a37fdafd63d5961359fff93faf",
-      "html_url": "https://github.com/thekevinscott/pr-monitor/commit/d363fa23b78250a37fdafd63d5961359fff93faf",
-      "comments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/d363fa23b78250a37fdafd63d5961359fff93faf/comments",
+      "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/c7131f1ef99e18a845395c6af6e4816203f5c321",
+      "html_url": "https://github.com/thekevinscott/pr-monitor/commit/c7131f1ef99e18a845395c6af6e4816203f5c321",
+      "comments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/c7131f1ef99e18a845395c6af6e4816203f5c321/comments",
       "author": {
         "login": "thekevinbot",
         "id": 248217931,
@@ -938,28 +739,28 @@
       },
       "parents": [
         {
-          "sha": "9f69b3c18aea34be8dd5a004ed41c32a49d8a9b7",
-          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/9f69b3c18aea34be8dd5a004ed41c32a49d8a9b7",
-          "html_url": "https://github.com/thekevinscott/pr-monitor/commit/9f69b3c18aea34be8dd5a004ed41c32a49d8a9b7"
+          "sha": "7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+          "html_url": "https://github.com/thekevinscott/pr-monitor/commit/7bb6c0f8c7a371537aaf830b3e700a9907ec2151"
         }
       ],
       "stats": {
-        "total": 18,
-        "additions": 12,
-        "deletions": 6
+        "total": 1,
+        "additions": 1,
+        "deletions": 0
       },
       "files": [
         {
-          "sha": "d1dce908d8db3fdb764a01d422ef93cf96497d0f",
-          "filename": "src/messages/formatNeverStarted.test.ts",
+          "sha": "01fa4eaa29228881cd5731d1224f4b8d090e962a",
+          "filename": "README.md",
           "status": "modified",
-          "additions": 12,
-          "deletions": 6,
-          "changes": 18,
-          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/d363fa23b78250a37fdafd63d5961359fff93faf/src%2Fmessages%2FformatNeverStarted.test.ts",
-          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/d363fa23b78250a37fdafd63d5961359fff93faf/src%2Fmessages%2FformatNeverStarted.test.ts",
-          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/src%2Fmessages%2FformatNeverStarted.test.ts?ref=d363fa23b78250a37fdafd63d5961359fff93faf",
-          "patch": "@@ -1,12 +1,18 @@\n import { expect, test } from 'vitest';\n import { formatNeverStarted } from './formatNeverStarted';\n \n-test('names every workflow that never started', () => {\n-  const message = formatNeverStarted(['a.yml', 'b.yml'], 60_000);\n-  expect(message).toContain('a.yml');\n-  expect(message).toContain('b.yml');\n+test('names every workflow that never started and rules out lateness', () => {\n+  const msg = formatNeverStarted(['a.yml', 'b.yml'], 60_000);\n+  expect(msg).toContain('Predicted workflow runs GitHub never started: [\"a.yml\",\"b.yml\"]');\n+  expect(msg).toContain('GitHub created no run for them');\n });\n \n-test('reports the grace it waited out in seconds', () => {\n-  expect(formatNeverStarted(['a.yml'], 60_000)).toContain('60s');\n+test('reports the grace it waited out, in seconds', () => {\n+  expect(formatNeverStarted(['a.yml'], 60_000)).toContain('nothing appeared for 60s');\n+});\n+\n+test('offers both readings, since the gate cannot tell which side is wrong', () => {\n+  const msg = formatNeverStarted(['a.yml'], 60_000);\n+  expect(msg).toContain('not receiving the events its triggers ask for');\n+  expect(msg).toContain('the prediction is wrong to expect it to dispatch');\n });"
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/c7131f1ef99e18a845395c6af6e4816203f5c321/README.md",
+          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/c7131f1ef99e18a845395c6af6e4816203f5c321/README.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/README.md?ref=c7131f1ef99e18a845395c6af6e4816203f5c321",
+          "patch": "@@ -181,3 +181,4 @@ CI enforces typecheck, lint, and coverage on every PR, plus a [testing-conventio\n ## License\n \n MIT\n+"
         }
       ]
     }
@@ -1026,7 +827,7 @@
     "params": {
       "owner": "thekevinscott",
       "repo": "pr-monitor",
-      "ref": "6bc702d251fc4f0ff1cf77809308e31afa7fe251"
+      "ref": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4"
     },
     "result": [
       {
@@ -1034,15 +835,15 @@
         "path": ".github/workflows/move-major-tag.yml",
         "sha": "f520fc62af78801291d01ea4906e4fc00b797815",
         "size": 1045,
-        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/move-major-tag.yml?ref=6bc702d251fc4f0ff1cf77809308e31afa7fe251",
-        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/6bc702d251fc4f0ff1cf77809308e31afa7fe251/.github/workflows/move-major-tag.yml",
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/move-major-tag.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/move-major-tag.yml",
         "git_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/f520fc62af78801291d01ea4906e4fc00b797815",
-        "download_url": "https://raw.githubusercontent.com/thekevinscott/pr-monitor/6bc702d251fc4f0ff1cf77809308e31afa7fe251/.github/workflows/move-major-tag.yml",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/pr-monitor/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/move-major-tag.yml",
         "type": "file",
         "_links": {
-          "self": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/move-major-tag.yml?ref=6bc702d251fc4f0ff1cf77809308e31afa7fe251",
+          "self": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/move-major-tag.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
           "git": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/f520fc62af78801291d01ea4906e4fc00b797815",
-          "html": "https://github.com/thekevinscott/pr-monitor/blob/6bc702d251fc4f0ff1cf77809308e31afa7fe251/.github/workflows/move-major-tag.yml"
+          "html": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/move-major-tag.yml"
         }
       },
       {
@@ -1050,15 +851,15 @@
         "path": ".github/workflows/pr-monitor.yml",
         "sha": "bc95b347ddce8e8e97a61badbdc382b35e2c90a1",
         "size": 485,
-        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/pr-monitor.yml?ref=6bc702d251fc4f0ff1cf77809308e31afa7fe251",
-        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/6bc702d251fc4f0ff1cf77809308e31afa7fe251/.github/workflows/pr-monitor.yml",
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/pr-monitor.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/pr-monitor.yml",
         "git_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/bc95b347ddce8e8e97a61badbdc382b35e2c90a1",
-        "download_url": "https://raw.githubusercontent.com/thekevinscott/pr-monitor/6bc702d251fc4f0ff1cf77809308e31afa7fe251/.github/workflows/pr-monitor.yml",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/pr-monitor/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/pr-monitor.yml",
         "type": "file",
         "_links": {
-          "self": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/pr-monitor.yml?ref=6bc702d251fc4f0ff1cf77809308e31afa7fe251",
+          "self": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/pr-monitor.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
           "git": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/bc95b347ddce8e8e97a61badbdc382b35e2c90a1",
-          "html": "https://github.com/thekevinscott/pr-monitor/blob/6bc702d251fc4f0ff1cf77809308e31afa7fe251/.github/workflows/pr-monitor.yml"
+          "html": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/pr-monitor.yml"
         }
       },
       {
@@ -1066,15 +867,15 @@
         "path": ".github/workflows/test.yml",
         "sha": "a1b3d17b9627e380a7a9fba493b2bfd663cc22ec",
         "size": 1798,
-        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/test.yml?ref=6bc702d251fc4f0ff1cf77809308e31afa7fe251",
-        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/6bc702d251fc4f0ff1cf77809308e31afa7fe251/.github/workflows/test.yml",
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/test.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/test.yml",
         "git_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/a1b3d17b9627e380a7a9fba493b2bfd663cc22ec",
-        "download_url": "https://raw.githubusercontent.com/thekevinscott/pr-monitor/6bc702d251fc4f0ff1cf77809308e31afa7fe251/.github/workflows/test.yml",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/pr-monitor/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/test.yml",
         "type": "file",
         "_links": {
-          "self": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/test.yml?ref=6bc702d251fc4f0ff1cf77809308e31afa7fe251",
+          "self": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/test.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
           "git": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/a1b3d17b9627e380a7a9fba493b2bfd663cc22ec",
-          "html": "https://github.com/thekevinscott/pr-monitor/blob/6bc702d251fc4f0ff1cf77809308e31afa7fe251/.github/workflows/test.yml"
+          "html": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/test.yml"
         }
       },
       {
@@ -1082,15 +883,15 @@
         "path": ".github/workflows/testing-conventions.yml",
         "sha": "600908c5c6aa54b91e3c025d32bb2c6b1ccf5bc3",
         "size": 319,
-        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/testing-conventions.yml?ref=6bc702d251fc4f0ff1cf77809308e31afa7fe251",
-        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/6bc702d251fc4f0ff1cf77809308e31afa7fe251/.github/workflows/testing-conventions.yml",
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/testing-conventions.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/testing-conventions.yml",
         "git_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/600908c5c6aa54b91e3c025d32bb2c6b1ccf5bc3",
-        "download_url": "https://raw.githubusercontent.com/thekevinscott/pr-monitor/6bc702d251fc4f0ff1cf77809308e31afa7fe251/.github/workflows/testing-conventions.yml",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/pr-monitor/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/testing-conventions.yml",
         "type": "file",
         "_links": {
-          "self": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/testing-conventions.yml?ref=6bc702d251fc4f0ff1cf77809308e31afa7fe251",
+          "self": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/testing-conventions.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
           "git": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/600908c5c6aa54b91e3c025d32bb2c6b1ccf5bc3",
-          "html": "https://github.com/thekevinscott/pr-monitor/blob/6bc702d251fc4f0ff1cf77809308e31afa7fe251/.github/workflows/testing-conventions.yml"
+          "html": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/testing-conventions.yml"
         }
       }
     ]
@@ -1101,7 +902,7 @@
       "owner": "thekevinscott",
       "repo": "pr-monitor",
       "path": ".github/workflows/move-major-tag.yml",
-      "ref": "6bc702d251fc4f0ff1cf77809308e31afa7fe251"
+      "ref": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4"
     },
     "result": "name: Promote v1 tag\n\non:\n  workflow_run:\n    # Every workflow that runs on push to `main` belongs here, or `v1` never advances.\n    workflows:\n      - Tests\n      - Testing Conventions\n    types: [completed]\n\npermissions:\n  contents: write\n  actions: read\n\nconcurrency:\n  group: promote-v1\n  cancel-in-progress: false\n\njobs:\n  promote:\n    name: Promote v1\n    if: >-\n      github.event.workflow_run.event == 'push' &&\n      github.event.workflow_run.head_branch == 'main'\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v5\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v6\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - name: Promote v1\n        env:\n          GITHUB_TOKEN: ${{ github.token }}\n          PROMOTE_OWNER: ${{ github.repository_owner }}\n          PROMOTE_REPO: ${{ github.event.repository.name }}\n          PROMOTE_SHA: ${{ github.event.workflow_run.head_sha }}\n          PROMOTE_TAG: v1\n        run: pnpm run promote\n"
   },
@@ -1111,7 +912,7 @@
       "owner": "thekevinscott",
       "repo": "pr-monitor",
       "path": ".github/workflows/pr-monitor.yml",
-      "ref": "6bc702d251fc4f0ff1cf77809308e31afa7fe251"
+      "ref": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4"
     },
     "result": "name: PR Monitor\n\non:\n  pull_request:\n    types: [opened, synchronize, reopened]\n    branches:\n      - main\n\nconcurrency:\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  actions: read\n  contents: read\n  pull-requests: read\n\njobs:\n  monitor:\n    name: 'CI Gate'\n    runs-on: ubuntu-latest\n    # The action has no timeout of its own; this is the backstop.\n    timeout-minutes: 20\n    steps:\n      - uses: actions/checkout@v5\n      - uses: ./\n"
   },
@@ -1121,7 +922,7 @@
       "owner": "thekevinscott",
       "repo": "pr-monitor",
       "path": ".github/workflows/test.yml",
-      "ref": "6bc702d251fc4f0ff1cf77809308e31afa7fe251"
+      "ref": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4"
     },
     "result": "name: Tests\n\non:\n  pull_request:\n  push:\n    branches: [main]\n\njobs:\n  typecheck:\n    name: Typecheck\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v5\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v6\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm run typecheck\n\n  lint:\n    name: Lint\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v5\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v6\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm run lint\n\n  test:\n    name: Test (100% coverage)\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v5\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v6\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm run test:coverage\n\n  actionlint:\n    name: Actionlint\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v5\n      # Pinned release + checksum: a `uses:` on a former owner name runs whoever claims it next.\n      - name: Install actionlint\n        env:\n          VERSION: 1.7.12\n          SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8\n        run: |\n          curl -fsSL -o \"$RUNNER_TEMP/actionlint.tar.gz\" \"https://github.com/rhysd/actionlint/releases/download/v$VERSION/actionlint_${VERSION}_linux_amd64.tar.gz\"\n          echo \"$SHA256  $RUNNER_TEMP/actionlint.tar.gz\" | sha256sum -c -\n          tar -xzf \"$RUNNER_TEMP/actionlint.tar.gz\" -C \"$RUNNER_TEMP\" actionlint\n      - name: Lint workflows\n        run: |\n          \"$RUNNER_TEMP/actionlint\" -color\n"
   },
@@ -1131,7 +932,7 @@
       "owner": "thekevinscott",
       "repo": "pr-monitor",
       "path": ".github/workflows/testing-conventions.yml",
-      "ref": "6bc702d251fc4f0ff1cf77809308e31afa7fe251"
+      "ref": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4"
     },
     "result": "name: Testing Conventions\n\non:\n  pull_request:\n  push:\n    branches: [main]\n\npermissions:\n  contents: read\n\njobs:\n  conventions:\n    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0\n    with:\n      languages: '[\"typescript\"]'\n      source: src\n      config: testing-conventions.toml\n"
   },
@@ -1264,7 +1065,7 @@
     "params": {
       "owner": "thekevinscott",
       "repo": "pr-monitor",
-      "ref": "6bc702d251fc4f0ff1cf77809308e31afa7fe251"
+      "ref": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4"
     },
     "result": {
       "$binary": "tarball-0.bin"
