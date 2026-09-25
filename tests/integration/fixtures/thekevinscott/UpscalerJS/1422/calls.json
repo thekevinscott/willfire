@@ -1,0 +1,1014 @@
+[
+  {
+    "method": "getPull",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "UpscalerJS",
+      "pull_number": 1422
+    },
+    "result": {
+      "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/pulls/1422",
+      "id": 4248619048,
+      "node_id": "PR_kwDOEOapOM79PMgo",
+      "html_url": "https://github.com/thekevinscott/UpscalerJS/pull/1422",
+      "diff_url": "https://github.com/thekevinscott/UpscalerJS/pull/1422.diff",
+      "patch_url": "https://github.com/thekevinscott/UpscalerJS/pull/1422.patch",
+      "issue_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/issues/1422",
+      "number": 1422,
+      "state": "closed",
+      "locked": false,
+      "title": "Allow @parcel/watcher build scripts",
+      "user": {
+        "login": "thekevinscott",
+        "id": 151596,
+        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinscott",
+        "html_url": "https://github.com/thekevinscott",
+        "followers_url": "https://api.github.com/users/thekevinscott/followers",
+        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+        "repos_url": "https://api.github.com/users/thekevinscott/repos",
+        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "body": "New transitive via the wireit bump; ERR_PNPM_IGNORED_BUILDS currently fails install on every\n  Renovate PR. Prebuilt binaries ship as optional deps.",
+      "created_at": "2026-08-10T22:10:32Z",
+      "updated_at": "2026-08-10T22:16:30Z",
+      "closed_at": "2026-08-10T22:16:29Z",
+      "merged_at": "2026-08-10T22:16:29Z",
+      "merge_commit_sha": "92d2043b6ecae610acd74895e23323148c683eea",
+      "assignees": [],
+      "requested_reviewers": [],
+      "requested_teams": [],
+      "labels": [],
+      "milestone": null,
+      "draft": false,
+      "commits_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/pulls/1422/commits",
+      "review_comments_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/pulls/1422/comments",
+      "review_comment_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/pulls/comments{/number}",
+      "comments_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/issues/1422/comments",
+      "statuses_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/statuses/c8b2c5dfc1dcde3bcc5cc8399790fa8938f000b2",
+      "head": {
+        "label": "thekevinscott:ks/allow-parcel-watcher-build",
+        "ref": "ks/allow-parcel-watcher-build",
+        "sha": "c8b2c5dfc1dcde3bcc5cc8399790fa8938f000b2",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 283552056,
+          "node_id": "MDEwOlJlcG9zaXRvcnkyODM1NTIwNTY=",
+          "name": "UpscalerJS",
+          "full_name": "thekevinscott/UpscalerJS",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/UpscalerJS",
+          "description": "Enhance Images with Javascript and AI. Increase resolution, retouch, denoise, and more. Open Source, Browser & Node Compatible, MIT License.",
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/UpscalerJS",
+          "forks_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/deployments",
+          "created_at": "2020-07-29T16:43:48Z",
+          "updated_at": "2026-09-16T22:12:25Z",
+          "pushed_at": "2026-09-22T00:16:47Z",
+          "git_url": "git://github.com/thekevinscott/UpscalerJS.git",
+          "ssh_url": "git@github.com:thekevinscott/UpscalerJS.git",
+          "clone_url": "https://github.com/thekevinscott/UpscalerJS.git",
+          "svn_url": "https://github.com/thekevinscott/UpscalerJS",
+          "homepage": "https://upscalerjs.com",
+          "size": 753273,
+          "stargazers_count": 899,
+          "watchers_count": 899,
+          "language": "TypeScript",
+          "has_issues": true,
+          "has_projects": false,
+          "has_downloads": false,
+          "has_wiki": false,
+          "has_pages": true,
+          "has_discussions": true,
+          "forks_count": 85,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 24,
+          "license": {
+            "key": "mit",
+            "name": "MIT License",
+            "spdx_id": "MIT",
+            "url": "https://api.github.com/licenses/mit",
+            "node_id": "MDc6TGljZW5zZTEz"
+          },
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [
+            "ai",
+            "deblurring",
+            "dehazing",
+            "denoising",
+            "deraining",
+            "esrgan",
+            "image-enhancment",
+            "low-light-image-enhancement",
+            "neural-networks",
+            "retouching",
+            "super-resoluion",
+            "tensorflow",
+            "tfjs",
+            "upscale"
+          ],
+          "visibility": "public",
+          "forks": 85,
+          "open_issues": 24,
+          "watchers": 899,
+          "default_branch": "main"
+        }
+      },
+      "base": {
+        "label": "thekevinscott:main",
+        "ref": "main",
+        "sha": "14abce7e7cd4d7212902c75d7a615047d91b58c2",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 283552056,
+          "node_id": "MDEwOlJlcG9zaXRvcnkyODM1NTIwNTY=",
+          "name": "UpscalerJS",
+          "full_name": "thekevinscott/UpscalerJS",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/UpscalerJS",
+          "description": "Enhance Images with Javascript and AI. Increase resolution, retouch, denoise, and more. Open Source, Browser & Node Compatible, MIT License.",
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/UpscalerJS",
+          "forks_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/deployments",
+          "created_at": "2020-07-29T16:43:48Z",
+          "updated_at": "2026-09-16T22:12:25Z",
+          "pushed_at": "2026-09-22T00:16:47Z",
+          "git_url": "git://github.com/thekevinscott/UpscalerJS.git",
+          "ssh_url": "git@github.com:thekevinscott/UpscalerJS.git",
+          "clone_url": "https://github.com/thekevinscott/UpscalerJS.git",
+          "svn_url": "https://github.com/thekevinscott/UpscalerJS",
+          "homepage": "https://upscalerjs.com",
+          "size": 753273,
+          "stargazers_count": 899,
+          "watchers_count": 899,
+          "language": "TypeScript",
+          "has_issues": true,
+          "has_projects": false,
+          "has_downloads": false,
+          "has_wiki": false,
+          "has_pages": true,
+          "has_discussions": true,
+          "forks_count": 85,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 24,
+          "license": {
+            "key": "mit",
+            "name": "MIT License",
+            "spdx_id": "MIT",
+            "url": "https://api.github.com/licenses/mit",
+            "node_id": "MDc6TGljZW5zZTEz"
+          },
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [
+            "ai",
+            "deblurring",
+            "dehazing",
+            "denoising",
+            "deraining",
+            "esrgan",
+            "image-enhancment",
+            "low-light-image-enhancement",
+            "neural-networks",
+            "retouching",
+            "super-resoluion",
+            "tensorflow",
+            "tfjs",
+            "upscale"
+          ],
+          "visibility": "public",
+          "forks": 85,
+          "open_issues": 24,
+          "watchers": 899,
+          "default_branch": "main"
+        }
+      },
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/thekevinscott/UpscalerJS/pulls/1422"
+        },
+        "html": {
+          "href": "https://github.com/thekevinscott/UpscalerJS/pull/1422"
+        },
+        "issue": {
+          "href": "https://api.github.com/repos/thekevinscott/UpscalerJS/issues/1422"
+        },
+        "comments": {
+          "href": "https://api.github.com/repos/thekevinscott/UpscalerJS/issues/1422/comments"
+        },
+        "review_comments": {
+          "href": "https://api.github.com/repos/thekevinscott/UpscalerJS/pulls/1422/comments"
+        },
+        "review_comment": {
+          "href": "https://api.github.com/repos/thekevinscott/UpscalerJS/pulls/comments{/number}"
+        },
+        "commits": {
+          "href": "https://api.github.com/repos/thekevinscott/UpscalerJS/pulls/1422/commits"
+        },
+        "statuses": {
+          "href": "https://api.github.com/repos/thekevinscott/UpscalerJS/statuses/c8b2c5dfc1dcde3bcc5cc8399790fa8938f000b2"
+        }
+      },
+      "author_association": "OWNER",
+      "auto_merge": {
+        "enabled_by": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "merge_method": "squash",
+        "commit_title": "Allow @parcel/watcher build scripts (#1422)",
+        "commit_message": "New transitive (via the wireit bump in Renovate's non-major group);\npnpm's ERR_PNPM_IGNORED_BUILDS fails CI install on every Renovate PR\nwithout it. Prebuilt platform binaries ship as optional deps, so the\nscript is a fast no-op fallback.\n\n\nClaude-Session: https://claude.ai/code/session_01U8x51XJ8MednyMxQjA7xcc\n\nCo-authored-by: thekevinbot <248217931+thekevinbot@users.noreply.github.com>\nCo-authored-by: Claude Fable 5 <noreply@anthropic.com>"
+      },
+      "assignee": null,
+      "active_lock_reason": null,
+      "merged": true,
+      "mergeable": null,
+      "rebaseable": null,
+      "mergeable_state": "unknown",
+      "merged_by": {
+        "login": "thekevinscott",
+        "id": 151596,
+        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinscott",
+        "html_url": "https://github.com/thekevinscott",
+        "followers_url": "https://api.github.com/users/thekevinscott/followers",
+        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+        "repos_url": "https://api.github.com/users/thekevinscott/repos",
+        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "comments": 0,
+      "review_comments": 0,
+      "maintainer_can_modify": false,
+      "commits": 1,
+      "additions": 1,
+      "deletions": 0,
+      "changed_files": 1
+    }
+  },
+  {
+    "method": "listPullFiles",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "UpscalerJS",
+      "pull_number": 1422
+    },
+    "result": [
+      {
+        "sha": "afb57113a448b65306dee92b32602a6c8b789303",
+        "filename": "pnpm-workspace.yaml",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 0,
+        "changes": 1,
+        "blob_url": "https://github.com/thekevinscott/UpscalerJS/blob/c8b2c5dfc1dcde3bcc5cc8399790fa8938f000b2/pnpm-workspace.yaml",
+        "raw_url": "https://github.com/thekevinscott/UpscalerJS/raw/c8b2c5dfc1dcde3bcc5cc8399790fa8938f000b2/pnpm-workspace.yaml",
+        "contents_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/pnpm-workspace.yaml?ref=c8b2c5dfc1dcde3bcc5cc8399790fa8938f000b2",
+        "patch": "@@ -14,6 +14,7 @@ overrides:\n   webpack: 5.96.1\n \n allowBuilds:\n+  '@parcel/watcher': true\n   '@tensorflow/tfjs-node': true\n   '@tensorflow/tfjs-node-gpu': true\n   core-js: true"
+      }
+    ]
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "UpscalerJS",
+      "ref": "92d2043b6ecae610acd74895e23323148c683eea"
+    },
+    "result": {
+      "sha": "92d2043b6ecae610acd74895e23323148c683eea",
+      "node_id": "C_kwDOEOapONoAKDkyZDIwNDNiNmVjYWU2MTBhY2Q3NDg5NWUyMzMyMzE0OGM2ODNlZWE",
+      "commit": {
+        "author": {
+          "name": "Kevin Scott",
+          "email": "151596+thekevinscott@users.noreply.github.com",
+          "date": "2026-08-10T22:16:28Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-08-10T22:16:28Z"
+        },
+        "message": "Allow @parcel/watcher build scripts (#1422)\n\nNew transitive (via the wireit bump in Renovate's non-major group);\npnpm's ERR_PNPM_IGNORED_BUILDS fails CI install on every Renovate PR\nwithout it. Prebuilt platform binaries ship as optional deps, so the\nscript is a fast no-op fallback.\n\n\nClaude-Session: https://claude.ai/code/session_01U8x51XJ8MednyMxQjA7xcc\n\nCo-authored-by: thekevinbot <248217931+thekevinbot@users.noreply.github.com>\nCo-authored-by: Claude Fable 5 <noreply@anthropic.com>",
+        "tree": {
+          "sha": "dd71d4c392fc4d2b09025985f99b1c12ab4082f3",
+          "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/trees/dd71d4c392fc4d2b09025985f99b1c12ab4082f3"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/commits/92d2043b6ecae610acd74895e23323148c683eea",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqek28CRC1aQ7uu5UhlAAAM9wQACOFQxwGhBJymg94f4DWo51s\n+MSNqlZZalXFigF/q6dtdWNJHCldkz/VRXpWg9eQlxNPBZ1DrzR6XjVKJIZispZe\nqZMX+VBgmTqAK/oeSvsOnk0TWoc8gFU71j/JJc5N0qh89u/K1mANzdU9y7exGNkj\n7104i+LdBkNZLUlXp4E0kaeZvUC3xIIFFKNmdAeCxMLpj0CvQtO1k+NaB7Jc6krT\n3R9CqqGVY08/NIbgEUi41ZHWNeyo4xOWyGlzQiAXdIEm/OF9ph4Usm6w9ZW12QN1\nDTfpjninHFswTDDgYdKcJuVyo0ulKkDD5owT53fNojCrZmtfpnp8Y7/b+LGAIGhS\nK8LMMKlH2i9at+MzNymqrBB9mn6N1762Oa2ImO7RLVNwSvOAYzG4/mS5tUd1k8z+\nlVUCLKWw5SMwwFYl69sa5h76zRGrTrByEGEbiZh3HEYd/23WWNVC1Hu9M5AkgaaM\nq4+j00wBTCfY2SIaPe4qEd72NqN4ELCeLeRdtszXlcZpuZBLMoIct7LkauRceXUz\nqUdkg1yh+C/QIqsr8UcZOxrzKFmw1pC+qlbEFULAF/dwwvTbw1h7mfiZuhwicbem\nOvV5jLh0C42/r8AofEBbaTTotgcVkEGze6om1go9Qs/8RiSBKS3b9pegKNE1dI9g\nk2g5BEJq3WyLsWKh0k7n\n=rTe/\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree dd71d4c392fc4d2b09025985f99b1c12ab4082f3\nparent 14abce7e7cd4d7212902c75d7a615047d91b58c2\nauthor Kevin Scott <151596+thekevinscott@users.noreply.github.com> 1786400188 -0400\ncommitter GitHub <noreply@github.com> 1786400188 +0000\n\nAllow @parcel/watcher build scripts (#1422)\n\nNew transitive (via the wireit bump in Renovate's non-major group);\npnpm's ERR_PNPM_IGNORED_BUILDS fails CI install on every Renovate PR\nwithout it. Prebuilt platform binaries ship as optional deps, so the\nscript is a fast no-op fallback.\n\n\nClaude-Session: https://claude.ai/code/session_01U8x51XJ8MednyMxQjA7xcc\n\nCo-authored-by: thekevinbot <248217931+thekevinbot@users.noreply.github.com>\nCo-authored-by: Claude Fable 5 <noreply@anthropic.com>",
+          "verified_at": "2026-08-10T22:16:33Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/commits/92d2043b6ecae610acd74895e23323148c683eea",
+      "html_url": "https://github.com/thekevinscott/UpscalerJS/commit/92d2043b6ecae610acd74895e23323148c683eea",
+      "comments_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/commits/92d2043b6ecae610acd74895e23323148c683eea/comments",
+      "author": {
+        "login": "thekevinscott",
+        "id": 151596,
+        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinscott",
+        "html_url": "https://github.com/thekevinscott",
+        "followers_url": "https://api.github.com/users/thekevinscott/followers",
+        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+        "repos_url": "https://api.github.com/users/thekevinscott/repos",
+        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "14abce7e7cd4d7212902c75d7a615047d91b58c2",
+          "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/commits/14abce7e7cd4d7212902c75d7a615047d91b58c2",
+          "html_url": "https://github.com/thekevinscott/UpscalerJS/commit/14abce7e7cd4d7212902c75d7a615047d91b58c2"
+        }
+      ],
+      "stats": {
+        "total": 1,
+        "additions": 1,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "afb57113a448b65306dee92b32602a6c8b789303",
+          "filename": "pnpm-workspace.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/UpscalerJS/blob/92d2043b6ecae610acd74895e23323148c683eea/pnpm-workspace.yaml",
+          "raw_url": "https://github.com/thekevinscott/UpscalerJS/raw/92d2043b6ecae610acd74895e23323148c683eea/pnpm-workspace.yaml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/pnpm-workspace.yaml?ref=92d2043b6ecae610acd74895e23323148c683eea",
+          "patch": "@@ -14,6 +14,7 @@ overrides:\n   webpack: 5.96.1\n \n allowBuilds:\n+  '@parcel/watcher': true\n   '@tensorflow/tfjs-node': true\n   '@tensorflow/tfjs-node-gpu': true\n   core-js: true"
+        }
+      ]
+    }
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "UpscalerJS",
+      "ref": "main"
+    },
+    "result": {
+      "sha": "6d074fb5835a6c659a19c83123beab8c3f28beac",
+      "node_id": "C_kwDOEOapONoAKDZkMDc0ZmI1ODM1YTZjNjU5YTE5YzgzMTIzYmVhYjhjM2YyOGJlYWM",
+      "commit": {
+        "author": {
+          "name": "renovate[bot]",
+          "email": "29139614+renovate[bot]@users.noreply.github.com",
+          "date": "2026-08-11T13:29:00Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-08-11T13:29:00Z"
+        },
+        "message": "Update dependency chalk to v6 (#1421)\n\n* Update dependency chalk to v6\n\n* Fix logger types for chalk 6\n\nchalk 5+ dropped the chalk.Chalk namespace type; use the named\nChalkInstance export.\n\nCo-Authored-By: Claude Fable 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01U8x51XJ8MednyMxQjA7xcc\n\n* Update dependency chalk to v6\n\n---------\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>\nCo-authored-by: thekevinbot <248217931+thekevinbot@users.noreply.github.com>\nCo-authored-by: Claude Fable 5 <noreply@anthropic.com>\nCo-authored-by: Kevin Scott <151596+thekevinscott@users.noreply.github.com>",
+        "tree": {
+          "sha": "6ae2b47ca47a87efa4e519b0caf8cd56ab2a5683",
+          "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/trees/6ae2b47ca47a87efa4e519b0caf8cd56ab2a5683"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/commits/6d074fb5835a6c659a19c83123beab8c3f28beac",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqeyOcCRC1aQ7uu5UhlAAAOjsQACZuQXmtVxAW2YDuXh8ZHjiQ\nb9VJdfsqqqHUuvqZL7HBYt1u5kK+1FQSPPx4JeSb/iW8FDYIlfmuvgzrH5mjzF/6\n0k+dHCeg1yZ9Q5MpG5YaRAlpDUxuYYXhm6odTsqGcg2Zqfh+0KEEvN+jbdmvphH0\nyLSTuiXm8eWEhqxzCZHsQ6/Q580ivPRFKdHQaeSpdiDiXrZGcCKsO9wdEJUQslCd\nEv8uU6S5fUg7LvTks9zxVvl+mFuvN2UCAQhrwPi9AQX5nYx3bopJz4pnvBtnM0/g\nB6AFCSl+ExS1iWtjKqzJUISZGsghoSEqyHA+y+uC+4ZiqnW1LRdOv3ewh52gOXha\nAI2udtrBhbrTXij5ryLvW24TCTXGIQq5z4SAEutN0LErIuVxF64X7Z4WIXw44zN2\nnX1ZD+L1c5T1IS0N977BB9LkH66kTYGbkvOf+097wIatBzzJzvNh0IaG2WsD5jr2\nXVps83WRWaugSCFFz/JOk8f7WFqRTpe8aJw1Z+d63x1WlZ1bp4M3Y/yStkCTfT3t\n3xdRiNk8MlIqdrX3/eyHII7BWaIhAq/sWExh53AM9W+JGK/LWEqcjKHhim8dJa3X\nS38lE0WHo2PjySQWQc0ML1HVBjG7ebE5R5y33QyrLzpggNiWZZLkdIM3uawRRemb\nWJbeOnC0CDyBPDmu1A+l\n=pvCd\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 6ae2b47ca47a87efa4e519b0caf8cd56ab2a5683\nparent 73d6cf228792f5181242ee1cccc6887d929b201c\nauthor renovate[bot] <29139614+renovate[bot]@users.noreply.github.com> 1786454940 -0400\ncommitter GitHub <noreply@github.com> 1786454940 -0400\n\nUpdate dependency chalk to v6 (#1421)\n\n* Update dependency chalk to v6\n\n* Fix logger types for chalk 6\n\nchalk 5+ dropped the chalk.Chalk namespace type; use the named\nChalkInstance export.\n\nCo-Authored-By: Claude Fable 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01U8x51XJ8MednyMxQjA7xcc\n\n* Update dependency chalk to v6\n\n---------\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>\nCo-authored-by: thekevinbot <248217931+thekevinbot@users.noreply.github.com>\nCo-authored-by: Claude Fable 5 <noreply@anthropic.com>\nCo-authored-by: Kevin Scott <151596+thekevinscott@users.noreply.github.com>",
+          "verified_at": "2026-08-11T13:29:07Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/commits/6d074fb5835a6c659a19c83123beab8c3f28beac",
+      "html_url": "https://github.com/thekevinscott/UpscalerJS/commit/6d074fb5835a6c659a19c83123beab8c3f28beac",
+      "comments_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/commits/6d074fb5835a6c659a19c83123beab8c3f28beac/comments",
+      "author": {
+        "login": "renovate[bot]",
+        "id": 29139614,
+        "node_id": "MDM6Qm90MjkxMzk2MTQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/in/2740?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/renovate%5Bbot%5D",
+        "html_url": "https://github.com/apps/renovate",
+        "followers_url": "https://api.github.com/users/renovate%5Bbot%5D/followers",
+        "following_url": "https://api.github.com/users/renovate%5Bbot%5D/following{/other_user}",
+        "gists_url": "https://api.github.com/users/renovate%5Bbot%5D/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/renovate%5Bbot%5D/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/renovate%5Bbot%5D/subscriptions",
+        "organizations_url": "https://api.github.com/users/renovate%5Bbot%5D/orgs",
+        "repos_url": "https://api.github.com/users/renovate%5Bbot%5D/repos",
+        "events_url": "https://api.github.com/users/renovate%5Bbot%5D/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/renovate%5Bbot%5D/received_events",
+        "type": "Bot",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "73d6cf228792f5181242ee1cccc6887d929b201c",
+          "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/commits/73d6cf228792f5181242ee1cccc6887d929b201c",
+          "html_url": "https://github.com/thekevinscott/UpscalerJS/commit/73d6cf228792f5181242ee1cccc6887d929b201c"
+        }
+      ],
+      "stats": {
+        "total": 18,
+        "additions": 12,
+        "deletions": 6
+      },
+      "files": [
+        {
+          "sha": "2ab64e0b714dae22bbaa4c87d13162e083d3f866",
+          "filename": "internals/common/package.json",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/thekevinscott/UpscalerJS/blob/6d074fb5835a6c659a19c83123beab8c3f28beac/internals%2Fcommon%2Fpackage.json",
+          "raw_url": "https://github.com/thekevinscott/UpscalerJS/raw/6d074fb5835a6c659a19c83123beab8c3f28beac/internals%2Fcommon%2Fpackage.json",
+          "contents_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/internals%2Fcommon%2Fpackage.json?ref=6d074fb5835a6c659a19c83123beab8c3f28beac",
+          "patch": "@@ -26,7 +26,7 @@\n   \"author\": \"Kevin Scott\",\n   \"license\": \"MIT\",\n   \"dependencies\": {\n-    \"chalk\": \"^4.1.2\",\n+    \"chalk\": \"^6.0.0\",\n     \"ejs\": \"^3.1.9\",\n     \"fs-extra\": \"^11.4.0\",\n     \"get-port\": \"^7.0.0\","
+        },
+        {
+          "sha": "da2ab612f3407f95425809f3d6631d473ed2e830",
+          "filename": "internals/common/src/logger.ts",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/thekevinscott/UpscalerJS/blob/6d074fb5835a6c659a19c83123beab8c3f28beac/internals%2Fcommon%2Fsrc%2Flogger.ts",
+          "raw_url": "https://github.com/thekevinscott/UpscalerJS/raw/6d074fb5835a6c659a19c83123beab8c3f28beac/internals%2Fcommon%2Fsrc%2Flogger.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/internals%2Fcommon%2Fsrc%2Flogger.ts?ref=6d074fb5835a6c659a19c83123beab8c3f28beac",
+          "patch": "@@ -1,4 +1,4 @@\n-import chalk from 'chalk';\n+import chalk, { type ChalkInstance } from 'chalk';\n \n export type LogLevel = 'info' | 'warn' | 'error' | 'verbose';\n \n@@ -17,7 +17,7 @@ const level: { level: LogLevel } = {\n   level: DEFAULT_LOG_LEVEL,\n }\n \n-export const logTypes: Record<LogLevel, chalk.Chalk> = {\n+export const logTypes: Record<LogLevel, ChalkInstance> = {\n   error: chalk.bold.red,\n   warn: chalk.hex('#FFA500'), // Orange color\n   info: chalk.bold.blue,"
+        },
+        {
+          "sha": "08ee636ba9b3b987939397fa88377e0a559c0771",
+          "filename": "pnpm-lock.yaml",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 3,
+          "changes": 12,
+          "blob_url": "https://github.com/thekevinscott/UpscalerJS/blob/6d074fb5835a6c659a19c83123beab8c3f28beac/pnpm-lock.yaml",
+          "raw_url": "https://github.com/thekevinscott/UpscalerJS/raw/6d074fb5835a6c659a19c83123beab8c3f28beac/pnpm-lock.yaml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/pnpm-lock.yaml?ref=6d074fb5835a6c659a19c83123beab8c3f28beac",
+          "patch": "@@ -527,8 +527,8 @@ importers:\n   internals/common:\n     dependencies:\n       chalk:\n-        specifier: ^4.1.2\n-        version: 4.1.2\n+        specifier: ^6.0.0\n+        version: 6.0.0\n       ejs:\n         specifier: ^3.1.9\n         version: 3.1.10\n@@ -4834,6 +4834,10 @@ packages:\n     resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}\n     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}\n \n+  chalk@6.0.0:\n+    resolution: {integrity: sha512-2uNTXIuTTxk7ciZgAU1BQcgnchcG0xXnrs6jzkQfj9SsRa9M2s5zE8WT96hS6KmG4MzWHSrvH43DF1m4XRkrFg==}\n+    engines: {node: '>=22'}\n+\n   character-entities-legacy@1.1.4:\n     resolution: {integrity: sha512-3Xnr+7ZFS1uxeiUDvV02wQ+QDbc55o97tIV5zHScSPJpcLm/r0DFPcoY3tYRp+VZukxuMeKgXYmsXQHO05zQeA==}\n \n@@ -13950,7 +13954,7 @@ snapshots:\n     dependencies:\n       ansi-align: 3.0.1\n       camelcase: 7.0.1\n-      chalk: 5.0.1\n+      chalk: 5.6.2\n       cli-boxes: 3.0.0\n       string-width: 5.1.2\n       type-fest: 2.19.0\n@@ -14126,6 +14130,8 @@ snapshots:\n \n   chalk@5.6.2: {}\n \n+  chalk@6.0.0: {}\n+\n   character-entities-legacy@1.1.4: {}\n \n   character-entities@1.2.4: {}"
+        }
+      ]
+    }
+  },
+  {
+    "method": "listPulls",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "UpscalerJS",
+      "state": "open",
+      "head": "thekevinscott:main"
+    },
+    "result": []
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "UpscalerJS",
+      "ref": "c8b2c5dfc1dcde3bcc5cc8399790fa8938f000b2"
+    },
+    "result": {
+      "sha": "c8b2c5dfc1dcde3bcc5cc8399790fa8938f000b2",
+      "node_id": "C_kwDOEOapONoAKGM4YjJjNWRmYzFkY2RlM2JjYzVjYzgzOTk3OTBmYTg5MzhmMDAwYjI",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-08-10T22:03:23Z"
+        },
+        "committer": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-08-10T22:03:23Z"
+        },
+        "message": "Allow @parcel/watcher build scripts\n\nNew transitive (via the wireit bump in Renovate's non-major group);\npnpm's ERR_PNPM_IGNORED_BUILDS fails CI install on every Renovate PR\nwithout it. Prebuilt platform binaries ship as optional deps, so the\nscript is a fast no-op fallback.\n\nCo-Authored-By: Claude Fable 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01U8x51XJ8MednyMxQjA7xcc",
+        "tree": {
+          "sha": "dd71d4c392fc4d2b09025985f99b1c12ab4082f3",
+          "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/trees/dd71d4c392fc4d2b09025985f99b1c12ab4082f3"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/commits/c8b2c5dfc1dcde3bcc5cc8399790fa8938f000b2",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCgAdFiEEnU3Dh/cnWdmpxUeIBqUoxO3sGUIFAmp6SqsACgkQBqUoxO3s\nGUJIUw/+Ked2Ja6DshJGdu7exA6AZfokOabEe+JH3j+6pTc4j/txnBHt0PMcmIF3\nHrZ68V2Bq2viEpqY4xEoqmhk+6Wr/vRXlw4nlHiBfvQeEiE5ScVw2kDxC+4yPYI/\nWqUjXz6tbSUKo/YFaqm2zGKFenqSn+FtxQfpOOLRjZzFezZxyrPGGLRSPY/43ADX\ndzSdlxugCkujt+XyKwqJtEvihf4sJ2VWViXx1GYml0pfHCB8dNmSPXqxmsq9CvvD\nVjhrtG1ZbrpkdE6/Xyln4fXIvsWn+IQ6IHHWAgsH1d+7IE73qvK4/CkFK53JOVxb\nxmtLMxGKl5mC1BLmHSmWLQHzdq+RWm/1MQ766r7Zoz+tDf/+h2b5zGBiJZv/nl+S\nfjEVvTO02OyKpjOmfRpSqp2a3dHu5aDmJ3NXblyEkpxZo7qjhgUSmKLdaEinKL0M\n/bABLwgjGnRsfRHyN9rG20TYVtGfucm3t+kjCje74/MJ7bbvtXlDHBRwq7u0nhVk\n49eIv54oBF3xw6zGBju9MS/5+4LYdhqRgawK/4OC6FKmQIGyubPUHYOc6R97ZY6C\n112X7v80RxxEsd/qYr5UP5Y5hxqjdSKoaxfoNWRUMcnYVmUs61vRFFlUT/s+dnvm\nka9/Fi6FfKedD6NIdjoIxmRGIk8mzimSg73c+MnezWsMYRd1akA=\n=zFo1\n-----END PGP SIGNATURE-----",
+          "payload": "tree dd71d4c392fc4d2b09025985f99b1c12ab4082f3\nparent 14abce7e7cd4d7212902c75d7a615047d91b58c2\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1786399403 -0400\ncommitter thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1786399403 -0400\n\nAllow @parcel/watcher build scripts\n\nNew transitive (via the wireit bump in Renovate's non-major group);\npnpm's ERR_PNPM_IGNORED_BUILDS fails CI install on every Renovate PR\nwithout it. Prebuilt platform binaries ship as optional deps, so the\nscript is a fast no-op fallback.\n\nCo-Authored-By: Claude Fable 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01U8x51XJ8MednyMxQjA7xcc\n",
+          "verified_at": "2026-08-10T22:10:34Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/commits/c8b2c5dfc1dcde3bcc5cc8399790fa8938f000b2",
+      "html_url": "https://github.com/thekevinscott/UpscalerJS/commit/c8b2c5dfc1dcde3bcc5cc8399790fa8938f000b2",
+      "comments_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/commits/c8b2c5dfc1dcde3bcc5cc8399790fa8938f000b2/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "14abce7e7cd4d7212902c75d7a615047d91b58c2",
+          "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/commits/14abce7e7cd4d7212902c75d7a615047d91b58c2",
+          "html_url": "https://github.com/thekevinscott/UpscalerJS/commit/14abce7e7cd4d7212902c75d7a615047d91b58c2"
+        }
+      ],
+      "stats": {
+        "total": 1,
+        "additions": 1,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "afb57113a448b65306dee92b32602a6c8b789303",
+          "filename": "pnpm-workspace.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/UpscalerJS/blob/c8b2c5dfc1dcde3bcc5cc8399790fa8938f000b2/pnpm-workspace.yaml",
+          "raw_url": "https://github.com/thekevinscott/UpscalerJS/raw/c8b2c5dfc1dcde3bcc5cc8399790fa8938f000b2/pnpm-workspace.yaml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/pnpm-workspace.yaml?ref=c8b2c5dfc1dcde3bcc5cc8399790fa8938f000b2",
+          "patch": "@@ -14,6 +14,7 @@ overrides:\n   webpack: 5.96.1\n \n allowBuilds:\n+  '@parcel/watcher': true\n   '@tensorflow/tfjs-node': true\n   '@tensorflow/tfjs-node-gpu': true\n   core-js: true"
+        }
+      ]
+    }
+  },
+  {
+    "method": "listWorkflows",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "UpscalerJS"
+    },
+    "result": [
+      {
+        "id": 61467726,
+        "node_id": "W_kwDOEOapOM4DqexO",
+        "name": "Update Browserslist database",
+        "path": ".github/workflows/browserlist.yml",
+        "state": "active",
+        "created_at": "2023-06-27T05:58:18.000-04:00",
+        "updated_at": "2023-06-27T05:58:18.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/actions/workflows/61467726",
+        "html_url": "https://github.com/thekevinscott/UpscalerJS/blob/main/.github/workflows/browserlist.yml",
+        "badge_url": "https://github.com/thekevinscott/UpscalerJS/workflows/Update%20Browserslist%20database/badge.svg"
+      },
+      {
+        "id": 61463713,
+        "node_id": "W_kwDOEOapOM4Dqdyh",
+        "name": "Deploy Docs",
+        "path": ".github/workflows/docs.yml",
+        "state": "active",
+        "created_at": "2023-06-27T05:21:08.000-04:00",
+        "updated_at": "2023-06-27T05:21:08.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/actions/workflows/61463713",
+        "html_url": "https://github.com/thekevinscott/UpscalerJS/blob/main/.github/workflows/docs.yml",
+        "badge_url": "https://github.com/thekevinscott/UpscalerJS/workflows/Deploy%20Docs/badge.svg"
+      },
+      {
+        "id": 266384651,
+        "node_id": "W_kwDOEOapOM4P4LUL",
+        "name": "PR Monitor",
+        "path": ".github/workflows/pr-monitor.yml",
+        "state": "active",
+        "created_at": "2026-04-25T15:54:37.000-04:00",
+        "updated_at": "2026-04-26T17:30:48.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/actions/workflows/266384651",
+        "html_url": "https://github.com/thekevinscott/UpscalerJS/blob/main/.github/workflows/pr-monitor.yml",
+        "badge_url": "https://github.com/thekevinscott/UpscalerJS/workflows/PR%20Monitor/badge.svg"
+      },
+      {
+        "id": 6741748,
+        "node_id": "MDg6V29ya2Zsb3c2NzQxNzQ4",
+        "name": "Tests",
+        "path": ".github/workflows/tests.yml",
+        "state": "active",
+        "created_at": "2021-03-15T09:16:30.000-04:00",
+        "updated_at": "2023-10-13T09:41:34.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/actions/workflows/6741748",
+        "html_url": "https://github.com/thekevinscott/UpscalerJS/blob/main/.github/workflows/tests.yml",
+        "badge_url": "https://github.com/thekevinscott/UpscalerJS/workflows/Tests/badge.svg"
+      },
+      {
+        "id": 266762409,
+        "node_id": "W_kwDOEOapOM4P5nip",
+        "name": "Dependabot Updates",
+        "path": "dynamic/dependabot/dependabot-updates",
+        "state": "active",
+        "created_at": "2026-04-26T17:45:47.000-04:00",
+        "updated_at": "2026-04-26T17:45:47.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/actions/workflows/266762409",
+        "html_url": "https://github.com/thekevinscott/UpscalerJS/actions/workflows/dependabot/dependabot-updates",
+        "badge_url": "https://github.com/thekevinscott/UpscalerJS/actions/workflows/dependabot/dependabot-updates/badge.svg"
+      }
+    ]
+  },
+  {
+    "method": "listWorkflowFiles",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "UpscalerJS",
+      "ref": "92d2043b6ecae610acd74895e23323148c683eea"
+    },
+    "result": [
+      {
+        "name": "browserlist.yml",
+        "path": ".github/workflows/browserlist.yml",
+        "sha": "dcd21c6b27a08b7f25db4ec5b9052e8eb1c87341",
+        "size": 996,
+        "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/.github/workflows/browserlist.yml?ref=92d2043b6ecae610acd74895e23323148c683eea",
+        "html_url": "https://github.com/thekevinscott/UpscalerJS/blob/92d2043b6ecae610acd74895e23323148c683eea/.github/workflows/browserlist.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/blobs/dcd21c6b27a08b7f25db4ec5b9052e8eb1c87341",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/UpscalerJS/92d2043b6ecae610acd74895e23323148c683eea/.github/workflows/browserlist.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/.github/workflows/browserlist.yml?ref=92d2043b6ecae610acd74895e23323148c683eea",
+          "git": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/blobs/dcd21c6b27a08b7f25db4ec5b9052e8eb1c87341",
+          "html": "https://github.com/thekevinscott/UpscalerJS/blob/92d2043b6ecae610acd74895e23323148c683eea/.github/workflows/browserlist.yml"
+        }
+      },
+      {
+        "name": "docs.yml",
+        "path": ".github/workflows/docs.yml",
+        "sha": "cd3495c43fa61b88c64722878a9285063bc3eb02",
+        "size": 1925,
+        "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/.github/workflows/docs.yml?ref=92d2043b6ecae610acd74895e23323148c683eea",
+        "html_url": "https://github.com/thekevinscott/UpscalerJS/blob/92d2043b6ecae610acd74895e23323148c683eea/.github/workflows/docs.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/blobs/cd3495c43fa61b88c64722878a9285063bc3eb02",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/UpscalerJS/92d2043b6ecae610acd74895e23323148c683eea/.github/workflows/docs.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/.github/workflows/docs.yml?ref=92d2043b6ecae610acd74895e23323148c683eea",
+          "git": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/blobs/cd3495c43fa61b88c64722878a9285063bc3eb02",
+          "html": "https://github.com/thekevinscott/UpscalerJS/blob/92d2043b6ecae610acd74895e23323148c683eea/.github/workflows/docs.yml"
+        }
+      },
+      {
+        "name": "pr-monitor.yml",
+        "path": ".github/workflows/pr-monitor.yml",
+        "sha": "f46d83266494e8c4a68dfe783ff742bd4f5b1000",
+        "size": 229,
+        "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/.github/workflows/pr-monitor.yml?ref=92d2043b6ecae610acd74895e23323148c683eea",
+        "html_url": "https://github.com/thekevinscott/UpscalerJS/blob/92d2043b6ecae610acd74895e23323148c683eea/.github/workflows/pr-monitor.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/blobs/f46d83266494e8c4a68dfe783ff742bd4f5b1000",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/UpscalerJS/92d2043b6ecae610acd74895e23323148c683eea/.github/workflows/pr-monitor.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/.github/workflows/pr-monitor.yml?ref=92d2043b6ecae610acd74895e23323148c683eea",
+          "git": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/blobs/f46d83266494e8c4a68dfe783ff742bd4f5b1000",
+          "html": "https://github.com/thekevinscott/UpscalerJS/blob/92d2043b6ecae610acd74895e23323148c683eea/.github/workflows/pr-monitor.yml"
+        }
+      },
+      {
+        "name": "tests.yml",
+        "path": ".github/workflows/tests.yml",
+        "sha": "5e54cb58e0275cff415548947124a8362d87167b",
+        "size": 8883,
+        "url": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/.github/workflows/tests.yml?ref=92d2043b6ecae610acd74895e23323148c683eea",
+        "html_url": "https://github.com/thekevinscott/UpscalerJS/blob/92d2043b6ecae610acd74895e23323148c683eea/.github/workflows/tests.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/blobs/5e54cb58e0275cff415548947124a8362d87167b",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/UpscalerJS/92d2043b6ecae610acd74895e23323148c683eea/.github/workflows/tests.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/UpscalerJS/contents/.github/workflows/tests.yml?ref=92d2043b6ecae610acd74895e23323148c683eea",
+          "git": "https://api.github.com/repos/thekevinscott/UpscalerJS/git/blobs/5e54cb58e0275cff415548947124a8362d87167b",
+          "html": "https://github.com/thekevinscott/UpscalerJS/blob/92d2043b6ecae610acd74895e23323148c683eea/.github/workflows/tests.yml"
+        }
+      }
+    ]
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "UpscalerJS",
+      "path": ".github/workflows/browserlist.yml",
+      "ref": "92d2043b6ecae610acd74895e23323148c683eea"
+    },
+    "result": "name: Update Browserslist database\n\non:\n  schedule:\n    - cron: '0 2 1,15 * *'\n\npermissions:\n  contents: write\n  pull-requests: write\n\njobs:\n  update-browserslist-database:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Checkout repository\n        uses: actions/checkout@v7\n        with:\n          fetch-depth: 0\n      - name: Configure git\n        run: |\n          git config --global user.email \"action@github.com\"\n          git config --global user.name \"GitHub Action\"\n      - name: Update Browserslist database and create PR if applies\n        uses: c2corg/browserslist-update-action@v2\n        with:\n          github_token: ${{ secrets.GITHUB_TOKEN }}\n          branch: browserslist-update\n          base_branch: main\n          commit_message: 'build: update Browserslist db'\n          title: 'build: update Browserslist db'\n          body: Auto-generated by [browserslist-update-action](https://github.com/c2corg/browserslist-update-action/)\n          labels: 'chores, github action'\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "UpscalerJS",
+      "path": ".github/workflows/docs.yml",
+      "ref": "92d2043b6ecae610acd74895e23323148c683eea"
+    },
+    "result": "# Simple workflow for deploying static content to GitHub Pages\nname: Deploy Docs\n\non:\n  # Runs on pushes targeting the default branch\n  push:\n    branches: [\"main\"]\n\n  # Allows you to run this workflow manually from the Actions tab\n  workflow_dispatch:\n\n# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages\npermissions:\n  contents: read\n  pages: write\n  id-token: write\n\n# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.\n# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.\nconcurrency:\n  group: \"pages\"\n  cancel-in-progress: false\n\njobs:\n  # Build job\n  build:\n    environment:\n      name: github-pages\n      url: ${{ steps.deployment.outputs.page_url }}\n    runs-on: ubuntu-latest\n    strategy:\n      matrix:\n        node-version: [22]\n    steps:\n      - name: 'Checkout repository'\n        uses: actions/checkout@v7\n        with:\n          lfs: 'true'\n\n      - name: Use Node.js ${{ matrix.node-version }}\n        uses: actions/setup-node@v7\n        with:\n          node-version: ${{ matrix.node-version }}\n\n      # - name: Setup tmate session\n      #   uses: mxschmitt/action-tmate@v3\n      #   with:\n      #     detached: true\n\n      - name: 'Setup PNPM'\n        uses: ./.github/actions/setup-pnpm\n\n      - name: 'Install dependencies'\n        timeout-minutes: 10\n        run: pnpm install --frozen-lockfile\n\n      - name: 'Build'\n        working-directory: ./docs\n        run: pnpm build\n\n      - name: Upload artifact\n        uses: actions/upload-pages-artifact@v5\n        with:\n          path: ./docs/build\n\n  # Deployment job\n  deploy:\n    environment:\n      name: github-pages\n      url: ${{ steps.deployment.outputs.page_url }}\n    runs-on: ubuntu-latest\n    needs: build\n    steps:\n      - name: Deploy to GitHub Pages\n        id: deployment\n        uses: actions/deploy-pages@v5\n  "
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "UpscalerJS",
+      "path": ".github/workflows/pr-monitor.yml",
+      "ref": "92d2043b6ecae610acd74895e23323148c683eea"
+    },
+    "result": "name: PR Monitor\n\non:\n  pull_request:\n\npermissions:\n  checks: read\n\njobs:\n  monitor:\n    name: 'CI Gate'\n    runs-on: ubuntu-latest\n    steps:\n      - uses: thekevinscott/pr-monitor@v1\n        with:\n          job-name: 'CI Gate'\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "UpscalerJS",
+      "path": ".github/workflows/tests.yml",
+      "ref": "92d2043b6ecae610acd74895e23323148c683eea"
+    },
+    "result": "name: 'Tests'\non: [push]\n\nconcurrency:\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\nenv:\n  TF_CPP_MIN_LOG_LEVEL: 2\n\njobs:\n  lint:\n    name: 'Lint'\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    env:\n      PUPPETEER_SKIP_DOWNLOAD: 'true'\n    steps:\n      - name: 'Checkout repository'\n        uses: actions/checkout@v7\n        with:\n          lfs: 'true'\n\n      # - name: Setup tmate session\n      #   uses: mxschmitt/action-tmate@v3\n      #   with:\n      #     detached: true\n\n      - name: 'Setup PNPM with Node 22'\n        uses: ./.github/actions/setup-pnpm\n        with:\n          node-version: 22\n\n      - name: 'Lint'\n        run: 'pnpm lint'\n\n  unit-browser-vite:\n    name: 'Unit / Browser / Vite'\n    runs-on: ubuntu-latest\n    timeout-minutes: 20\n    steps:\n      - name: 'Checkout repository'\n        uses: actions/checkout@v7\n        with:\n          lfs: 'true'\n\n      - name: 'Setup PNPM with Node 22'\n        uses: ./.github/actions/setup-pnpm\n        with:\n          node-version: 22\n\n      - name: 'Unit Tests / Vite'\n        working-directory: ./packages/upscalerjs\n        run: pnpm test:unit:browser:vite\n\n      - name: 'Upload Unit Browser Artifact'\n        uses: actions/upload-artifact@v7\n        with:\n          name: artifacts-test-unit-browser-vite\n          path: |\n            ./packages/upscalerjs/coverage/coverage-final.json\n\n  unit-browser-playwright:\n    name: 'Unit / Browser / Playwright'\n    runs-on: ubuntu-latest\n    timeout-minutes: 20\n    steps:\n      - name: 'Checkout repository'\n        uses: actions/checkout@v7\n        with:\n          lfs: 'true'\n\n      - name: 'Setup PNPM with Node 22'\n        uses: ./.github/actions/setup-pnpm\n        with:\n          node-version: 22\n\n      - name: 'Unit Tests / Playwright'\n        working-directory: ./packages/upscalerjs\n        run: pnpm test:unit:browser:playwright\n\n      - name: 'Upload Unit Browser Artifact'\n        uses: actions/upload-artifact@v7\n        with:\n          name: artifacts-test-unit-browser-playwright\n          path: |\n            ./packages/upscalerjs/.nyc_output/coverage-pw.json\n\n\n  unit-node:\n    name: 'Unit / Node'\n    runs-on: ubuntu-latest\n    timeout-minutes: 15\n    env:\n      PUPPETEER_SKIP_DOWNLOAD: 'true'\n    steps:\n      - name: 'Checkout repository'\n        uses: actions/checkout@v7\n        with:\n          lfs: 'true'\n\n      - name: 'Setup PNPM with Node 22'\n        uses: ./.github/actions/setup-pnpm\n        with:\n          node-version: 22\n\n      - name: 'Unit Tests'\n        working-directory: ./packages/upscalerjs\n        run: pnpm test:unit:node\n\n      - name: 'Upload Unit Node Artifact'\n        uses: actions/upload-artifact@v7\n        with:\n          name: artifacts-test-unit-node\n          path: ./packages/upscalerjs/coverage/coverage-final.json\n\n  shared-unit:\n    name: 'Shared / Unit'\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    env:\n      PUPPETEER_SKIP_DOWNLOAD: 'true'\n    steps:\n      - name: 'Checkout repository'\n        uses: actions/checkout@v7\n        with:\n          lfs: 'true'\n\n      - name: 'Setup PNPM with Node 22'\n        uses: ./.github/actions/setup-pnpm\n        with:\n          node-version: 22\n\n      - name: 'Unit Tests'\n        working-directory: ./packages/shared\n        run: pnpm test\n\n  internal-unit:\n    name: 'Internals / Unit'\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    env:\n      PUPPETEER_SKIP_DOWNLOAD: 'true'\n    steps:\n      - name: 'Checkout repository'\n        uses: actions/checkout@v7\n        with:\n          lfs: 'true'\n\n      - name: 'Setup PNPM with Node 22'\n        uses: ./.github/actions/setup-pnpm\n        with:\n          node-version: 22\n\n      - name: 'Unit Tests'\n        working-directory: ./internals\n        run: pnpm test\n\n  upload-to-codecov:\n    name: 'Upload to CodeCov'\n    runs-on: ubuntu-latest\n    timeout-minutes: 5\n    needs: [ unit-node, unit-browser-vite, unit-browser-playwright ]\n    env:\n      PUPPETEER_SKIP_DOWNLOAD: 'true'\n    steps:\n      - name: Download artifacts\n        uses: actions/download-artifact@v8\n\n      - name: 'Codecov'\n        uses: codecov/codecov-action@v7\n        with:\n          verbose: true\n\n  integration-browserstack:\n    name: 'Integration / Browserstack'\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n    if: github.actor != 'dependabot[bot]'\n    steps:\n      - name: 'BrowserStack Env Setup'  # Invokes the setup-env action\n        uses: browserstack/github-actions/setup-env@master\n        with:\n          username: ${{ secrets.BROWSERSTACK_USERNAME }}\n          access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}\n\n      - name: 'Start BrowserStack Local'  # Tunnels the runner's localhost to the cloud browsers\n        uses: browserstack/github-actions/setup-local@master\n        with:\n          local-testing: start\n          local-identifier: random\n\n      - name: 'Checkout repository'\n        uses: actions/checkout@v7\n        with:\n          lfs: 'true'\n\n      - name: 'Setup PNPM with Node 22'\n        uses: ./.github/actions/setup-pnpm\n        with:\n          node-version: 22\n\n      # - name: Setup tmate session\n      #   uses: mxschmitt/action-tmate@v3\n      #   with:\n      #     detached: true\n\n\n      - name: 'Integration Tests'\n        run: pnpm test:integration:browserstack\n        env:\n          NODE_OPTIONS: --max_old_space_size=8192\n\n      - name: 'Stop BrowserStack Local'\n        if: always()\n        uses: browserstack/github-actions/setup-local@master\n        with:\n          local-testing: stop\n\n  integration-clientside:\n    name: 'Integration / Clientside'\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n    steps:\n      - name: 'Checkout repository'\n        uses: actions/checkout@v7\n        with:\n          lfs: 'true'\n\n      - name: 'Setup PNPM with Node 22'\n        uses: ./.github/actions/setup-pnpm\n        with:\n          node-version: 22\n\n      - name: 'Integration Tests'\n        run: pnpm test:integration:clientside\n        env:\n          NODE_OPTIONS: --max_old_space_size=8192\n\n  integration-serverside:\n    name: 'Integration / Serverside'\n    runs-on: ubuntu-latest\n    timeout-minutes: 20\n    env:\n      PUPPETEER_SKIP_DOWNLOAD: 'true'\n    steps:\n      - name: 'Checkout repository'\n        uses: actions/checkout@v7\n        with:\n          lfs: 'true'\n\n      - name: 'Setup PNPM with Node 22'\n        uses: ./.github/actions/setup-pnpm\n        with:\n          node-version: 22\n\n      # - name: Setup tmate session\n      #   uses: mxschmitt/action-tmate@v3\n      #   with:\n      #     detached: true\n\n      - name: 'Integration Tests'\n        run: pnpm test:integration:serverside\n\n  integration-models-browser:\n    name: 'Models / Browser'\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n    # strategy:\n    #   matrix:\n    #     node-version: [16]\n    steps:\n      - name: 'Checkout repository'\n        uses: actions/checkout@v7\n        with:\n          lfs: 'true'\n\n      - name: 'Setup PNPM with Node 22'\n        uses: ./.github/actions/setup-pnpm\n        with:\n          node-version: 22\n\n      # - name: Setup tmate session\n      #   uses: mxschmitt/action-tmate@v3\n      #   with:\n      #     detached: true\n      - name: 'Integration Tests'\n        run: pnpm test:integration:model:clientside\n\n  integration-models-node:\n    name: 'Models / Node'\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n    env:\n      PUPPETEER_SKIP_DOWNLOAD: 'true'\n    steps:\n      - name: 'Checkout repository'\n        uses: actions/checkout@v7\n        with:\n          lfs: 'true'\n\n      - name: 'Setup PNPM with Node 22'\n        uses: ./.github/actions/setup-pnpm\n        with:\n          node-version: 22\n\n      - name: 'Integration Tests'\n        run: pnpm test:integration:model:serverside\n\n  integration-memory-leaks:\n    name: 'Integration / Memory Leaks'\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n    steps:\n      - name: 'Checkout repository'\n        uses: actions/checkout@v7\n        with:\n          lfs: 'true'\n\n      - name: 'Setup PNPM with Node 22'\n        uses: ./.github/actions/setup-pnpm\n        with:\n          node-version: 22\n\n      - name: 'Memory Leak Tests'\n        run: pnpm test:integration:memory-leaks\n\n  build-docs:\n    name: 'Build Documentation'\n    runs-on: ubuntu-latest\n    timeout-minutes: 15\n    env:\n      PUPPETEER_SKIP_DOWNLOAD: 'true'\n    steps:\n      - name: 'Checkout repository'\n        uses: actions/checkout@v7\n        with:\n          lfs: 'true'\n\n      - name: 'Setup PNPM with Node 22'\n        uses: ./.github/actions/setup-pnpm\n        with:\n          node-version: 22\n\n      # - name: Setup tmate session\n      #   uses: mxschmitt/action-tmate@v3\n      #   with:\n      #     detached: true\n\n      - name: 'Install dependencies'\n        timeout-minutes: 10\n        run: pnpm install --frozen-lockfile\n\n      - name: 'Build'\n        working-directory: ./docs\n        run: pnpm build\n"
+  }
+]
