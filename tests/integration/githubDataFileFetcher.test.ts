@@ -15,4 +15,7 @@ test.each(CASES)(
 
     expect(checkNames).toEqual([...new Set(dispatched.map((d) => d.name))].sort());
   },
+  // A replay with a runtime-computed matrix runs the docker sandbox, and CI
+  // provisions the image inside the first such test.
+  300_000,
 );
