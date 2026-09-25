@@ -27,11 +27,11 @@ under `tests/fixtures/willrun-probe/` are the record, and `setup-probe.sh` pushe
 them. Changing one of those assertions is a claim that GitHub's behavior
 changed — verify it against a real PR before you do.
 
-`unknown` is the honest answer for anything undecidable from the workflow files
-alone (a runtime-computed matrix, a cross-repo reusable workflow). Do not guess
-in order to make an entry look decided. It is job-level only: `Entry` is a
-closed union and the workflow-level variant has no `unknown`, because every
-workflow-level verdict is decidable. Do not widen it back.
+willfire MUST return the exact list of check-name strings, with zero
+`unknown`s. Anything it cannot decide — a runtime-computed matrix, an
+unreadable cross-repo workflow — throws an explicit error naming what it could
+not decide. Never guess a name to make an entry look decided; never emit an
+`unknown` verdict or add one to `Entry`.
 
 ## e2e attestations
 
