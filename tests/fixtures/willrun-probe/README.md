@@ -21,6 +21,10 @@ Two families of workflow live here:
   executor refuses a step?" Observed on PR #15: GitHub ran `action-gen`,
   `action-use (r)` and `action-use (s)`, so the checks willfire leaves
   undecided are real ones it declined to name rather than guess.
+- **Actor probe** — `actor.yml`. It answers "who is `github.actor` for a
+  pull_request run?" Observed on PR #17: the opener on `opened`, the pusher on
+  `synchronize` — a synchronize commit with an unmapped git author still
+  echoed the pusher, so commit metadata never decides it.
 
 The check-name probes are the ground truth behind willfire's
 `src/names.test.ts`: every expectation in that file is a job name read back
