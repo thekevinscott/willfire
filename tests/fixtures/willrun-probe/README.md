@@ -16,6 +16,13 @@ Two families of workflow live here:
 - **Cross-repo reusable probes** — `remote-caller.yml`, `remote-reusable.yml`,
   `remote-inner.yml`, `remote-bad.yml`. These answer "which repo and which ref
   does a `owner/repo/path@ref` call actually read?"
+- **Secrets-in-if probe** — `secrets-if.yml`, deliberately invalid: `secrets`
+  is not a recognized context in a job-level `if:` ("Unrecognized
+  named-value: 'secrets'"). Observed on PR #16: every push gets a zero-job
+  failure run named by the file's path, and the PR gets no check from the
+  workflow at all — not even a failed one. A job `if:` referencing `secrets`
+  invalidates the whole file, and an invalid file contributes nothing to a
+  PR's check set.
 - **Step-level action probe** — `action-decline.yml`, the only workflow here
   that uses an action at all. It answers "what does GitHub run when willfire's
   executor refuses a step?" Observed on PR #15: GitHub ran `action-gen`,
