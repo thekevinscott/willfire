@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1790335253,
+  "exit_code": 0,
+  "commit": "8e8729de4371c51a23679858211f1d64c9b48ccb",
+  "branch": "fix/github-actor-opened"
+}
