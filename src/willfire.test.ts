@@ -96,6 +96,8 @@ interface Fixture {
   parents?: Record<string, string[]>;
   /** Open PRs, for the stack walk's `listPulls` lookup by head branch. */
   openPrs?: { headRef: string; baseRef: string; mergeSha: string | null }[];
+  /** The PR's author login. */
+  author?: string;
 }
 
 /**
@@ -142,6 +144,7 @@ function fakeGithub(f: Fixture): GithubClient {
         base: { ref: f.baseRef ?? "main" },
         head: { sha: HEAD_SHA },
         merge_commit_sha: f.mergeSha ?? null,
+        user: { login: f.author ?? "octocat" },
       };
     },
     listPulls: async ({ head }) =>
@@ -1085,6 +1088,39 @@ describe("github.repository as a prediction-wide fact", () => {
     });
     const { checkNames } = await willfire(github, "o/r", 1);
     expect(checkNames).toEqual(["call / inner"]);
+  });
+});
+
+describe("github.actor as a prediction-wide fact", () => {
+  const GUARDED = JSON.stringify({
+    on: "pull_request",
+    jobs: {
+      human: { if: "github.actor != 'dependabot[bot]'" },
+      bot: { if: "github.actor == 'dependabot[bot]'" },
+    },
+  });
+
+  it("decides an actor guard from the PR author on `opened`", async () => {
+    const { checkNames } = await willfire(
+      fakeGithub({ contents: { [WF]: GUARDED }, author: "dependabot[bot]" }),
+      "o/r",
+      1,
+      { action: "opened" },
+    );
+    expect(checkNames).toEqual(["bot"]);
+  });
+
+  it("leaves the guard undecided on `synchronize`, where the actor is the pusher", async () => {
+    const { entries } = await willfire(
+      fakeGithub({ contents: { [WF]: GUARDED }, author: "dependabot[bot]" }),
+      "o/r",
+      1,
+      { action: "synchronize" },
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["human", "unknown"],
+      ["bot", "unknown"],
+    ]);
   });
 });
 

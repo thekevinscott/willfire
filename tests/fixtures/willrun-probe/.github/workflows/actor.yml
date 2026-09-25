@@ -1,0 +1,24 @@
+# Who is `github.actor` for a pull_request run? Scoped to src/actor.txt so it
+# stays out of the other probe PRs' predictions. The synchronize push on the
+# probe PR carries an unmapped git author, so the echoed actor says whether
+# GitHub reads the pusher or the commit author.
+name: actor
+on:
+  pull_request:
+    paths:
+      - src/actor.txt
+jobs:
+  echo-actor:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "actor=${{ github.actor }} action=${{ github.event.action }} pr-author=${{ github.event.pull_request.user.login }}"
+  guard-not-dependabot:
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo guard ran
+  guard-is-dependabot:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo guard ran

@@ -19,6 +19,7 @@ export interface GithubPullSummary {
 export interface GithubPull extends GithubPullSummary {
   commits: number;
   head: { sha: string };
+  user: { login: string };
 }
 
 export interface GithubPullFile {

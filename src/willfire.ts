@@ -196,8 +196,15 @@ export async function willfire(
   // workflows and composite actions all run in the repo the PR is against.
   // Seeding it once makes guards like the fleet's hermetic-vs-published
   // `github.repository ==` checks decidable everywhere, granted or not.
+  // `github.actor` is whoever triggered the run: the opener on `opened`, but
+  // the head pusher on `synchronize` — an identity nothing in the PR payload
+  // or its commits names (probe willrun-probe#17; live putitoutthere#657) —
+  // so only `opened` seeds it.
   const prFacts: Scope = {
-    github: { repository: `${headSource.owner}/${headSource.repo}` },
+    github: {
+      repository: `${headSource.owner}/${headSource.repo}`,
+      ...(ctx.action === "opened" ? { actor: pr.user.login } : {}),
+    },
   };
 
   const workflowEntries = async (path: string, state: string): Promise<DraftEntry[]> => {

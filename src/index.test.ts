@@ -90,6 +90,7 @@ describe("root barrel", () => {
         merge_commit_sha: null,
         commits: 1,
         head: { sha: "abc" },
+        user: { login: "octocat" },
       }),
       listPulls: async () => [{ base: { ref: "main" }, merge_commit_sha: null }],
       listPullFiles: async () => [{ filename: "a.ts" }],
@@ -110,6 +111,7 @@ describe("root barrel", () => {
       merge_commit_sha: null,
       commits: 1,
       head: { sha: "abc" },
+      user: { login: "octocat" },
     });
     await expect(
       client.listPulls({ owner: "o", repo: "r", state: "open", head: "o:b" }),
@@ -156,6 +158,7 @@ describe("root barrel", () => {
         merge_commit_sha: string | null;
         commits: number;
         head: { sha: string };
+        user: { login: string };
       }>;
       listPulls(
         params: Repo & { state: string; head: string },

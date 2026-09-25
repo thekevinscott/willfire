@@ -167,5 +167,21 @@ git commit -m "pr12: touch the action-decline probe path"
 git push origin pr12-action-decline
 mkpr pr12-action-decline main "pr12: step-level action the executor refuses"
 
+# PR13 (opened as #17): who is `github.actor`? Two runs answer it: the
+# `opened` run echoed the PR opener, and a synchronize push whose commit
+# carried an unmapped git author echoed the pusher — so the actor is the
+# opener on `opened` and the pusher on `synchronize`, never the commit author.
+git checkout -b pr-actor main
+echo "actor probe change" > src/actor.txt
+git add src/actor.txt
+git commit -m "pr-actor: touch the actor probe path"
+git push origin pr-actor
+mkpr pr-actor main "pr-actor: github.actor probe"
+echo "second change" >> src/actor.txt
+GIT_AUTHOR_NAME="Unmapped Author" GIT_AUTHOR_EMAIL="unmapped-actor-probe@invalid.example" \
+GIT_COMMITTER_NAME="Unmapped Author" GIT_COMMITTER_EMAIL="unmapped-actor-probe@invalid.example" \
+git commit -am "pr-actor: synchronize with an unmapped git author"
+git push origin pr-actor
+
 git checkout main
 echo "done"

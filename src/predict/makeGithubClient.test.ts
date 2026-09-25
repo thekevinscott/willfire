@@ -65,7 +65,13 @@ describe("makeGithubClient", () => {
   });
 
   it("gets a pull request", async () => {
-    const pr = { commits: 1, base: { ref: "main" }, head: { sha: "abc" }, merge_commit_sha: null };
+    const pr = {
+      commits: 1,
+      base: { ref: "main" },
+      head: { sha: "abc" },
+      merge_commit_sha: null,
+      user: { login: "octocat" },
+    };
     stage(json(pr));
     expect(await client().getPull({ ...REPO, pull_number: 5 })).toEqual(pr);
     expect(calls[0].url).toBe("https://api.github.com/repos/o/r/pulls/5");
