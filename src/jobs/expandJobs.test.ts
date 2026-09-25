@@ -344,6 +344,31 @@ describe("reusable workflows", () => {
     ]);
   });
 
+  it("counts a cross-repo hop as one level, same as a local one", async () => {
+    // The chain alternates pinned owner/repo hops and `./` hops on its way to
+    // the bound, so the tenth being declined means both kinds were counted.
+    const path = (i: number) => `.github/workflows/n${i}.yml`;
+    const hop = (i: number) =>
+      i % 2 === 1 ? `octo/repo/${path(i)}@${REMOTE_SHA}` : `./${path(i)}`;
+    const files: Record<string, string> = {};
+    for (let i = 1; i <= 9; i++) {
+      const jobs =
+        i === 9 ? { leaf: {}, j: { uses: hop(10) } } : { j: { uses: hop(i + 1) } };
+      files[path(i)] = JSON.stringify({ on: { workflow_call: null }, jobs });
+    }
+    const entries = await expand({ call: { uses: hop(1) } }, readerFor(files));
+    const p = `call${" / j".repeat(8)}`;
+    expect(entries).toEqual([
+      { job: `${p} / leaf`, checkName: `${p} / leaf`, status: "run", reason: "" },
+      {
+        job: `${p} / j`,
+        checkName: null,
+        status: "unknown",
+        reason: "reusable workflow nested deeper than 9 levels",
+      },
+    ]);
+  });
+
   it("reports a dynamic matrix on the calling job as unknown", async () => {
     // The caller's matrix multiplies the whole callee set, so an unknown
     // multiplier makes the entire subtree unpredictable: one unknown entry
