@@ -1,0 +1,562 @@
+[
+  {
+    "id": 96651959451,
+    "run_id": 32441156749,
+    "workflow_name": "Changelog",
+    "head_branch": "claude/12-engine-owns-npm-binary",
+    "run_url": "https://api.github.com/repos/thekevinscott/steervec/actions/runs/32441156749",
+    "run_attempt": 1,
+    "node_id": "CR_kwDOShECys8AAAAWgOfcmw",
+    "head_sha": "ad24f1ae1c4e19602cead7c1a9396e112f033e89",
+    "url": "https://api.github.com/repos/thekevinscott/steervec/actions/jobs/96651959451",
+    "html_url": "https://github.com/thekevinscott/steervec/actions/runs/32441156749/job/96651959451",
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-08-21T02:48:59Z",
+    "started_at": "2026-08-21T02:49:17Z",
+    "completed_at": "2026-08-21T02:49:23Z",
+    "name": "CHANGELOG + MIGRATIONS touched",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1,
+        "started_at": "2026-08-21T02:49:19Z",
+        "completed_at": "2026-08-21T02:49:19Z"
+      },
+      {
+        "name": "Run actions/checkout@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2,
+        "started_at": "2026-08-21T02:49:19Z",
+        "completed_at": "2026-08-21T02:49:20Z"
+      },
+      {
+        "name": "Check",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3,
+        "started_at": "2026-08-21T02:49:20Z",
+        "completed_at": "2026-08-21T02:49:20Z"
+      },
+      {
+        "name": "Post Run actions/checkout@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6,
+        "started_at": "2026-08-21T02:49:20Z",
+        "completed_at": "2026-08-21T02:49:20Z"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 7,
+        "started_at": "2026-08-21T02:49:20Z",
+        "completed_at": "2026-08-21T02:49:20Z"
+      }
+    ],
+    "check_run_url": "https://api.github.com/repos/thekevinscott/steervec/check-runs/96651959451",
+    "labels": [
+      "ubuntu-latest"
+    ],
+    "runner_id": 1000218217,
+    "runner_name": "GitHub Actions 1000218217",
+    "runner_group_id": 0,
+    "runner_group_name": "GitHub Actions"
+  },
+  {
+    "id": 96649828278,
+    "run_id": 32440409136,
+    "workflow_name": "Changelog",
+    "head_branch": "claude/12-engine-owns-npm-binary",
+    "run_url": "https://api.github.com/repos/thekevinscott/steervec/actions/runs/32440409136",
+    "run_attempt": 1,
+    "node_id": "CR_kwDOShECys8AAAAWgMdXtg",
+    "head_sha": "ad24f1ae1c4e19602cead7c1a9396e112f033e89",
+    "url": "https://api.github.com/repos/thekevinscott/steervec/actions/jobs/96649828278",
+    "html_url": "https://github.com/thekevinscott/steervec/actions/runs/32440409136/job/96649828278",
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-08-21T02:35:55Z",
+    "started_at": "2026-08-21T02:36:21Z",
+    "completed_at": "2026-08-21T02:36:27Z",
+    "name": "CHANGELOG + MIGRATIONS touched",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1,
+        "started_at": "2026-08-21T02:36:22Z",
+        "completed_at": "2026-08-21T02:36:23Z"
+      },
+      {
+        "name": "Run actions/checkout@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2,
+        "started_at": "2026-08-21T02:36:23Z",
+        "completed_at": "2026-08-21T02:36:24Z"
+      },
+      {
+        "name": "Check",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3,
+        "started_at": "2026-08-21T02:36:24Z",
+        "completed_at": "2026-08-21T02:36:24Z"
+      },
+      {
+        "name": "Post Run actions/checkout@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6,
+        "started_at": "2026-08-21T02:36:24Z",
+        "completed_at": "2026-08-21T02:36:24Z"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 7,
+        "started_at": "2026-08-21T02:36:24Z",
+        "completed_at": "2026-08-21T02:36:24Z"
+      }
+    ],
+    "check_run_url": "https://api.github.com/repos/thekevinscott/steervec/check-runs/96649828278",
+    "labels": [
+      "ubuntu-latest"
+    ],
+    "runner_id": 1000217660,
+    "runner_name": "GitHub Actions 1000217660",
+    "runner_group_id": 0,
+    "runner_group_name": "GitHub Actions"
+  },
+  {
+    "id": 96649828549,
+    "run_id": 32440409183,
+    "workflow_name": "PR Monitor",
+    "head_branch": "claude/12-engine-owns-npm-binary",
+    "run_url": "https://api.github.com/repos/thekevinscott/steervec/actions/runs/32440409183",
+    "run_attempt": 1,
+    "node_id": "CR_kwDOShECys8AAAAWgMdYxQ",
+    "head_sha": "ad24f1ae1c4e19602cead7c1a9396e112f033e89",
+    "url": "https://api.github.com/repos/thekevinscott/steervec/actions/jobs/96649828549",
+    "html_url": "https://github.com/thekevinscott/steervec/actions/runs/32440409183/job/96649828549",
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-08-21T02:35:55Z",
+    "started_at": "2026-08-21T02:36:19Z",
+    "completed_at": "2026-08-21T02:37:20Z",
+    "name": "CI Gate",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1,
+        "started_at": "2026-08-21T02:36:19Z",
+        "completed_at": "2026-08-21T02:36:20Z"
+      },
+      {
+        "name": "Run thekevinscott/pr-monitor@v1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2,
+        "started_at": "2026-08-21T02:36:20Z",
+        "completed_at": "2026-08-21T02:37:19Z"
+      },
+      {
+        "name": "Post Run thekevinscott/pr-monitor@v1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4,
+        "started_at": "2026-08-21T02:37:19Z",
+        "completed_at": "2026-08-21T02:37:19Z"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5,
+        "started_at": "2026-08-21T02:37:19Z",
+        "completed_at": "2026-08-21T02:37:19Z"
+      }
+    ],
+    "check_run_url": "https://api.github.com/repos/thekevinscott/steervec/check-runs/96649828549",
+    "labels": [
+      "ubuntu-latest"
+    ],
+    "runner_id": 1000217659,
+    "runner_name": "GitHub Actions 1000217659",
+    "runner_group_id": 0,
+    "runner_group_name": "GitHub Actions"
+  },
+  {
+    "id": 96649827566,
+    "run_id": 32440409068,
+    "workflow_name": "Node",
+    "head_branch": "claude/12-engine-owns-npm-binary",
+    "run_url": "https://api.github.com/repos/thekevinscott/steervec/actions/runs/32440409068",
+    "run_attempt": 1,
+    "node_id": "CR_kwDOShECys8AAAAWgMdU7g",
+    "head_sha": "ad24f1ae1c4e19602cead7c1a9396e112f033e89",
+    "url": "https://api.github.com/repos/thekevinscott/steervec/actions/jobs/96649827566",
+    "html_url": "https://github.com/thekevinscott/steervec/actions/runs/32440409068/job/96649827566",
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-08-21T02:35:55Z",
+    "started_at": "2026-08-21T02:36:24Z",
+    "completed_at": "2026-08-21T02:36:39Z",
+    "name": "Lint",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1,
+        "started_at": "2026-08-21T02:36:25Z",
+        "completed_at": "2026-08-21T02:36:26Z"
+      },
+      {
+        "name": "Run actions/checkout@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2,
+        "started_at": "2026-08-21T02:36:26Z",
+        "completed_at": "2026-08-21T02:36:27Z"
+      },
+      {
+        "name": "Run pnpm/action-setup@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3,
+        "started_at": "2026-08-21T02:36:27Z",
+        "completed_at": "2026-08-21T02:36:28Z"
+      },
+      {
+        "name": "Run actions/setup-node@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4,
+        "started_at": "2026-08-21T02:36:28Z",
+        "completed_at": "2026-08-21T02:36:32Z"
+      },
+      {
+        "name": "Run pnpm install --no-frozen-lockfile",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5,
+        "started_at": "2026-08-21T02:36:32Z",
+        "completed_at": "2026-08-21T02:36:34Z"
+      },
+      {
+        "name": "Run pnpm run lint",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6,
+        "started_at": "2026-08-21T02:36:34Z",
+        "completed_at": "2026-08-21T02:36:36Z"
+      },
+      {
+        "name": "Post Run actions/setup-node@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10,
+        "started_at": "2026-08-21T02:36:36Z",
+        "completed_at": "2026-08-21T02:36:36Z"
+      },
+      {
+        "name": "Post Run pnpm/action-setup@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 11,
+        "started_at": "2026-08-21T02:36:36Z",
+        "completed_at": "2026-08-21T02:36:36Z"
+      },
+      {
+        "name": "Post Run actions/checkout@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 12,
+        "started_at": "2026-08-21T02:36:36Z",
+        "completed_at": "2026-08-21T02:36:36Z"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 13,
+        "started_at": "2026-08-21T02:36:36Z",
+        "completed_at": "2026-08-21T02:36:36Z"
+      }
+    ],
+    "check_run_url": "https://api.github.com/repos/thekevinscott/steervec/check-runs/96649827566",
+    "labels": [
+      "ubuntu-latest"
+    ],
+    "runner_id": 1000217661,
+    "runner_name": "GitHub Actions 1000217661",
+    "runner_group_id": 0,
+    "runner_group_name": "GitHub Actions"
+  },
+  {
+    "id": 96649827733,
+    "run_id": 32440409068,
+    "workflow_name": "Node",
+    "head_branch": "claude/12-engine-owns-npm-binary",
+    "run_url": "https://api.github.com/repos/thekevinscott/steervec/actions/runs/32440409068",
+    "run_attempt": 1,
+    "node_id": "CR_kwDOShECys8AAAAWgMdVlQ",
+    "head_sha": "ad24f1ae1c4e19602cead7c1a9396e112f033e89",
+    "url": "https://api.github.com/repos/thekevinscott/steervec/actions/jobs/96649827733",
+    "html_url": "https://github.com/thekevinscott/steervec/actions/runs/32440409068/job/96649827733",
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-08-21T02:35:55Z",
+    "started_at": "2026-08-21T02:36:30Z",
+    "completed_at": "2026-08-21T02:36:41Z",
+    "name": "Typecheck",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1,
+        "started_at": "2026-08-21T02:36:31Z",
+        "completed_at": "2026-08-21T02:36:32Z"
+      },
+      {
+        "name": "Run actions/checkout@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2,
+        "started_at": "2026-08-21T02:36:32Z",
+        "completed_at": "2026-08-21T02:36:33Z"
+      },
+      {
+        "name": "Run pnpm/action-setup@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3,
+        "started_at": "2026-08-21T02:36:33Z",
+        "completed_at": "2026-08-21T02:36:34Z"
+      },
+      {
+        "name": "Run actions/setup-node@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4,
+        "started_at": "2026-08-21T02:36:34Z",
+        "completed_at": "2026-08-21T02:36:35Z"
+      },
+      {
+        "name": "Run pnpm install --no-frozen-lockfile",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5,
+        "started_at": "2026-08-21T02:36:35Z",
+        "completed_at": "2026-08-21T02:36:37Z"
+      },
+      {
+        "name": "Run pnpm run typecheck",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6,
+        "started_at": "2026-08-21T02:36:37Z",
+        "completed_at": "2026-08-21T02:36:38Z"
+      },
+      {
+        "name": "Post Run actions/setup-node@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10,
+        "started_at": "2026-08-21T02:36:38Z",
+        "completed_at": "2026-08-21T02:36:38Z"
+      },
+      {
+        "name": "Post Run pnpm/action-setup@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 11,
+        "started_at": "2026-08-21T02:36:38Z",
+        "completed_at": "2026-08-21T02:36:38Z"
+      },
+      {
+        "name": "Post Run actions/checkout@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 12,
+        "started_at": "2026-08-21T02:36:38Z",
+        "completed_at": "2026-08-21T02:36:38Z"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 13,
+        "started_at": "2026-08-21T02:36:38Z",
+        "completed_at": "2026-08-21T02:36:38Z"
+      }
+    ],
+    "check_run_url": "https://api.github.com/repos/thekevinscott/steervec/check-runs/96649827733",
+    "labels": [
+      "ubuntu-latest"
+    ],
+    "runner_id": 1000217668,
+    "runner_name": "GitHub Actions 1000217668",
+    "runner_group_id": 0,
+    "runner_group_name": "GitHub Actions"
+  },
+  {
+    "id": 96649827805,
+    "run_id": 32440409068,
+    "workflow_name": "Node",
+    "head_branch": "claude/12-engine-owns-npm-binary",
+    "run_url": "https://api.github.com/repos/thekevinscott/steervec/actions/runs/32440409068",
+    "run_attempt": 1,
+    "node_id": "CR_kwDOShECys8AAAAWgMdV3Q",
+    "head_sha": "ad24f1ae1c4e19602cead7c1a9396e112f033e89",
+    "url": "https://api.github.com/repos/thekevinscott/steervec/actions/jobs/96649827805",
+    "html_url": "https://github.com/thekevinscott/steervec/actions/runs/32440409068/job/96649827805",
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-08-21T02:35:55Z",
+    "started_at": "2026-08-21T02:36:46Z",
+    "completed_at": "2026-08-21T02:37:14Z",
+    "name": "Build + smoke",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1,
+        "started_at": "2026-08-21T02:36:47Z",
+        "completed_at": "2026-08-21T02:36:48Z"
+      },
+      {
+        "name": "Run actions/checkout@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2,
+        "started_at": "2026-08-21T02:36:48Z",
+        "completed_at": "2026-08-21T02:36:49Z"
+      },
+      {
+        "name": "Run dtolnay/rust-toolchain@stable",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3,
+        "started_at": "2026-08-21T02:36:49Z",
+        "completed_at": "2026-08-21T02:36:57Z"
+      },
+      {
+        "name": "Run Swatinem/rust-cache@v2",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4,
+        "started_at": "2026-08-21T02:36:57Z",
+        "completed_at": "2026-08-21T02:36:58Z"
+      },
+      {
+        "name": "Run pnpm/action-setup@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5,
+        "started_at": "2026-08-21T02:36:58Z",
+        "completed_at": "2026-08-21T02:36:59Z"
+      },
+      {
+        "name": "Run actions/setup-node@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6,
+        "started_at": "2026-08-21T02:36:59Z",
+        "completed_at": "2026-08-21T02:37:00Z"
+      },
+      {
+        "name": "Build rust binary",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 7,
+        "started_at": "2026-08-21T02:37:00Z",
+        "completed_at": "2026-08-21T02:37:07Z"
+      },
+      {
+        "name": "Build node package",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 8,
+        "started_at": "2026-08-21T02:37:07Z",
+        "completed_at": "2026-08-21T02:37:11Z"
+      },
+      {
+        "name": "Stage rust binary as platform optional dep (flat, as piot publishes it)",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 9,
+        "started_at": "2026-08-21T02:37:11Z",
+        "completed_at": "2026-08-21T02:37:11Z"
+      },
+      {
+        "name": "Smoke (--version via node wrapper -> rust binary)",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10,
+        "started_at": "2026-08-21T02:37:11Z",
+        "completed_at": "2026-08-21T02:37:11Z"
+      },
+      {
+        "name": "Post Run actions/setup-node@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 17,
+        "started_at": "2026-08-21T02:37:11Z",
+        "completed_at": "2026-08-21T02:37:11Z"
+      },
+      {
+        "name": "Post Run pnpm/action-setup@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 18,
+        "started_at": "2026-08-21T02:37:11Z",
+        "completed_at": "2026-08-21T02:37:11Z"
+      },
+      {
+        "name": "Post Run Swatinem/rust-cache@v2",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 19,
+        "started_at": "2026-08-21T02:37:11Z",
+        "completed_at": "2026-08-21T02:37:12Z"
+      },
+      {
+        "name": "Post Run actions/checkout@v4",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 20,
+        "started_at": "2026-08-21T02:37:12Z",
+        "completed_at": "2026-08-21T02:37:13Z"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 21,
+        "started_at": "2026-08-21T02:37:13Z",
+        "completed_at": "2026-08-21T02:37:13Z"
+      }
+    ],
+    "check_run_url": "https://api.github.com/repos/thekevinscott/steervec/check-runs/96649827805",
+    "labels": [
+      "ubuntu-latest"
+    ],
+    "runner_id": 1000217683,
+    "runner_name": "GitHub Actions 1000217683",
+    "runner_group_id": 0,
+    "runner_group_name": "GitHub Actions"
+  }
+]

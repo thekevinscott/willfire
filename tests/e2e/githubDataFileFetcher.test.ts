@@ -5,7 +5,7 @@ import { getResponse } from "./getResponse.js";
 
 const github = makeGithubClient();
 
-const CASES = discoverCases(new URL("./responses/", import.meta.url));
+const CASES = discoverCases(new URL("./responses/", import.meta.url), "fixture.json");
 
 test.each(CASES)(
   "$owner/$repo#$pr still predicts the committed list",

@@ -4,7 +4,7 @@ import { discoverCases } from "../cases.js";
 import { getFixture } from "./getFixture.js";
 import { replayClient } from "./replayClient.js";
 
-const CASES = discoverCases(new URL("./fixtures/", import.meta.url));
+const CASES = discoverCases(new URL("./fixtures/", import.meta.url), "dispatched.json");
 
 test.each(CASES)(
   "$owner/$repo#$pr predicts the dispatched check list exactly",

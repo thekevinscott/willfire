@@ -3,7 +3,8 @@ import { join } from "node:path";
 import type { RecordedCall } from "./replayClient.js";
 
 export interface Fixture {
-  dispatched: { workflow: string; name: string; conclusion: string | null }[];
+  /** Raw Actions API job objects; tests derive what they assert on. */
+  dispatched: { name: string; conclusion: string | null }[];
   calls: RecordedCall[];
 }
 
@@ -16,12 +17,15 @@ const binaryRef = (result: unknown): string | null =>
     ? (result as { $binary: string }).$binary
     : null;
 
+const read = (dir: string, file: string): unknown =>
+  JSON.parse(readFileSync(join(dir, file), "utf8"));
+
 export const getFixture = (dir: string): Fixture => {
-  const fixture = JSON.parse(readFileSync(join(dir, "fixture.json"), "utf8")) as Fixture;
-  const calls = fixture.calls.map((call) => {
+  const dispatched = read(dir, "dispatched.json") as Fixture["dispatched"];
+  const calls = (read(dir, "calls.json") as RecordedCall[]).map((call) => {
     const ref = binaryRef(call.result);
     if (ref === null) return call;
     return { ...call, result: new Uint8Array(readFileSync(join(dir, ref))).buffer };
   });
-  return { ...fixture, calls };
+  return { dispatched, calls };
 };
