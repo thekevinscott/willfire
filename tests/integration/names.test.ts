@@ -340,7 +340,7 @@ const REMOTE_REUSABLE = workflow("remote-reusable.yml");
 const REMOTE_INNER = workflow("remote-inner.yml");
 
 /**
- * `setup-probe.sh` builds the `remote-v0` tag by renaming exactly these two
+ * The probe seed built the `remote-v0` tag by renaming exactly these two
  * jobs in the `main` copies; mirroring the rename keeps both refs on one file.
  */
 const atV0 = (yaml: string) =>
@@ -360,8 +360,8 @@ const REMOTE_INNER_AT_CALLER_HEAD = REMOTE_INNER.replace(
 const REMOTE_CALLER = workflow("remote-caller.yml");
 
 /**
- * `setup-probe.sh` rewrites the pinned SHA at push time, so a literal here
- * would go stale on the next seed.
+ * The probe seed rewrote the pinned SHA at push time, so the fixture is the
+ * source of truth; a literal here would drift from it.
  */
 const V0_SHA = (() => {
   const m = REMOTE_CALLER.match(/remote-reusable\.yml@([0-9a-f]{40})$/m);

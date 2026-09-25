@@ -23,8 +23,8 @@ standard, enforced by `.github/workflows/conventions.yml`.
 The expectations in `src/willfire.test.ts` are **not** opinions about how GitHub
 ought to behave. Every workflow-level verdict was read off a live dispatch on
 [willrun-probe](https://github.com/thekevinbot/willrun-probe); the workflows
-under `tests/fixtures/willrun-probe/` are the record, and `setup-probe.sh` pushes
-them. Changing one of those assertions is a claim that GitHub's behavior
+under `tests/fixtures/willrun-probe/` are the record. Changing one of those
+assertions is a claim that GitHub's behavior
 changed — verify it against a real PR before you do.
 
 willfire MUST return the exact list of check-name strings, with zero
