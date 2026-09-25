@@ -1,11 +1,11 @@
 import { expect, test } from "vitest";
 import { makeGithubClient, predict } from "willfire";
 import { discoverCases } from "../cases.js";
-import { getResponse } from "./getResponse.js";
+import { getResponse } from "../getResponse.js";
 
 const github = makeGithubClient();
 
-const CASES = discoverCases(new URL("./responses/", import.meta.url), "fixture.json");
+const CASES = discoverCases(new URL("./responses/", import.meta.url));
 
 test.each(CASES)(
   "$owner/$repo#$pr still predicts the committed list",

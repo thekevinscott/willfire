@@ -149,8 +149,8 @@
           "releases_url": "https://api.github.com/repos/thekevinscott/willfire/releases{/id}",
           "deployments_url": "https://api.github.com/repos/thekevinscott/willfire/deployments",
           "created_at": "2026-08-19T13:30:06Z",
-          "updated_at": "2026-09-25T10:28:25Z",
-          "pushed_at": "2026-09-25T10:46:35Z",
+          "updated_at": "2026-09-25T10:48:16Z",
+          "pushed_at": "2026-09-25T10:50:24Z",
           "git_url": "git://github.com/thekevinscott/willfire.git",
           "ssh_url": "git@github.com:thekevinscott/willfire.git",
           "clone_url": "https://github.com/thekevinscott/willfire.git",
@@ -170,7 +170,7 @@
           "mirror_url": null,
           "archived": false,
           "disabled": false,
-          "open_issues_count": 28,
+          "open_issues_count": 29,
           "license": {
             "key": "mit",
             "name": "MIT License",
@@ -186,7 +186,7 @@
           "topics": [],
           "visibility": "public",
           "forks": 0,
-          "open_issues": 28,
+          "open_issues": 29,
           "watchers": 1,
           "default_branch": "main"
         }
@@ -284,8 +284,8 @@
           "releases_url": "https://api.github.com/repos/thekevinscott/willfire/releases{/id}",
           "deployments_url": "https://api.github.com/repos/thekevinscott/willfire/deployments",
           "created_at": "2026-08-19T13:30:06Z",
-          "updated_at": "2026-09-25T10:28:25Z",
-          "pushed_at": "2026-09-25T10:46:35Z",
+          "updated_at": "2026-09-25T10:48:16Z",
+          "pushed_at": "2026-09-25T10:50:24Z",
           "git_url": "git://github.com/thekevinscott/willfire.git",
           "ssh_url": "git@github.com:thekevinscott/willfire.git",
           "clone_url": "https://github.com/thekevinscott/willfire.git",
@@ -305,7 +305,7 @@
           "mirror_url": null,
           "archived": false,
           "disabled": false,
-          "open_issues_count": 28,
+          "open_issues_count": 29,
           "license": {
             "key": "mit",
             "name": "MIT License",
@@ -321,7 +321,7 @@
           "topics": [],
           "visibility": "public",
           "forks": 0,
-          "open_issues": 28,
+          "open_issues": 29,
           "watchers": 1,
           "default_branch": "main"
         }
@@ -534,37 +534,37 @@
       "ref": "main"
     },
     "result": {
-      "sha": "7907ab562889ed006644cd32d501c18e325436c9",
-      "node_id": "C_kwDOT9j2e9oAKDc5MDdhYjU2Mjg4OWVkMDA2NjQ0Y2QzMmQ1MDFjMThlMzI1NDM2Yzk",
+      "sha": "1776d75fae1725d91de07acce9c57ad88ee0011f",
+      "node_id": "C_kwDOT9j2e9oAKDE3NzZkNzVmYWUxNzI1ZDkxZGUwN2FjY2U5YzU3YWQ4OGVlMDAxMWY",
       "commit": {
         "author": {
           "name": "Kevin Scott",
           "email": "151596+thekevinscott@users.noreply.github.com",
-          "date": "2026-09-25T10:28:20Z"
+          "date": "2026-09-25T10:48:11Z"
         },
         "committer": {
           "name": "GitHub",
           "email": "noreply@github.com",
-          "date": "2026-09-25T10:28:20Z"
+          "date": "2026-09-25T10:48:11Z"
         },
-        "message": "Merge pull request #275 from thekevinscott/test/capture-fixtures-group-c\n\nCapture the testing-conventions#694 e2e response; report why the other group-C cases cannot be captured",
+        "message": "Merge pull request #277 from thekevinscott/docs/no-unknowns\n\nState the contract: an exact list of strings, zero unknowns",
         "tree": {
-          "sha": "f95c820e2b5b1a744db934f9836accc33400276f",
-          "url": "https://api.github.com/repos/thekevinscott/willfire/git/trees/f95c820e2b5b1a744db934f9836accc33400276f"
+          "sha": "defad2d8775b1a0df5bae96bfaa724d116159db6",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/git/trees/defad2d8775b1a0df5bae96bfaa724d116159db6"
         },
-        "url": "https://api.github.com/repos/thekevinscott/willfire/git/commits/7907ab562889ed006644cd32d501c18e325436c9",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/git/commits/1776d75fae1725d91de07acce9c57ad88ee0011f",
         "comment_count": 0,
         "verification": {
           "verified": true,
           "reason": "valid",
-          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqtkzECRC1aQ7uu5UhlAAAS9kQAIiV1cObtH3It0c4oiNuz9Mj\nhmUvqo0+paCCev6pRcUp0/QCMpzHz5Y4Y0hBmB+jDLnGQGiB+8r+Vqirjyt3oQ2a\nWL+VYwzcbrdsIQDWFG32f8jkvz2FrRZ6LeFSeDLg1IUrcfs3sQfgVWRlNFH48RGG\nzjJ/fViprYjelDFxdiyzjfFS432hjWJC6W1Rl8jz05DWzM1qTHgWdtpuXmo9KYnB\nXAGwsHljcnf9kIhZQTzTZm44OH9e+819PI0J3AxlSvnbUFjGU16l4S6QkiZqWb3p\naO5VpKSuXqyHOIr4ojntC/W8+4OfRpzWC0VEle8SZqP/wYqC04WPVaWKNVYc17jN\nGDEa1bMjhAahNhIyTRnAjmRcGNhEnrVu1xrpqNvPzu4XODWva0wjxFSmDxOKqVK4\nBS9HP8oaCJ7YjRf4Rn/ShLSrzg4uYRbVkAD/GeiPsgRDNnCK9lJtW1knPUxt2xoQ\nVdKOQ+nJ6ttc3RgWkPIArrVTF8BPhtw/0BEkbxemiSDQYd5vs+V2nbczTWj7xDUG\n8k1AswFOG0x5ueubhM8oSZZD5+YBWiDlRyqUrCcG2QcYG5XfLzoxGWzUuzBtTyp3\nFddfqrh7Iu0WNQoe9O7Hbp6cGO+uMswiD2GYCGgyIoR/5WRAXCgVBZIRP7jlxqdl\nszfH0T/jB+YGfrZ2eVe/\n=Lclr\n-----END PGP SIGNATURE-----\n",
-          "payload": "tree f95c820e2b5b1a744db934f9836accc33400276f\nparent 5a25e03737b172031e33f9197fe2137a0239a690\nparent e058ae9511cb321bc4a1d17811ec5c4c3181ed70\nauthor Kevin Scott <151596+thekevinscott@users.noreply.github.com> 1790332100 -0400\ncommitter GitHub <noreply@github.com> 1790332100 -0400\n\nMerge pull request #275 from thekevinscott/test/capture-fixtures-group-c\n\nCapture the testing-conventions#694 e2e response; report why the other group-C cases cannot be captured",
-          "verified_at": "2026-09-25T10:28:21Z"
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqtlFrCRC1aQ7uu5UhlAAAoQ8QAAToXS9qhCmGUZrSWllAPgZU\nQ2xT4HC80SB3lhMLpxy5hNEoIK1EF33y5RpbgUzw1PkHcG1ZQakrQ/hGFwwuFFWg\nzd1osuANsOS/DjK+W3Bo1CrsHOrLRFshovLyv41oY7i9eiYELcd2fM+l29wremG3\nebx4YdG4yl22trKQUlr47qq1tKr8UD0Y+/Oo8XHrixw9CGECdIb7j0SjQ9GOLysv\n016Bai4q0YPx7zmU611B/9n01WI/x6EQesYgSg2IacJuMuFL/0OWDRY/l3/CurHs\n7I95d1oXumDN4rnXKYpK2r5uj3jGwW0jph+f+5u1iyuAjAIn14JTiVQGPYRIpvak\npFpN25G63Fs2mzjpErtLEEzsVvRp6z+PlN+eF7TH1NxZpmvUoDkrvM7H/eYnXVD5\nKOxuKRGYjONlaYv9ztjWDEH//xIsg/yocg3NjtlP1fgVSYnL6yLeVozCNMfaflLN\nU1Ey5J74rkB1c8EsIXHDpLyTsediSg+ZciCnB+KbDXpVg1xSg/XyLHZEB6/FIxEx\nLP6sZ3ykIiohOP2ViCtNAOcuecKYybABG5Y//ZWwp+0d45LmgHdXF0lnQXXlOPcJ\ngv3LhtJfhbvNzA7KN9mj67B3EynXMbpQTgru/S4lL/SnaSWTqLjVcO3FgM5SkBro\nI1kwOZFKh/3kARRRuH7g\n=iqrI\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree defad2d8775b1a0df5bae96bfaa724d116159db6\nparent 7907ab562889ed006644cd32d501c18e325436c9\nparent 00423b5f6b6452e8b77dce2ed5d5528b460ce7b4\nauthor Kevin Scott <151596+thekevinscott@users.noreply.github.com> 1790333291 -0400\ncommitter GitHub <noreply@github.com> 1790333291 -0400\n\nMerge pull request #277 from thekevinscott/docs/no-unknowns\n\nState the contract: an exact list of strings, zero unknowns",
+          "verified_at": "2026-09-25T10:48:11Z"
         }
       },
-      "url": "https://api.github.com/repos/thekevinscott/willfire/commits/7907ab562889ed006644cd32d501c18e325436c9",
-      "html_url": "https://github.com/thekevinscott/willfire/commit/7907ab562889ed006644cd32d501c18e325436c9",
-      "comments_url": "https://api.github.com/repos/thekevinscott/willfire/commits/7907ab562889ed006644cd32d501c18e325436c9/comments",
+      "url": "https://api.github.com/repos/thekevinscott/willfire/commits/1776d75fae1725d91de07acce9c57ad88ee0011f",
+      "html_url": "https://github.com/thekevinscott/willfire/commit/1776d75fae1725d91de07acce9c57ad88ee0011f",
+      "comments_url": "https://api.github.com/repos/thekevinscott/willfire/commits/1776d75fae1725d91de07acce9c57ad88ee0011f/comments",
       "author": {
         "login": "thekevinscott",
         "id": 151596,
@@ -609,33 +609,45 @@
       },
       "parents": [
         {
-          "sha": "5a25e03737b172031e33f9197fe2137a0239a690",
-          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/5a25e03737b172031e33f9197fe2137a0239a690",
-          "html_url": "https://github.com/thekevinscott/willfire/commit/5a25e03737b172031e33f9197fe2137a0239a690"
+          "sha": "7907ab562889ed006644cd32d501c18e325436c9",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/7907ab562889ed006644cd32d501c18e325436c9",
+          "html_url": "https://github.com/thekevinscott/willfire/commit/7907ab562889ed006644cd32d501c18e325436c9"
         },
         {
-          "sha": "e058ae9511cb321bc4a1d17811ec5c4c3181ed70",
-          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/e058ae9511cb321bc4a1d17811ec5c4c3181ed70",
-          "html_url": "https://github.com/thekevinscott/willfire/commit/e058ae9511cb321bc4a1d17811ec5c4c3181ed70"
+          "sha": "00423b5f6b6452e8b77dce2ed5d5528b460ce7b4",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/00423b5f6b6452e8b77dce2ed5d5528b460ce7b4",
+          "html_url": "https://github.com/thekevinscott/willfire/commit/00423b5f6b6452e8b77dce2ed5d5528b460ce7b4"
         }
       ],
       "stats": {
-        "total": 1,
-        "additions": 1,
-        "deletions": 0
+        "total": 12,
+        "additions": 6,
+        "deletions": 6
       },
       "files": [
         {
-          "sha": "dd99116ff2ada2c0e7dd327dfa1a28810c7e3985",
-          "filename": "tests/e2e/responses/thekevinscott/testing-conventions/694/fixture.json",
-          "status": "added",
+          "sha": "7af14a374961ae6cc5a2ac4cec2a92c73edb9e05",
+          "filename": "AGENTS.md",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/thekevinscott/willfire/blob/1776d75fae1725d91de07acce9c57ad88ee0011f/AGENTS.md",
+          "raw_url": "https://github.com/thekevinscott/willfire/raw/1776d75fae1725d91de07acce9c57ad88ee0011f/AGENTS.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/AGENTS.md?ref=1776d75fae1725d91de07acce9c57ad88ee0011f",
+          "patch": "@@ -27,11 +27,11 @@ under `tests/fixtures/willrun-probe/` are the record, and `setup-probe.sh` pushe\n them. Changing one of those assertions is a claim that GitHub's behavior\n changed — verify it against a real PR before you do.\n \n-`unknown` is the honest answer for anything undecidable from the workflow files\n-alone (a runtime-computed matrix, a cross-repo reusable workflow). Do not guess\n-in order to make an entry look decided. It is job-level only: `Entry` is a\n-closed union and the workflow-level variant has no `unknown`, because every\n-workflow-level verdict is decidable. Do not widen it back.\n+willfire MUST return the exact list of check-name strings, with zero\n+`unknown`s. Anything it cannot decide — a runtime-computed matrix, an\n+unreadable cross-repo workflow — throws an explicit error naming what it could\n+not decide. Never guess a name to make an entry look decided; never emit an\n+`unknown` verdict or add one to `Entry`.\n \n ## e2e attestations\n "
+        },
+        {
+          "sha": "a9063844ddcaba337650d570da91389abb989e97",
+          "filename": "GOALS.md",
+          "status": "modified",
           "additions": 1,
-          "deletions": 0,
-          "changes": 1,
-          "blob_url": "https://github.com/thekevinscott/willfire/blob/7907ab562889ed006644cd32d501c18e325436c9/tests%2Fe2e%2Fresponses%2Fthekevinscott%2Ftesting-conventions%2F694%2Ffixture.json",
-          "raw_url": "https://github.com/thekevinscott/willfire/raw/7907ab562889ed006644cd32d501c18e325436c9/tests%2Fe2e%2Fresponses%2Fthekevinscott%2Ftesting-conventions%2F694%2Ffixture.json",
-          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/tests%2Fe2e%2Fresponses%2Fthekevinscott%2Ftesting-conventions%2F694%2Ffixture.json?ref=7907ab562889ed006644cd32d501c18e325436c9",
-          "patch": "@@ -0,0 +1 @@\n+[\"Build\",\"Build + smoke\",\"Build the CLI from HEAD (hermetic)\",\"CI Gate\",\"Colocated test (packages/node/src) / Detect requested languages with sources\",\"Colocated test (packages/node/src) / Static checks (typescript)\",\"E2E attestation (packages/node) / Detect requested languages with sources\",\"E2E attestation (packages/node) / E2E attestation freshness (e2e verify)\",\"Integration + e2e tests + coverage (100%)\",\"Lint\",\"Lint (fmt + clippy)\",\"Shipped reusable workflow over the Python plugin source / CHANGELOG + MIGRATIONS touched\",\"Shipped reusable workflow over the Python plugin source / Detect requested languages with sources\",\"Shipped reusable workflow over the Python plugin source / Packaging (no test files in the built artifact)\",\"Shipped reusable workflow over the Python plugin source / Static checks (python)\",\"Shipped reusable workflow over the Python plugin source / Unit mutation — changed lines (python)\",\"Shipped reusable workflow over the Python plugin source / Unit-test coverage (python)\",\"Shipped reusable workflow over the Python plugin source / Unit-test coverage — changed lines (python)\",\"Shipped reusable workflow over the detect action's package / CHANGELOG + MIGRATIONS touched\",\"Shipped reusable workflow over the detect action's package / Detect requested languages with sources\",\"Shipped reusable workflow over the detect action's package / Packaging (no test files in the built artifact)\",\"Shipped reusable workflow over the detect action's package / Static checks (python)\",\"Shipped reusable workflow over the detect action's package / Unit mutation — changed lines (python)\",\"Shipped reusable workflow over the detect action's package / Unit-test coverage (python)\",\"Shipped reusable workflow over the detect action's package / Unit-test coverage — changed lines (python)\",\"Shipped reusable workflow over the move-major-tag helper / CHANGELOG + MIGRATIONS touched\",\"Shipped reusable workflow over the move-major-tag helper / Detect requested languages with sources\",\"Shipped reusable workflow over the move-major-tag helper / Packaging (no test files in the built artifact)\",\"Shipped reusable workflow over the move-major-tag helper / Static checks (python)\",\"Shipped reusable workflow over the move-major-tag helper / Unit mutation — changed lines (python)\",\"Shipped reusable workflow over the move-major-tag helper / Unit-test coverage (python)\",\"Shipped reusable workflow over the move-major-tag helper / Unit-test coverage — changed lines (python)\",\"Shipped reusable workflow over the self-test checks package / CHANGELOG + MIGRATIONS touched\",\"Shipped reusable workflow over the self-test checks package / Detect requested languages with sources\",\"Shipped reusable workflow over the self-test checks package / Packaging (no test files in the built artifact)\",\"Shipped reusable workflow over the self-test checks package / Static checks (python)\",\"Shipped reusable workflow over the self-test checks package / Unit mutation — changed lines (python)\",\"Shipped reusable workflow over the self-test checks package / Unit-test coverage (python)\",\"Shipped reusable workflow over the self-test checks package / Unit-test coverage — changed lines (python)\",\"Test\",\"Typecheck\",\"Unit lint (packages/node/src) / Detect requested languages with sources\",\"Unit lint (packages/node/src) / Static checks (typescript)\",\"Unit tests\",\"Windows checkout path budget\",\"putitoutthere check\",\"tc-checks — unit + e2e\"]"
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/thekevinscott/willfire/blob/1776d75fae1725d91de07acce9c57ad88ee0011f/GOALS.md",
+          "raw_url": "https://github.com/thekevinscott/willfire/raw/1776d75fae1725d91de07acce9c57ad88ee0011f/GOALS.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/GOALS.md?ref=1776d75fae1725d91de07acce9c57ad88ee0011f",
+          "patch": "@@ -8,5 +8,5 @@ Design goals for `willfire` include:\n 2. **No repo knowledge in willfire.** `willfire` is a general tool and must not encode any consumer's internals or repositories.\n 3. **No configuration required.**\n 4. **Speed.** The job should execute as fast as is possible. Instant is ideal, and should be strived for.\n-5. **No static artifacts, written or read.** `willfire` persists nothing and depends on nothing persisted. A run reads the repo and GitHub's API, answers, and leaves nothing behind but the answer; scratch space is ephemeral and is cleaned up. No consumer is ever asked to commit an artifact for `willfire`'s benefit, or to keep one current. Runtime-computed values follow from this: a matrix or a job output is computed at prediction time or reported `unknown`, never snapshotted into a committed artifact and read back. Snapshots drift, and a stale one produces a confidently wrong prediction instead of an honest `unknown`.\n+5. **No static artifacts, written or read.** `willfire` persists nothing and depends on nothing persisted. A run reads the repo and GitHub's API, answers, and leaves nothing behind but the answer; scratch space is ephemeral and is cleaned up. No consumer is ever asked to commit an artifact for `willfire`'s benefit, or to keep one current. Runtime-computed values follow from this: a matrix or a job output is computed at prediction time, never snapshotted into a committed artifact and read back. Snapshots drift, and a stale one produces a confidently wrong prediction.\n 6. **One level of configuration.** Anything a consumer configures is declared in exactly one place. A config artifact at one level that only takes effect because of a declaration at another — an `eslint.json` in a repo that never declares eslint as a dependency — is two levels, and forbidden."
         }
       ]
     }
