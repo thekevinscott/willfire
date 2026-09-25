@@ -1,22 +1,24 @@
 # Capturing an integration fixture
 
-A fixture is two halves recorded from GitHub in one sitting: every
-`GithubClient` call a live prediction made, and the check list GitHub actually
-dispatched. The second half is the ground truth the first is measured against,
-so it is read from the Actions API, never from willfire's own answer.
+A capture is two recordings taken from GitHub in one sitting, landed in
+`fixtures/<owner>/<repo>/<pr>/`:
 
-`fixtures/<owner>/<repo>/<pr>/fixture.json`:
+- `calls.json` — every `GithubClient` call a live prediction made, verbatim.
+- `fixture.json` — the check names GitHub actually dispatched: a bare JSON
+  array of strings, deduplicated and sorted. Ground truth, read from the
+  Actions API, never from willfire's own answer. Same format as
+  `tests/e2e/responses/`; both suites load it through `tests/getResponse.ts`.
 
 ```json
-{
-  "dispatched": [
-    { "workflow": ".github/workflows/pr-monitor.yml", "name": "CI Gate", "conclusion": "success" }
-  ],
-  "calls": [{ "method": "getPull", "params": {}, "result": null }]
-}
+["CI Gate", "conventions / Static checks (typescript)"]
 ```
 
-Discovery keys on `fixture.json`, so a directory holding only a `README.md` is
+JSON has no `ArrayBuffer`, so a binary result (`downloadTarball`) is recorded
+in `calls.json` as `{ "$binary": "tarball-0.bin" }` with the bytes in a
+sibling file; `getCalls` reads the reference back into an `ArrayBuffer` at
+replay, and a missing sibling fails loudly.
+
+Discovery keys on `fixture.json`, so a directory holding only READMEs is
 inert until the capture lands.
 
 ## Pick the pull request
@@ -44,22 +46,24 @@ await predict(recording, `${owner}/${repo}`, pr);
 
 Record `params` exactly as passed. `replayClient` keys on the method plus its
 params sorted by key, so property order cannot decide whether a lookup hits;
-an unrecorded call throws rather than answering a default.
+an unrecorded call throws rather than answering a default. Before writing
+`calls.json`, swap each `ArrayBuffer` result for a `$binary` reference and
+write the bytes beside it.
 
 ## Read the dispatched list
 
 Runs hang off the pull request's **head** commit, not the test merge commit
-willfire reads workflow files from.
+willfire reads workflow files from. No `event=` filter: filtering to
+`pull_request` drops `pull_request_target`, `push`, and `merge_group` runs.
 
 ```sh
-gh api "repos/$OWNER/$REPO/actions/runs?head_sha=$HEAD_SHA&event=pull_request" \
-  --paginate --jq '.workflow_runs[] | "\(.id) \(.path)"'
+gh api "repos/$OWNER/$REPO/actions/runs?head_sha=$HEAD_SHA" \
+  --paginate --jq '.workflow_runs[].id'
 gh api "repos/$OWNER/$REPO/actions/runs/$RUN_ID/jobs" \
-  --paginate --jq '.jobs[] | "\(.name) \(.conclusion)"'
+  --paginate --jq '.jobs[].name'
 ```
 
-One `dispatched` row per job: the run's `path` is `workflow`, the job's `name`
-and `conclusion` are the other two.
+`fixture.json` is those job names, deduplicated and sorted.
 
 ## Re-record, never edit
 
