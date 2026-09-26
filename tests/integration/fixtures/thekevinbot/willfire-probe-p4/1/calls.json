@@ -1,0 +1,818 @@
+[
+  {
+    "method": "getPull",
+    "params": {
+      "owner": "thekevinbot",
+      "repo": "willfire-probe-p4",
+      "pull_number": 1
+    },
+    "result": {
+      "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/pulls/1",
+      "id": 4648361369,
+      "node_id": "PR_kwDOUtK_xM8AAAABFRBdmQ",
+      "html_url": "https://github.com/thekevinbot/willfire-probe-p4/pull/1",
+      "diff_url": "https://github.com/thekevinbot/willfire-probe-p4/pull/1.diff",
+      "patch_url": "https://github.com/thekevinbot/willfire-probe-p4/pull/1.patch",
+      "issue_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/issues/1",
+      "number": 1,
+      "state": "open",
+      "locked": false,
+      "title": "probe: P4 (throwaway)",
+      "user": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "body": "Dispatch probe for case P4 (workflow disabled in the Actions tab). Captured then deleted with the repo.",
+      "created_at": "2026-09-26T16:53:47Z",
+      "updated_at": "2026-09-26T16:53:47Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "4f675da151388f03acf4c49d23d722b471194bba",
+      "assignees": [],
+      "requested_reviewers": [],
+      "requested_teams": [],
+      "labels": [],
+      "milestone": null,
+      "draft": false,
+      "commits_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/pulls/1/commits",
+      "review_comments_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/pulls/1/comments",
+      "review_comment_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/pulls/comments{/number}",
+      "comments_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/issues/1/comments",
+      "statuses_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/statuses/f22360fa4dd809fb713894a7f283fdf66cc8bccd",
+      "head": {
+        "label": "thekevinbot:probe/p4",
+        "ref": "probe/p4",
+        "sha": "f22360fa4dd809fb713894a7f283fdf66cc8bccd",
+        "user": {
+          "login": "thekevinbot",
+          "id": 248217931,
+          "node_id": "U_kgDODsuBSw",
+          "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinbot",
+          "html_url": "https://github.com/thekevinbot",
+          "followers_url": "https://api.github.com/users/thekevinbot/followers",
+          "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+          "repos_url": "https://api.github.com/users/thekevinbot/repos",
+          "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1389543364,
+          "node_id": "R_kgDOUtK_xA",
+          "name": "willfire-probe-p4",
+          "full_name": "thekevinbot/willfire-probe-p4",
+          "private": true,
+          "owner": {
+            "login": "thekevinbot",
+            "id": 248217931,
+            "node_id": "U_kgDODsuBSw",
+            "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinbot",
+            "html_url": "https://github.com/thekevinbot",
+            "followers_url": "https://api.github.com/users/thekevinbot/followers",
+            "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+            "repos_url": "https://api.github.com/users/thekevinbot/repos",
+            "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinbot/willfire-probe-p4",
+          "description": "ephemeral probe: P4 workflow disabled in Actions tab",
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4",
+          "forks_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/forks",
+          "keys_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/events",
+          "assignees_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/merges",
+          "archive_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/deployments",
+          "created_at": "2026-09-26T16:52:48Z",
+          "updated_at": "2026-09-26T16:53:05Z",
+          "pushed_at": "2026-09-26T16:53:46Z",
+          "git_url": "git://github.com/thekevinbot/willfire-probe-p4.git",
+          "ssh_url": "git@github.com:thekevinbot/willfire-probe-p4.git",
+          "clone_url": "https://github.com/thekevinbot/willfire-probe-p4.git",
+          "svn_url": "https://github.com/thekevinbot/willfire-probe-p4",
+          "homepage": null,
+          "size": 0,
+          "stargazers_count": 0,
+          "watchers_count": 0,
+          "language": null,
+          "has_issues": true,
+          "has_projects": true,
+          "has_downloads": false,
+          "has_wiki": false,
+          "has_pages": false,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 1,
+          "license": null,
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [],
+          "visibility": "private",
+          "forks": 0,
+          "open_issues": 1,
+          "watchers": 0,
+          "default_branch": "main"
+        }
+      },
+      "base": {
+        "label": "thekevinbot:main",
+        "ref": "main",
+        "sha": "a4d4c0f4972cd4687f0b008134d47e20da41437f",
+        "user": {
+          "login": "thekevinbot",
+          "id": 248217931,
+          "node_id": "U_kgDODsuBSw",
+          "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinbot",
+          "html_url": "https://github.com/thekevinbot",
+          "followers_url": "https://api.github.com/users/thekevinbot/followers",
+          "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+          "repos_url": "https://api.github.com/users/thekevinbot/repos",
+          "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1389543364,
+          "node_id": "R_kgDOUtK_xA",
+          "name": "willfire-probe-p4",
+          "full_name": "thekevinbot/willfire-probe-p4",
+          "private": true,
+          "owner": {
+            "login": "thekevinbot",
+            "id": 248217931,
+            "node_id": "U_kgDODsuBSw",
+            "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinbot",
+            "html_url": "https://github.com/thekevinbot",
+            "followers_url": "https://api.github.com/users/thekevinbot/followers",
+            "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+            "repos_url": "https://api.github.com/users/thekevinbot/repos",
+            "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinbot/willfire-probe-p4",
+          "description": "ephemeral probe: P4 workflow disabled in Actions tab",
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4",
+          "forks_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/forks",
+          "keys_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/events",
+          "assignees_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/merges",
+          "archive_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/deployments",
+          "created_at": "2026-09-26T16:52:48Z",
+          "updated_at": "2026-09-26T16:53:05Z",
+          "pushed_at": "2026-09-26T16:53:46Z",
+          "git_url": "git://github.com/thekevinbot/willfire-probe-p4.git",
+          "ssh_url": "git@github.com:thekevinbot/willfire-probe-p4.git",
+          "clone_url": "https://github.com/thekevinbot/willfire-probe-p4.git",
+          "svn_url": "https://github.com/thekevinbot/willfire-probe-p4",
+          "homepage": null,
+          "size": 0,
+          "stargazers_count": 0,
+          "watchers_count": 0,
+          "language": null,
+          "has_issues": true,
+          "has_projects": true,
+          "has_downloads": false,
+          "has_wiki": false,
+          "has_pages": false,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 1,
+          "license": null,
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [],
+          "visibility": "private",
+          "forks": 0,
+          "open_issues": 1,
+          "watchers": 0,
+          "default_branch": "main"
+        }
+      },
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/pulls/1"
+        },
+        "html": {
+          "href": "https://github.com/thekevinbot/willfire-probe-p4/pull/1"
+        },
+        "issue": {
+          "href": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/issues/1"
+        },
+        "comments": {
+          "href": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/issues/1/comments"
+        },
+        "review_comments": {
+          "href": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/pulls/1/comments"
+        },
+        "review_comment": {
+          "href": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/pulls/comments{/number}"
+        },
+        "commits": {
+          "href": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/pulls/1/commits"
+        },
+        "statuses": {
+          "href": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/statuses/f22360fa4dd809fb713894a7f283fdf66cc8bccd"
+        }
+      },
+      "author_association": "OWNER",
+      "auto_merge": null,
+      "assignee": null,
+      "active_lock_reason": null,
+      "merged": false,
+      "mergeable": true,
+      "rebaseable": true,
+      "mergeable_state": "clean",
+      "merged_by": null,
+      "comments": 0,
+      "review_comments": 0,
+      "maintainer_can_modify": false,
+      "commits": 1,
+      "additions": 1,
+      "deletions": 0,
+      "changed_files": 1
+    }
+  },
+  {
+    "method": "listPullFiles",
+    "params": {
+      "owner": "thekevinbot",
+      "repo": "willfire-probe-p4",
+      "pull_number": 1
+    },
+    "result": [
+      {
+        "sha": "0835e4f9714005ed591f68d306eea0d6d2ae8fd7",
+        "filename": "probe.txt",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0,
+        "changes": 1,
+        "blob_url": "https://github.com/thekevinbot/willfire-probe-p4/blob/f22360fa4dd809fb713894a7f283fdf66cc8bccd/probe.txt",
+        "raw_url": "https://github.com/thekevinbot/willfire-probe-p4/raw/f22360fa4dd809fb713894a7f283fdf66cc8bccd/probe.txt",
+        "contents_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/contents/probe.txt?ref=f22360fa4dd809fb713894a7f283fdf66cc8bccd",
+        "patch": "@@ -0,0 +1 @@\n+change"
+      }
+    ]
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinbot",
+      "repo": "willfire-probe-p4",
+      "ref": "4f675da151388f03acf4c49d23d722b471194bba"
+    },
+    "result": {
+      "sha": "4f675da151388f03acf4c49d23d722b471194bba",
+      "node_id": "C_kwDOUtK_xNoAKDRmNjc1ZGExNTEzODhmMDNhY2Y0YzQ5ZDIzZDcyMmI0NzExOTRiYmE",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-26T16:53:48Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-09-26T16:53:48Z"
+        },
+        "message": "Merge f22360fa4dd809fb713894a7f283fdf66cc8bccd into a4d4c0f4972cd4687f0b008134d47e20da41437f",
+        "tree": {
+          "sha": "a814cdfa864549879ffef857225b06460bfdf95b",
+          "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/trees/a814cdfa864549879ffef857225b06460bfdf95b"
+        },
+        "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/commits/4f675da151388f03acf4c49d23d722b471194bba",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqt/icCRC1aQ7uu5UhlAAAihoQAHBQqmgQwRpci4QyGHc0sYtj\nBzg+wF158NyWQWxwetjwj45OLKY0mWEybd1RC0AO1ZqCTiRbPSPsyNA43rza5iDF\nCCU0B+S6cSX2FLG/G+9qBqVKVg8f5ha3aDrn6yXjy1vYGEudQ11/WpiGGW9AnETz\nCeessnQzDDz8SnoNE3eLaxXN8tKL9Hd0FF68iuMkMLWjZpykLTdsXXGgSFosCz0v\npyQFwLYhlAdyI71ewb7VSTpMaqfr8Av/Yfv0lswXiniZXwP77/pXsC/kH5ajy/jx\n4Ed2BRVdW8dWf3BqPBUc+ibTBbaHd6eTavc8oZlIm6QjaLYCEtCZgX8At6/UR9fZ\nuf5nlWUvmrG9dFI9cd0mCIaL67yMSFkWeYmqciXvh5TNoEafXNMACnUwbNyGlWgk\nDliqiPNlQH9R7r5+AdrP6Nfx+G7DFuTVkm7xzULuL8KK9m1u+fZhLtGoYQs5V4gU\nMfx3kQtRxQRzXGR5B/YuAC703ZOCBjBn/1dpFffIDy+lV/9HsC9AtHpmVLLgCFVd\nvRDUi+mxiwtigbDPz4Kv2w2c+/Cog0kKJKmcwPtT3eUQsmhpbW1PtHhkSXEHUOlx\nMmmG0NQEtO7Armc+oMx0LKnQOCAEsiULQSMiwuQiYWx4tQyBQPg/id7EqlMoRJ4u\n8zqAvVcF0phrrzhKuf4i\n=tl5z\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree a814cdfa864549879ffef857225b06460bfdf95b\nparent a4d4c0f4972cd4687f0b008134d47e20da41437f\nparent f22360fa4dd809fb713894a7f283fdf66cc8bccd\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790441628 -0400\ncommitter GitHub <noreply@github.com> 1790441628 -0400\n\nMerge f22360fa4dd809fb713894a7f283fdf66cc8bccd into a4d4c0f4972cd4687f0b008134d47e20da41437f\n",
+          "verified_at": "2026-09-26T16:53:49Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/commits/4f675da151388f03acf4c49d23d722b471194bba",
+      "html_url": "https://github.com/thekevinbot/willfire-probe-p4/commit/4f675da151388f03acf4c49d23d722b471194bba",
+      "comments_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/commits/4f675da151388f03acf4c49d23d722b471194bba/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "a4d4c0f4972cd4687f0b008134d47e20da41437f",
+          "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/commits/a4d4c0f4972cd4687f0b008134d47e20da41437f",
+          "html_url": "https://github.com/thekevinbot/willfire-probe-p4/commit/a4d4c0f4972cd4687f0b008134d47e20da41437f"
+        },
+        {
+          "sha": "f22360fa4dd809fb713894a7f283fdf66cc8bccd",
+          "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/commits/f22360fa4dd809fb713894a7f283fdf66cc8bccd",
+          "html_url": "https://github.com/thekevinbot/willfire-probe-p4/commit/f22360fa4dd809fb713894a7f283fdf66cc8bccd"
+        }
+      ],
+      "stats": {
+        "total": 1,
+        "additions": 1,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "0835e4f9714005ed591f68d306eea0d6d2ae8fd7",
+          "filename": "probe.txt",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinbot/willfire-probe-p4/blob/4f675da151388f03acf4c49d23d722b471194bba/probe.txt",
+          "raw_url": "https://github.com/thekevinbot/willfire-probe-p4/raw/4f675da151388f03acf4c49d23d722b471194bba/probe.txt",
+          "contents_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/contents/probe.txt?ref=4f675da151388f03acf4c49d23d722b471194bba",
+          "patch": "@@ -0,0 +1 @@\n+change"
+        }
+      ]
+    }
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinbot",
+      "repo": "willfire-probe-p4",
+      "ref": "main"
+    },
+    "result": {
+      "sha": "a4d4c0f4972cd4687f0b008134d47e20da41437f",
+      "node_id": "C_kwDOUtK_xNoAKGE0ZDRjMGY0OTcyY2Q0Njg3ZjBiMDA4MTM0ZDQ3ZTIwZGE0MTQzN2Y",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-26T16:53:01Z"
+        },
+        "committer": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-26T16:53:01Z"
+        },
+        "message": "seed: two pull_request workflows",
+        "tree": {
+          "sha": "d1791e3edf3974293b983da61bca93795247b731",
+          "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/trees/d1791e3edf3974293b983da61bca93795247b731"
+        },
+        "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/commits/a4d4c0f4972cd4687f0b008134d47e20da41437f",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCgAdFiEEnU3Dh/cnWdmpxUeIBqUoxO3sGUIFAmq3+G0ACgkQBqUoxO3s\nGUJzEQ//Z6o70pHjDQn3tMHqF6cnGCcsh/8UWJFioCXNdf7mY97XcMUobyVS0K54\nG6NxkARLqBJOgrf1fJNmqmb8fv9bBCkI+us2dBXEMc0Ymk35s2jhj112YM8vchQ2\nfizJMNoqJFW2e7g/IBsARIT0zGiRc+kGcVlafn8zTU3pnWJoLP3RMJmWLNOBSpYB\nmkmgVfhUV1MlIfeN1bJWvNilwfef3MMbJ+C0dyEAPy/DBD760TdmTWEQjznIf7yn\nE6YeqXw48fPD/j3J9HvubH7/EymP3zV0wOMz+/IerK+9d9BEr0f+aqgh1N0Sshdh\nPaqNHDqhHYo0c2ilTPe1Vfm1AHlTAZ2r0LXHxIqqASQzumV7ypyHqwhv8Jh8DKuA\nppzgu6VnYnxjNi35ISDBfCFo/+gB/DbumbuNLKmiQpEAZ9Qaixr/B3zyLyFLdjxT\n7fVkf7LJAvYrM7az7Z5yVihCrJexMTxvRUyTnpPhAV61LVf+8kIiRkqeUwbWjHJ5\nL6pewVyRKfGdU445qY7a3U8LHUl/sRVPrQHFUJDgsPI3CTGgFmN4a8TMvjzzgcsT\nKHV+P42cJac8MxWm6QHgkR4K/AWkObr2RurFydf4c0IIkQlTxvZ94RIIK729+Y9X\n3Wjr3pqKpnp+xD7klBm9BEvVjjwkNEnAOYtib77GLxahxAZb+EY=\n=Kuso\n-----END PGP SIGNATURE-----",
+          "payload": "tree d1791e3edf3974293b983da61bca93795247b731\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790441581 -0400\ncommitter thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790441581 -0400\n\nseed: two pull_request workflows\n",
+          "verified_at": "2026-09-26T16:53:02Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/commits/a4d4c0f4972cd4687f0b008134d47e20da41437f",
+      "html_url": "https://github.com/thekevinbot/willfire-probe-p4/commit/a4d4c0f4972cd4687f0b008134d47e20da41437f",
+      "comments_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/commits/a4d4c0f4972cd4687f0b008134d47e20da41437f/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [],
+      "stats": {
+        "total": 15,
+        "additions": 15,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "76bf6ca4de44bbd93c86e253567fc2e3bc1ac5c5",
+          "filename": ".github/workflows/probe-disabled.yml",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/thekevinbot/willfire-probe-p4/blob/a4d4c0f4972cd4687f0b008134d47e20da41437f/.github%2Fworkflows%2Fprobe-disabled.yml",
+          "raw_url": "https://github.com/thekevinbot/willfire-probe-p4/raw/a4d4c0f4972cd4687f0b008134d47e20da41437f/.github%2Fworkflows%2Fprobe-disabled.yml",
+          "contents_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/contents/.github%2Fworkflows%2Fprobe-disabled.yml?ref=a4d4c0f4972cd4687f0b008134d47e20da41437f",
+          "patch": "@@ -0,0 +1,7 @@\n+name: probe-disabled\n+on: pull_request\n+jobs:\n+  disabled-job:\n+    runs-on: ubuntu-latest\n+    steps:\n+      - run: echo disabled"
+        },
+        {
+          "sha": "8ae8d230b9ede594a8fc27da60448271e8067bb1",
+          "filename": ".github/workflows/probe-enabled.yml",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/thekevinbot/willfire-probe-p4/blob/a4d4c0f4972cd4687f0b008134d47e20da41437f/.github%2Fworkflows%2Fprobe-enabled.yml",
+          "raw_url": "https://github.com/thekevinbot/willfire-probe-p4/raw/a4d4c0f4972cd4687f0b008134d47e20da41437f/.github%2Fworkflows%2Fprobe-enabled.yml",
+          "contents_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/contents/.github%2Fworkflows%2Fprobe-enabled.yml?ref=a4d4c0f4972cd4687f0b008134d47e20da41437f",
+          "patch": "@@ -0,0 +1,7 @@\n+name: probe-enabled\n+on: pull_request\n+jobs:\n+  enabled-job:\n+    runs-on: ubuntu-latest\n+    steps:\n+      - run: echo enabled"
+        },
+        {
+          "sha": "da0c4eb8d9a48d171a33574b380752e183286751",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinbot/willfire-probe-p4/blob/a4d4c0f4972cd4687f0b008134d47e20da41437f/README.md",
+          "raw_url": "https://github.com/thekevinbot/willfire-probe-p4/raw/a4d4c0f4972cd4687f0b008134d47e20da41437f/README.md",
+          "contents_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/contents/README.md?ref=a4d4c0f4972cd4687f0b008134d47e20da41437f",
+          "patch": "@@ -0,0 +1 @@\n+probe"
+        }
+      ]
+    }
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinbot",
+      "repo": "willfire-probe-p4",
+      "ref": "f22360fa4dd809fb713894a7f283fdf66cc8bccd"
+    },
+    "result": {
+      "sha": "f22360fa4dd809fb713894a7f283fdf66cc8bccd",
+      "node_id": "C_kwDOUtK_xNoAKGYyMjM2MGZhNGRkODA5ZmI3MTM4OTRhN2YyODNmZGY2NmNjOGJjY2Q",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-26T16:53:45Z"
+        },
+        "committer": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-26T16:53:45Z"
+        },
+        "message": "probe: touch a file",
+        "tree": {
+          "sha": "a814cdfa864549879ffef857225b06460bfdf95b",
+          "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/trees/a814cdfa864549879ffef857225b06460bfdf95b"
+        },
+        "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/commits/f22360fa4dd809fb713894a7f283fdf66cc8bccd",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCgAdFiEEnU3Dh/cnWdmpxUeIBqUoxO3sGUIFAmq3+JkACgkQBqUoxO3s\nGUJTjxAAjvqgnFgHm8vs61V66RUi8Odnn7SIasHmkJv/zsHraGaNCpih+5Tgf7F/\nDk9ML+EvHLhY9LKg58rVQKJ/CvIV4qHK+rHsshHAgUOO3ckel73YbLy9+9NfjDw5\noaOjtoRgb2GOrqO1cAM54ZO6gk1G2OhO2OKLH3Usz7v6oAVgLNv+tRxFcKM6YAU0\nHsu6Bk7IUmkGkIk9zJh/vnNHI7pfCyFKjmbNipM6n2cJz5Cym9YJXKtZAB18kJ4O\nyj1A3XTP53B31dbnq5KxIh4IcVXNDe3x2AhapX6Fu3/+yt8V/YmOFg9tUoyVypN/\nNheuFKMefXcn8GbJZsQ1g/qmoDbJfVXXkaDpEVC51Zd5yRtE/McLtsc4GfRUqgBX\nx1BfWftpI59XHsvW0u3qPYRmuEpA+MfogNPY5umI9qW/DQi536iLuAH5MreXW6I5\n2XzqMVuR8pkn6ZRWC42wQBjI2srA/hQZjEiRognK3vsiYxq1Ss4NfgyTfva+ddHS\nZNqwmf/9bYbLf37YNUvDDsU2ex+QdAanDUsp0yZWFNNbFRFz1rjmwudtgSz5ueaZ\nuSW2B1IBUWCBzc48EG7QD/Ia/oID1A+0DnwlVGBnQfR892m81dgcrUiokczeO6ib\nf4IJLdmEbzQj2pyCH2TzrljQNjW+lX2gbDVhJ0QuKlj7q4kVPcQ=\n=g1I6\n-----END PGP SIGNATURE-----",
+          "payload": "tree a814cdfa864549879ffef857225b06460bfdf95b\nparent a4d4c0f4972cd4687f0b008134d47e20da41437f\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790441625 -0400\ncommitter thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790441625 -0400\n\nprobe: touch a file\n",
+          "verified_at": "2026-09-26T16:53:47Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/commits/f22360fa4dd809fb713894a7f283fdf66cc8bccd",
+      "html_url": "https://github.com/thekevinbot/willfire-probe-p4/commit/f22360fa4dd809fb713894a7f283fdf66cc8bccd",
+      "comments_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/commits/f22360fa4dd809fb713894a7f283fdf66cc8bccd/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "a4d4c0f4972cd4687f0b008134d47e20da41437f",
+          "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/commits/a4d4c0f4972cd4687f0b008134d47e20da41437f",
+          "html_url": "https://github.com/thekevinbot/willfire-probe-p4/commit/a4d4c0f4972cd4687f0b008134d47e20da41437f"
+        }
+      ],
+      "stats": {
+        "total": 1,
+        "additions": 1,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "0835e4f9714005ed591f68d306eea0d6d2ae8fd7",
+          "filename": "probe.txt",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinbot/willfire-probe-p4/blob/f22360fa4dd809fb713894a7f283fdf66cc8bccd/probe.txt",
+          "raw_url": "https://github.com/thekevinbot/willfire-probe-p4/raw/f22360fa4dd809fb713894a7f283fdf66cc8bccd/probe.txt",
+          "contents_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/contents/probe.txt?ref=f22360fa4dd809fb713894a7f283fdf66cc8bccd",
+          "patch": "@@ -0,0 +1 @@\n+change"
+        }
+      ]
+    }
+  },
+  {
+    "method": "listWorkflows",
+    "params": {
+      "owner": "thekevinbot",
+      "repo": "willfire-probe-p4"
+    },
+    "result": [
+      {
+        "id": 367824371,
+        "node_id": "W_kwDOUtK_xM4V7I3z",
+        "name": "probe-disabled",
+        "path": ".github/workflows/probe-disabled.yml",
+        "state": "disabled_manually",
+        "created_at": "2026-09-26T12:53:02.000-04:00",
+        "updated_at": "2026-09-26T12:53:33.000-04:00",
+        "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/actions/workflows/367824371",
+        "html_url": "https://github.com/thekevinbot/willfire-probe-p4/blob/main/.github/workflows/probe-disabled.yml",
+        "badge_url": "https://github.com/thekevinbot/willfire-probe-p4/workflows/probe-disabled/badge.svg"
+      },
+      {
+        "id": 367824372,
+        "node_id": "W_kwDOUtK_xM4V7I30",
+        "name": "probe-enabled",
+        "path": ".github/workflows/probe-enabled.yml",
+        "state": "active",
+        "created_at": "2026-09-26T12:53:02.000-04:00",
+        "updated_at": "2026-09-26T12:53:02.000-04:00",
+        "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/actions/workflows/367824372",
+        "html_url": "https://github.com/thekevinbot/willfire-probe-p4/blob/main/.github/workflows/probe-enabled.yml",
+        "badge_url": "https://github.com/thekevinbot/willfire-probe-p4/workflows/probe-enabled/badge.svg"
+      }
+    ]
+  },
+  {
+    "method": "listWorkflowFiles",
+    "params": {
+      "owner": "thekevinbot",
+      "repo": "willfire-probe-p4",
+      "ref": "4f675da151388f03acf4c49d23d722b471194bba"
+    },
+    "result": [
+      {
+        "name": "probe-disabled.yml",
+        "path": ".github/workflows/probe-disabled.yml",
+        "sha": "76bf6ca4de44bbd93c86e253567fc2e3bc1ac5c5",
+        "size": 125,
+        "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/contents/.github/workflows/probe-disabled.yml?ref=4f675da151388f03acf4c49d23d722b471194bba",
+        "html_url": "https://github.com/thekevinbot/willfire-probe-p4/blob/4f675da151388f03acf4c49d23d722b471194bba/.github/workflows/probe-disabled.yml",
+        "git_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/blobs/76bf6ca4de44bbd93c86e253567fc2e3bc1ac5c5",
+        "download_url": "https://raw.githubusercontent.com/thekevinbot/willfire-probe-p4/4f675da151388f03acf4c49d23d722b471194bba/.github/workflows/probe-disabled.yml?token=B3FYCS2OXY443WCXX3UTVYLKW75A3AA",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/contents/.github/workflows/probe-disabled.yml?ref=4f675da151388f03acf4c49d23d722b471194bba",
+          "git": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/blobs/76bf6ca4de44bbd93c86e253567fc2e3bc1ac5c5",
+          "html": "https://github.com/thekevinbot/willfire-probe-p4/blob/4f675da151388f03acf4c49d23d722b471194bba/.github/workflows/probe-disabled.yml"
+        }
+      },
+      {
+        "name": "probe-enabled.yml",
+        "path": ".github/workflows/probe-enabled.yml",
+        "sha": "8ae8d230b9ede594a8fc27da60448271e8067bb1",
+        "size": 122,
+        "url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/contents/.github/workflows/probe-enabled.yml?ref=4f675da151388f03acf4c49d23d722b471194bba",
+        "html_url": "https://github.com/thekevinbot/willfire-probe-p4/blob/4f675da151388f03acf4c49d23d722b471194bba/.github/workflows/probe-enabled.yml",
+        "git_url": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/blobs/8ae8d230b9ede594a8fc27da60448271e8067bb1",
+        "download_url": "https://raw.githubusercontent.com/thekevinbot/willfire-probe-p4/4f675da151388f03acf4c49d23d722b471194bba/.github/workflows/probe-enabled.yml?token=B3FYCSY2RV5FQF4EPB52XQDKW75A3AA",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/contents/.github/workflows/probe-enabled.yml?ref=4f675da151388f03acf4c49d23d722b471194bba",
+          "git": "https://api.github.com/repos/thekevinbot/willfire-probe-p4/git/blobs/8ae8d230b9ede594a8fc27da60448271e8067bb1",
+          "html": "https://github.com/thekevinbot/willfire-probe-p4/blob/4f675da151388f03acf4c49d23d722b471194bba/.github/workflows/probe-enabled.yml"
+        }
+      }
+    ]
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinbot",
+      "repo": "willfire-probe-p4",
+      "path": ".github/workflows/probe-enabled.yml",
+      "ref": "4f675da151388f03acf4c49d23d722b471194bba"
+    },
+    "result": "name: probe-enabled\non: pull_request\njobs:\n  enabled-job:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo enabled\n"
+  }
+]
