@@ -1,0 +1,17 @@
+name: probe-d7
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/probe-*.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  d7:
+    name: d7
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo d7

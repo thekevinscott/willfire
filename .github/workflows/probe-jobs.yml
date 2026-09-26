@@ -1,0 +1,42 @@
+name: probe-jobs
+
+on:
+  pull_request: {}
+
+permissions:
+  contents: read
+
+jobs:
+  j3:
+    name: j3
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        letter: [a, b, c]
+    steps:
+      - run: echo j3 ${{ matrix.letter }}
+  j4:
+    name: j4
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        letter: [a, b]
+        number: [1, 2, 3]
+    steps:
+      - run: echo j4 ${{ matrix.letter }} ${{ matrix.number }}
+  j8-skipped:
+    name: j8-skipped
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo j8-skipped
+  j8-needs:
+    name: j8-needs
+    needs: [j8-skipped]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo j8-needs

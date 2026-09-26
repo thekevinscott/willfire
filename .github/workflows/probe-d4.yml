@@ -1,0 +1,16 @@
+name: probe-d4
+
+on:
+  pull_request:
+    types: [edited]
+
+permissions:
+  contents: read
+
+jobs:
+  d4:
+    name: d4
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo d4
