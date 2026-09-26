@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*willfire#34)\"",
+  "ran_at": 1790271142,
+  "exit_code": 0,
+  "commit": "62414635df41f8b536cd9db62921ce6156ac18b5",
+  "branch": "fix/pin-callbacks-232"
+}
