@@ -561,7 +561,7 @@ describe("willfire", () => {
       mergeable: false,
     });
 
-    expect(prediction.checkNames).toEqual([]);
+    expect(prediction).toEqual({ entries: [], checkNames: [], skip: null, sources: [] });
   });
 
   it("continues predicting while GitHub is still computing mergeability", async () => {

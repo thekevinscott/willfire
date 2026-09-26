@@ -158,6 +158,7 @@ describe("root barrel", () => {
       ): Promise<{
         base: { ref: string };
         merge_commit_sha: string | null;
+        mergeable: boolean | null;
         commits: number;
         head: { sha: string };
         user: { login: string };
