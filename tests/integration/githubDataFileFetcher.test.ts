@@ -3,7 +3,7 @@ import { predict } from "willfire";
 import { discoverCases } from "../cases.js";
 import { getResponse } from "../getResponse.js";
 import { getCalls } from "./getCalls.js";
-import { replayClient } from "./replayClient.js";
+import { replayClient } from "./mocks/replayClient.js";
 
 const CASES = discoverCases(new URL("./fixtures/", import.meta.url));
 
