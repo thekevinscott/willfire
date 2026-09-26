@@ -1071,7 +1071,7 @@ describe("github.repository as a prediction-wide fact", () => {
       },
     });
     const { checkNames } = await willfire(fakeGithub({ contents: { [WF]: wf } }), "o/r", 1);
-    expect(checkNames).toEqual(["hermetic"]);
+    expect(checkNames).toEqual(["hermetic", "published"]);
   });
 
   it("carries the fact across a reusable workflow call", async () => {
@@ -1107,7 +1107,7 @@ describe("github.actor as a prediction-wide fact", () => {
       1,
       { action: "opened" },
     );
-    expect(checkNames).toEqual(["bot"]);
+    expect(checkNames).toEqual(["bot", "human"]);
   });
 
   it("leaves the guard undecided on `synchronize`, where the actor is the pusher", async () => {
