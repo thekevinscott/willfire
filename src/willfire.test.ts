@@ -92,6 +92,8 @@ interface Fixture {
   tarballs?: Record<string, Uint8Array<ArrayBuffer>>;
   /** The PR's `merge_commit_sha` — its test merge. Absent means null. */
   mergeSha?: string | null;
+  /** GitHub's mergeability verdict; null while the mergeability check is pending. */
+  mergeable?: boolean | null;
   /** Parent shas by commit sha, via `getCommit`. Unlisted: no parents. */
   parents?: Record<string, string[]>;
   /** Open PRs, for the stack walk's `listPulls` lookup by head branch. */
@@ -144,6 +146,7 @@ function fakeGithub(f: Fixture): GithubClient {
         base: { ref: f.baseRef ?? "main" },
         head: { sha: HEAD_SHA },
         merge_commit_sha: f.mergeSha ?? null,
+        mergeable: f.mergeable ?? null,
         user: { login: f.author ?? "octocat" },
       };
     },
@@ -553,6 +556,22 @@ describe("workflow-level verdicts", () => {
 // ------------------------------------------------------------- repo-level pipeline
 
 describe("willfire", () => {
+  it("predicts no checks when GitHub reports the pull request is unmergeable", async () => {
+    const prediction = await run("on: pull_request\njobs:\n  build:\n    runs-on: ubuntu-latest\n", {
+      mergeable: false,
+    });
+
+    expect(prediction.checkNames).toEqual([]);
+  });
+
+  it("continues predicting while GitHub is still computing mergeability", async () => {
+    const prediction = await run("on: pull_request\njobs:\n  build:\n    runs-on: ubuntu-latest\n", {
+      mergeable: null,
+    });
+
+    expect(prediction.checkNames).toEqual(["build"]);
+  });
+
   it("reports a disabled workflow as no-dispatch without reading the file", async () => {
     const github = fakeGithub({
       workflows: [{ path: WF, state: "disabled_manually" }],

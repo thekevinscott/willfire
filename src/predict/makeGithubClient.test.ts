@@ -70,6 +70,7 @@ describe("makeGithubClient", () => {
       base: { ref: "main" },
       head: { sha: "abc" },
       merge_commit_sha: null,
+      mergeable: null,
       user: { login: "octocat" },
     };
     stage(json(pr));

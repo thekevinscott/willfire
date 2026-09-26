@@ -88,6 +88,7 @@ describe("root barrel", () => {
       getPull: async () => ({
         base: { ref: "main" },
         merge_commit_sha: null,
+        mergeable: null,
         commits: 1,
         head: { sha: "abc" },
         user: { login: "octocat" },
@@ -109,6 +110,7 @@ describe("root barrel", () => {
     await expect(client.getPull({ owner: "o", repo: "r", pull_number: 1 })).resolves.toEqual({
       base: { ref: "main" },
       merge_commit_sha: null,
+      mergeable: null,
       commits: 1,
       head: { sha: "abc" },
       user: { login: "octocat" },
