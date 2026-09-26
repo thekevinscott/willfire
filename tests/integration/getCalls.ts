@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { RecordedCall } from "./replayClient.js";
+import type { RecordedCall } from "./mocks/replayClient.js";
 
 // JSON has no ArrayBuffer, so a binary result is recorded as a reference to a
 // sibling file holding the bytes.
