@@ -1,0 +1,9 @@
+name: probe-cross-repo-gates
+on: pull_request
+jobs:
+  conventions:
+    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0
+    with:
+      languages: '["python"]'
+      source: src
+      gates: '["colocated-test", "one-function-per-file", "unit-lint", "unit-coverage", "integration-lint", "mutation", "packaging", "e2e-verify"]'
