@@ -1,0 +1,1207 @@
+[
+  {
+    "method": "getPull",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "pull_number": 25
+    },
+    "result": {
+      "url": "https://api.github.com/repos/thekevinscott/curtaincall/pulls/25",
+      "id": 4324920419,
+      "node_id": "PR_kwDORRBpPc8AAAABAckMYw",
+      "html_url": "https://github.com/thekevinscott/curtaincall/pull/25",
+      "diff_url": "https://github.com/thekevinscott/curtaincall/pull/25.diff",
+      "patch_url": "https://github.com/thekevinscott/curtaincall/pull/25.patch",
+      "issue_url": "https://api.github.com/repos/thekevinscott/curtaincall/issues/25",
+      "number": 25,
+      "state": "closed",
+      "locked": false,
+      "title": "ci: cancel superseded CI Gate runs, normalize the timeout",
+      "user": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "body": "Adds a `concurrency:` group to the `CI Gate` workflow, and normalizes\n`timeout-minutes`.\n\n**Concurrency.** Push a new commit to a PR and the running gate job keeps going.\nIt resolved its target SHA at startup, so it spends the rest of its life polling\nfor runs on a commit nobody cares about any more, holding a runner the whole\ntime. `cancel-in-progress` kills it when its replacement starts. The group keys\non `github.ref`, which for a `pull_request` event is `refs/pull/N/merge` — so\nit scopes per PR and never cancels across PRs.\n\nThree repos (dirsql, willfire, github-data-file-fetcher) already had this from\nan earlier rollout. This brings the other eleven in line.\n\n**Timeout.** Settling the fleet on a single rule: 20 minutes, raised only where\nthe measured slowest non-gate `pull_request` run gets close. The only repo that\nqualifies is putitoutthere at 16 minutes, which stays at 30. dirsql, willfire\nand github-data-file-fetcher drop from 45 to 20 — their slowest observed runs\nare 7 minutes, under 1 minute, and none-at-all respectively, so 45 just meant a\nwedged gate burned twice as long before anyone noticed.\n\nNo change to gating behavior.\n",
+      "created_at": "2026-08-20T16:56:03Z",
+      "updated_at": "2026-08-20T16:59:57Z",
+      "closed_at": "2026-08-20T16:59:55Z",
+      "merged_at": "2026-08-20T16:59:55Z",
+      "merge_commit_sha": "e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+      "assignees": [],
+      "requested_reviewers": [],
+      "requested_teams": [],
+      "labels": [],
+      "milestone": null,
+      "draft": false,
+      "commits_url": "https://api.github.com/repos/thekevinscott/curtaincall/pulls/25/commits",
+      "review_comments_url": "https://api.github.com/repos/thekevinscott/curtaincall/pulls/25/comments",
+      "review_comment_url": "https://api.github.com/repos/thekevinscott/curtaincall/pulls/comments{/number}",
+      "comments_url": "https://api.github.com/repos/thekevinscott/curtaincall/issues/25/comments",
+      "statuses_url": "https://api.github.com/repos/thekevinscott/curtaincall/statuses/298d1fb00baa4f0dab49efe006bca115dcc34739",
+      "head": {
+        "label": "thekevinscott:ci/gate-concurrency",
+        "ref": "ci/gate-concurrency",
+        "sha": "298d1fb00baa4f0dab49efe006bca115dcc34739",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1158703421,
+          "node_id": "R_kgDORRBpPQ",
+          "name": "curtaincall",
+          "full_name": "thekevinscott/curtaincall",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/curtaincall",
+          "description": "Testing library for terminal applications. pytest plugin with auto-waiting assertions, locators, and snapshot testing.",
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/curtaincall",
+          "forks_url": "https://api.github.com/repos/thekevinscott/curtaincall/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/curtaincall/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/curtaincall/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/curtaincall/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/curtaincall/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/curtaincall/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/curtaincall/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/curtaincall/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/curtaincall/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/curtaincall/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/curtaincall/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/curtaincall/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/curtaincall/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/curtaincall/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/curtaincall/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/curtaincall/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/curtaincall/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/curtaincall/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/curtaincall/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/curtaincall/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/curtaincall/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/curtaincall/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/curtaincall/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/curtaincall/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/curtaincall/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/curtaincall/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/curtaincall/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/curtaincall/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/curtaincall/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/curtaincall/deployments",
+          "created_at": "2026-02-15T19:40:18Z",
+          "updated_at": "2026-08-20T17:07:44Z",
+          "pushed_at": "2026-08-23T22:12:33Z",
+          "git_url": "git://github.com/thekevinscott/curtaincall.git",
+          "ssh_url": "git@github.com:thekevinscott/curtaincall.git",
+          "clone_url": "https://github.com/thekevinscott/curtaincall.git",
+          "svn_url": "https://github.com/thekevinscott/curtaincall",
+          "homepage": "https://thekevinscott.github.io/curtaincall/",
+          "size": 167,
+          "stargazers_count": 0,
+          "watchers_count": 0,
+          "language": "Python",
+          "has_issues": true,
+          "has_projects": true,
+          "has_downloads": false,
+          "has_wiki": false,
+          "has_pages": true,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 6,
+          "license": null,
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [],
+          "visibility": "public",
+          "forks": 0,
+          "open_issues": 6,
+          "watchers": 0,
+          "default_branch": "main"
+        }
+      },
+      "base": {
+        "label": "thekevinscott:main",
+        "ref": "main",
+        "sha": "d0412f4f9133086d0815d31341d6296bdfa0dd42",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1158703421,
+          "node_id": "R_kgDORRBpPQ",
+          "name": "curtaincall",
+          "full_name": "thekevinscott/curtaincall",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/curtaincall",
+          "description": "Testing library for terminal applications. pytest plugin with auto-waiting assertions, locators, and snapshot testing.",
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/curtaincall",
+          "forks_url": "https://api.github.com/repos/thekevinscott/curtaincall/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/curtaincall/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/curtaincall/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/curtaincall/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/curtaincall/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/curtaincall/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/curtaincall/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/curtaincall/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/curtaincall/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/curtaincall/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/curtaincall/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/curtaincall/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/curtaincall/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/curtaincall/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/curtaincall/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/curtaincall/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/curtaincall/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/curtaincall/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/curtaincall/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/curtaincall/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/curtaincall/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/curtaincall/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/curtaincall/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/curtaincall/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/curtaincall/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/curtaincall/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/curtaincall/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/curtaincall/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/curtaincall/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/curtaincall/deployments",
+          "created_at": "2026-02-15T19:40:18Z",
+          "updated_at": "2026-08-20T17:07:44Z",
+          "pushed_at": "2026-08-23T22:12:33Z",
+          "git_url": "git://github.com/thekevinscott/curtaincall.git",
+          "ssh_url": "git@github.com:thekevinscott/curtaincall.git",
+          "clone_url": "https://github.com/thekevinscott/curtaincall.git",
+          "svn_url": "https://github.com/thekevinscott/curtaincall",
+          "homepage": "https://thekevinscott.github.io/curtaincall/",
+          "size": 167,
+          "stargazers_count": 0,
+          "watchers_count": 0,
+          "language": "Python",
+          "has_issues": true,
+          "has_projects": true,
+          "has_downloads": false,
+          "has_wiki": false,
+          "has_pages": true,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 6,
+          "license": null,
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [],
+          "visibility": "public",
+          "forks": 0,
+          "open_issues": 6,
+          "watchers": 0,
+          "default_branch": "main"
+        }
+      },
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/thekevinscott/curtaincall/pulls/25"
+        },
+        "html": {
+          "href": "https://github.com/thekevinscott/curtaincall/pull/25"
+        },
+        "issue": {
+          "href": "https://api.github.com/repos/thekevinscott/curtaincall/issues/25"
+        },
+        "comments": {
+          "href": "https://api.github.com/repos/thekevinscott/curtaincall/issues/25/comments"
+        },
+        "review_comments": {
+          "href": "https://api.github.com/repos/thekevinscott/curtaincall/pulls/25/comments"
+        },
+        "review_comment": {
+          "href": "https://api.github.com/repos/thekevinscott/curtaincall/pulls/comments{/number}"
+        },
+        "commits": {
+          "href": "https://api.github.com/repos/thekevinscott/curtaincall/pulls/25/commits"
+        },
+        "statuses": {
+          "href": "https://api.github.com/repos/thekevinscott/curtaincall/statuses/298d1fb00baa4f0dab49efe006bca115dcc34739"
+        }
+      },
+      "author_association": "COLLABORATOR",
+      "auto_merge": null,
+      "assignee": null,
+      "active_lock_reason": null,
+      "merged": true,
+      "mergeable": null,
+      "rebaseable": null,
+      "mergeable_state": "unknown",
+      "merged_by": {
+        "login": "thekevinscott",
+        "id": 151596,
+        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinscott",
+        "html_url": "https://github.com/thekevinscott",
+        "followers_url": "https://api.github.com/users/thekevinscott/followers",
+        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+        "repos_url": "https://api.github.com/users/thekevinscott/repos",
+        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "comments": 0,
+      "review_comments": 0,
+      "maintainer_can_modify": false,
+      "commits": 1,
+      "additions": 5,
+      "deletions": 0,
+      "changed_files": 1
+    }
+  },
+  {
+    "method": "listPullFiles",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "pull_number": 25
+    },
+    "result": [
+      {
+        "sha": "225f22a7eb479eaa26a132d472db766262b0083f",
+        "filename": ".github/workflows/pr-monitor.yml",
+        "status": "modified",
+        "additions": 5,
+        "deletions": 0,
+        "changes": 5,
+        "blob_url": "https://github.com/thekevinscott/curtaincall/blob/298d1fb00baa4f0dab49efe006bca115dcc34739/.github%2Fworkflows%2Fpr-monitor.yml",
+        "raw_url": "https://github.com/thekevinscott/curtaincall/raw/298d1fb00baa4f0dab49efe006bca115dcc34739/.github%2Fworkflows%2Fpr-monitor.yml",
+        "contents_url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github%2Fworkflows%2Fpr-monitor.yml?ref=298d1fb00baa4f0dab49efe006bca115dcc34739",
+        "patch": "@@ -3,6 +3,11 @@ name: PR Monitor\n on:\n   pull_request:\n \n+concurrency:\n+  # A superseded gate run polls a stale SHA until it finishes. Cancel it.\n+  group: ${{ github.workflow }}-${{ github.ref }}\n+  cancel-in-progress: true\n+\n permissions:\n   actions: read\n   contents: read"
+      }
+    ]
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "ref": "e07c5fc088a41b3de835067baeb6d721b5c4cc42"
+    },
+    "result": {
+      "sha": "e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+      "node_id": "C_kwDORRBpPdoAKGUwN2M1ZmMwODhhNDFiM2RlODM1MDY3YmFlYjZkNzIxYjVjNGNjNDI",
+      "commit": {
+        "author": {
+          "name": "Kevin Scott",
+          "email": "151596+thekevinscott@users.noreply.github.com",
+          "date": "2026-08-20T16:59:55Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-08-20T16:59:55Z"
+        },
+        "message": "Merge pull request #25 from thekevinscott/ci/gate-concurrency\n\nci: cancel superseded CI Gate runs, normalize the timeout",
+        "tree": {
+          "sha": "078a25fd1dd3d641abc7a3eb0c034f4b5f11a0df",
+          "url": "https://api.github.com/repos/thekevinscott/curtaincall/git/trees/078a25fd1dd3d641abc7a3eb0c034f4b5f11a0df"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/git/commits/e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqhzKLCRC1aQ7uu5UhlAAAyb4QAHowUkay2upGlmrYCUJ6UnpZ\nD4KQHAmQSwXkLxq81zPEL+HChS+UYPP1Hk5dvSIG/wjxY8fdkknrF6LmsjyCV0kY\nzlh7c69rQEIZteJ6SpqzbMmLdms7hnpTQbmm6JnD4cLVCNnVZNMgKY1w9leNfe9Y\nPzTfMLEZjCctRdhf5CJmU3QDD1jL2qH2sQsdCUuoMfANa/D6DG1afDSiNTpr61HZ\npVXX2HpEWBynGYimQO8ghXImXJrz3sVO8uET26o2Z1oV5ganV1q1wEPKiPXhRvDY\nmDA7bTcpIAQuqO+/jtkutDEf1l2BK3sV9LMZGd7tr7nDuUWnWPTxONDt3mVgLzsM\nxLLX26e86XqpkTxsJk8+ytMUDjA02viV0U3w2KAoP51oZe4Ac4mBaZ4fJGPLOz9z\nSAjelA12YWZEXLh0i+m/VoU5MAEExr7Iaobjfsz3g0la+B92B8tPoDd+6o0L8d0j\nGIuGvjK3PYee+9ODJjNDX1oarNXWGf3F1V1Y8gxdk6pJX2vJiZiTVyCsnQrgGpOF\nC+w+WwtRAE5naa80CM7rkPBJrVxQfyv1YxICcUtzfdBb06wI52En2Tz6KmDWnvZa\nUkUwiV1Xrs0TUOmxNHscV+NIAFx0pBja4IPnSS5ZZB98kyYzI4gVwLccjNCnsfNr\n2H6wFDTMbb9cyP7NAEv8\n=t5Su\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 078a25fd1dd3d641abc7a3eb0c034f4b5f11a0df\nparent d0412f4f9133086d0815d31341d6296bdfa0dd42\nparent 298d1fb00baa4f0dab49efe006bca115dcc34739\nauthor Kevin Scott <151596+thekevinscott@users.noreply.github.com> 1787245195 -0400\ncommitter GitHub <noreply@github.com> 1787245195 -0400\n\nMerge pull request #25 from thekevinscott/ci/gate-concurrency\n\nci: cancel superseded CI Gate runs, normalize the timeout",
+          "verified_at": "2026-08-20T16:59:55Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/curtaincall/commits/e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+      "html_url": "https://github.com/thekevinscott/curtaincall/commit/e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+      "comments_url": "https://api.github.com/repos/thekevinscott/curtaincall/commits/e07c5fc088a41b3de835067baeb6d721b5c4cc42/comments",
+      "author": {
+        "login": "thekevinscott",
+        "id": 151596,
+        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinscott",
+        "html_url": "https://github.com/thekevinscott",
+        "followers_url": "https://api.github.com/users/thekevinscott/followers",
+        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+        "repos_url": "https://api.github.com/users/thekevinscott/repos",
+        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "d0412f4f9133086d0815d31341d6296bdfa0dd42",
+          "url": "https://api.github.com/repos/thekevinscott/curtaincall/commits/d0412f4f9133086d0815d31341d6296bdfa0dd42",
+          "html_url": "https://github.com/thekevinscott/curtaincall/commit/d0412f4f9133086d0815d31341d6296bdfa0dd42"
+        },
+        {
+          "sha": "298d1fb00baa4f0dab49efe006bca115dcc34739",
+          "url": "https://api.github.com/repos/thekevinscott/curtaincall/commits/298d1fb00baa4f0dab49efe006bca115dcc34739",
+          "html_url": "https://github.com/thekevinscott/curtaincall/commit/298d1fb00baa4f0dab49efe006bca115dcc34739"
+        }
+      ],
+      "stats": {
+        "total": 5,
+        "additions": 5,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "225f22a7eb479eaa26a132d472db766262b0083f",
+          "filename": ".github/workflows/pr-monitor.yml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github%2Fworkflows%2Fpr-monitor.yml",
+          "raw_url": "https://github.com/thekevinscott/curtaincall/raw/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github%2Fworkflows%2Fpr-monitor.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github%2Fworkflows%2Fpr-monitor.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+          "patch": "@@ -3,6 +3,11 @@ name: PR Monitor\n on:\n   pull_request:\n \n+concurrency:\n+  # A superseded gate run polls a stale SHA until it finishes. Cancel it.\n+  group: ${{ github.workflow }}-${{ github.ref }}\n+  cancel-in-progress: true\n+\n permissions:\n   actions: read\n   contents: read"
+        }
+      ]
+    }
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "ref": "main"
+    },
+    "result": {
+      "sha": "635c690b70607a2af3534c4b06445fbe079177bf",
+      "node_id": "C_kwDORRBpPdoAKDYzNWM2OTBiNzA2MDdhMmFmMzUzNGM0YjA2NDQ1ZmJlMDc5MTc3YmY",
+      "commit": {
+        "author": {
+          "name": "Kevin Scott",
+          "email": "151596+thekevinscott@users.noreply.github.com",
+          "date": "2026-08-20T17:01:08Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-08-20T17:01:08Z"
+        },
+        "message": "Merge pull request #22 from thekevinscott/dependabot/github_actions/actions/checkout-6\n\nci: bump actions/checkout from 4 to 7",
+        "tree": {
+          "sha": "2670e84558e63d695977a0835b86d27c495e2e33",
+          "url": "https://api.github.com/repos/thekevinscott/curtaincall/git/trees/2670e84558e63d695977a0835b86d27c495e2e33"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/git/commits/635c690b70607a2af3534c4b06445fbe079177bf",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqhzLUCRC1aQ7uu5UhlAAA6YYQABOCpfkcdM/dT2yTfSnzUGqv\nDgeBa+gDEIylAwwwR44h0xGfBI8w8vRCXUDI8LCo4RGKqjt6WvsRErRJ/VMYn4XW\nBeRkS3wJ3f0Sj8uB5qINMRgWveayJceBW6Rnq4TRTVIhUGqtToWFQBrxBMsgfbtD\nR69Etqx+q7DgCEu1OcuafsZ9bQQCbj9xToXPERoZVJZAoKofSIPFlvH6NuG+XP8v\nLrn7010fKYWlqD/JC46W4430ojUNGEUMkxs8R7v283aq5V4aGOTlnaimQUHeSqTe\n8dyyLOi2ff/IqkS3dc1pQQQAlrWyjJTwBbp9/MEupILxqy5cjovAwy7XdrjQZ//v\nt8bzYZ+UU2S0r25UIzkLtRVnVeHjHV8EEJnD6OKgaj9pXXR8JHWoCIQcYo3FOZke\nEbG0TdCD1KcZN9mz+azKfgO5XbSJ+0FDTOIY6zmxpEXAP70p1nnp+KTRHovrTKbe\n7kdUGGxmX+8/PYL8LdM9SvfHMqwP1LwGVhWRE6hQybWs3j5kibx9vxiORWxi6Q5P\nHlFdFCBfb8dQq5NyGu4yFqVflmomuy4n2Ul9efpJCg106kohMs0qdqAYd5SIiIMY\nMndad2Y80rSm2ap4o9g+78nW50nj/V1qp1Vf2p1rL77JmpdkAMGjipgbrPTtb3lc\nzMXHG8o5PHNq/uH6/Wxo\n=tYHm\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 2670e84558e63d695977a0835b86d27c495e2e33\nparent b1f5607d6506e4fcbefa80fa6649f70d62e6ddbb\nparent d9a1947d9eee7844944f25d312067c7ceece42f2\nauthor Kevin Scott <151596+thekevinscott@users.noreply.github.com> 1787245268 -0400\ncommitter GitHub <noreply@github.com> 1787245268 -0400\n\nMerge pull request #22 from thekevinscott/dependabot/github_actions/actions/checkout-6\n\nci: bump actions/checkout from 4 to 7",
+          "verified_at": "2026-08-20T17:01:09Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/curtaincall/commits/635c690b70607a2af3534c4b06445fbe079177bf",
+      "html_url": "https://github.com/thekevinscott/curtaincall/commit/635c690b70607a2af3534c4b06445fbe079177bf",
+      "comments_url": "https://api.github.com/repos/thekevinscott/curtaincall/commits/635c690b70607a2af3534c4b06445fbe079177bf/comments",
+      "author": {
+        "login": "thekevinscott",
+        "id": 151596,
+        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinscott",
+        "html_url": "https://github.com/thekevinscott",
+        "followers_url": "https://api.github.com/users/thekevinscott/followers",
+        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+        "repos_url": "https://api.github.com/users/thekevinscott/repos",
+        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "b1f5607d6506e4fcbefa80fa6649f70d62e6ddbb",
+          "url": "https://api.github.com/repos/thekevinscott/curtaincall/commits/b1f5607d6506e4fcbefa80fa6649f70d62e6ddbb",
+          "html_url": "https://github.com/thekevinscott/curtaincall/commit/b1f5607d6506e4fcbefa80fa6649f70d62e6ddbb"
+        },
+        {
+          "sha": "d9a1947d9eee7844944f25d312067c7ceece42f2",
+          "url": "https://api.github.com/repos/thekevinscott/curtaincall/commits/d9a1947d9eee7844944f25d312067c7ceece42f2",
+          "html_url": "https://github.com/thekevinscott/curtaincall/commit/d9a1947d9eee7844944f25d312067c7ceece42f2"
+        }
+      ],
+      "stats": {
+        "total": 20,
+        "additions": 10,
+        "deletions": 10
+      },
+      "files": [
+        {
+          "sha": "5e553c75b54cee2416d55df645e8e04868f8d236",
+          "filename": ".github/workflows/build.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/thekevinscott/curtaincall/blob/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Fbuild.yml",
+          "raw_url": "https://github.com/thekevinscott/curtaincall/raw/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Fbuild.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github%2Fworkflows%2Fbuild.yml?ref=635c690b70607a2af3534c4b06445fbe079177bf",
+          "patch": "@@ -19,7 +19,7 @@ jobs:\n   build:\n     runs-on: ubuntu-latest\n     steps:\n-      - uses: actions/checkout@v6\n+      - uses: actions/checkout@v7\n       - uses: astral-sh/setup-uv@v7\n       - run: uv sync --extra dev\n       - name: Build package"
+        },
+        {
+          "sha": "10f8adcb7ce3fab75e8de4accfabf33997e0695a",
+          "filename": ".github/workflows/changelog.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/thekevinscott/curtaincall/blob/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Fchangelog.yml",
+          "raw_url": "https://github.com/thekevinscott/curtaincall/raw/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Fchangelog.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github%2Fworkflows%2Fchangelog.yml?ref=635c690b70607a2af3534c4b06445fbe079177bf",
+          "patch": "@@ -8,7 +8,7 @@ jobs:\n   changelog:\n     runs-on: ubuntu-latest\n     steps:\n-      - uses: actions/checkout@v6\n+      - uses: actions/checkout@v7\n         with:\n           fetch-depth: 0\n       - name: Check CHANGELOG.md and MIGRATIONS.md requirements"
+        },
+        {
+          "sha": "a313acd9348e3202d69fd447343b405a2241abc6",
+          "filename": ".github/workflows/docs.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/thekevinscott/curtaincall/blob/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Fdocs.yml",
+          "raw_url": "https://github.com/thekevinscott/curtaincall/raw/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Fdocs.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github%2Fworkflows%2Fdocs.yml?ref=635c690b70607a2af3534c4b06445fbe079177bf",
+          "patch": "@@ -26,7 +26,7 @@ jobs:\n       url: ${{ steps.deployment.outputs.page_url }}\n     runs-on: ubuntu-latest\n     steps:\n-      - uses: actions/checkout@v6\n+      - uses: actions/checkout@v7\n       - uses: astral-sh/setup-uv@v7\n       - run: uv sync --extra docs\n       - run: uv run mkdocs build"
+        },
+        {
+          "sha": "810531d8eecc9bf3636f7ddab148be1e2e9047ae",
+          "filename": ".github/workflows/integration.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/thekevinscott/curtaincall/blob/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Fintegration.yml",
+          "raw_url": "https://github.com/thekevinscott/curtaincall/raw/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Fintegration.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github%2Fworkflows%2Fintegration.yml?ref=635c690b70607a2af3534c4b06445fbe079177bf",
+          "patch": "@@ -21,7 +21,7 @@ jobs:\n   integration:\n     runs-on: ubuntu-latest\n     steps:\n-      - uses: actions/checkout@v6\n+      - uses: actions/checkout@v7\n       - uses: astral-sh/setup-uv@v7\n       - run: uv sync --extra dev\n       - name: Run integration tests"
+        },
+        {
+          "sha": "5db8594e11c204c003d34e9333c7c2d2ccd3a000",
+          "filename": ".github/workflows/lint.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/thekevinscott/curtaincall/blob/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Flint.yml",
+          "raw_url": "https://github.com/thekevinscott/curtaincall/raw/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Flint.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github%2Fworkflows%2Flint.yml?ref=635c690b70607a2af3534c4b06445fbe079177bf",
+          "patch": "@@ -19,7 +19,7 @@ jobs:\n   lint:\n     runs-on: ubuntu-latest\n     steps:\n-      - uses: actions/checkout@v6\n+      - uses: actions/checkout@v7\n       - uses: astral-sh/setup-uv@v7\n       - run: uv sync --extra dev\n       - name: Lint"
+        },
+        {
+          "sha": "39388527059782d61811edc7a52049604c8ca57c",
+          "filename": ".github/workflows/release.yml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/thekevinscott/curtaincall/blob/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Frelease.yml",
+          "raw_url": "https://github.com/thekevinscott/curtaincall/raw/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Frelease.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github%2Fworkflows%2Frelease.yml?ref=635c690b70607a2af3534c4b06445fbe079177bf",
+          "patch": "@@ -24,7 +24,7 @@ jobs:\n     outputs:\n       matrix: ${{ steps.plan.outputs.matrix }}\n     steps:\n-      - uses: actions/checkout@v4\n+      - uses: actions/checkout@v7\n         with:\n           fetch-depth: 0\n       - id: plan\n@@ -47,7 +47,7 @@ jobs:\n     env:\n       SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CURTAINCALL: ${{ matrix.version }}\n     steps:\n-      - uses: actions/checkout@v4\n+      - uses: actions/checkout@v7\n         with:\n           fetch-depth: 0\n       - name: Setup Python\n@@ -73,7 +73,7 @@ jobs:\n       contents: write\n       id-token: write\n     steps:\n-      - uses: actions/checkout@v4\n+      - uses: actions/checkout@v7\n         with:\n           fetch-depth: 0\n       # PyPI publish shells out to `twine`. Hosted runners don't ship it;"
+        },
+        {
+          "sha": "b5a8ad124a21e4862eb5b74760ed6a9cec5fe24e",
+          "filename": ".github/workflows/security.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/thekevinscott/curtaincall/blob/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Fsecurity.yml",
+          "raw_url": "https://github.com/thekevinscott/curtaincall/raw/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Fsecurity.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github%2Fworkflows%2Fsecurity.yml?ref=635c690b70607a2af3534c4b06445fbe079177bf",
+          "patch": "@@ -17,7 +17,7 @@ jobs:\n   bandit:\n     runs-on: ubuntu-latest\n     steps:\n-      - uses: actions/checkout@v6\n+      - uses: actions/checkout@v7\n       - uses: astral-sh/setup-uv@v7\n       - run: uv sync --extra dev\n       - name: Run security scan"
+        },
+        {
+          "sha": "72b2c31d5cac2b84e1cfff2ee54d42c71d042052",
+          "filename": ".github/workflows/test.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/thekevinscott/curtaincall/blob/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Ftest.yml",
+          "raw_url": "https://github.com/thekevinscott/curtaincall/raw/635c690b70607a2af3534c4b06445fbe079177bf/.github%2Fworkflows%2Ftest.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github%2Fworkflows%2Ftest.yml?ref=635c690b70607a2af3534c4b06445fbe079177bf",
+          "patch": "@@ -22,7 +22,7 @@ jobs:\n       matrix:\n         python-version: [\"3.12\", \"3.13\"]\n     steps:\n-      - uses: actions/checkout@v6\n+      - uses: actions/checkout@v7\n       - uses: astral-sh/setup-uv@v7\n         with:\n           python-version: ${{ matrix.python-version }}"
+        }
+      ]
+    }
+  },
+  {
+    "method": "listPulls",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "state": "open",
+      "head": "thekevinscott:main"
+    },
+    "result": []
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "ref": "298d1fb00baa4f0dab49efe006bca115dcc34739"
+    },
+    "result": {
+      "sha": "298d1fb00baa4f0dab49efe006bca115dcc34739",
+      "node_id": "C_kwDORRBpPdoAKDI5OGQxZmIwMGJhYTRmMGRhYjQ5ZWZlMDA2YmNhMTE1ZGNjMzQ3Mzk",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-08-20T16:56:00Z"
+        },
+        "committer": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-08-20T16:56:00Z"
+        },
+        "message": "ci: cancel superseded CI Gate runs, normalize the timeout\n\nA gate job resolves its target SHA at startup, so once a new commit\nlands on the PR the old run just polls for runs on a commit nobody\ncares about, holding a runner until it finishes. The concurrency group\ncancels it when the replacement starts. Keyed on github.ref, which for\npull_request is refs/pull/N/merge, so it scopes per PR.\n\nTimeout settles on one fleet rule: 20 minutes, raised only where the\nmeasured slowest non-gate pull_request run gets close. putitoutthere is\nthe only repo that qualifies (16 min observed, stays at 30).\n\nSkip-Changelog: true\nSkip-Migration: true\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01GGUxA1SfkcFh4VbuQ9UExQ",
+        "tree": {
+          "sha": "078a25fd1dd3d641abc7a3eb0c034f4b5f11a0df",
+          "url": "https://api.github.com/repos/thekevinscott/curtaincall/git/trees/078a25fd1dd3d641abc7a3eb0c034f4b5f11a0df"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/git/commits/298d1fb00baa4f0dab49efe006bca115dcc34739",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCgAdFiEEnU3Dh/cnWdmpxUeIBqUoxO3sGUIFAmqHMaAACgkQBqUoxO3s\nGUKpnxAArvKn8+A4bSAdqyjD3WwIX9rw8bP2L6RqcA3pjBTLeve3+15A5JCHvDnN\ncdI1btzu1pgoW1rwB6WquW3btetH6FX91aJV4LvaoZUoNE4wuHwBA+H6hplcVMXL\nypTbBNDHiFPQcXKEoc45c7XTTvN9EaMcF6pxV539AoBJmjnPJ27+tjlxVTn5rEaz\nDaRzD7sJaHMfMmjAbOHj6PG2y21FByVQlhNhxnH39qzzEKRLc8KFYljnd9um8lSh\nN7Pmnu6ptF9rfNjJ2E387uUg/9k64b19ijXuE/ma73B7m+zvh5580I+CUB0bGmsJ\nzCmXbSxJGu3YhwOxLRHZVIVIQndPTZ/y7veaV56CI7uVIpI5OWoG/mQPbr/X2ALm\n0LK16ART49YwR7j65xUBi++OQeSKge5wDq6fIzyO6UcjfDbeaBEdoiITvu9borDA\ncIcx1+IH8eZ+0qdsFPLR3RnOG/XRJxCVs9hDO7BmtEjhsvAU1ql6h/5e59+jkfCW\nO+wmNjpkGbUB2qKrzvnuIvoZigVHSFOl//tbFTNAbqmxFZddIHf7fVnlKvKyNAnr\nB9L99HHXEkMN6fyXFeFtGO3OiZLgVanBqVouhN5yWC+Fi4dH+W9y+fWyrq1Bk6Yx\nfb1gUirg1H9G7s/kuWv9hDKuab2UkAf0nWuJC35tAVctZDJBoZs=\n=Lv3u\n-----END PGP SIGNATURE-----",
+          "payload": "tree 078a25fd1dd3d641abc7a3eb0c034f4b5f11a0df\nparent d0412f4f9133086d0815d31341d6296bdfa0dd42\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1787244960 -0400\ncommitter thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1787244960 -0400\n\nci: cancel superseded CI Gate runs, normalize the timeout\n\nA gate job resolves its target SHA at startup, so once a new commit\nlands on the PR the old run just polls for runs on a commit nobody\ncares about, holding a runner until it finishes. The concurrency group\ncancels it when the replacement starts. Keyed on github.ref, which for\npull_request is refs/pull/N/merge, so it scopes per PR.\n\nTimeout settles on one fleet rule: 20 minutes, raised only where the\nmeasured slowest non-gate pull_request run gets close. putitoutthere is\nthe only repo that qualifies (16 min observed, stays at 30).\n\nSkip-Changelog: true\nSkip-Migration: true\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01GGUxA1SfkcFh4VbuQ9UExQ\n",
+          "verified_at": "2026-08-20T16:56:03Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/curtaincall/commits/298d1fb00baa4f0dab49efe006bca115dcc34739",
+      "html_url": "https://github.com/thekevinscott/curtaincall/commit/298d1fb00baa4f0dab49efe006bca115dcc34739",
+      "comments_url": "https://api.github.com/repos/thekevinscott/curtaincall/commits/298d1fb00baa4f0dab49efe006bca115dcc34739/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "d0412f4f9133086d0815d31341d6296bdfa0dd42",
+          "url": "https://api.github.com/repos/thekevinscott/curtaincall/commits/d0412f4f9133086d0815d31341d6296bdfa0dd42",
+          "html_url": "https://github.com/thekevinscott/curtaincall/commit/d0412f4f9133086d0815d31341d6296bdfa0dd42"
+        }
+      ],
+      "stats": {
+        "total": 5,
+        "additions": 5,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "225f22a7eb479eaa26a132d472db766262b0083f",
+          "filename": ".github/workflows/pr-monitor.yml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/thekevinscott/curtaincall/blob/298d1fb00baa4f0dab49efe006bca115dcc34739/.github%2Fworkflows%2Fpr-monitor.yml",
+          "raw_url": "https://github.com/thekevinscott/curtaincall/raw/298d1fb00baa4f0dab49efe006bca115dcc34739/.github%2Fworkflows%2Fpr-monitor.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github%2Fworkflows%2Fpr-monitor.yml?ref=298d1fb00baa4f0dab49efe006bca115dcc34739",
+          "patch": "@@ -3,6 +3,11 @@ name: PR Monitor\n on:\n   pull_request:\n \n+concurrency:\n+  # A superseded gate run polls a stale SHA until it finishes. Cancel it.\n+  group: ${{ github.workflow }}-${{ github.ref }}\n+  cancel-in-progress: true\n+\n permissions:\n   actions: read\n   contents: read"
+        }
+      ]
+    }
+  },
+  {
+    "method": "listWorkflows",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall"
+    },
+    "result": [
+      {
+        "id": 234632795,
+        "node_id": "W_kwDORRBpPc4N_DZb",
+        "name": "Build",
+        "path": ".github/workflows/build.yml",
+        "state": "active",
+        "created_at": "2026-02-15T15:18:59.000-05:00",
+        "updated_at": "2026-02-15T15:18:59.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/actions/workflows/234632795",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/main/.github/workflows/build.yml",
+        "badge_url": "https://github.com/thekevinscott/curtaincall/workflows/Build/badge.svg"
+      },
+      {
+        "id": 266008331,
+        "node_id": "W_kwDORRBpPc4P2vcL",
+        "name": "Changelog",
+        "path": ".github/workflows/changelog.yml",
+        "state": "active",
+        "created_at": "2026-04-24T15:56:00.000-04:00",
+        "updated_at": "2026-04-24T18:46:05.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/actions/workflows/266008331",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/main/.github/workflows/changelog.yml",
+        "badge_url": "https://github.com/thekevinscott/curtaincall/workflows/Changelog/badge.svg"
+      },
+      {
+        "id": 234625766,
+        "node_id": "W_kwDORRBpPc4N_Brm",
+        "name": "Deploy docs",
+        "path": ".github/workflows/docs.yml",
+        "state": "active",
+        "created_at": "2026-02-15T14:41:53.000-05:00",
+        "updated_at": "2026-02-15T14:41:53.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/actions/workflows/234625766",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/main/.github/workflows/docs.yml",
+        "badge_url": "https://github.com/thekevinscott/curtaincall/workflows/Deploy%20docs/badge.svg"
+      },
+      {
+        "id": 234632796,
+        "node_id": "W_kwDORRBpPc4N_DZc",
+        "name": "Integration Tests",
+        "path": ".github/workflows/integration.yml",
+        "state": "active",
+        "created_at": "2026-02-15T15:18:59.000-05:00",
+        "updated_at": "2026-02-15T15:18:59.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/actions/workflows/234632796",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/main/.github/workflows/integration.yml",
+        "badge_url": "https://github.com/thekevinscott/curtaincall/workflows/Integration%20Tests/badge.svg"
+      },
+      {
+        "id": 234632797,
+        "node_id": "W_kwDORRBpPc4N_DZd",
+        "name": "Lint",
+        "path": ".github/workflows/lint.yml",
+        "state": "active",
+        "created_at": "2026-02-15T15:18:59.000-05:00",
+        "updated_at": "2026-02-15T15:18:59.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/actions/workflows/234632797",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/main/.github/workflows/lint.yml",
+        "badge_url": "https://github.com/thekevinscott/curtaincall/workflows/Lint/badge.svg"
+      },
+      {
+        "id": 234632800,
+        "node_id": "W_kwDORRBpPc4N_DZg",
+        "name": "PR Monitor",
+        "path": ".github/workflows/pr-monitor.yml",
+        "state": "active",
+        "created_at": "2026-02-15T15:18:59.000-05:00",
+        "updated_at": "2026-02-15T15:18:59.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/actions/workflows/234632800",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/main/.github/workflows/pr-monitor.yml",
+        "badge_url": "https://github.com/thekevinscott/curtaincall/workflows/PR%20Monitor/badge.svg"
+      },
+      {
+        "id": 266106399,
+        "node_id": "W_kwDORRBpPc4P3HYf",
+        "name": "Release",
+        "path": ".github/workflows/release.yml",
+        "state": "active",
+        "created_at": "2026-04-24T21:53:07.000-04:00",
+        "updated_at": "2026-04-25T08:12:09.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/actions/workflows/266106399",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/main/.github/workflows/release.yml",
+        "badge_url": "https://github.com/thekevinscott/curtaincall/workflows/Release/badge.svg"
+      },
+      {
+        "id": 234632802,
+        "node_id": "W_kwDORRBpPc4N_DZi",
+        "name": "Security",
+        "path": ".github/workflows/security.yml",
+        "state": "active",
+        "created_at": "2026-02-15T15:18:59.000-05:00",
+        "updated_at": "2026-02-15T15:18:59.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/actions/workflows/234632802",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/main/.github/workflows/security.yml",
+        "badge_url": "https://github.com/thekevinscott/curtaincall/workflows/Security/badge.svg"
+      },
+      {
+        "id": 234632803,
+        "node_id": "W_kwDORRBpPc4N_DZj",
+        "name": "Test",
+        "path": ".github/workflows/test.yml",
+        "state": "active",
+        "created_at": "2026-02-15T15:18:59.000-05:00",
+        "updated_at": "2026-02-15T15:18:59.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/actions/workflows/234632803",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/main/.github/workflows/test.yml",
+        "badge_url": "https://github.com/thekevinscott/curtaincall/workflows/Test/badge.svg"
+      },
+      {
+        "id": 234656508,
+        "node_id": "W_kwDORRBpPc4N_JL8",
+        "name": "Dependabot Updates",
+        "path": "dynamic/dependabot/dependabot-updates",
+        "state": "active",
+        "created_at": "2026-02-15T17:29:18.000-05:00",
+        "updated_at": "2026-02-15T17:29:18.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/actions/workflows/234656508",
+        "html_url": "https://github.com/thekevinscott/curtaincall/actions/workflows/dependabot/dependabot-updates",
+        "badge_url": "https://github.com/thekevinscott/curtaincall/actions/workflows/dependabot/dependabot-updates/badge.svg"
+      }
+    ]
+  },
+  {
+    "method": "listWorkflowFiles",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "ref": "e07c5fc088a41b3de835067baeb6d721b5c4cc42"
+    },
+    "result": [
+      {
+        "name": "build.yml",
+        "path": ".github/workflows/build.yml",
+        "sha": "d9e50a48bb92d2fa0ee62a7bbcca86d8f01d031c",
+        "size": 494,
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/build.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/build.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/d9e50a48bb92d2fa0ee62a7bbcca86d8f01d031c",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/curtaincall/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/build.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/build.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+          "git": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/d9e50a48bb92d2fa0ee62a7bbcca86d8f01d031c",
+          "html": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/build.yml"
+        }
+      },
+      {
+        "name": "changelog.yml",
+        "path": ".github/workflows/changelog.yml",
+        "sha": "7f4abfa49cb9e86012ec8ee0a4b4aa7e2959f8ec",
+        "size": 3755,
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/changelog.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/changelog.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/7f4abfa49cb9e86012ec8ee0a4b4aa7e2959f8ec",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/curtaincall/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/changelog.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/changelog.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+          "git": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/7f4abfa49cb9e86012ec8ee0a4b4aa7e2959f8ec",
+          "html": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/changelog.yml"
+        }
+      },
+      {
+        "name": "docs.yml",
+        "path": ".github/workflows/docs.yml",
+        "sha": "621172a9b0943ab9cccfa212049dbd94bffeba7d",
+        "size": 742,
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/docs.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/docs.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/621172a9b0943ab9cccfa212049dbd94bffeba7d",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/curtaincall/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/docs.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/docs.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+          "git": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/621172a9b0943ab9cccfa212049dbd94bffeba7d",
+          "html": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/docs.yml"
+        }
+      },
+      {
+        "name": "integration.yml",
+        "path": ".github/workflows/integration.yml",
+        "sha": "96efac3f458665bcd0fa724e18144e3cc2d8bfa0",
+        "size": 605,
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/integration.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/integration.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/96efac3f458665bcd0fa724e18144e3cc2d8bfa0",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/curtaincall/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/integration.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/integration.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+          "git": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/96efac3f458665bcd0fa724e18144e3cc2d8bfa0",
+          "html": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/integration.yml"
+        }
+      },
+      {
+        "name": "lint.yml",
+        "path": ".github/workflows/lint.yml",
+        "sha": "828ef5645eee1bf47ab8b964da7dd53c4136236a",
+        "size": 545,
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/lint.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/lint.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/828ef5645eee1bf47ab8b964da7dd53c4136236a",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/curtaincall/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/lint.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/lint.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+          "git": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/828ef5645eee1bf47ab8b964da7dd53c4136236a",
+          "html": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/lint.yml"
+        }
+      },
+      {
+        "name": "pr-monitor.yml",
+        "path": ".github/workflows/pr-monitor.yml",
+        "sha": "225f22a7eb479eaa26a132d472db766262b0083f",
+        "size": 678,
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/pr-monitor.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/pr-monitor.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/225f22a7eb479eaa26a132d472db766262b0083f",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/curtaincall/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/pr-monitor.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/pr-monitor.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+          "git": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/225f22a7eb479eaa26a132d472db766262b0083f",
+          "html": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/pr-monitor.yml"
+        }
+      },
+      {
+        "name": "release.yml",
+        "path": ".github/workflows/release.yml",
+        "sha": "d275ac2f764ba67288adb2d86577f851db4f5c4c",
+        "size": 2996,
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/release.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/release.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/d275ac2f764ba67288adb2d86577f851db4f5c4c",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/curtaincall/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/release.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/release.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+          "git": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/d275ac2f764ba67288adb2d86577f851db4f5c4c",
+          "html": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/release.yml"
+        }
+      },
+      {
+        "name": "security.yml",
+        "path": ".github/workflows/security.yml",
+        "sha": "0fdd8ff5d1eaeaa9d4d678eb01ce4b2f1151ca98",
+        "size": 475,
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/security.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/security.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/0fdd8ff5d1eaeaa9d4d678eb01ce4b2f1151ca98",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/curtaincall/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/security.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/security.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+          "git": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/0fdd8ff5d1eaeaa9d4d678eb01ce4b2f1151ca98",
+          "html": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/security.yml"
+        }
+      },
+      {
+        "name": "test.yml",
+        "path": ".github/workflows/test.yml",
+        "sha": "c6e7b3099f7e52ac204beeee6ac5a7bbad44872c",
+        "size": 774,
+        "url": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/test.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+        "html_url": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/test.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/c6e7b3099f7e52ac204beeee6ac5a7bbad44872c",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/curtaincall/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/test.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/curtaincall/contents/.github/workflows/test.yml?ref=e07c5fc088a41b3de835067baeb6d721b5c4cc42",
+          "git": "https://api.github.com/repos/thekevinscott/curtaincall/git/blobs/c6e7b3099f7e52ac204beeee6ac5a7bbad44872c",
+          "html": "https://github.com/thekevinscott/curtaincall/blob/e07c5fc088a41b3de835067baeb6d721b5c4cc42/.github/workflows/test.yml"
+        }
+      }
+    ]
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "path": ".github/workflows/build.yml",
+      "ref": "e07c5fc088a41b3de835067baeb6d721b5c4cc42"
+    },
+    "result": "name: Build\n\non:\n  push:\n    branches: [main]\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - '.github/workflows/build.yml'\n  pull_request:\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - '.github/workflows/build.yml'\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n      - uses: astral-sh/setup-uv@v7\n      - run: uv sync --extra dev\n      - name: Build package\n        run: uv run just build\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "path": ".github/workflows/changelog.yml",
+      "ref": "e07c5fc088a41b3de835067baeb6d721b5c4cc42"
+    },
+    "result": "name: Changelog\n\non:\n  pull_request:\n    types: [opened, synchronize, reopened]\n\njobs:\n  changelog:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          fetch-depth: 0\n      - name: Check CHANGELOG.md and MIGRATIONS.md requirements\n        env:\n          BASE_SHA: ${{ github.event.pull_request.base.sha }}\n          HEAD_SHA: ${{ github.event.pull_request.head.sha }}\n          PR_AUTHOR: ${{ github.event.pull_request.user.login }}\n        run: |\n          SKIP_CHANGELOG=0\n          BREAKING=0\n\n          # Dependabot writes its own commits, so it cannot carry a\n          # Skip-Changelog trailer and cannot edit CHANGELOG.md. Without an\n          # exemption every dependency bump fails here permanently, which in\n          # turn reds the CI Gate that aggregates it. Dependency bumps have no\n          # consumer-facing behaviour change, which is exactly what the\n          # Skip-Changelog trailer is for.\n          if [ \"$PR_AUTHOR\" = \"dependabot[bot]\" ]; then\n            SKIP_CHANGELOG=1\n            echo \"Author is dependabot[bot]; bypassing CHANGELOG.md requirement.\"\n          fi\n          for sha in $(git rev-list \"$BASE_SHA\"..\"$HEAD_SHA\"); do\n            trailers=$(git log -1 --format=%B \"$sha\" | git interpret-trailers --parse)\n            if echo \"$trailers\" | grep -qiE '^skip-changelog:[[:space:]]*true[[:space:]]*$'; then\n              SKIP_CHANGELOG=1\n            fi\n            if echo \"$trailers\" | grep -qiE '^breaking-change:[[:space:]]*true[[:space:]]*$'; then\n              BREAKING=1\n            fi\n          done\n\n          CHANGED_FILES=$(git diff --name-only \"$BASE_SHA\" \"$HEAD_SHA\")\n\n          # CHANGELOG.md requirement\n          if [ \"$SKIP_CHANGELOG\" = \"1\" ]; then\n            echo \"Skip-Changelog: true trailer found; bypassing CHANGELOG.md requirement.\"\n          elif echo \"$CHANGED_FILES\" | grep -qx 'CHANGELOG.md'; then\n            echo \"CHANGELOG.md was updated.\"\n          else\n            echo \"::error::CHANGELOG.md was not updated in this PR.\"\n            echo \"\"\n            echo \"Curtaincall is pre-1.0 and does not strictly follow SemVer, so every PR\"\n            echo \"must add an entry under the [Unreleased] heading in CHANGELOG.md.\"\n            echo \"\"\n            echo \"If this PR has no consumer impact (pure CI, internal refactor with no\"\n            echo \"behavior change), add a 'Skip-Changelog: true' trailer to any commit\"\n            echo \"in this PR to bypass the check. Example:\"\n            echo \"\"\n            echo \"    chore: rename internal helper\"\n            echo \"\"\n            echo \"    Skip-Changelog: true\"\n            exit 1\n          fi\n\n          # MIGRATIONS.md requirement, gated on Breaking-Change trailer\n          if [ \"$BREAKING\" = \"1\" ]; then\n            if echo \"$CHANGED_FILES\" | grep -qx 'MIGRATIONS.md'; then\n              echo \"Breaking-Change: true trailer found and MIGRATIONS.md was updated.\"\n            else\n              echo \"::error::A Breaking-Change: true trailer was found but MIGRATIONS.md was not updated.\"\n              echo \"\"\n              echo \"Breaking changes and meaningful deprecations require an entry in\"\n              echo \"MIGRATIONS.md under ## Unreleased, with all five required sections:\"\n              echo \"Summary, Required changes, Deprecations removed, Behavior changes\"\n              echo \"without code changes, Verification. See MIGRATIONS.md for the template.\"\n              echo \"\"\n              echo \"If this change is not actually breaking, remove the Breaking-Change\"\n              echo \"trailer from the commit(s) in this PR.\"\n              exit 1\n            fi\n          else\n            echo \"No Breaking-Change trailer detected; MIGRATIONS.md update not required.\"\n          fi\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "path": ".github/workflows/docs.yml",
+      "ref": "e07c5fc088a41b3de835067baeb6d721b5c4cc42"
+    },
+    "result": "name: Deploy docs\n\non:\n  push:\n    branches: [main]\n    paths:\n      - 'docs/**'\n      - 'mkdocs.yml'\n      - 'src/curtaincall/**'\n      - 'MIGRATIONS.md'\n      - '.github/workflows/docs.yml'\n\npermissions:\n  contents: read\n  pages: write\n  id-token: write\n\nconcurrency:\n  group: pages\n  cancel-in-progress: true\n\njobs:\n  deploy:\n    environment:\n      name: github-pages\n      url: ${{ steps.deployment.outputs.page_url }}\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n      - uses: astral-sh/setup-uv@v7\n      - run: uv sync --extra docs\n      - run: uv run mkdocs build\n      - uses: actions/upload-pages-artifact@v4\n        with:\n          path: site/\n      - id: deployment\n        uses: actions/deploy-pages@v4\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "path": ".github/workflows/integration.yml",
+      "ref": "e07c5fc088a41b3de835067baeb6d721b5c4cc42"
+    },
+    "result": "name: Integration Tests\n\non:\n  push:\n    branches: [main]\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - 'tests/integration/**'\n      - '.github/workflows/integration.yml'\n  pull_request:\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - 'tests/integration/**'\n      - '.github/workflows/integration.yml'\n\njobs:\n  integration:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n      - uses: astral-sh/setup-uv@v7\n      - run: uv sync --extra dev\n      - name: Run integration tests\n        run: uv run just test-integration\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "path": ".github/workflows/lint.yml",
+      "ref": "e07c5fc088a41b3de835067baeb6d721b5c4cc42"
+    },
+    "result": "name: Lint\n\non:\n  push:\n    branches: [main]\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - '.github/workflows/lint.yml'\n  pull_request:\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - '.github/workflows/lint.yml'\n\njobs:\n  lint:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n      - uses: astral-sh/setup-uv@v7\n      - run: uv sync --extra dev\n      - name: Lint\n        run: uv run just lint\n      - name: Format check\n        run: uv run just format-check\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "path": ".github/workflows/pr-monitor.yml",
+      "ref": "e07c5fc088a41b3de835067baeb6d721b5c4cc42"
+    },
+    "result": "name: PR Monitor\n\non:\n  pull_request:\n\nconcurrency:\n  # A superseded gate run polls a stale SHA until it finishes. Cancel it.\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  actions: read\n  contents: read\n  # willfire reads the PR and its changed files to predict which workflows dispatch.\n  pull-requests: read\n\njobs:\n  monitor:\n    name: 'CI Gate'\n    runs-on: ubuntu-latest\n    # The action has no timeout of its own (see monitor.ts) -- this is the\n    # backstop. If a predicted run never dispatches, the gate waits here\n    # until the job is killed.\n    timeout-minutes: 20\n    steps:\n      - uses: thekevinscott/pr-monitor@v1\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "path": ".github/workflows/release.yml",
+      "ref": "e07c5fc088a41b3de835067baeb6d721b5c4cc42"
+    },
+    "result": "name: Release\n\non:\n  push:\n    branches: [main]\n  workflow_dispatch:\n    inputs:\n      dry_run:\n        description: 'Dry-run: compute plan, skip publish + tag'\n        type: boolean\n        default: false\n\nconcurrency:\n  group: release\n  cancel-in-progress: false\n\npermissions:\n  contents: read\n  id-token: write\n\njobs:\n  plan:\n    runs-on: ubuntu-latest\n    outputs:\n      matrix: ${{ steps.plan.outputs.matrix }}\n    steps:\n      - uses: actions/checkout@v4\n        with:\n          fetch-depth: 0\n      - id: plan\n        uses: thekevinscott/put-it-out-there@v0\n        with:\n          command: plan\n\n  build:\n    needs: plan\n    if: fromJSON(needs.plan.outputs.matrix || '[]')[0] != null\n    strategy:\n      fail-fast: false\n      matrix:\n        include: ${{ fromJSON(needs.plan.outputs.matrix) }}\n    runs-on: ${{ matrix.runs_on }}\n    # hatch-vcs derives the version from the nearest git tag at build time, but\n    # piot does not create the tag until the publish job. Without this handoff\n    # the sdist would ship as e.g. 0.5.1.devN. See:\n    # https://github.com/thekevinscott/put-it-out-there/blob/main/docs/guide/dynamic-versions.md\n    env:\n      SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CURTAINCALL: ${{ matrix.version }}\n    steps:\n      - uses: actions/checkout@v4\n        with:\n          fetch-depth: 0\n      - name: Setup Python\n        if: matrix.kind == 'pypi'\n        uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n      - name: Build sdist\n        if: matrix.kind == 'pypi' && matrix.build != 'maturin' && matrix.target == 'sdist'\n        run: |\n          cd ${{ matrix.path }}\n          python -m pip install build\n          python -m build --sdist --outdir dist\n      - uses: actions/upload-artifact@v4\n        with:\n          name: ${{ matrix.artifact_name }}\n          path: ${{ matrix.artifact_path }}\n\n  publish:\n    needs: [plan, build]\n    runs-on: ubuntu-latest\n    permissions:\n      contents: write\n      id-token: write\n    steps:\n      - uses: actions/checkout@v4\n        with:\n          fetch-depth: 0\n      # PyPI publish shells out to `twine`. Hosted runners don't ship it;\n      # install it here so the publish job has twine on PATH.\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n      - name: Install twine\n        run: pip install twine\n      # piot cuts an annotated tag per publish (`git tag -a`). Hosted\n      # runners have no committer identity set; configure one before the\n      # piot step or tag creation fails with \"Please tell me who you are.\"\n      - name: Configure git identity\n        run: |\n          git config --global user.name \"github-actions[bot]\"\n          git config --global user.email \"41898282+github-actions[bot]@users.noreply.github.com\"\n      - uses: actions/download-artifact@v4\n        with:\n          path: artifacts\n      - uses: thekevinscott/put-it-out-there@v0\n        with:\n          command: publish\n          dry_run: ${{ inputs.dry_run || 'false' }}\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "path": ".github/workflows/security.yml",
+      "ref": "e07c5fc088a41b3de835067baeb6d721b5c4cc42"
+    },
+    "result": "name: Security\n\non:\n  push:\n    branches: [main]\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - '.github/workflows/security.yml'\n  pull_request:\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - '.github/workflows/security.yml'\n\njobs:\n  bandit:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n      - uses: astral-sh/setup-uv@v7\n      - run: uv sync --extra dev\n      - name: Run security scan\n        run: uv run just security\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "curtaincall",
+      "path": ".github/workflows/test.yml",
+      "ref": "e07c5fc088a41b3de835067baeb6d721b5c4cc42"
+    },
+    "result": "name: Test\n\non:\n  push:\n    branches: [main]\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - '.github/workflows/test.yml'\n  pull_request:\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - '.github/workflows/test.yml'\n\njobs:\n  test:\n    runs-on: ubuntu-latest\n    strategy:\n      matrix:\n        python-version: [\"3.12\", \"3.13\"]\n    steps:\n      - uses: actions/checkout@v6\n      - uses: astral-sh/setup-uv@v7\n        with:\n          python-version: ${{ matrix.python-version }}\n      - run: uv sync --extra dev\n      - name: Run tests\n        run: uv run just test-ci\n      - name: Upload coverage\n        uses: codecov/codecov-action@v5\n        with:\n          files: coverage.xml\n          fail_ci_if_error: false\n"
+  }
+]

