@@ -1,0 +1,13 @@
+name: probe-d6-any-base
+
+# D6 control: no branch filter, so this dispatches on any base.
+on:
+  pull_request:
+
+jobs:
+  probe-d6-any-base:
+    name: probe-d6-any-base
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo probe-d6-any-base

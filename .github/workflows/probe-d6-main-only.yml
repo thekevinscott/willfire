@@ -1,0 +1,14 @@
+name: probe-d6-main-only
+
+# D6: base is probe/d6-base, so this must NOT dispatch.
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  probe-d6-main-only:
+    name: probe-d6-main-only
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo probe-d6-main-only
