@@ -67,7 +67,8 @@ export interface Prediction {
   entries: Entry[];
   /**
    * Convenience aggregate: the sorted, deduplicated check names of every
-   * entry with status "run" and a resolved name. Entries whose name could
+   * dispatched entry (run or skipped) with a resolved name. Entries whose name
+   * could
    * not be resolved are absent here — read `entries` to see them.
    */
   checkNames: string[];
