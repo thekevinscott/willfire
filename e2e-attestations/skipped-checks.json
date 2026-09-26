@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1790445337,
+  "exit_code": 0,
+  "commit": "7d9a91f4797dc46ec8042d7d59842d64c2c939e0",
+  "branch": "fix/skipped-checks"
+}
