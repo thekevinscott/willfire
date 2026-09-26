@@ -23,14 +23,12 @@ import type {
 } from "../types.js";
 
 /**
- * GitHub allows a reusable-workflow call chain four levels deep. Past that the
- * run itself fails, so anything deeper is not a name we could predict anyway.
- * Probe-verified to three levels: `call-nested / Mid Call / inner`.
- *
- * A cross-repo hop costs the same one level as a local one, so a chain that
- * mixes the two is counted the same way.
+ * GitHub.com connects ten levels of workflows — the top-level caller plus nine
+ * reusable levels below it — so a tenth level fails the run and has no check
+ * name to predict. A cross-repo hop costs the same one level as a local one.
+ * https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows#nesting-reusable-workflows
  */
-const MAX_REUSABLE_DEPTH = 4;
+const MAX_REUSABLE_DEPTH = 9;
 
 /** `ref` is already a commit id, so resolving it is a no-op. */
 const SHA_RE = /^[0-9a-f]{40}$/i;

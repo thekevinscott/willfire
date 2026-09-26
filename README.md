@@ -59,8 +59,8 @@ single name is knowable ahead of the run:
   execution could not resolve, reported as one `unknown` entry for that job
   and nothing else — see "Executing needed jobs" below;
 - a reusable workflow we cannot read — private, deleted, a ref that does not
-  exist, a `uses:` built from an expression, or one nested past GitHub's
-  four-level limit;
+  exist, a `uses:` built from an expression, or one nested past the ten
+  workflows GitHub.com chains;
 - a `name:` interpolating something we cannot evaluate statically.
 
 `sources` is the provenance of the answer: the PR's own repo at the head
