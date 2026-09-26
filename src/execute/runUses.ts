@@ -11,6 +11,7 @@ import { readActionManifest } from "./readActionManifest.js";
 import { renderTemplate } from "./renderTemplate.js";
 import { runNodeAction } from "./runNodeAction.js";
 import { runSteps } from "./runSteps.js";
+import { withinRoot } from "./withinRoot.js";
 import type { ActionModel, Res, StepModel, WalkCtx } from "./types.js";
 
 /** A cycle guard, not a fidelity claim — a self-including composite would recurse forever. */
@@ -100,6 +101,9 @@ export async function runUses(
     }
     actionDir = join(root, target.path);
     actionRoot = root;
+  }
+  if (!(await withinRoot(actionRoot ?? ctx.tree, actionDir))) {
+    return err(`${label}: ${uses} resolves outside its repo tree`);
   }
   const manifest = await readActionManifest(actionDir);
   if (manifest === null) {
