@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1790446375,
+  "exit_code": 0,
+  "commit": "9a44c5cfcc3dc94f1e5d0ce4a8577618f43781c4",
+  "branch": "fix/conflicting-prs"
+}

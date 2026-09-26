@@ -41,6 +41,10 @@ export async function willfire(
   const base = { owner, repo: name };
 
   const pr = await github.getPull({ ...base, pull_number: prNumber });
+  if (pr.mergeable === false) {
+    return finalizePrediction([], null, new Map());
+  }
+
   const files = await github.listPullFiles({ ...base, pull_number: prNumber });
   const stackTarget = await stackTargetRef(github, owner, name, pr);
   const ctx: Ctx = {

@@ -17,6 +17,7 @@ export interface GithubPullSummary {
 }
 
 export interface GithubPull extends GithubPullSummary {
+  mergeable: boolean | null;
   commits: number;
   head: { sha: string };
   user: { login: string };
