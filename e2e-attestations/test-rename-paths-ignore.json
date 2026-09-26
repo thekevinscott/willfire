@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1790440616,
+  "exit_code": 0,
+  "commit": "12888282acbada8182f4d90854c0291e1cf06a06",
+  "branch": "test/rename-paths-ignore"
+}
