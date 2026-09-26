@@ -435,6 +435,12 @@ describe("workflow-level verdicts", () => {
     });
   });
 
+  it("accepts when only a renamed file's previous path escapes `paths-ignore` (#237)", async () => {
+    const wf = "on:\n  pull_request:\n    paths-ignore: ['docs/**']\njobs:\n  a: {}\n";
+    const files = [{ filename: "docs/a.md", previous_filename: "src/app.ts" }];
+    expect(await only(wf, { files })).toMatchObject({ job: "a" });
+  });
+
   // ---- stacked PRs (#30) ----
 
   // GitHub's stack-aware dispatch (a per-repo rollout, read off dirsql#1002)
