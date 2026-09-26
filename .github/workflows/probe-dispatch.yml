@@ -1,0 +1,30 @@
+name: probe-dispatch
+on: pull_request
+jobs:
+  root-if:
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo root-if
+  root-needs:
+    needs: root-if
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo root-needs
+  root-matrix:
+    if: ${{ false }}
+    name: root matrix ${{ matrix.language }}
+    strategy:
+      matrix:
+        language: [ts, py]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo root-matrix
+  local-call:
+    uses: ./.github/workflows/probe-child.yml
+    with:
+      gates: '["other"]'
+  remote-call:
+    uses: thekevinscott/willfire/.github/workflows/probe-child.yml@probe/skipped-check-evidence
+    with:
+      gates: '["other"]'

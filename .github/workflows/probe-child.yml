@@ -1,0 +1,33 @@
+name: probe-child
+on:
+  workflow_call:
+    inputs:
+      gates:
+        type: string
+        default: ''
+        required: false
+jobs:
+  child-if:
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo child-if
+  child-needs:
+    needs: child-if
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo child-needs
+  child-matrix:
+    if: ${{ false }}
+    name: child matrix ${{ matrix.language }}
+    strategy:
+      matrix:
+        language: [ts, py]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo child-matrix
+  child-gate:
+    if: ${{ inputs.gates == '' || contains(inputs.gates, '"include-me"') }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo child-gate
