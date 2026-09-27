@@ -53,7 +53,15 @@ const real = makeGithubClient();
 const calls: RecordedCall[] = [];
 const recording = new Proxy(real, {
   get: (t, method: string) => async (params: never) => {
-    const result = await (t as Record<string, (p: never) => Promise<unknown>>)[method](params);
+    let result: unknown;
+    try {
+      result = await (t as Record<string, (p: never) => Promise<unknown>>)[method](params);
+    } catch (error) {
+      const { status, message } = error as { status?: unknown; message?: unknown };
+      if (typeof status !== "number") throw error;
+      calls.push({ method, params, result: { $error: { status, message: String(message) } } });
+      throw error;
+    }
     calls.push({ method, params, result });
     return result;
   },
@@ -63,9 +71,11 @@ await predict(recording, `${owner}/${repo}`, pr);
 
 Record `params` exactly as passed. `replayClient` keys on the method plus its
 params sorted by key, so property order cannot decide whether a lookup hits;
-an unrecorded call throws rather than answering a default. Before writing
-`calls.json`, swap each `ArrayBuffer` result for a `$binary` reference and
-write the bytes beside it.
+an unrecorded call throws rather than answering a default. A call the live
+client rejected (a 404 for a file absent at that ref) is recorded as
+`{ "$error": { status, message } }` and replayed as a rejection with `.status`
+set. Before writing `calls.json`, swap each `ArrayBuffer` result for a
+`$binary` reference and write the bytes beside it.
 
 ### Read the dispatched list
 
