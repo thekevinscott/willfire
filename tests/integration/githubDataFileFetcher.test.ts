@@ -5,10 +5,13 @@ import { getResponse } from "../getResponse.js";
 import { getCalls } from "./getCalls.js";
 import { replayClient } from "./mocks/replayClient.js";
 
-const CASES = discoverCases(new URL("./fixtures/", import.meta.url));
+const CASES = discoverCases(new URL("./fixtures/", import.meta.url)).map((c) => ({
+  ...c,
+  title: c.caseId === undefined ? `${c.owner}/${c.repo}#${c.pr}` : `${c.owner}/${c.repo}#${c.pr} case ${c.caseId}`,
+}));
 
 test.each(CASES)(
-  "$owner/$repo#$pr predicts the dispatched check list exactly",
+  "$title predicts the dispatched check list exactly",
   async ({ owner, repo, pr, dir }) => {
     const { checkNames } = await predict(replayClient(getCalls(dir)), `${owner}/${repo}`, pr);
 

@@ -1,0 +1,1371 @@
+[
+  {
+    "method": "getPull",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "pull_number": 259
+    },
+    "result": {
+      "url": "https://api.github.com/repos/thekevinscott/willfire/pulls/259",
+      "id": 4630789956,
+      "node_id": "PR_kwDOT9j2e88AAAABFAQ_RA",
+      "html_url": "https://github.com/thekevinscott/willfire/pull/259",
+      "diff_url": "https://github.com/thekevinscott/willfire/pull/259.diff",
+      "patch_url": "https://github.com/thekevinscott/willfire/pull/259.patch",
+      "issue_url": "https://api.github.com/repos/thekevinscott/willfire/issues/259",
+      "number": 259,
+      "state": "closed",
+      "locked": false,
+      "title": "Discover fixture cases with globSync",
+      "user": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "body": "Closes #252. Part of #251.\n\n`tests/cases.ts` hand-walked three levels of directories to find `<owner>/<repo>/<pr>/`. `globSync(\"*/*/*/fixture.json\")` does the same in one expression.\n\nThe change of key matters beyond brevity: matching on `fixture.json` rather than on directory depth means a case folder committed ahead of its capture — README only, no fixture — is simply not discovered, which is how the folders land before the captures do (#255, #256).\n\n**Consumer impact: none.** `tests/` is not in the published package; `grep -rn \"discoverCases\" src/` returns nothing, and the file has no importer outside the two suites.\n\n**Measured:** `pnpm typecheck` clean; `pnpm test:integration` 4 files / 90 tests passed, which includes the one real case — `discoverCases` throws on an empty result, so a green run is proof the glob resolved.",
+      "created_at": "2026-09-24T20:33:43Z",
+      "updated_at": "2026-09-24T20:35:18Z",
+      "closed_at": "2026-09-24T20:35:16Z",
+      "merged_at": "2026-09-24T20:35:16Z",
+      "merge_commit_sha": "b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+      "assignees": [],
+      "requested_reviewers": [],
+      "requested_teams": [],
+      "labels": [],
+      "milestone": null,
+      "draft": false,
+      "commits_url": "https://api.github.com/repos/thekevinscott/willfire/pulls/259/commits",
+      "review_comments_url": "https://api.github.com/repos/thekevinscott/willfire/pulls/259/comments",
+      "review_comment_url": "https://api.github.com/repos/thekevinscott/willfire/pulls/comments{/number}",
+      "comments_url": "https://api.github.com/repos/thekevinscott/willfire/issues/259/comments",
+      "statuses_url": "https://api.github.com/repos/thekevinscott/willfire/statuses/fce5e357ad8749ed88f1a02e1cbe5be675027ca4",
+      "head": {
+        "label": "thekevinscott:chore/glob-cases",
+        "ref": "chore/glob-cases",
+        "sha": "fce5e357ad8749ed88f1a02e1cbe5be675027ca4",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1339618939,
+          "node_id": "R_kgDOT9j2ew",
+          "name": "willfire",
+          "full_name": "thekevinscott/willfire",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/willfire",
+          "description": "Predict the set of CI check entries GitHub Actions will create for a PR",
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/willfire",
+          "forks_url": "https://api.github.com/repos/thekevinscott/willfire/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/willfire/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/willfire/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/willfire/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/willfire/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/willfire/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/willfire/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/willfire/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/willfire/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/willfire/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/willfire/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/willfire/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/willfire/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/willfire/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/willfire/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/willfire/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/willfire/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/willfire/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/willfire/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/willfire/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/willfire/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/willfire/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/willfire/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/willfire/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/willfire/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/willfire/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/willfire/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/willfire/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/willfire/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/willfire/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/willfire/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/willfire/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/willfire/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/willfire/deployments",
+          "created_at": "2026-08-19T13:30:06Z",
+          "updated_at": "2026-09-25T10:48:16Z",
+          "pushed_at": "2026-09-25T10:50:24Z",
+          "git_url": "git://github.com/thekevinscott/willfire.git",
+          "ssh_url": "git@github.com:thekevinscott/willfire.git",
+          "clone_url": "https://github.com/thekevinscott/willfire.git",
+          "svn_url": "https://github.com/thekevinscott/willfire",
+          "homepage": null,
+          "size": 1733,
+          "stargazers_count": 1,
+          "watchers_count": 1,
+          "language": "TypeScript",
+          "has_issues": true,
+          "has_projects": true,
+          "has_downloads": false,
+          "has_wiki": true,
+          "has_pages": false,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 29,
+          "license": {
+            "key": "mit",
+            "name": "MIT License",
+            "spdx_id": "MIT",
+            "url": "https://api.github.com/licenses/mit",
+            "node_id": "MDc6TGljZW5zZTEz"
+          },
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [],
+          "visibility": "public",
+          "forks": 0,
+          "open_issues": 29,
+          "watchers": 1,
+          "default_branch": "main"
+        }
+      },
+      "base": {
+        "label": "thekevinscott:main",
+        "ref": "main",
+        "sha": "6b821432ac655fa66d13572e31712ab7f988230f",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1339618939,
+          "node_id": "R_kgDOT9j2ew",
+          "name": "willfire",
+          "full_name": "thekevinscott/willfire",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/willfire",
+          "description": "Predict the set of CI check entries GitHub Actions will create for a PR",
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/willfire",
+          "forks_url": "https://api.github.com/repos/thekevinscott/willfire/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/willfire/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/willfire/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/willfire/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/willfire/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/willfire/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/willfire/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/willfire/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/willfire/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/willfire/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/willfire/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/willfire/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/willfire/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/willfire/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/willfire/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/willfire/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/willfire/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/willfire/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/willfire/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/willfire/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/willfire/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/willfire/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/willfire/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/willfire/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/willfire/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/willfire/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/willfire/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/willfire/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/willfire/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/willfire/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/willfire/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/willfire/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/willfire/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/willfire/deployments",
+          "created_at": "2026-08-19T13:30:06Z",
+          "updated_at": "2026-09-25T10:48:16Z",
+          "pushed_at": "2026-09-25T10:50:24Z",
+          "git_url": "git://github.com/thekevinscott/willfire.git",
+          "ssh_url": "git@github.com:thekevinscott/willfire.git",
+          "clone_url": "https://github.com/thekevinscott/willfire.git",
+          "svn_url": "https://github.com/thekevinscott/willfire",
+          "homepage": null,
+          "size": 1733,
+          "stargazers_count": 1,
+          "watchers_count": 1,
+          "language": "TypeScript",
+          "has_issues": true,
+          "has_projects": true,
+          "has_downloads": false,
+          "has_wiki": true,
+          "has_pages": false,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 29,
+          "license": {
+            "key": "mit",
+            "name": "MIT License",
+            "spdx_id": "MIT",
+            "url": "https://api.github.com/licenses/mit",
+            "node_id": "MDc6TGljZW5zZTEz"
+          },
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [],
+          "visibility": "public",
+          "forks": 0,
+          "open_issues": 29,
+          "watchers": 1,
+          "default_branch": "main"
+        }
+      },
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/pulls/259"
+        },
+        "html": {
+          "href": "https://github.com/thekevinscott/willfire/pull/259"
+        },
+        "issue": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/issues/259"
+        },
+        "comments": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/issues/259/comments"
+        },
+        "review_comments": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/pulls/259/comments"
+        },
+        "review_comment": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/pulls/comments{/number}"
+        },
+        "commits": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/pulls/259/commits"
+        },
+        "statuses": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/statuses/fce5e357ad8749ed88f1a02e1cbe5be675027ca4"
+        }
+      },
+      "author_association": "COLLABORATOR",
+      "auto_merge": null,
+      "assignee": null,
+      "active_lock_reason": null,
+      "merged": true,
+      "mergeable": null,
+      "rebaseable": null,
+      "mergeable_state": "unknown",
+      "merged_by": {
+        "login": "thekevinscott",
+        "id": 151596,
+        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinscott",
+        "html_url": "https://github.com/thekevinscott",
+        "followers_url": "https://api.github.com/users/thekevinscott/followers",
+        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+        "repos_url": "https://api.github.com/users/thekevinscott/repos",
+        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "comments": 0,
+      "review_comments": 0,
+      "maintainer_can_modify": false,
+      "commits": 1,
+      "additions": 9,
+      "deletions": 19,
+      "changed_files": 1
+    }
+  },
+  {
+    "method": "listPullFiles",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "pull_number": 259
+    },
+    "result": [
+      {
+        "sha": "e280cd10caad1bd943daa34bc3f68c500120577e",
+        "filename": "tests/cases.ts",
+        "status": "modified",
+        "additions": 9,
+        "deletions": 19,
+        "changes": 28,
+        "blob_url": "https://github.com/thekevinscott/willfire/blob/fce5e357ad8749ed88f1a02e1cbe5be675027ca4/tests%2Fcases.ts",
+        "raw_url": "https://github.com/thekevinscott/willfire/raw/fce5e357ad8749ed88f1a02e1cbe5be675027ca4/tests%2Fcases.ts",
+        "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/tests%2Fcases.ts?ref=fce5e357ad8749ed88f1a02e1cbe5be675027ca4",
+        "patch": "@@ -1,26 +1,16 @@\n-import { readdirSync } from \"node:fs\";\n-import { join } from \"node:path\";\n+import { globSync } from \"node:fs\";\n+import { join, sep } from \"node:path\";\n import { fileURLToPath } from \"node:url\";\n \n-const dirs = (at: string): string[] =>\n-  readdirSync(at, { withFileTypes: true })\n-    .filter((e) => e.isDirectory())\n-    .map((e) => e.name)\n-    .sort();\n-\n-/** Every `<owner>/<repo>/<pr>/` under `root`. A suite that finds none has a broken path, not zero cases. */\n+/** Every `<owner>/<repo>/<pr>/` holding a fixture under `root`. A suite that finds none has a broken path, not zero cases. */\n export function discoverCases(root: URL): { owner: string; repo: string; pr: number; dir: string }[] {\n   const base = fileURLToPath(root);\n-  const cases = dirs(base).flatMap((owner) =>\n-    dirs(join(base, owner)).flatMap((repo) =>\n-      dirs(join(base, owner, repo)).map((pr) => ({\n-        owner,\n-        repo,\n-        pr: Number(pr),\n-        dir: join(base, owner, repo, pr),\n-      })),\n-    ),\n-  );\n+  const cases = globSync(\"*/*/*/fixture.json\", { cwd: base })\n+    .sort()\n+    .map((hit) => {\n+      const [owner, repo, pr] = hit.split(sep);\n+      return { owner, repo, pr: Number(pr), dir: join(base, owner, repo, pr) };\n+    });\n   if (cases.length === 0) {\n     throw new Error(`no cases found under ${base}`);\n   }"
+      }
+    ]
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "ref": "b976a7dc600948aadc7c79fe2383a8a5e27bc173"
+    },
+    "result": {
+      "sha": "b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+      "node_id": "C_kwDOT9j2e9oAKGI5NzZhN2RjNjAwOTQ4YWFkYzdjNzlmZTIzODNhOGE1ZTI3YmMxNzM",
+      "commit": {
+        "author": {
+          "name": "Kevin Scott",
+          "email": "151596+thekevinscott@users.noreply.github.com",
+          "date": "2026-09-24T20:35:15Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-09-24T20:35:15Z"
+        },
+        "message": "Merge pull request #259 from thekevinscott/chore/glob-cases\n\nDiscover fixture cases with globSync",
+        "tree": {
+          "sha": "b9ec7457abfaa25be642c3f55dbf5a5cf2af565b",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/git/trees/b9ec7457abfaa25be642c3f55dbf5a5cf2af565b"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/willfire/git/commits/b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqtYmDCRC1aQ7uu5UhlAAAIocQAB+3jzyH4MID5fzBhesUulKO\n86qekC9ScwSCaZfgSC15qSj4GzZ96EjA+NM30YLewUEkcIdBhNeYCyncV5Ta3G21\nVyoTD9h+RuDxFEp5vUkAg4xco49KZmsseZIKW9Ima42qFDUyLRLz3qq7fvl48EOD\nXy39kNuP4Wu1jcKFQg0YQTI7HsTrG3qXM/4aD2mcy6CE97qz6qlNdC1yE9a6D9gQ\ntxgK+wCkPHbUekTsQq2ahd6wJ1zQ7kNeM4W5OJl55jf+bPS7XhKXuErfyZfNqUl7\nyUvgk6UjJm/qtMYPyNYWT40Fkx1NHhwwP821VBYSQU3IoWqEVHMwcTMSbqdGrx9N\nvXkM/1+YfZMR1S5/8qxLlLjARSBfo2chpCrfrm1OLLCmP4Hkv9FHdRt7dj8Gyjas\nnkUHti5ir1R+WbOrBxVdG8h2+zMHYM1b8M7TXO49OkBlRAGX7bMaVdhwf3jRXYG/\ns5lnq5CIcWCXFkzlbD1ZB/+z0T/VnIVhSkfsIY5v8ANeAhVuRydfQJsLRId4k3TV\nfrKWqasSSgRBQk+XpRFiDM3IyKiBBPm75NlN8EmL8S+7j85/xGjuQGhAkL+IAro1\n5C0OX3MACkO+8TWE44gI1DudBLsLAhECzCZUe9/9Sh/A+jbzXh2t2oqa/ugVLLDC\nGNohCacEbRhbCbUHqpmH\n=xj0C\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree b9ec7457abfaa25be642c3f55dbf5a5cf2af565b\nparent 1cff23a1e7b984a9cc65b424b51ae4785424f36d\nparent fce5e357ad8749ed88f1a02e1cbe5be675027ca4\nauthor Kevin Scott <151596+thekevinscott@users.noreply.github.com> 1790282115 -0400\ncommitter GitHub <noreply@github.com> 1790282115 -0400\n\nMerge pull request #259 from thekevinscott/chore/glob-cases\n\nDiscover fixture cases with globSync",
+          "verified_at": "2026-09-24T20:35:15Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/willfire/commits/b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+      "html_url": "https://github.com/thekevinscott/willfire/commit/b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+      "comments_url": "https://api.github.com/repos/thekevinscott/willfire/commits/b976a7dc600948aadc7c79fe2383a8a5e27bc173/comments",
+      "author": {
+        "login": "thekevinscott",
+        "id": 151596,
+        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinscott",
+        "html_url": "https://github.com/thekevinscott",
+        "followers_url": "https://api.github.com/users/thekevinscott/followers",
+        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+        "repos_url": "https://api.github.com/users/thekevinscott/repos",
+        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "1cff23a1e7b984a9cc65b424b51ae4785424f36d",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/1cff23a1e7b984a9cc65b424b51ae4785424f36d",
+          "html_url": "https://github.com/thekevinscott/willfire/commit/1cff23a1e7b984a9cc65b424b51ae4785424f36d"
+        },
+        {
+          "sha": "fce5e357ad8749ed88f1a02e1cbe5be675027ca4",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/fce5e357ad8749ed88f1a02e1cbe5be675027ca4",
+          "html_url": "https://github.com/thekevinscott/willfire/commit/fce5e357ad8749ed88f1a02e1cbe5be675027ca4"
+        }
+      ],
+      "stats": {
+        "total": 28,
+        "additions": 9,
+        "deletions": 19
+      },
+      "files": [
+        {
+          "sha": "e280cd10caad1bd943daa34bc3f68c500120577e",
+          "filename": "tests/cases.ts",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 19,
+          "changes": 28,
+          "blob_url": "https://github.com/thekevinscott/willfire/blob/b976a7dc600948aadc7c79fe2383a8a5e27bc173/tests%2Fcases.ts",
+          "raw_url": "https://github.com/thekevinscott/willfire/raw/b976a7dc600948aadc7c79fe2383a8a5e27bc173/tests%2Fcases.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/tests%2Fcases.ts?ref=b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+          "patch": "@@ -1,26 +1,16 @@\n-import { readdirSync } from \"node:fs\";\n-import { join } from \"node:path\";\n+import { globSync } from \"node:fs\";\n+import { join, sep } from \"node:path\";\n import { fileURLToPath } from \"node:url\";\n \n-const dirs = (at: string): string[] =>\n-  readdirSync(at, { withFileTypes: true })\n-    .filter((e) => e.isDirectory())\n-    .map((e) => e.name)\n-    .sort();\n-\n-/** Every `<owner>/<repo>/<pr>/` under `root`. A suite that finds none has a broken path, not zero cases. */\n+/** Every `<owner>/<repo>/<pr>/` holding a fixture under `root`. A suite that finds none has a broken path, not zero cases. */\n export function discoverCases(root: URL): { owner: string; repo: string; pr: number; dir: string }[] {\n   const base = fileURLToPath(root);\n-  const cases = dirs(base).flatMap((owner) =>\n-    dirs(join(base, owner)).flatMap((repo) =>\n-      dirs(join(base, owner, repo)).map((pr) => ({\n-        owner,\n-        repo,\n-        pr: Number(pr),\n-        dir: join(base, owner, repo, pr),\n-      })),\n-    ),\n-  );\n+  const cases = globSync(\"*/*/*/fixture.json\", { cwd: base })\n+    .sort()\n+    .map((hit) => {\n+      const [owner, repo, pr] = hit.split(sep);\n+      return { owner, repo, pr: Number(pr), dir: join(base, owner, repo, pr) };\n+    });\n   if (cases.length === 0) {\n     throw new Error(`no cases found under ${base}`);\n   }"
+        }
+      ]
+    }
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "ref": "main"
+    },
+    "result": {
+      "sha": "1776d75fae1725d91de07acce9c57ad88ee0011f",
+      "node_id": "C_kwDOT9j2e9oAKDE3NzZkNzVmYWUxNzI1ZDkxZGUwN2FjY2U5YzU3YWQ4OGVlMDAxMWY",
+      "commit": {
+        "author": {
+          "name": "Kevin Scott",
+          "email": "151596+thekevinscott@users.noreply.github.com",
+          "date": "2026-09-25T10:48:11Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-09-25T10:48:11Z"
+        },
+        "message": "Merge pull request #277 from thekevinscott/docs/no-unknowns\n\nState the contract: an exact list of strings, zero unknowns",
+        "tree": {
+          "sha": "defad2d8775b1a0df5bae96bfaa724d116159db6",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/git/trees/defad2d8775b1a0df5bae96bfaa724d116159db6"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/willfire/git/commits/1776d75fae1725d91de07acce9c57ad88ee0011f",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqtlFrCRC1aQ7uu5UhlAAAoQ8QAAToXS9qhCmGUZrSWllAPgZU\nQ2xT4HC80SB3lhMLpxy5hNEoIK1EF33y5RpbgUzw1PkHcG1ZQakrQ/hGFwwuFFWg\nzd1osuANsOS/DjK+W3Bo1CrsHOrLRFshovLyv41oY7i9eiYELcd2fM+l29wremG3\nebx4YdG4yl22trKQUlr47qq1tKr8UD0Y+/Oo8XHrixw9CGECdIb7j0SjQ9GOLysv\n016Bai4q0YPx7zmU611B/9n01WI/x6EQesYgSg2IacJuMuFL/0OWDRY/l3/CurHs\n7I95d1oXumDN4rnXKYpK2r5uj3jGwW0jph+f+5u1iyuAjAIn14JTiVQGPYRIpvak\npFpN25G63Fs2mzjpErtLEEzsVvRp6z+PlN+eF7TH1NxZpmvUoDkrvM7H/eYnXVD5\nKOxuKRGYjONlaYv9ztjWDEH//xIsg/yocg3NjtlP1fgVSYnL6yLeVozCNMfaflLN\nU1Ey5J74rkB1c8EsIXHDpLyTsediSg+ZciCnB+KbDXpVg1xSg/XyLHZEB6/FIxEx\nLP6sZ3ykIiohOP2ViCtNAOcuecKYybABG5Y//ZWwp+0d45LmgHdXF0lnQXXlOPcJ\ngv3LhtJfhbvNzA7KN9mj67B3EynXMbpQTgru/S4lL/SnaSWTqLjVcO3FgM5SkBro\nI1kwOZFKh/3kARRRuH7g\n=iqrI\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree defad2d8775b1a0df5bae96bfaa724d116159db6\nparent 7907ab562889ed006644cd32d501c18e325436c9\nparent 00423b5f6b6452e8b77dce2ed5d5528b460ce7b4\nauthor Kevin Scott <151596+thekevinscott@users.noreply.github.com> 1790333291 -0400\ncommitter GitHub <noreply@github.com> 1790333291 -0400\n\nMerge pull request #277 from thekevinscott/docs/no-unknowns\n\nState the contract: an exact list of strings, zero unknowns",
+          "verified_at": "2026-09-25T10:48:11Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/willfire/commits/1776d75fae1725d91de07acce9c57ad88ee0011f",
+      "html_url": "https://github.com/thekevinscott/willfire/commit/1776d75fae1725d91de07acce9c57ad88ee0011f",
+      "comments_url": "https://api.github.com/repos/thekevinscott/willfire/commits/1776d75fae1725d91de07acce9c57ad88ee0011f/comments",
+      "author": {
+        "login": "thekevinscott",
+        "id": 151596,
+        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinscott",
+        "html_url": "https://github.com/thekevinscott",
+        "followers_url": "https://api.github.com/users/thekevinscott/followers",
+        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+        "repos_url": "https://api.github.com/users/thekevinscott/repos",
+        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "7907ab562889ed006644cd32d501c18e325436c9",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/7907ab562889ed006644cd32d501c18e325436c9",
+          "html_url": "https://github.com/thekevinscott/willfire/commit/7907ab562889ed006644cd32d501c18e325436c9"
+        },
+        {
+          "sha": "00423b5f6b6452e8b77dce2ed5d5528b460ce7b4",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/00423b5f6b6452e8b77dce2ed5d5528b460ce7b4",
+          "html_url": "https://github.com/thekevinscott/willfire/commit/00423b5f6b6452e8b77dce2ed5d5528b460ce7b4"
+        }
+      ],
+      "stats": {
+        "total": 12,
+        "additions": 6,
+        "deletions": 6
+      },
+      "files": [
+        {
+          "sha": "7af14a374961ae6cc5a2ac4cec2a92c73edb9e05",
+          "filename": "AGENTS.md",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/thekevinscott/willfire/blob/1776d75fae1725d91de07acce9c57ad88ee0011f/AGENTS.md",
+          "raw_url": "https://github.com/thekevinscott/willfire/raw/1776d75fae1725d91de07acce9c57ad88ee0011f/AGENTS.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/AGENTS.md?ref=1776d75fae1725d91de07acce9c57ad88ee0011f",
+          "patch": "@@ -27,11 +27,11 @@ under `tests/fixtures/willrun-probe/` are the record, and `setup-probe.sh` pushe\n them. Changing one of those assertions is a claim that GitHub's behavior\n changed — verify it against a real PR before you do.\n \n-`unknown` is the honest answer for anything undecidable from the workflow files\n-alone (a runtime-computed matrix, a cross-repo reusable workflow). Do not guess\n-in order to make an entry look decided. It is job-level only: `Entry` is a\n-closed union and the workflow-level variant has no `unknown`, because every\n-workflow-level verdict is decidable. Do not widen it back.\n+willfire MUST return the exact list of check-name strings, with zero\n+`unknown`s. Anything it cannot decide — a runtime-computed matrix, an\n+unreadable cross-repo workflow — throws an explicit error naming what it could\n+not decide. Never guess a name to make an entry look decided; never emit an\n+`unknown` verdict or add one to `Entry`.\n \n ## e2e attestations\n "
+        },
+        {
+          "sha": "a9063844ddcaba337650d570da91389abb989e97",
+          "filename": "GOALS.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/thekevinscott/willfire/blob/1776d75fae1725d91de07acce9c57ad88ee0011f/GOALS.md",
+          "raw_url": "https://github.com/thekevinscott/willfire/raw/1776d75fae1725d91de07acce9c57ad88ee0011f/GOALS.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/GOALS.md?ref=1776d75fae1725d91de07acce9c57ad88ee0011f",
+          "patch": "@@ -8,5 +8,5 @@ Design goals for `willfire` include:\n 2. **No repo knowledge in willfire.** `willfire` is a general tool and must not encode any consumer's internals or repositories.\n 3. **No configuration required.**\n 4. **Speed.** The job should execute as fast as is possible. Instant is ideal, and should be strived for.\n-5. **No static artifacts, written or read.** `willfire` persists nothing and depends on nothing persisted. A run reads the repo and GitHub's API, answers, and leaves nothing behind but the answer; scratch space is ephemeral and is cleaned up. No consumer is ever asked to commit an artifact for `willfire`'s benefit, or to keep one current. Runtime-computed values follow from this: a matrix or a job output is computed at prediction time or reported `unknown`, never snapshotted into a committed artifact and read back. Snapshots drift, and a stale one produces a confidently wrong prediction instead of an honest `unknown`.\n+5. **No static artifacts, written or read.** `willfire` persists nothing and depends on nothing persisted. A run reads the repo and GitHub's API, answers, and leaves nothing behind but the answer; scratch space is ephemeral and is cleaned up. No consumer is ever asked to commit an artifact for `willfire`'s benefit, or to keep one current. Runtime-computed values follow from this: a matrix or a job output is computed at prediction time, never snapshotted into a committed artifact and read back. Snapshots drift, and a stale one produces a confidently wrong prediction.\n 6. **One level of configuration.** Anything a consumer configures is declared in exactly one place. A config artifact at one level that only takes effect because of a declaration at another — an `eslint.json` in a repo that never declares eslint as a dependency — is two levels, and forbidden."
+        }
+      ]
+    }
+  },
+  {
+    "method": "listPulls",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "state": "open",
+      "head": "thekevinscott:main"
+    },
+    "result": []
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "ref": "fce5e357ad8749ed88f1a02e1cbe5be675027ca4"
+    },
+    "result": {
+      "sha": "fce5e357ad8749ed88f1a02e1cbe5be675027ca4",
+      "node_id": "C_kwDOT9j2e9oAKGZjZTVlMzU3YWQ4NzQ5ZWQ4OGYxYTAyZTFjYmU1YmU2NzUwMjdjYTQ",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-24T20:33:41Z"
+        },
+        "committer": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-24T20:33:41Z"
+        },
+        "message": "Discover cases with globSync instead of a hand-walk\n\nKeying on fixture.json rather than directory depth means a case folder\nholding only a README stays inert until its fixture lands.\n\nFixes #252\n\nrelease: skip",
+        "tree": {
+          "sha": "be387f79ef85781e305ee78bf97853480f4f6a2b",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/git/trees/be387f79ef85781e305ee78bf97853480f4f6a2b"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/willfire/git/commits/fce5e357ad8749ed88f1a02e1cbe5be675027ca4",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCgAdFiEEnU3Dh/cnWdmpxUeIBqUoxO3sGUIFAmq1iSUACgkQBqUoxO3s\nGULBdA/+Mf7UZd+2dfP2nxbqgEkL5252jRQVOLwPRGF/hEWqA78ZAwdixQK19WD8\nrAeN2GTKSLijTwjzefgLuqUGnnCPYLW4wcbpPbKHIywZ9vKhkQZmWMMOi2EYDPUM\n4Ni0ljQDmmdJ6X9ZSPHewm89d3+voIY4JiyslJDq70XkTD6euZb3i7xn4PE4VbPu\n4+ILm1E/RKnkD/doLHVxfmi2DQ0jLm3hDgm30tuBRl5pBQX/axbwoB0s/F4gI1YX\ntErSbrUKD/KtBnsjMNWYWr/RlwIoisS928VwIv3iaotla/lXEROLxH0+I2amL/KK\nolzJ8jSeZN6ZwKYsG7KP0O3YQ6W3wkuYL51RNfZ7pUgZfzoZLoi4PjbEt+4VZ75X\njrj0Ws3jEi9xo1sYMYJEXuWn7RmBGvMdDCRZ/l8jxCREswzxKeIZv0oozL4Z8mEt\nMA/G/cnUT19mzFI41IGa16eZPXbobF+R9F9mq/u5ny3kES77g/vkrKfrpvvsVaeG\nrHJLLRDfCoXHpRuSF+P9m+z3DhsOvlidKe4zFJ9dVtnFYOcUgk+VkTC5qeuPu2OJ\nLJfPhCJl9npYyA578cQ5Jw/XeXXK9PgDsRNPqkKTv6nxgBOivnezqV6DApnq1FzM\nn7I5p7JQAuxNh4fX6ihIleJgl40jnHYML90KquHFBGA/5hFBubY=\n=Km3T\n-----END PGP SIGNATURE-----",
+          "payload": "tree be387f79ef85781e305ee78bf97853480f4f6a2b\nparent 6b821432ac655fa66d13572e31712ab7f988230f\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790282021 -0400\ncommitter thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790282021 -0400\n\nDiscover cases with globSync instead of a hand-walk\n\nKeying on fixture.json rather than directory depth means a case folder\nholding only a README stays inert until its fixture lands.\n\nFixes #252\n\nrelease: skip\n",
+          "verified_at": "2026-09-24T20:33:43Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/willfire/commits/fce5e357ad8749ed88f1a02e1cbe5be675027ca4",
+      "html_url": "https://github.com/thekevinscott/willfire/commit/fce5e357ad8749ed88f1a02e1cbe5be675027ca4",
+      "comments_url": "https://api.github.com/repos/thekevinscott/willfire/commits/fce5e357ad8749ed88f1a02e1cbe5be675027ca4/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "6b821432ac655fa66d13572e31712ab7f988230f",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/6b821432ac655fa66d13572e31712ab7f988230f",
+          "html_url": "https://github.com/thekevinscott/willfire/commit/6b821432ac655fa66d13572e31712ab7f988230f"
+        }
+      ],
+      "stats": {
+        "total": 28,
+        "additions": 9,
+        "deletions": 19
+      },
+      "files": [
+        {
+          "sha": "e280cd10caad1bd943daa34bc3f68c500120577e",
+          "filename": "tests/cases.ts",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 19,
+          "changes": 28,
+          "blob_url": "https://github.com/thekevinscott/willfire/blob/fce5e357ad8749ed88f1a02e1cbe5be675027ca4/tests%2Fcases.ts",
+          "raw_url": "https://github.com/thekevinscott/willfire/raw/fce5e357ad8749ed88f1a02e1cbe5be675027ca4/tests%2Fcases.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/tests%2Fcases.ts?ref=fce5e357ad8749ed88f1a02e1cbe5be675027ca4",
+          "patch": "@@ -1,26 +1,16 @@\n-import { readdirSync } from \"node:fs\";\n-import { join } from \"node:path\";\n+import { globSync } from \"node:fs\";\n+import { join, sep } from \"node:path\";\n import { fileURLToPath } from \"node:url\";\n \n-const dirs = (at: string): string[] =>\n-  readdirSync(at, { withFileTypes: true })\n-    .filter((e) => e.isDirectory())\n-    .map((e) => e.name)\n-    .sort();\n-\n-/** Every `<owner>/<repo>/<pr>/` under `root`. A suite that finds none has a broken path, not zero cases. */\n+/** Every `<owner>/<repo>/<pr>/` holding a fixture under `root`. A suite that finds none has a broken path, not zero cases. */\n export function discoverCases(root: URL): { owner: string; repo: string; pr: number; dir: string }[] {\n   const base = fileURLToPath(root);\n-  const cases = dirs(base).flatMap((owner) =>\n-    dirs(join(base, owner)).flatMap((repo) =>\n-      dirs(join(base, owner, repo)).map((pr) => ({\n-        owner,\n-        repo,\n-        pr: Number(pr),\n-        dir: join(base, owner, repo, pr),\n-      })),\n-    ),\n-  );\n+  const cases = globSync(\"*/*/*/fixture.json\", { cwd: base })\n+    .sort()\n+    .map((hit) => {\n+      const [owner, repo, pr] = hit.split(sep);\n+      return { owner, repo, pr: Number(pr), dir: join(base, owner, repo, pr) };\n+    });\n   if (cases.length === 0) {\n     throw new Error(`no cases found under ${base}`);\n   }"
+        }
+      ]
+    }
+  },
+  {
+    "method": "listWorkflows",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire"
+    },
+    "result": [
+      {
+        "id": 337832515,
+        "node_id": "W_kwDOT9j2e84UIupD",
+        "name": "putitoutthere check",
+        "path": ".github/workflows/check.yml",
+        "state": "active",
+        "created_at": "2026-08-19T09:40:02.000-04:00",
+        "updated_at": "2026-08-19T09:41:05.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/337832515",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/check.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/putitoutthere%20check/badge.svg"
+      },
+      {
+        "id": 347063166,
+        "node_id": "W_kwDOT9j2e84Ur8N-",
+        "name": "Testing Conventions (willfire)",
+        "path": ".github/workflows/conventions-src.yml",
+        "state": "active",
+        "created_at": "2026-08-31T20:13:30.000-04:00",
+        "updated_at": "2026-08-31T20:16:55.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/347063166",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/conventions-src.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/Testing%20Conventions%20(willfire)/badge.svg"
+      },
+      {
+        "id": 343919555,
+        "node_id": "W_kwDOT9j2e84Uf8vD",
+        "name": "lint",
+        "path": ".github/workflows/lint.yml",
+        "state": "active",
+        "created_at": "2026-08-27T12:01:09.000-04:00",
+        "updated_at": "2026-08-27T12:11:14.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/343919555",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/lint.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/lint/badge.svg"
+      },
+      {
+        "id": 338727184,
+        "node_id": "W_kwDOT9j2e84UMJEQ",
+        "name": "PR Monitor",
+        "path": ".github/workflows/pr-monitor.yml",
+        "state": "active",
+        "created_at": "2026-08-20T11:41:40.000-04:00",
+        "updated_at": "2026-08-20T12:16:44.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/338727184",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/pr-monitor.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/PR%20Monitor/badge.svg"
+      },
+      {
+        "id": 337833212,
+        "node_id": "W_kwDOT9j2e84UIuz8",
+        "name": "Release",
+        "path": ".github/workflows/release.yml",
+        "state": "active",
+        "created_at": "2026-08-19T09:41:05.000-04:00",
+        "updated_at": "2026-08-19T09:41:05.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/337833212",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/release.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/Release/badge.svg"
+      },
+      {
+        "id": 338821234,
+        "node_id": "W_kwDOT9j2e84UMgBy",
+        "name": "test",
+        "path": ".github/workflows/test.yml",
+        "state": "active",
+        "created_at": "2026-08-20T14:10:57.000-04:00",
+        "updated_at": "2026-08-20T14:36:43.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/338821234",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/test.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/test/badge.svg"
+      }
+    ]
+  },
+  {
+    "method": "listWorkflowFiles",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "ref": "b976a7dc600948aadc7c79fe2383a8a5e27bc173"
+    },
+    "result": [
+      {
+        "name": "check.yml",
+        "path": ".github/workflows/check.yml",
+        "sha": "1123e982399b0c237670b255b32b39ee35ff2b1e",
+        "size": 320,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/check.yml?ref=b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/check.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/1123e982399b0c237670b255b32b39ee35ff2b1e",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/check.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/check.yml?ref=b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/1123e982399b0c237670b255b32b39ee35ff2b1e",
+          "html": "https://github.com/thekevinscott/willfire/blob/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/check.yml"
+        }
+      },
+      {
+        "name": "conventions-src.yml",
+        "path": ".github/workflows/conventions-src.yml",
+        "sha": "8f0c52373b74db4525709b3ffdcef60315af5c01",
+        "size": 1410,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/conventions-src.yml?ref=b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/conventions-src.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/8f0c52373b74db4525709b3ffdcef60315af5c01",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/conventions-src.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/conventions-src.yml?ref=b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/8f0c52373b74db4525709b3ffdcef60315af5c01",
+          "html": "https://github.com/thekevinscott/willfire/blob/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/conventions-src.yml"
+        }
+      },
+      {
+        "name": "lint.yml",
+        "path": ".github/workflows/lint.yml",
+        "sha": "801c106a374543ba403e43a4528e3acd3837e928",
+        "size": 486,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/lint.yml?ref=b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/lint.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/801c106a374543ba403e43a4528e3acd3837e928",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/lint.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/lint.yml?ref=b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/801c106a374543ba403e43a4528e3acd3837e928",
+          "html": "https://github.com/thekevinscott/willfire/blob/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/lint.yml"
+        }
+      },
+      {
+        "name": "pr-monitor.yml",
+        "path": ".github/workflows/pr-monitor.yml",
+        "sha": "f90c7a95c4a7cf2ba8aa51737f14cfb2159663a7",
+        "size": 520,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/pr-monitor.yml?ref=b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/pr-monitor.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/f90c7a95c4a7cf2ba8aa51737f14cfb2159663a7",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/pr-monitor.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/pr-monitor.yml?ref=b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/f90c7a95c4a7cf2ba8aa51737f14cfb2159663a7",
+          "html": "https://github.com/thekevinscott/willfire/blob/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/pr-monitor.yml"
+        }
+      },
+      {
+        "name": "release.yml",
+        "path": ".github/workflows/release.yml",
+        "sha": "598acec69c3873f20f45bf661340fd3688de8685",
+        "size": 2281,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/release.yml?ref=b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/release.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/598acec69c3873f20f45bf661340fd3688de8685",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/release.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/release.yml?ref=b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/598acec69c3873f20f45bf661340fd3688de8685",
+          "html": "https://github.com/thekevinscott/willfire/blob/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/release.yml"
+        }
+      },
+      {
+        "name": "test.yml",
+        "path": ".github/workflows/test.yml",
+        "sha": "5b280c4cf289b42f193bdef7e5dd30f585ca1d64",
+        "size": 1694,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/test.yml?ref=b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/test.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/5b280c4cf289b42f193bdef7e5dd30f585ca1d64",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/test.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/test.yml?ref=b976a7dc600948aadc7c79fe2383a8a5e27bc173",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/5b280c4cf289b42f193bdef7e5dd30f585ca1d64",
+          "html": "https://github.com/thekevinscott/willfire/blob/b976a7dc600948aadc7c79fe2383a8a5e27bc173/.github/workflows/test.yml"
+        }
+      }
+    ]
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/check.yml",
+      "ref": "b976a7dc600948aadc7c79fe2383a8a5e27bc173"
+    },
+    "result": "name: putitoutthere check\n\non:\n  pull_request:\n    paths:\n      - 'putitoutthere.toml'\n      - 'package.json'\n      - 'scripts/*/package.json'\n      - '.github/workflows/release.yml'\n      - '.github/workflows/check.yml'\n\njobs:\n  putitoutthere-check:\n    uses: thekevinscott/putitoutthere/.github/workflows/check.yml@v0\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/conventions-src.yml",
+      "ref": "b976a7dc600948aadc7c79fe2383a8a5e27bc173"
+    },
+    "result": "name: Testing Conventions (willfire)\n\n# Runs the upstream testing-conventions gates over the root `willfire` package,\n# pinned to the rolling `v0` tag (the same convention as check.yml).\n#\n# Every gate runs (`gates` left at its empty default): mutation's Stryker deps\n# are in devDependencies, and `e2e-attestations/` holds the receipt the\n# e2e-verify gate checks.\n#\n# One workflow file per workspace package (docs/monorepo.md), because `paths:`\n# is per-file and each package's lane has a different trigger set.\n\non:\n  pull_request:\n    paths:\n      - 'src/**'\n      - 'tests/**'\n      - 'e2e-attestations/**'\n      - 'package.json'\n      - 'pnpm-lock.yaml'\n      - 'pnpm-workspace.yaml'\n      - 'tsconfig.json'\n      - 'tsconfig.build.json'\n      - 'vitest.config.mts'\n      - '.github/workflows/conventions-src.yml'\n  push:\n    branches: [main]\n    paths:\n      - 'src/**'\n      - 'tests/**'\n      - 'e2e-attestations/**'\n      - 'package.json'\n      - 'pnpm-lock.yaml'\n      - 'pnpm-workspace.yaml'\n      - 'tsconfig.json'\n      - 'tsconfig.build.json'\n      - 'vitest.config.mts'\n      - '.github/workflows/conventions-src.yml'\n\npermissions:\n  contents: read\n\njobs:\n  # Job id kept as-is: it prefixes every check name this call produces.\n  conventions:\n    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0\n    with:\n      languages: '[\"typescript\"]'\n      source: src\n"
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "testing-conventions",
+      "ref": "v0"
+    },
+    "result": {
+      "sha": "64f8e7a34f565f665a8d6288ab320be50caf047a",
+      "node_id": "C_kwDOS0hnNNoAKDY0ZjhlN2EzNGY1NjVmNjY1YThkNjI4OGFiMzIwYmU1MGNhZjA0N2E",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-24T18:54:28Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-09-24T18:54:28Z"
+        },
+        "message": "Merge pull request #703 from thekevinscott/fix/698-workflow-lint-gate\n\nfeat: ship a workflow-lint check that keeps logic out of CI YAML",
+        "tree": {
+          "sha": "53814a561e967fd8d3785fcb016644d7dda5af3c",
+          "url": "https://api.github.com/repos/thekevinscott/testing-conventions/git/trees/53814a561e967fd8d3785fcb016644d7dda5af3c"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/testing-conventions/git/commits/64f8e7a34f565f665a8d6288ab320be50caf047a",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqtXHkCRC1aQ7uu5UhlAAA0TAQAAk5LfxLdprEeq7iY7lnUkFu\nQnn1p9ttpR8IZBFJKP68CgrfXSQwvc0ZqGTaWSqr7iB055va3zCx2fZ01QQ0AQtw\nbD/GWtexljOj9g5S0CHTsBI8qrTseCqLWpQdBu/2NpqlVVALLdmLwRF1luDBKCZ4\nejBu6ln2SOIqxZYBQhYBLT/KDsee+AVp/mwAYcMXlag+/hQL+e+UAmvEGGUxbC/f\nxN58P0O+E8UHNBw+0cm/D6S9FlsIctv0Q7Ru9VMdQgDLxJ+YbJbWHgAcOfed8yqE\nWfQU4s/RloSUaLPLLFO2Vs2VCTo8B8ZO3YC7ejGNhPxanewTZFpA7D4mjNCtVWfP\n/KQayIZHVIgiWa0Zzaz3xTnRNMHy1sWkEEH0hgGC7+pYVc/YApUPLM/uccAaWmL8\nNNSO7PvL4Rz8IqI3OYiwYx8sd3a+XFgFcd5ZbNgBsGy2GVC6FXlZd/rw9QOvQoVp\ndj5Q143Ba3nouo3004p/SGHgtSdi4uz+YQku6FLJCNxLY8Tv8LG4JT4n80fiVje8\nTkC/+2kYIi3NtKgbbVrrUAqnveJI6NorXEcAUt5gvZMz31tutN9QnpjpLpLGkrrX\nthlshUyn7Iyn6gg48ezBq04cpvGiRYybjm8upKhu+OqnUmsBJRY2GTKLd9Zzntq1\nCeEv4ykdDe8musjkYRTs\n=IFQb\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 53814a561e967fd8d3785fcb016644d7dda5af3c\nparent d847ce9af678919cf36c36596548415cd4f109b4\nparent 832c003cc9e2419b15e83d2582be95dffec323ac\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790276068 -0400\ncommitter GitHub <noreply@github.com> 1790276068 -0400\n\nMerge pull request #703 from thekevinscott/fix/698-workflow-lint-gate\n\nfeat: ship a workflow-lint check that keeps logic out of CI YAML",
+          "verified_at": "2026-09-24T18:54:29Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/testing-conventions/commits/64f8e7a34f565f665a8d6288ab320be50caf047a",
+      "html_url": "https://github.com/thekevinscott/testing-conventions/commit/64f8e7a34f565f665a8d6288ab320be50caf047a",
+      "comments_url": "https://api.github.com/repos/thekevinscott/testing-conventions/commits/64f8e7a34f565f665a8d6288ab320be50caf047a/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "d847ce9af678919cf36c36596548415cd4f109b4",
+          "url": "https://api.github.com/repos/thekevinscott/testing-conventions/commits/d847ce9af678919cf36c36596548415cd4f109b4",
+          "html_url": "https://github.com/thekevinscott/testing-conventions/commit/d847ce9af678919cf36c36596548415cd4f109b4"
+        },
+        {
+          "sha": "832c003cc9e2419b15e83d2582be95dffec323ac",
+          "url": "https://api.github.com/repos/thekevinscott/testing-conventions/commits/832c003cc9e2419b15e83d2582be95dffec323ac",
+          "html_url": "https://github.com/thekevinscott/testing-conventions/commit/832c003cc9e2419b15e83d2582be95dffec323ac"
+        }
+      ],
+      "stats": {
+        "total": 1016,
+        "additions": 1015,
+        "deletions": 1
+      },
+      "files": [
+        {
+          "sha": "76e8de068c056184908785b48db22bf993651269",
+          "filename": "docs/.vitepress/config.ts",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/docs%2F.vitepress%2Fconfig.ts",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/docs%2F.vitepress%2Fconfig.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/docs%2F.vitepress%2Fconfig.ts?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -73,6 +73,7 @@ export default defineConfig({\n                 { text: 'unit-coverage', link: '/reference/checks/unit-coverage' },\n                 { text: 'mutation', link: '/reference/checks/mutation' },\n                 { text: 'packaging', link: '/reference/checks/packaging' },\n+                { text: 'workflow-lint', link: '/reference/checks/workflow-lint' },\n                 { text: 'e2e-verify', link: '/reference/checks/e2e-verify' },\n                 { text: 'changelog', link: '/reference/checks/changelog' },\n               ],"
+        },
+        {
+          "sha": "f36743497a058b528041ccb5af0c5c98a32b6309",
+          "filename": "docs/reference/checks/index.md",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/docs%2Freference%2Fchecks%2Findex.md",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/docs%2Freference%2Fchecks%2Findex.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/docs%2Freference%2Fchecks%2Findex.md?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -44,9 +44,14 @@ carries the complete factual record.\n | [`unit-coverage`](./unit-coverage) | Unit-test coverage | Does the unit suite **run** the code — whole-tree and on the changed lines? |\n | [`mutation`](./mutation) | Unit mutation | Does the unit suite **verify** the code — break it, and a test fails? |\n | [`packaging`](./packaging) | Packaging | Does the **built artifact** ship no test files? |\n+| [`workflow-lint`](./workflow-lint) | _none yet_ | Does every CI `run:` body read as **wiring** rather than a program? |\n | [`e2e-verify`](./e2e-verify) | E2E attestation freshness | Does a branch that changed the code record one visible **e2e decision**? |\n | [`changelog`](./changelog) | CHANGELOG + MIGRATIONS touched | Does a pull request that changed a package's **public surface** add a fragment recording it? |\n \n+`workflow-lint` is the exception to that first sentence: it ships in the CLI but has no job and no\n+`gates` name yet. The job wiring lands in a following release, once the published binary understands\n+the subcommand — until then, run it yourself.\n+\n Each check's page states the facts and opens with the why; the [explanation section](/explanation/)\n carries the same ground as discursive essays — the testing model, the unit ladder, and the design\n trade-offs behind each check. One deliberate asymmetry: the two lint checks share one essay,"
+        },
+        {
+          "sha": "a5a92756835dd15e8b73e3fc4f1f7462769a6355",
+          "filename": "docs/reference/checks/workflow-lint.md",
+          "status": "added",
+          "additions": 121,
+          "deletions": 0,
+          "changes": 121,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/docs%2Freference%2Fchecks%2Fworkflow-lint.md",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/docs%2Freference%2Fchecks%2Fworkflow-lint.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/docs%2Freference%2Fchecks%2Fworkflow-lint.md?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -0,0 +1,121 @@\n+---\n+description: \"The workflow-lint check — a GitHub Actions `run:` or `github-script` body must be wiring, not a program. Covers the markers that make a body logic, the glue ceiling, which files are scanned, and why there is no exemption.\"\n+---\n+\n+# `workflow-lint`\n+\n+A `run:` block is the one place in a repository where code escapes every other gate. Nothing\n+imports it, so no test covers it; nothing builds it, so no compiler or linter reads it; you cannot\n+run it locally without a runner. This check keeps logic out of it.\n+\n+## Why this check exists\n+\n+Every other check on this list assumes code lives somewhere a test can reach. A shell script pasted\n+into YAML lives nowhere: it has no module, no caller, and no way to be exercised except by pushing\n+a commit and watching a job. So it is written once, half-verified by the one green run that\n+followed, and then it drifts — because the next person to touch it is also guessing.\n+\n+The failure mode is specific. A loop over package names silently publishes nothing when the list is\n+empty. A `case` arm that never matches falls through to success. A `sed` expression that stops\n+matching leaves a version string unreplaced, and the release ships. None of these fail loudly, and\n+none of them are visible in review, because a reviewer reading YAML is reading configuration and\n+skims it as such.\n+\n+Moving the logic into a tested package in the repository's own language costs one function and one\n+test. What you get back is a thing you can run on your laptop, step through, and cover — and a\n+`run:` line short enough that reviewing it is reading it.\n+\n+## What it enforces {#enforces}\n+\n+Every step's `run:` body, and the `script:` of an `actions/github-script` step, must read as\n+wiring. A body is flagged when it carries any of these:\n+\n+| Marker | Why it is logic |\n+| --- | --- |\n+| `for`, `while`, `until`, `select` at a command position | iteration — the empty-list case is invisible |\n+| `case` at a command position | multi-branch dispatch — the unmatched arm is invisible |\n+| `awk` running anywhere in the body | a text transformation worth its own test |\n+| `sed` running anywhere in the body | as above |\n+| more than **12** command lines | past a dozen commands it is a script whatever its control flow |\n+\n+A keyword counts only as the **first word** of a line, so `before_hook` and `casements=3` are\n+untouched. `awk` and `sed` count wherever a command can start — bare, or after a `|`, `;`, `&&`, or\n+`$(` — so `echo x | awk …` is caught, while `echo 'use awk for this'` is not.\n+\n+The line count ignores bookkeeping: blank lines, `#` comments, and a `set -…` prologue do not\n+count against the ceiling.\n+\n+### What stays inline\n+\n+The check is built to tolerate the glue a consumer's step would carry anyway. None of this is\n+flagged:\n+\n+- A toolchain install, a `checkout`, a cache restore.\n+- A single invocation, however long its argument list.\n+- A handful of straight-line commands.\n+- **One guard around an early exit.** `if [ … ]; then echo \"::error::…\"; exit 1; fi` is a\n+  precondition, not dispatch, and reads correctly at a glance.\n+\n+It is a pragmatic scanner, not a shell parser: it flags the high-signal markers of \"this is a\n+program\" and favors precision over recall. A borderline body that slips through is still worth\n+extracting — an extracted script is testable, and this one isn't.\n+\n+### Where the logic should go\n+\n+Into a tested package in the repository's own language, split the way the\n+[composition-root pattern](/explanation/isolation) asks: a pure decision layer holding the\n+branching, and a thin entry point that supplies the real I/O. The workflow then invokes it through\n+a declared bin, and the `run:` line is one call.\n+\n+Pass data in through the step's `env:` rather than interpolating `${{ }}` into the script body. An\n+`env:` value is templated safely; inline interpolation splices attacker-controlled text straight\n+into the shell.\n+\n+## Which files are scanned\n+\n+The YAML GitHub actually executes, and nothing else:\n+\n+- every `*.yml` / `*.yaml` **directly inside** a `workflows/` directory;\n+- every file named `action.yml` / `action.yaml`, at any depth — a composite action's\n+  `runs.steps` is scanned exactly like a job's.\n+\n+Discovery follows GitHub's own rules rather than taking every `*.yml` in the tree, so a lockfile or\n+a test fixture that happens to sit under `.github/` is never mistaken for CI. A named file is\n+always scanned, so you can point the check anywhere.\n+\n+A document that does not parse yields no findings rather than an error. Malformed workflow YAML is\n+[actionlint](https://github.com/rhysd/actionlint)'s to report, and it does so far better than this\n+check could.\n+\n+## When it runs\n+\n+Always — the files it reads are in the tree on every event, so there is nothing to scope to a diff.\n+A repository with no workflows passes untouched.\n+\n+Run it from the CLI:\n+\n+```sh\n+npx testing-conventions workflow-lint          # defaults to .github\n+npx testing-conventions workflow-lint path/to/workflow.yml\n+```\n+\n+The reusable workflow runs it as its own job in a following release, where the\n+[`gates` input](/reference/workflow#inputs) will name it `workflow-lint`.\n+\n+## Configuration\n+\n+The check reads no configuration and honors no exemption rules.\n+\n+That is deliberate. The escape hatch for every other check is a per-file exemption with a reason,\n+because a file can be a genuine exception. A `run:` body cannot: the argument for leaving logic\n+inline is always that extracting it is not worth the trouble, and the whole point of the check is\n+that the trouble is one function and one test. A step that truly cannot move is a sign the work\n+belongs in a composite action or a real program, not in an exemption.\n+\n+Once the check runs as a job, a consumer that needs it off leaves it out of\n+[`gates`](/reference/workflow#inputs) — the allowlist is authoritative.\n+\n+## Learn more\n+\n+- [`packaging`](./packaging) — the other check that reads build output rather than source.\n+- [Respond to a red check](/guide/configure) — what to do when this one fires."
+        },
+        {
+          "sha": "e5e5fda313f6c48d18b30848305560a6aee97b3d",
+          "filename": "packages/rust/Cargo.lock",
+          "status": "modified",
+          "additions": 97,
+          "deletions": 0,
+          "changes": 97,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2FCargo.lock",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2FCargo.lock",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/packages%2Frust%2FCargo.lock?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -91,6 +91,12 @@ dependencies = [\n  \"derive_arbitrary\",\n ]\n \n+[[package]]\n+name = \"arraydeque\"\n+version = \"0.5.1\"\n+source = \"registry+https://github.com/rust-lang/crates.io-index\"\n+checksum = \"7d902e3d592a523def97af8f317b08ce16b7ab854c1985a0c671e6f15cebc236\"\n+\n [[package]]\n name = \"autocfg\"\n version = \"1.5.1\"\n@@ -199,6 +205,12 @@ version = \"0.10.2\"\n source = \"registry+https://github.com/rust-lang/crates.io-index\"\n checksum = \"a6ef517f0926dd24a1582492c791b6a4818a4d94e789a334894aa15b0d12f55c\"\n \n+[[package]]\n+name = \"core_detect\"\n+version = \"1.0.0\"\n+source = \"registry+https://github.com/rust-lang/crates.io-index\"\n+checksum = \"7f8f80099a98041a3d1622845c271458a2d73e688351bf3cb999266764b81d48\"\n+\n [[package]]\n name = \"cow-utils\"\n version = \"0.1.3\"\n@@ -298,6 +310,12 @@ dependencies = [\n  \"syn\",\n ]\n \n+[[package]]\n+name = \"doc-comment\"\n+version = \"0.3.4\"\n+source = \"registry+https://github.com/rust-lang/crates.io-index\"\n+checksum = \"780955b8b195a21ab8e4ac6b60dd1dbdcec1dc6c51c0617964b08c81785e12c9\"\n+\n [[package]]\n name = \"dragonbox_ecma\"\n version = \"0.1.12\"\n@@ -310,6 +328,20 @@ version = \"1.16.0\"\n source = \"registry+https://github.com/rust-lang/crates.io-index\"\n checksum = \"91622ff5e7162018101f2fea40d6ebf4a78bbe5a49736a2020649edf9693679e\"\n \n+[[package]]\n+name = \"encoding_rs\"\n+version = \"0.8.42\"\n+source = \"registry+https://github.com/rust-lang/crates.io-index\"\n+checksum = \"8e985e0451871ad22fb8d2b6b076e2028a502a0d3950998c2c5c0a4f9b5d9679\"\n+dependencies = [\n+ \"cfg-if\",\n+ \"core_detect\",\n+ \"multiversion_no_op\",\n+ \"rustversion\",\n+ \"scopeguard\",\n+ \"simdutf8\",\n+]\n+\n [[package]]\n name = \"equivalent\"\n version = \"1.0.2\"\n@@ -352,6 +384,12 @@ dependencies = [\n  \"miniz_oxide\",\n ]\n \n+[[package]]\n+name = \"foldhash\"\n+version = \"0.1.5\"\n+source = \"registry+https://github.com/rust-lang/crates.io-index\"\n+checksum = \"d9c4f5dac5e15c24eb999c26181a6ca40b39fe946cbe4c263c7209467bc83af2\"\n+\n [[package]]\n name = \"getopts\"\n version = \"0.2.24\"\n@@ -381,6 +419,15 @@ dependencies = [\n  \"ahash\",\n ]\n \n+[[package]]\n+name = \"hashbrown\"\n+version = \"0.15.5\"\n+source = \"registry+https://github.com/rust-lang/crates.io-index\"\n+checksum = \"9229cfe53dfd69f0609a49f65461bd93001ea1ef889cd5529dd176593f5338a1\"\n+dependencies = [\n+ \"foldhash\",\n+]\n+\n [[package]]\n name = \"hashbrown\"\n version = \"0.17.1\"\n@@ -390,6 +437,15 @@ dependencies = [\n  \"allocator-api2\",\n ]\n \n+[[package]]\n+name = \"hashlink\"\n+version = \"0.10.0\"\n+source = \"registry+https://github.com/rust-lang/crates.io-index\"\n+checksum = \"7382cf6263419f2d8df38c55d7da83da5c18aef87fc7a7fc1fb1e344edfe14c1\"\n+dependencies = [\n+ \"hashbrown 0.15.5\",\n+]\n+\n [[package]]\n name = \"heck\"\n version = \"0.5.0\"\n@@ -545,6 +601,17 @@ dependencies = [\n  \"malachite-nz\",\n ]\n \n+[[package]]\n+name = \"marked-yaml\"\n+version = \"0.8.0\"\n+source = \"registry+https://github.com/rust-lang/crates.io-index\"\n+checksum = \"3a76cf4e66a8ffccfce983161b0faafe61a5ef03fe875ef2e3deb897e4e915fa\"\n+dependencies = [\n+ \"doc-comment\",\n+ \"hashlink\",\n+ \"yaml-rust2\",\n+]\n+\n [[package]]\n name = \"memchr\"\n version = \"2.8.1\"\n@@ -561,6 +628,12 @@ dependencies = [\n  \"simd-adler32\",\n ]\n \n+[[package]]\n+name = \"multiversion_no_op\"\n+version = \"1.0.0\"\n+source = \"registry+https://github.com/rust-lang/crates.io-index\"\n+checksum = \"743fb55ba31b18fb1ecef6bdc9aa2743314978ac084044301a7eee33fb99a20d\"\n+\n [[package]]\n name = \"nonmax\"\n version = \"0.5.5\"\n@@ -1133,6 +1206,12 @@ version = \"1.0.23\"\n source = \"registry+https://github.com/rust-lang/crates.io-index\"\n checksum = \"9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f\"\n \n+[[package]]\n+name = \"scopeguard\"\n+version = \"1.2.0\"\n+source = \"registry+https://github.com/rust-lang/crates.io-index\"\n+checksum = \"94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49\"\n+\n [[package]]\n name = \"self_cell\"\n version = \"1.3.0\"\n@@ -1214,6 +1293,12 @@ version = \"0.3.9\"\n source = \"registry+https://github.com/rust-lang/crates.io-index\"\n checksum = \"703d5c7ef118737c72f1af64ad2f6f8c5e1921f818cdcb97b8fe6fc69bf66214\"\n \n+[[package]]\n+name = \"simdutf8\"\n+version = \"0.1.5\"\n+source = \"registry+https://github.com/rust-lang/crates.io-index\"\n+checksum = \"e3a9fe34e3e7a50316060351f37187a3f546bce95496156754b601a5fa71b76e\"\n+\n [[package]]\n name = \"siphasher\"\n version = \"1.0.3\"\n@@ -1276,6 +1361,7 @@ dependencies = [\n  \"anyhow\",\n  \"clap\",\n  \"flate2\",\n+ \"marked-yaml\",\n  \"oxc\",\n  \"oxc_codegen\",\n  \"proc-macro2\",\n@@ -1539,6 +1625,17 @@ dependencies = [\n  \"rustix\",\n ]\n \n+[[package]]\n+name = \"yaml-rust2\"\n+version = \"0.10.4\"\n+source = \"registry+https://github.com/rust-lang/crates.io-index\"\n+checksum = \"2462ea039c445496d8793d052e13787f2b90e750b833afee748e601c17621ed9\"\n+dependencies = [\n+ \"arraydeque\",\n+ \"encoding_rs\",\n+ \"hashlink\",\n+]\n+\n [[package]]\n name = \"zerocopy\"\n version = \"0.8.52\""
+        },
+        {
+          "sha": "db1b4e69f708d4a1fac77d280ccaeac37f9be1cb",
+          "filename": "packages/rust/Cargo.toml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2FCargo.toml",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2FCargo.toml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/packages%2Frust%2FCargo.toml?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -34,3 +34,4 @@ zip = { version = \"2\", default-features = false, features = [\"deflate\"] }\n flate2 = \"1\"\n tar = \"0.4\"\n sha2 = \"0.11.0\"\n+marked-yaml = \"0.8.0\""
+        },
+        {
+          "sha": "bb7332ad715fe8134c03f59e30f4770d23ad80bc",
+          "filename": "packages/rust/changelog.d/2026-09-24-workflow-lint-check.md",
+          "status": "added",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Fchangelog.d%2F2026-09-24-workflow-lint-check.md",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Fchangelog.d%2F2026-09-24-workflow-lint-check.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/packages%2Frust%2Fchangelog.d%2F2026-09-24-workflow-lint-check.md?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -0,0 +1,8 @@\n+**Added** `workflow-lint [path]` — a GitHub Actions `run:` or `github-script` body must read as\n+wiring, not a program. A body is flagged when it iterates (`for` / `while` / `until` / `select`),\n+dispatches on `case`, runs `awk` or `sed`, or exceeds 12 command lines; blank lines, comments and a\n+`set -…` prologue do not count against the ceiling. Discovery follows GitHub's own rules — every\n+`*.yml` / `*.yaml` directly inside a `workflows/` directory, plus every `action.yml` /\n+`action.yaml` at any depth — so a fixture or lockfile under `.github` is never mistaken for CI. The\n+check reads no configuration and honors no exemptions, and a repository with no workflows is\n+skipped, never failed."
+        },
+        {
+          "sha": "9ef9f0fb70828a4b96de773e8c21e700466f1e2d",
+          "filename": "packages/rust/migrations.d/2026-09-24-workflow-lint-check.md",
+          "status": "added",
+          "additions": 42,
+          "deletions": 0,
+          "changes": 42,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Fmigrations.d%2F2026-09-24-workflow-lint-check.md",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Fmigrations.d%2F2026-09-24-workflow-lint-check.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/packages%2Frust%2Fmigrations.d%2F2026-09-24-workflow-lint-check.md?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -0,0 +1,42 @@\n+### The workflow-lint check ships in the CLI\n+\n+**Summary**\n+\n+\"`run:` holds no logic\" has been written policy across these repositories and machine-enforced in\n+none of them. actionlint and shellcheck catch bad refs and shell bugs; neither flags a loop, a\n+`case` dispatch, or `sed` munging in a `run:` body. The only enforcement anywhere was a repo-local\n+Python gate in `thekevinscott/template-lib` that every repository made from the template inherited\n+as a copy, free to drift. That rule set now ships in the published binary as\n+`testing-conventions workflow-lint [path]`.\n+\n+The rule is deliberately narrow. It flags the high-signal markers of \"this is a program\" —\n+iteration, `case` dispatch, `awk`/`sed`, and a body longer than 12 command lines — and leaves\n+everything else alone, including a single guard around an early exit, which is a precondition\n+rather than dispatch. A keyword counts only as the first word of a line, so `before_hook` and\n+`casements=3` are untouched. The check reads no configuration and honors no exemptions: the\n+argument for leaving logic inline is always that extracting it is not worth the trouble, and the\n+trouble is one function and one test.\n+\n+**Required changes**\n+\n+_None._ The command is additive; existing subcommands are unchanged.\n+\n+**Deprecations removed**\n+\n+_None._\n+\n+**Behavior changes without code changes**\n+\n+_None._ The reusable workflow does not run the check yet — the job wiring lands in a following\n+release, once the published binary understands the subcommand.\n+\n+**Verification**\n+\n+Run it at a repository root:\n+\n+```sh\n+npx testing-conventions workflow-lint\n+```\n+\n+It scans `.github` by default and names each offending step with its file, line, and the reasons it\n+was flagged. A repository with no workflows exits 0."
+        },
+        {
+          "sha": "7f03ba9eeeb6edf5a42722d39d1b615664a071fe",
+          "filename": "packages/rust/src/lib.rs",
+          "status": "modified",
+          "additions": 33,
+          "deletions": 0,
+          "changes": 33,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Fsrc%2Flib.rs",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Fsrc%2Flib.rs",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/packages%2Frust%2Fsrc%2Flib.rs?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -17,6 +17,7 @@ pub mod ts;\n pub mod violation;\n mod walk;\n pub mod workflow;\n+pub mod workflow_lint;\n \n use std::path::{Path, PathBuf};\n \n@@ -77,6 +78,14 @@ enum Command {\n         #[command(subcommand)]\n         command: E2eCommand,\n     },\n+    /// Workflow conventions: a GitHub Actions `run:` or `github-script` body must be wiring, not a\n+    /// program. Iteration, multi-branch dispatch, text-munging, and a body past a dozen commands\n+    /// belong in a tested package in the repository's own language, invoked as a one-line `run:`.\n+    WorkflowLint {\n+        /// Workflow or action file, or a directory of them (defaults to `.github`).\n+        #[arg(default_value = \".github\")]\n+        path: PathBuf,\n+    },\n     /// Changelog conventions: a pull request that changes a package's public surface adds a\n     /// fragment recording it. Skipped when the repository keeps no fragment directories.\n     Changelog {\n@@ -333,6 +342,7 @@ where\n         Some(Command::Packaging { path, language }) => run_packaging(&path, language),\n         Some(Command::Changelog { base, path }) => run_changelog(&base, &path),\n         Some(Command::Workflow { path }) => run_workflow(&path),\n+        Some(Command::WorkflowLint { path }) => run_workflow_lint(&path),\n         Some(Command::E2e { command }) => match command {\n             E2eCommand::Attest { command } => run_e2e_attest(&command),\n             E2eCommand::Verify {\n@@ -947,6 +957,29 @@ fn run_workflow(path: &Path) -> anyhow::Result<i32> {\n     Ok(1)\n }\n \n+fn run_workflow_lint(path: &Path) -> anyhow::Result<i32> {\n+    let findings = workflow_lint::scan(path)?;\n+    if findings.is_empty() {\n+        return Ok(0);\n+    }\n+    for f in &findings {\n+        eprintln!(\n+            \"{}:{}: {} step `{}` encodes logic inline ({}) — move it into a tested package in \\\n+             this repository's own language, invoked as a one-line `run:`\",\n+            f.file.display(),\n+            f.line,\n+            f.kind,\n+            f.step,\n+            f.reasons.join(\"; \")\n+        );\n+    }\n+    eprintln!(\n+        \"error: {} step(s) encode logic in CI YAML, where nothing tests it\",\n+        findings.len()\n+    );\n+    Ok(1)\n+}\n+\n /// Run `command` as the branch's e2e decision and, when it passes, commit the receipt.\n /// Returns `command`'s own exit code.\n fn run_e2e_attest(command: &str) -> anyhow::Result<i32> {"
+        },
+        {
+          "sha": "53495b405942638649222d90f38d5c05684c2081",
+          "filename": "packages/rust/src/workflow_lint.rs",
+          "status": "added",
+          "additions": 494,
+          "deletions": 0,
+          "changes": 494,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Fsrc%2Fworkflow_lint.rs",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Fsrc%2Fworkflow_lint.rs",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/packages%2Frust%2Fsrc%2Fworkflow_lint.rs?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -0,0 +1,494 @@\n+//! `workflow-lint` — flag a program encoded in GitHub Actions YAML.\n+//!\n+//! A `run:` or `actions/github-script` body should be wiring: a few straight-line commands, or a\n+//! lone guard around an early exit. Iteration, multi-branch dispatch, and text-munging make it a\n+//! program, and a program in YAML is untested, un-runnable locally, and drifts in silence. It\n+//! belongs in a tested package in the repository's own language, invoked as a one-line `run:`.\n+//!\n+//! This is a pragmatic scanner, not a shell parser: it flags the high-signal markers of \"this is a\n+//! program\" and tolerates straight-line glue. It favors precision over recall — a borderline body\n+//! that slips through is still worth extracting, because an extracted script is testable.\n+\n+use std::path::{Path, PathBuf};\n+\n+use anyhow::{Context, Result};\n+\n+/// Straight-line bodies longer than this must move out, branch-free or not: past a dozen commands\n+/// the step is a script whatever its control flow.\n+pub const MAX_GLUE_LINES: usize = 12;\n+\n+/// Shell keywords that, at a command position, mean iteration or multi-branch dispatch.\n+const LOGIC_KEYWORDS: [(&str, &str); 5] = [\n+    (\"for\", \"for loop\"),\n+    (\"while\", \"while loop\"),\n+    (\"until\", \"until loop\"),\n+    (\"select\", \"select loop\"),\n+    (\"case\", \"case dispatch\"),\n+];\n+\n+/// Commands whose whole purpose is rewriting text, which is a transformation worth testing.\n+const MUNGING_COMMANDS: [&str; 2] = [\"awk\", \"sed\"];\n+\n+/// One step whose body encodes logic.\n+#[derive(Debug, Clone, PartialEq, Eq)]\n+pub struct Finding {\n+    pub file: PathBuf,\n+    /// 1-based line of the body the reasons were found in.\n+    pub line: usize,\n+    /// The step's `name`, else its `uses`, else a placeholder.\n+    pub step: String,\n+    /// Which kind of body: `run` or `github-script`.\n+    pub kind: &'static str,\n+    /// Why the body is too complex to stay inline, in the order found.\n+    pub reasons: Vec<String>,\n+}\n+\n+/// Why `body` is too complex to live inline. Empty means it reads as wiring.\n+pub fn flag_reasons(body: &str) -> Vec<String> {\n+    let mut reasons: Vec<String> = Vec::new();\n+    for (keyword, name) in LOGIC_KEYWORDS {\n+        if body.lines().any(|line| starts_command(line, keyword)) {\n+            reasons.push(name.to_string());\n+        }\n+    }\n+    for command in MUNGING_COMMANDS {\n+        if body.lines().any(|line| runs_command(line, command)) {\n+            reasons.push(command.to_string());\n+        }\n+    }\n+    let count = significant_lines(body);\n+    if count > MAX_GLUE_LINES {\n+        reasons.push(format!(\"{count} lines (> {MAX_GLUE_LINES})\"));\n+    }\n+    reasons\n+}\n+\n+/// How many lines of `body` carry a command — blanks, comments, and the `set -…` prologue are\n+/// bookkeeping, not length.\n+fn significant_lines(body: &str) -> usize {\n+    body.lines()\n+        .map(str::trim)\n+        .filter(|line| !line.is_empty() && !line.starts_with('#') && !line.starts_with(\"set -\"))\n+        .count()\n+}\n+\n+/// `true` when `line`'s first word is `keyword`. Matching the whole first word is what keeps\n+/// `before_hook` off the `for` marker and `casements=3` off the `case` one.\n+fn starts_command(line: &str, keyword: &str) -> bool {\n+    line.split_whitespace().next() == Some(keyword)\n+}\n+\n+/// `true` when `command` runs anywhere in `line` — at the start, or after a pipe, a separator, or a\n+/// substitution opener. `echo x | awk …` is as much a transformation as a bare `awk`.\n+fn runs_command(line: &str, command: &str) -> bool {\n+    command_segments(line).any(|segment| segment.split_whitespace().next() == Some(command))\n+}\n+\n+/// `line` split at the shell positions a fresh command can start after: `|`, `;`, `&`, and the\n+/// `$(` / `` ` `` substitution openers. Splitting on the single characters covers `||` and `&&`\n+/// too, since the extra empty segment matches nothing.\n+fn command_segments(line: &str) -> impl Iterator<Item = &str> {\n+    line.split(['|', ';', '&', '(', ')', '`', '{', '}'])\n+}\n+\n+/// Every logic-bearing step in one workflow or composite-action document.\n+///\n+/// A document that does not parse yields no findings rather than an error: `workflow-lint` judges\n+/// the shape of a body it can read, and unparseable YAML is [actionlint]'s to report, with far\n+/// better messages than this check could give.\n+///\n+/// [actionlint]: https://github.com/rhysd/actionlint\n+pub fn find_violations(yaml_text: &str, file: impl AsRef<Path>) -> Vec<Finding> {\n+    let file = file.as_ref();\n+    let root = match marked_yaml::parse_yaml(0, yaml_text) {\n+        Ok(marked_yaml::types::Node::Mapping(root)) => root,\n+        _ => return Vec::new(),\n+    };\n+\n+    let mut findings = Vec::new();\n+    for step in steps(&root) {\n+        let label = step_label(step);\n+        for (kind, body, line) in bodies(step) {\n+            let reasons = flag_reasons(&body);\n+            if !reasons.is_empty() {\n+                findings.push(Finding {\n+                    file: file.to_path_buf(),\n+                    line,\n+                    step: label.clone(),\n+                    kind,\n+                    reasons,\n+                });\n+            }\n+        }\n+    }\n+    findings\n+}\n+\n+/// Every step mapping in a document: each job's `steps` for a workflow, `runs.steps` for a\n+/// composite action.\n+fn steps(\n+    root: &marked_yaml::types::MarkedMappingNode,\n+) -> Vec<&marked_yaml::types::MarkedMappingNode> {\n+    let mut out = Vec::new();\n+    if let Some(jobs) = root.get_mapping(\"jobs\") {\n+        for (_, job) in jobs.iter() {\n+            if let Some(job) = job.as_mapping() {\n+                push_steps(job, &mut out);\n+            }\n+        }\n+    }\n+    if let Some(runs) = root.get_mapping(\"runs\") {\n+        push_steps(runs, &mut out);\n+    }\n+    out\n+}\n+\n+/// Append `owner`'s `steps` sequence, when it has one, to `out`.\n+fn push_steps<'a>(\n+    owner: &'a marked_yaml::types::MarkedMappingNode,\n+    out: &mut Vec<&'a marked_yaml::types::MarkedMappingNode>,\n+) {\n+    let Some(steps) = owner.get_sequence(\"steps\") else {\n+        return;\n+    };\n+    out.extend(steps.iter().filter_map(|step| step.as_mapping()));\n+}\n+\n+/// How the step names itself in a report: its `name`, else the action it `uses`.\n+fn step_label(step: &marked_yaml::types::MarkedMappingNode) -> String {\n+    step.get_scalar(\"name\")\n+        .or_else(|| step.get_scalar(\"uses\"))\n+        .map(|node| node.as_str().to_string())\n+        .unwrap_or_else(|| \"<unnamed step>\".to_string())\n+}\n+\n+/// Each `(kind, body, line)` a step carries: its `run`, and the `script` of a `github-script` step.\n+fn bodies(step: &marked_yaml::types::MarkedMappingNode) -> Vec<(&'static str, String, usize)> {\n+    let mut out = Vec::new();\n+    if let Some(run) = step.get_scalar(\"run\") {\n+        out.push((\"run\", run.as_str().to_string(), line_of(run.span())));\n+    }\n+    let uses = step\n+        .get_scalar(\"uses\")\n+        .map(|node| node.as_str().to_string());\n+    if uses.is_some_and(|uses| uses.starts_with(\"actions/github-script\")) {\n+        if let Some(script) = step\n+            .get_mapping(\"with\")\n+            .and_then(|w| w.get_scalar(\"script\"))\n+        {\n+            out.push((\n+                \"github-script\",\n+                script.as_str().to_string(),\n+                line_of(script.span()),\n+            ));\n+        }\n+    }\n+    out\n+}\n+\n+/// The 1-based line a node starts on, or 0 when the parser recorded no position.\n+fn line_of(span: &marked_yaml::Span) -> usize {\n+    span.start().map(|marker| marker.line()).unwrap_or(0)\n+}\n+\n+/// Every logic-bearing step under `path` — a workflow file, or a directory to search — in\n+/// file-then-line order.\n+///\n+/// A `path` that is not there yields no findings: a repository with no CI has nothing to judge, so\n+/// the default `.github` must not be an error.\n+pub fn scan(path: impl AsRef<Path>) -> Result<Vec<Finding>> {\n+    let path = path.as_ref();\n+    let mut files = Vec::new();\n+    if path.exists() {\n+        collect_ci_files(path, &mut files)?;\n+    }\n+    files.sort();\n+\n+    let mut findings = Vec::new();\n+    for file in files {\n+        let text = std::fs::read_to_string(&file)\n+            .with_context(|| format!(\"reading workflow `{}`\", file.display()))?;\n+        findings.extend(find_violations(&text, &file));\n+    }\n+    Ok(findings)\n+}\n+\n+/// Collect the YAML GitHub actually executes under `path` into `out`: `path` itself when it is a\n+/// file, else every qualifying file beneath it, recursively. A named file is always scanned, so a\n+/// caller can point the check anywhere.\n+fn collect_ci_files(path: &Path, out: &mut Vec<PathBuf>) -> Result<()> {\n+    if path.is_file() {\n+        out.push(path.to_path_buf());\n+        return Ok(());\n+    }\n+    let entries = std::fs::read_dir(path)\n+        .with_context(|| format!(\"reading directory `{}`\", path.display()))?;\n+    for entry in entries {\n+        let child = crate::walk::dir_entry(entry, path)?.path();\n+        if child.is_dir() {\n+            collect_ci_files(&child, out)?;\n+        } else if is_ci_file(&child) {\n+            out.push(child);\n+        }\n+    }\n+    Ok(())\n+}\n+\n+/// `true` when GitHub reads `path` as a workflow or a composite action: a YAML file directly inside\n+/// a `workflows` directory, or one named `action.yml` / `action.yaml` anywhere.\n+///\n+/// Discovery mirrors GitHub's own rules rather than taking every `*.yml` in the tree, so a fixture\n+/// or a lockfile that happens to sit under `.github` is never mistaken for CI.\n+fn is_ci_file(path: &Path) -> bool {\n+    if !matches!(\n+        path.extension().and_then(|e| e.to_str()),\n+        Some(\"yml\" | \"yaml\")\n+    ) {\n+        return false;\n+    }\n+    let name = path.file_name().and_then(|n| n.to_str());\n+    if matches!(name, Some(\"action.yml\" | \"action.yaml\")) {\n+        return true;\n+    }\n+    path.parent()\n+        .and_then(Path::file_name)\n+        .and_then(|n| n.to_str())\n+        == Some(\"workflows\")\n+}\n+\n+#[cfg(test)]\n+mod tests {\n+    use super::*;\n+\n+    #[test]\n+    fn straight_line_glue_is_not_logic() {\n+        assert_eq!(\n+            flag_reasons(\n+                \"pkg=@x/linux\\nmkdir -p \\\"$pkg/bin\\\"\\ninstall -m 755 bin/x \\\"$pkg/bin/x\\\"\"\n+            ),\n+            Vec::<String>::new()\n+        );\n+    }\n+\n+    #[test]\n+    fn a_lone_guard_around_an_exit_is_glue() {\n+        let body = \"set -euo pipefail\\n\\\n+                    private=$(gh api repos/x --jq .private)\\n\\\n+                    if [ \\\"$private\\\" = \\\"true\\\" ]; then\\n\\\n+                      echo \\\"::error::private\\\"\\n\\\n+                      exit 1\\n\\\n+                    fi\\n\\\n+                    echo ok\\n\";\n+        assert_eq!(flag_reasons(body), Vec::<String>::new());\n+    }\n+\n+    #[test]\n+    fn each_loop_and_dispatch_keyword_is_named() {\n+        assert_eq!(\n+            flag_reasons(\"for name in $NAMES; do\\n  npm publish \\\"$name\\\"\\ndone\"),\n+            vec![\"for loop\"]\n+        );\n+        assert_eq!(\n+            flag_reasons(\"while read -r l; do\\n  echo $l\\ndone\"),\n+            vec![\"while loop\"]\n+        );\n+        assert_eq!(\n+            flag_reasons(\"until ok; do\\n  sleep 1\\ndone\"),\n+            vec![\"until loop\"]\n+        );\n+        assert_eq!(\n+            flag_reasons(\"select x in a b; do\\n  echo $x\\ndone\"),\n+            vec![\"select loop\"]\n+        );\n+        assert_eq!(\n+            flag_reasons(\"case \\\"$1\\\" in\\n  a) echo a ;;\\nesac\"),\n+            vec![\"case dispatch\"]\n+        );\n+    }\n+\n+    #[test]\n+    fn a_keyword_is_only_a_marker_at_a_command_position() {\n+        // `before` / `format` / `casements` share a prefix with a keyword and must not trip it.\n+        assert_eq!(\n+            flag_reasons(\"before_hook\\nformat_output\\ncasements=3\"),\n+            Vec::<String>::new()\n+        );\n+        // A keyword as an argument is not a command either.\n+        assert_eq!(flag_reasons(\"echo for while case\"), Vec::<String>::new());\n+    }\n+\n+    #[test]\n+    fn text_munging_counts_wherever_the_command_runs() {\n+        assert_eq!(flag_reasons(\"awk -F/ '{print $2}' f\"), vec![\"awk\"]);\n+        assert_eq!(flag_reasons(\"echo x | awk -F/ '{print $2}'\"), vec![\"awk\"]);\n+        assert_eq!(flag_reasons(\"cat f | sed 's/a/b/'\"), vec![\"sed\"]);\n+        assert_eq!(flag_reasons(\"v=$(sed -n 1p f)\"), vec![\"sed\"]);\n+        assert_eq!(flag_reasons(\"a; sed -i s/x/y/ f\"), vec![\"sed\"]);\n+        assert_eq!(flag_reasons(\"ok && awk 'END{print NR}' f\"), vec![\"awk\"]);\n+    }\n+\n+    #[test]\n+    fn a_munging_command_named_as_an_argument_is_not_running() {\n+        assert_eq!(\n+            flag_reasons(\"echo 'use awk for this'\"),\n+            Vec::<String>::new()\n+        );\n+        assert_eq!(flag_reasons(\"apt-get install -y sed\"), Vec::<String>::new());\n+    }\n+\n+    #[test]\n+    fn a_long_straight_line_body_is_a_script_by_length() {\n+        let body = (0..MAX_GLUE_LINES + 3)\n+            .map(|i| format!(\"cmd{i}\"))\n+            .collect::<Vec<_>>()\n+            .join(\"\\n\");\n+        assert_eq!(flag_reasons(&body), vec![\"15 lines (> 12)\"]);\n+    }\n+\n+    #[test]\n+    fn the_length_count_ignores_bookkeeping() {\n+        // Exactly at the ceiling passes, and the prologue, comments, and blanks do not count.\n+        let body = (0..MAX_GLUE_LINES)\n+            .map(|i| format!(\"cmd{i}\"))\n+            .collect::<Vec<_>>()\n+            .join(\"\\n\");\n+        assert_eq!(flag_reasons(&body), Vec::<String>::new());\n+        assert_eq!(\n+            flag_reasons(\"set -euo pipefail\\n# a note\\n\\necho hi\"),\n+            Vec::<String>::new()\n+        );\n+    }\n+\n+    #[test]\n+    fn every_reason_a_body_earns_is_reported() {\n+        let body = \"for f in *; do\\n  case $f in\\n    a) sed -i s/x/y/ $f ;;\\n  esac\\ndone\";\n+        assert_eq!(flag_reasons(body), vec![\"for loop\", \"case dispatch\", \"sed\"]);\n+    }\n+\n+    const LOOP_WORKFLOW: &str = \"jobs:\\n  publish:\\n    steps:\\n      - name: Publish stubs\\n        run: |\\n          for name in $NAMES; do\\n            npm publish \\\"$name\\\"\\n          done\\n\";\n+\n+    #[test]\n+    fn a_run_step_reports_its_file_name_and_line() {\n+        let findings = find_violations(LOOP_WORKFLOW, \"w.yml\");\n+        assert_eq!(findings.len(), 1);\n+        assert_eq!(findings[0].step, \"Publish stubs\");\n+        assert_eq!(findings[0].kind, \"run\");\n+        assert_eq!(findings[0].reasons, vec![\"for loop\"]);\n+        assert_eq!(findings[0].file, PathBuf::from(\"w.yml\"));\n+        assert_eq!(findings[0].line, 6, \"the body starts on line 6\");\n+    }\n+\n+    #[test]\n+    fn a_github_script_body_is_judged_too() {\n+        let yaml = \"jobs:\\n  label:\\n    steps:\\n      - uses: actions/github-script@v7\\n        with:\\n          script: |\\n            for (const i of items) {\\n              core.info(i)\\n            }\\n\";\n+        let findings = find_violations(yaml, \"w.yml\");\n+        assert_eq!(findings.len(), 1);\n+        assert_eq!(findings[0].kind, \"github-script\");\n+        assert_eq!(findings[0].step, \"actions/github-script@v7\");\n+        assert_eq!(findings[0].reasons, vec![\"for loop\"]);\n+    }\n+\n+    #[test]\n+    fn another_actions_script_input_is_not_a_github_script_body() {\n+        let yaml = \"jobs:\\n  j:\\n    steps:\\n      - uses: some/other@v1\\n        with:\\n          script: |\\n            for x in 1 2; do echo $x; done\\n\";\n+        assert_eq!(find_violations(yaml, \"w.yml\"), Vec::new());\n+    }\n+\n+    #[test]\n+    fn a_composite_action_is_scanned_through_runs_steps() {\n+        let yaml = \"runs:\\n  using: composite\\n  steps:\\n    - name: Munge\\n      shell: bash\\n      run: cat f | sed 's/a/b/'\\n\";\n+        let findings = find_violations(yaml, \"action.yml\");\n+        assert_eq!(findings.len(), 1);\n+        assert_eq!(findings[0].step, \"Munge\");\n+        assert_eq!(findings[0].reasons, vec![\"sed\"]);\n+    }\n+\n+    #[test]\n+    fn a_clean_workflow_yields_nothing() {\n+        let yaml = \"jobs:\\n  build:\\n    steps:\\n      - uses: actions/checkout@v4\\n      - run: pnpm install --frozen-lockfile\\n      - name: Test\\n        run: pnpm test\\n\";\n+        assert_eq!(find_violations(yaml, \"w.yml\"), Vec::new());\n+    }\n+\n+    #[test]\n+    fn a_step_without_a_name_falls_back_to_its_uses_then_a_placeholder() {\n+        let named_by_uses = \"jobs:\\n  j:\\n    steps:\\n      - uses: actions/setup-node@v4\\n        run: for x in 1; do echo $x; done\\n\";\n+        assert_eq!(\n+            find_violations(named_by_uses, \"w.yml\")[0].step,\n+            \"actions/setup-node@v4\"\n+        );\n+\n+        let unnamed = \"jobs:\\n  j:\\n    steps:\\n      - run: for x in 1; do echo $x; done\\n\";\n+        assert_eq!(find_violations(unnamed, \"w.yml\")[0].step, \"<unnamed step>\");\n+    }\n+\n+    #[test]\n+    fn unparseable_yaml_is_actionlints_to_report_not_ours() {\n+        assert_eq!(find_violations(\"jobs: [unclosed\\n\", \"w.yml\"), Vec::new());\n+    }\n+\n+    #[test]\n+    fn a_document_with_no_steps_anywhere_yields_nothing() {\n+        assert_eq!(find_violations(\"name: CI\\non: push\\n\", \"w.yml\"), Vec::new());\n+        assert_eq!(find_violations(\"- a\\n- b\\n\", \"w.yml\"), Vec::new());\n+        assert_eq!(find_violations(\"\", \"w.yml\"), Vec::new());\n+        // A job, or a composite `runs:`, that declares no steps at all.\n+        assert_eq!(\n+            find_violations(\"jobs:\\n  a:\\n    runs-on: ubuntu-latest\\n\", \"w.yml\"),\n+            Vec::new()\n+        );\n+        assert_eq!(\n+            find_violations(\"runs:\\n  using: node20\\n  main: index.js\\n\", \"action.yml\"),\n+            Vec::new()\n+        );\n+    }\n+\n+    #[test]\n+    fn a_job_that_is_not_a_mapping_is_skipped() {\n+        // `jobs:` holding a scalar is nonsense GitHub would reject; it must not panic here.\n+        assert_eq!(find_violations(\"jobs:\\n  a: 3\\n\", \"w.yml\"), Vec::new());\n+    }\n+\n+    #[test]\n+    fn a_github_script_step_carrying_no_script_has_no_body() {\n+        let yaml = \"jobs:\\n  j:\\n    steps:\\n      - uses: actions/github-script@v7\\n\";\n+        assert_eq!(find_violations(yaml, \"w.yml\"), Vec::new());\n+    }\n+\n+    #[test]\n+    fn discovery_follows_githubs_own_rules() {\n+        assert!(is_ci_file(Path::new(\".github/workflows/ci.yml\")));\n+        assert!(is_ci_file(Path::new(\".github/workflows/ci.yaml\")));\n+        assert!(is_ci_file(Path::new(\".github/actions/detect/action.yml\")));\n+        assert!(is_ci_file(Path::new(\"tools/thing/action.yaml\")));\n+\n+        // Not CI: a lockfile or fixture that merely sits under `.github`, a nested file GitHub\n+        // never reads as a workflow, and a non-YAML extension.\n+        assert!(!is_ci_file(Path::new(\n+            \".github/selftest/clean/pnpm-lock.yaml\"\n+        )));\n+        assert!(!is_ci_file(Path::new(\n+            \".github/workflows/nested/deep/ci.yml\"\n+        )));\n+        assert!(!is_ci_file(Path::new(\".github/workflows/notes.md\")));\n+    }\n+\n+    #[test]\n+    fn an_unreadable_directory_names_itself() {\n+        let err = collect_ci_files(\n+            Path::new(\"tc-workflow-lint-no-such-directory\"),\n+            &mut Vec::new(),\n+        )\n+        .unwrap_err();\n+        assert!(\n+            format!(\"{err:#}\").contains(\"reading directory\"),\n+            \"got: {err:#}\"\n+        );\n+    }\n+\n+    #[test]\n+    fn every_job_in_a_workflow_is_scanned() {\n+        let yaml = \"jobs:\\n  a:\\n    steps:\\n      - run: for x in 1; do :; done\\n  b:\\n    steps:\\n      - run: cat f | sed s/a/b/\\n\";\n+        let findings = find_violations(yaml, \"w.yml\");\n+        assert_eq!(findings.len(), 2);\n+    }\n+}"
+        },
+        {
+          "sha": "1a51fd413ee9c5a989254af1d3aceeb42f0396d3",
+          "filename": "packages/rust/tests/fixtures/workflow_lint/clean/actions/detect/action.yml",
+          "status": "added",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fclean%2Factions%2Fdetect%2Faction.yml",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fclean%2Factions%2Fdetect%2Faction.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fclean%2Factions%2Fdetect%2Faction.yml?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -0,0 +1,9 @@\n+name: Detect\n+description: A composite action whose steps are wiring.\n+\n+runs:\n+  using: composite\n+  steps:\n+    - name: Detect\n+      shell: bash\n+      run: node \"$GITHUB_ACTION_PATH/dist/index.js\""
+        },
+        {
+          "sha": "6c66c4a342353d80991c344b6b51af9f7ecc66a3",
+          "filename": "packages/rust/tests/fixtures/workflow_lint/clean/selftest/workflow-fixture.yaml",
+          "status": "added",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fclean%2Fselftest%2Fworkflow-fixture.yaml",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fclean%2Fselftest%2Fworkflow-fixture.yaml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fclean%2Fselftest%2Fworkflow-fixture.yaml?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -0,0 +1,9 @@\n+# Not CI: a test fixture that merely sits under the scanned root. The loop below is here on purpose\n+# — discovery must never read this file as a workflow.\n+jobs:\n+  decoy:\n+    steps:\n+      - run: |\n+          for name in $NAMES; do\n+            npm publish \"$name\"\n+          done"
+        },
+        {
+          "sha": "6dfb0bdb99bfedb4c8abff5e3ca2b02d62a0bf27",
+          "filename": "packages/rust/tests/fixtures/workflow_lint/clean/workflows/ci.yml",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fclean%2Fworkflows%2Fci.yml",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fclean%2Fworkflows%2Fci.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fclean%2Fworkflows%2Fci.yml?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -0,0 +1,23 @@\n+name: CI\n+\n+on: push\n+\n+jobs:\n+  test:\n+    runs-on: ubuntu-latest\n+    steps:\n+      - uses: actions/checkout@v6\n+      - uses: actions/setup-node@v6\n+        with:\n+          node-version: 24\n+      - run: pnpm install --frozen-lockfile\n+      - name: Test\n+        run: pnpm test\n+      - name: Guard the private flag\n+        run: |\n+          set -euo pipefail\n+          private=$(gh api repos/x --jq .private)\n+          if [ \"$private\" = \"true\" ]; then\n+            echo \"::error::the repository is private\"\n+            exit 1\n+          fi"
+        },
+        {
+          "sha": "d3b4415186d57995cec976d0710ec5c09d8a73dc",
+          "filename": "packages/rust/tests/fixtures/workflow_lint/clean/workflows/nested/deep.yml",
+          "status": "added",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fclean%2Fworkflows%2Fnested%2Fdeep.yml",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fclean%2Fworkflows%2Fnested%2Fdeep.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fclean%2Fworkflows%2Fnested%2Fdeep.yml?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -0,0 +1,8 @@\n+# Not CI: GitHub reads only the YAML directly inside `workflows/`. The loop is here on purpose.\n+jobs:\n+  decoy:\n+    steps:\n+      - run: |\n+          for name in $NAMES; do\n+            npm publish \"$name\"\n+          done"
+        },
+        {
+          "sha": "a9f14e25d720a3a6441247a5303ecd3690fcab34",
+          "filename": "packages/rust/tests/fixtures/workflow_lint/red/actions/munge/action.yml",
+          "status": "added",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fred%2Factions%2Fmunge%2Faction.yml",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fred%2Factions%2Fmunge%2Faction.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fred%2Factions%2Fmunge%2Faction.yml?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -0,0 +1,9 @@\n+name: Munge\n+description: A composite action that rewrites text in a run step.\n+\n+runs:\n+  using: composite\n+  steps:\n+    - name: Rewrite the version\n+      shell: bash\n+      run: sed -i \"s/0.0.0/$VERSION/\" package.json"
+        },
+        {
+          "sha": "b7356ecd70f2027e46462d20480be4ec2c54e94d",
+          "filename": "packages/rust/tests/fixtures/workflow_lint/red/workflows/publish.yml",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fred%2Fworkflows%2Fpublish.yml",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fred%2Fworkflows%2Fpublish.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/packages%2Frust%2Ftests%2Ffixtures%2Fworkflow_lint%2Fred%2Fworkflows%2Fpublish.yml?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -0,0 +1,16 @@\n+name: Publish\n+\n+on:\n+  workflow_dispatch:\n+\n+jobs:\n+  publish:\n+    runs-on: ubuntu-latest\n+    steps:\n+      - uses: actions/checkout@v6\n+      - name: Publish bootstrap stubs\n+        run: |\n+          set -euo pipefail\n+          for name in $NAMES; do\n+            npm publish \"$name\" --access public\n+          done"
+        },
+        {
+          "sha": "c469c934fd2421b030ae5741cfb0c980363e9527",
+          "filename": "packages/rust/tests/workflow_e2e.rs",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Fworkflow_e2e.rs",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Fworkflow_e2e.rs",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/packages%2Frust%2Ftests%2Fworkflow_e2e.rs?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -40,10 +40,11 @@ fn help_stdout() -> String {\n #[test]\n fn help_does_not_list_the_private_workflow_command() {\n     let help = help_stdout();\n+    // The command word, not a prefix: the public `workflow-lint` shares one.\n     assert!(\n         !help\n             .lines()\n-            .any(|line| line.trim_start().starts_with(\"workflow\")),\n+            .any(|line| line.split_whitespace().next() == Some(\"workflow\")),\n         \"`workflow` must not be listed in --help:\\n{help}\"\n     );\n }"
+        },
+        {
+          "sha": "d9edc77d4d8f7f9a6148fb7a201cca9a2980b5a8",
+          "filename": "packages/rust/tests/workflow_lint.rs",
+          "status": "added",
+          "additions": 83,
+          "deletions": 0,
+          "changes": 83,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Fworkflow_lint.rs",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Fworkflow_lint.rs",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/packages%2Frust%2Ftests%2Fworkflow_lint.rs?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -0,0 +1,83 @@\n+use std::path::PathBuf;\n+\n+use testing_conventions::workflow_lint;\n+\n+fn fixture(name: &str) -> PathBuf {\n+    PathBuf::from(env!(\"CARGO_MANIFEST_DIR\"))\n+        .join(\"tests/fixtures/workflow_lint\")\n+        .join(name)\n+}\n+\n+#[test]\n+fn a_clean_tree_has_no_findings() {\n+    let findings = workflow_lint::scan(fixture(\"clean\")).unwrap();\n+    assert!(findings.is_empty(), \"unexpected findings: {findings:?}\");\n+}\n+\n+#[test]\n+fn discovery_skips_the_yaml_github_never_reads_as_ci() {\n+    // Both decoys carry a `for` loop: a test fixture under the scanned root, and a file nested a\n+    // directory below `workflows/`. A scan that read either would report it.\n+    let findings = workflow_lint::scan(fixture(\"clean\")).unwrap();\n+    assert_eq!(findings.len(), 0, \"a decoy was scanned: {findings:?}\");\n+}\n+\n+#[test]\n+fn a_red_tree_reports_the_workflow_and_the_composite_action() {\n+    let findings = workflow_lint::scan(fixture(\"red\")).unwrap();\n+    let steps: Vec<&str> = findings.iter().map(|f| f.step.as_str()).collect();\n+    assert_eq!(\n+        steps,\n+        vec![\"Rewrite the version\", \"Publish bootstrap stubs\"]\n+    );\n+}\n+\n+#[test]\n+fn a_finding_names_its_file_line_and_reasons() {\n+    let findings = workflow_lint::scan(fixture(\"red/workflows/publish.yml\")).unwrap();\n+    assert_eq!(findings.len(), 1);\n+    assert_eq!(findings[0].line, 13, \"the body starts on line 13\");\n+    assert_eq!(findings[0].kind, \"run\");\n+    assert_eq!(findings[0].reasons, vec![\"for loop\"]);\n+    assert!(findings[0].file.ends_with(\"workflows/publish.yml\"));\n+}\n+\n+#[test]\n+fn a_named_file_is_scanned_whatever_its_name() {\n+    // The decoy is not CI by discovery, but naming it directly scans it — so a caller can point\n+    // the check at any file.\n+    let findings = workflow_lint::scan(fixture(\"clean/selftest/workflow-fixture.yaml\")).unwrap();\n+    assert_eq!(findings.len(), 1);\n+    assert_eq!(findings[0].reasons, vec![\"for loop\"]);\n+}\n+\n+#[test]\n+fn a_repository_with_no_ci_directory_is_not_an_error() {\n+    let findings = workflow_lint::scan(fixture(\"no-such-directory\")).unwrap();\n+    assert!(findings.is_empty());\n+}\n+\n+fn unique_tmp(slug: &str) -> PathBuf {\n+    use std::sync::atomic::{AtomicU64, Ordering};\n+    static COUNTER: AtomicU64 = AtomicU64::new(0);\n+    let dir = std::env::temp_dir().join(format!(\n+        \"tc-workflow-lint-{slug}-{}-{}\",\n+        std::process::id(),\n+        COUNTER.fetch_add(1, Ordering::Relaxed),\n+    ));\n+    std::fs::create_dir_all(&dir).unwrap();\n+    dir\n+}\n+\n+#[test]\n+fn an_unreadable_workflow_names_the_file() {\n+    let dir = unique_tmp(\"nonutf8\");\n+    let file = dir.join(\"ci.yml\");\n+    std::fs::write(&file, [0xFF, 0xFE, 0x00]).unwrap();\n+    let err = workflow_lint::scan(&file).unwrap_err();\n+    let _ = std::fs::remove_dir_all(&dir);\n+    assert!(\n+        format!(\"{err:#}\").contains(\"reading workflow\"),\n+        \"got: {err:#}\"\n+    );\n+}"
+        },
+        {
+          "sha": "27386c447db81fb6e68cddeb71bb6318a40e27b2",
+          "filename": "packages/rust/tests/workflow_lint_e2e.rs",
+          "status": "added",
+          "additions": 54,
+          "deletions": 0,
+          "changes": 54,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Fworkflow_lint_e2e.rs",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/64f8e7a34f565f665a8d6288ab320be50caf047a/packages%2Frust%2Ftests%2Fworkflow_lint_e2e.rs",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/packages%2Frust%2Ftests%2Fworkflow_lint_e2e.rs?ref=64f8e7a34f565f665a8d6288ab320be50caf047a",
+          "patch": "@@ -0,0 +1,54 @@\n+use std::path::PathBuf;\n+use std::process::{Command, Output};\n+\n+fn fixture(name: &str) -> PathBuf {\n+    PathBuf::from(env!(\"CARGO_MANIFEST_DIR\"))\n+        .join(\"tests/fixtures/workflow_lint\")\n+        .join(name)\n+}\n+\n+/// `testing-conventions workflow-lint <fixture>`.\n+fn workflow_lint(name: &str) -> Output {\n+    Command::new(env!(\"CARGO_BIN_EXE_testing-conventions\"))\n+        .arg(\"workflow-lint\")\n+        .arg(fixture(name))\n+        .output()\n+        .expect(\"the built binary should run\")\n+}\n+\n+#[test]\n+fn a_clean_tree_exits_zero() {\n+    let out = workflow_lint(\"clean\");\n+    assert_eq!(out.status.code(), Some(0));\n+}\n+\n+#[test]\n+fn a_red_tree_exits_one_and_names_every_step() {\n+    let out = workflow_lint(\"red\");\n+    assert_eq!(out.status.code(), Some(1));\n+    let stderr = String::from_utf8(out.stderr).expect(\"stderr is utf-8\");\n+    assert!(\n+        stderr.contains(\"workflows/publish.yml:13:\") && stderr.contains(\"Publish bootstrap stubs\"),\n+        \"{stderr}\"\n+    );\n+    assert!(\n+        stderr.contains(\"action.yml:9:\") && stderr.contains(\"Rewrite the version\"),\n+        \"{stderr}\"\n+    );\n+    assert!(\n+        stderr.contains(\"2 step(s) encode logic in CI YAML\"),\n+        \"{stderr}\"\n+    );\n+}\n+\n+#[test]\n+fn the_default_path_is_dot_github() {\n+    // Run with no path argument in a directory that has no `.github`: the default must be a pass,\n+    // not a missing-path error.\n+    let out = Command::new(env!(\"CARGO_BIN_EXE_testing-conventions\"))\n+        .arg(\"workflow-lint\")\n+        .current_dir(fixture(\"clean/selftest\"))\n+        .output()\n+        .expect(\"the built binary should run\");\n+    assert_eq!(out.status.code(), Some(0));\n+}"
+        }
+      ]
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "testing-conventions",
+      "path": ".github/workflows/testing-conventions.yml",
+      "ref": "64f8e7a34f565f665a8d6288ab320be50caf047a"
+    },
+    "result": "name: Testing Conventions\n\n# Reusable, consumer-facing workflow: one `uses:` call runs every check.\n# See docs/reference/workflow.md for the inputs, the checks, and the `@v0` contract.\n\non:\n  workflow_call:\n    inputs:\n      languages:\n        description: 'Optional JSON array restricting which languages to check, e.g. [\"python\"]. Empty (the default) auto-detects every supported language present under `source`.'\n        type: string\n        default: ''\n      source:\n        description: 'Directory scanned recursively for sources.'\n        type: string\n        default: 'src'\n      version:\n        description: 'testing-conventions version to run, e.g. 0.1.0 (default: latest from npm).'\n        type: string\n        default: ''\n      config:\n        description: 'Optional config file to refine the checks (coverage thresholds, exemptions). If absent, every check runs with sane defaults.'\n        type: string\n        default: 'testing-conventions.toml'\n      base:\n        description: 'Base ref for the diff-scoped `--base` jobs, diffed as `<base>...HEAD`. Used by the `*-changed` jobs, which run on `pull_request` only and check out full history.'\n        type: string\n        default: 'origin/main'\n      run_e2e:\n        description: 'Force the `e2e verify` freshness gate on. It is already default-on when committed receipts (`e2e-attestations/`) are present at the package root; set this to run it regardless. Needs the receipts and full git history.'\n        type: boolean\n        default: false\n      packaging_artifact:\n        description: 'Name of an uploaded build artifact (actions/upload-artifact) holding the built distributions (.whl/.tar.gz/.tgz/.crate) to check. When set, the packaging job downloads and inspects it. When empty (default), packaging still runs over a conventional dist/ found in the checkout, and is skipped only when no dist/ exists either.'\n        type: string\n        default: ''\n      gates:\n        description: 'Optional JSON array naming which gates run, e.g. [\"colocated-test\", \"unit-lint\", \"integration-lint\"]. Empty (the default) runs every applicable gate. Gate names: colocated-test, one-function-per-file, unit-lint, unit-coverage, mutation, integration-lint, packaging, e2e-verify, changelog. A named gate still applies its own conditions, and its diff-scoped variant rides with it (colocated-test covers the co-change job, unit-coverage the changed-line job). The allowlist is authoritative: a gate left out is skipped even when run_e2e / packaging_artifact is set.'\n        type: string\n        default: ''\n      rust_toolchain:\n        description: 'Manual override: provision a stable Rust toolchain (with a cargo registry + target cache) in the suite-executing jobs, before build_command runs. unit coverage / changed-line coverage / unit mutation already auto-provision it when the manifest at the derived package root declares a Rust-compiling build (a Cargo.toml, a maturin backend, a napi key); set this by hand only for a build the manifest does not express. The rust matrix arm always carries its own toolchain. false (the default) leaves provisioning to that auto-derivation.'\n        type: boolean\n        default: false\n\npermissions:\n  contents: read\n\njobs:\n  detect:\n    name: Detect requested languages with sources\n    runs-on: ubuntu-latest\n    outputs:\n      languages: ${{ steps.scan_hermetic.outputs.languages || steps.scan_published.outputs.languages }}\n      colocated_test_languages: ${{ steps.scan_hermetic.outputs.colocated_test_languages || steps.scan_published.outputs.colocated_test_languages }}\n      integration_lint_languages: ${{ steps.scan_hermetic.outputs.integration_lint_languages || steps.scan_published.outputs.integration_lint_languages }}\n      isolation_languages: ${{ steps.scan_hermetic.outputs.isolation_languages || steps.scan_published.outputs.isolation_languages }}\n      static_languages: ${{ steps.scan_hermetic.outputs.static_languages || steps.scan_published.outputs.static_languages }}\n      one_function_languages: ${{ steps.scan_hermetic.outputs.one_function_languages || steps.scan_published.outputs.one_function_languages }}\n      coverage_languages: ${{ steps.scan_hermetic.outputs.coverage_languages || steps.scan_published.outputs.coverage_languages }}\n      mutation_languages: ${{ steps.scan_hermetic.outputs.mutation_languages || steps.scan_published.outputs.mutation_languages }}\n      packaging_dist: ${{ steps.scan_hermetic.outputs.packaging_dist || steps.scan_published.outputs.packaging_dist }}\n      e2e_attestation: ${{ steps.scan_hermetic.outputs.e2e_attestation || steps.scan_published.outputs.e2e_attestation }}\n      package_root: ${{ steps.scan_hermetic.outputs.package_root || steps.scan_published.outputs.package_root }}\n      ts_package_manager: ${{ steps.scan_hermetic.outputs.ts_package_manager || steps.scan_published.outputs.ts_package_manager }}\n      ts_pnpm_version: ${{ steps.scan_hermetic.outputs.ts_pnpm_version || steps.scan_published.outputs.ts_pnpm_version }}\n      python_env: ${{ steps.scan_hermetic.outputs.python_env || steps.scan_published.outputs.python_env }}\n      provision_rust: ${{ steps.scan_hermetic.outputs.provision_rust || steps.scan_published.outputs.provision_rust }}\n      cargo_target_dir: ${{ steps.scan_hermetic.outputs.cargo_target_dir || steps.scan_published.outputs.cargo_target_dir }}\n      config: ${{ steps.scan_hermetic.outputs.config || steps.scan_published.outputs.config }}\n      build_command: ${{ steps.scan_hermetic.outputs.build_command || steps.scan_published.outputs.build_command }}\n      packaging_build: ${{ steps.scan_hermetic.outputs.packaging_build || steps.scan_published.outputs.packaging_build }}\n      packaging_language: ${{ steps.scan_hermetic.outputs.packaging_language || steps.scan_published.outputs.packaging_language }}\n      e2e_extra_scope: ${{ steps.scan_hermetic.outputs.e2e_extra_scope || steps.scan_published.outputs.e2e_extra_scope }}\n      e2e_exclude: ${{ steps.scan_hermetic.outputs.e2e_exclude || steps.scan_published.outputs.e2e_exclude }}\n      cli_command: ${{ steps.scan_hermetic.outputs.cli_command || steps.scan_published.outputs.cli_command }}\n      ts_mutation_adapter_args: ${{ steps.scan_hermetic.outputs.ts_mutation_adapter_args || steps.scan_published.outputs.ts_mutation_adapter_args }}\n    steps:\n      - uses: actions/checkout@v6\n      - id: scan_hermetic\n        # `uses:` cannot be dynamic, so the HEAD and published detect actions are separate steps.\n        if: ${{ github.repository == 'thekevinscott/testing-conventions' && inputs.version == '' }}\n        uses: ./.github/actions/detect\n        with:\n          languages: ${{ inputs.languages }}\n          path: ${{ inputs.source }}\n          config: ${{ inputs.config }}\n          caller_repository: ${{ github.repository }}\n          version: ${{ inputs.version }}\n      - id: scan_published\n        if: ${{ !(github.repository == 'thekevinscott/testing-conventions' && inputs.version == '') }}\n        uses: thekevinscott/testing-conventions/.github/actions/detect@v0\n        with:\n          languages: ${{ inputs.languages }}\n          path: ${{ inputs.source }}\n          config: ${{ inputs.config }}\n          caller_repository: ${{ github.repository }}\n          version: ${{ inputs.version }}\n\n  changelog:\n    name: CHANGELOG + MIGRATIONS touched\n    needs: detect\n    if: ${{ github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"changelog\"')) }}\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          fetch-depth: 0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      - name: Check changelog and migration fragments\n        env:\n          BASE: ${{ inputs.base }}\n          VERSION: ${{ inputs.version }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} changelog --base \"$BASE\"\n\n  static:\n    name: Static checks (${{ matrix.language }})\n    needs: detect\n    if: ${{ (inputs.gates == '' || contains(inputs.gates, '\"colocated-test\"') || contains(inputs.gates, '\"unit-lint\"') || contains(inputs.gates, '\"one-function-per-file\"') || contains(inputs.gates, '\"integration-lint\"')) && (needs.detect.outputs.static_languages || needs.detect.outputs.integration_lint_languages) != '[]' }}\n    runs-on: ubuntu-latest\n    strategy:\n      fail-fast: false\n      matrix:\n        language: ${{ fromJSON(needs.detect.outputs.static_languages || needs.detect.outputs.integration_lint_languages) }}\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          # The fetch-depth values are quoted: a bare 0 is falsy, so `&& 0 || 1` would always yield 1.\n          fetch-depth: ${{ github.event_name == 'pull_request' && '0' || '1' }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      - name: Check colocated test\n        if: ${{ (inputs.gates == '' || contains(inputs.gates, '\"colocated-test\"')) && contains(needs.detect.outputs.colocated_test_languages || needs.detect.outputs.languages, format('\"{0}\"', matrix.language)) }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit colocated-test --language \"$LANGUAGE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n      - name: Check co-change vs ${{ inputs.base }}\n        # `!cancelled()`: an earlier gate's failure must not hide this gate's result.\n        if: ${{ !cancelled() && github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"colocated-test\"')) && contains(needs.detect.outputs.languages, format('\"{0}\"', matrix.language)) }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          BASE: ${{ inputs.base }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit colocated-test --language \"$LANGUAGE\" --base \"$BASE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n      - name: Check unit lint\n        if: ${{ !cancelled() && (inputs.gates == '' || contains(inputs.gates, '\"unit-lint\"')) && contains(needs.detect.outputs.isolation_languages, format('\"{0}\"', matrix.language)) }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit lint --language \"$LANGUAGE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n      - name: Check one function per file\n        # The `|| integration_lint_languages` fallback covers a stale `@v0` detect that predates\n        # `one_function_languages`; the two sets are identical.\n        if: ${{ !cancelled() && (inputs.gates == '' || contains(inputs.gates, '\"one-function-per-file\"')) && contains(needs.detect.outputs.one_function_languages || needs.detect.outputs.integration_lint_languages, format('\"{0}\"', matrix.language)) }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit one-function-per-file --language \"$LANGUAGE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n      - name: Lint integration tests\n        if: ${{ !cancelled() && (inputs.gates == '' || contains(inputs.gates, '\"integration-lint\"')) && contains(needs.detect.outputs.integration_lint_languages, format('\"{0}\"', matrix.language)) }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} integration lint --language \"$LANGUAGE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n\n  unit-coverage:\n    name: Unit-test coverage (${{ matrix.language }})\n    needs: detect\n    if: ${{ (inputs.gates == '' || contains(inputs.gates, '\"unit-coverage\"')) && needs.detect.outputs.coverage_languages != '[]' }}\n    runs-on: ubuntu-latest\n    strategy:\n      fail-fast: false\n      matrix:\n        language: ${{ fromJSON(needs.detect.outputs.coverage_languages) }}\n    steps:\n      - uses: actions/checkout@v6\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      # cargo must be on PATH first: `uv sync` or an npm `prepare` may itself compile a Rust core.\n      - if: matrix.language == 'rust'\n        uses: dtolnay/rust-toolchain@stable\n        with:\n          components: llvm-tools-preview\n      - if: matrix.language == 'rust'\n        name: Install cargo-llvm-cov\n        uses: taiki-e/install-action@v2\n        with:\n          tool: cargo-llvm-cov\n      - if: (inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true') && matrix.language != 'rust'\n        uses: dtolnay/rust-toolchain@stable\n      - if: inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true'\n        name: Cache the Rust build (cargo registry + target)\n        uses: actions/cache@v4\n        with:\n          path: |\n            ~/.cargo/registry\n            ~/.cargo/git\n            ${{ needs.detect.outputs.cargo_target_dir || format('{0}/target', needs.detect.outputs.package_root) }}\n          key: rust-toolchain-build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}\n          restore-keys: |\n            rust-toolchain-build-${{ runner.os }}-\n      - if: matrix.language == 'python'\n        uses: astral-sh/setup-uv@v7\n        with:\n          enable-cache: true\n      - if: matrix.language == 'python'\n        name: Provision the Python suite environment (uv)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PYTHON_ENV: ${{ needs.detect.outputs.python_env || 'pip' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PYTHON_ENV\" = \"uv\" ]; then uv sync; else uv venv; fi\n          if compgen -G \"$GITHUB_WORKSPACE/hermetic-cli/*.whl\" > /dev/null; then uv pip install pytest \"$GITHUB_WORKSPACE\"/hermetic-cli/*.whl; else uv pip install pytest testing-conventions; fi\n          echo \"$PWD/.venv/bin\" >> \"$GITHUB_PATH\"\n      - if: matrix.language == 'typescript' && (needs.detect.outputs.ts_package_manager || 'pnpm') == 'pnpm'\n        uses: pnpm/action-setup@v5\n        with:\n          version: ${{ needs.detect.outputs.ts_pnpm_version || '>=11' }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - if: matrix.language == 'typescript'\n        name: Install project dependencies\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PM: ${{ needs.detect.outputs.ts_package_manager || 'pnpm' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PM\" = \"pnpm\" ]; then pnpm install --frozen-lockfile; else npm ci; fi\n      # The command is passed through env and `eval`-ed, so a full shell string works and no\n      # caller value is interpolated into `run:`.\n      - if: needs.detect.outputs.build_command != ''\n        name: Run the build step (build_command)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          BUILD_COMMAND: ${{ needs.detect.outputs.build_command }}\n        run: |\n          set -euo pipefail\n          eval \"$BUILD_COMMAND\"\n      - name: Check unit-test coverage\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit coverage --language \"$LANGUAGE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n\n  coverage-changed:\n    name: Unit-test coverage — changed lines (${{ matrix.language }})\n    needs: detect\n    if: ${{ github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"unit-coverage\"')) && needs.detect.outputs.coverage_languages != '[]' }}\n    runs-on: ubuntu-latest\n    strategy:\n      fail-fast: false\n      matrix:\n        language: ${{ fromJSON(needs.detect.outputs.coverage_languages) }}\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          # `--base` diffs `<base>...HEAD`, so the base ref must be reachable.\n          fetch-depth: 0\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      # cargo must be on PATH first: `uv sync` or an npm `prepare` may itself compile a Rust core.\n      - if: matrix.language == 'rust'\n        uses: dtolnay/rust-toolchain@stable\n        with:\n          components: llvm-tools-preview\n      - if: matrix.language == 'rust'\n        name: Install cargo-llvm-cov\n        uses: taiki-e/install-action@v2\n        with:\n          tool: cargo-llvm-cov\n      - if: (inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true') && matrix.language != 'rust'\n        uses: dtolnay/rust-toolchain@stable\n      - if: inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true'\n        name: Cache the Rust build (cargo registry + target)\n        uses: actions/cache@v4\n        with:\n          path: |\n            ~/.cargo/registry\n            ~/.cargo/git\n            ${{ needs.detect.outputs.cargo_target_dir || format('{0}/target', needs.detect.outputs.package_root) }}\n          key: rust-toolchain-build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}\n          restore-keys: |\n            rust-toolchain-build-${{ runner.os }}-\n      - if: matrix.language == 'python'\n        uses: astral-sh/setup-uv@v7\n        with:\n          enable-cache: true\n      - if: matrix.language == 'python'\n        name: Provision the Python suite environment (uv)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PYTHON_ENV: ${{ needs.detect.outputs.python_env || 'pip' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PYTHON_ENV\" = \"uv\" ]; then uv sync; else uv venv; fi\n          if compgen -G \"$GITHUB_WORKSPACE/hermetic-cli/*.whl\" > /dev/null; then uv pip install pytest \"$GITHUB_WORKSPACE\"/hermetic-cli/*.whl; else uv pip install pytest testing-conventions; fi\n          echo \"$PWD/.venv/bin\" >> \"$GITHUB_PATH\"\n      - if: matrix.language == 'typescript' && (needs.detect.outputs.ts_package_manager || 'pnpm') == 'pnpm'\n        uses: pnpm/action-setup@v5\n        with:\n          version: ${{ needs.detect.outputs.ts_pnpm_version || '>=11' }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - if: matrix.language == 'typescript'\n        name: Install project dependencies\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PM: ${{ needs.detect.outputs.ts_package_manager || 'pnpm' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PM\" = \"pnpm\" ]; then pnpm install --frozen-lockfile; else npm ci; fi\n      - if: needs.detect.outputs.build_command != ''\n        name: Run the build step (build_command)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          BUILD_COMMAND: ${{ needs.detect.outputs.build_command }}\n        run: |\n          set -euo pipefail\n          eval \"$BUILD_COMMAND\"\n      - name: Check changed-line coverage vs ${{ inputs.base }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          BASE: ${{ inputs.base }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit coverage --language \"$LANGUAGE\" --base \"$BASE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n\n  mutation:\n    name: Unit mutation — changed lines (${{ matrix.language }})\n    needs: detect\n    # `mutation_languages` is a newer detect output, so the matrix falls back to\n    # `coverage_languages` (the identical set) until `@v0` advances to a detect that emits it.\n    if: ${{ github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"mutation\"')) && (needs.detect.outputs.mutation_languages || needs.detect.outputs.coverage_languages) != '[]' }}\n    runs-on: ubuntu-latest\n    strategy:\n      fail-fast: false\n      matrix:\n        language: ${{ fromJSON(needs.detect.outputs.mutation_languages || needs.detect.outputs.coverage_languages) }}\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          # `--base` diffs `<base>...HEAD`, so the base ref must be reachable.\n          fetch-depth: 0\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      # cargo must be on PATH first: a maturin/PyO3 build triggered by `uv sync` needs it.\n      - if: (inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true') && matrix.language != 'rust'\n        uses: dtolnay/rust-toolchain@stable\n      - if: inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true'\n        name: Cache the Rust build (cargo registry + target)\n        uses: actions/cache@v4\n        with:\n          path: |\n            ~/.cargo/registry\n            ~/.cargo/git\n            ${{ needs.detect.outputs.cargo_target_dir || format('{0}/target', needs.detect.outputs.package_root) }}\n          key: rust-toolchain-build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}\n          restore-keys: |\n            rust-toolchain-build-${{ runner.os }}-\n      - if: matrix.language == 'python'\n        uses: astral-sh/setup-uv@v7\n        with:\n          enable-cache: true\n      - if: matrix.language == 'python'\n        name: Provision the Python suite environment (uv)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PYTHON_ENV: ${{ needs.detect.outputs.python_env || 'pip' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PYTHON_ENV\" = \"uv\" ]; then uv sync; else uv venv; fi\n          if compgen -G \"$GITHUB_WORKSPACE/hermetic-cli/*.whl\" > /dev/null; then uv pip install pytest \"$GITHUB_WORKSPACE\"/hermetic-cli/*.whl; else uv pip install pytest testing-conventions; fi\n          echo \"$PWD/.venv/bin\" >> \"$GITHUB_PATH\"\n      - if: matrix.language == 'typescript' && (needs.detect.outputs.ts_package_manager || 'pnpm') == 'pnpm'\n        uses: pnpm/action-setup@v5\n        with:\n          version: ${{ needs.detect.outputs.ts_pnpm_version || '>=11' }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - if: matrix.language == 'typescript'\n        name: Install project dependencies\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PM: ${{ needs.detect.outputs.ts_package_manager || 'pnpm' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PM\" = \"pnpm\" ]; then pnpm install --frozen-lockfile; else npm ci; fi\n      # The CLI installs cargo-mutants itself on first use; caching that dir reuses the build.\n      - if: matrix.language == 'rust'\n        uses: dtolnay/rust-toolchain@stable\n      - if: matrix.language == 'rust'\n        name: Cache the provisioned cargo-mutants\n        uses: actions/cache@v4\n        with:\n          path: ~/.cache/testing-conventions\n          key: cargo-mutants-provision-${{ runner.os }}\n      - if: needs.detect.outputs.build_command != ''\n        name: Run the build step (build_command)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          BUILD_COMMAND: ${{ needs.detect.outputs.build_command }}\n        run: |\n          set -euo pipefail\n          eval \"$BUILD_COMMAND\"\n      - name: Check mutation on the lines changed vs ${{ inputs.base }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          BASE: ${{ inputs.base }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n          # `$TS_MUTATION_ADAPTER_ARGS` is deliberately unquoted: empty on the published path,\n          # word-split into flag and path on the hermetic one.\n          TS_MUTATION_ADAPTER_ARGS: ${{ needs.detect.outputs.ts_mutation_adapter_args }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit mutation --language \"$LANGUAGE\" --base \"$BASE\" --config \"$CONFIG\" \"$SCAN_PATH\" $TS_MUTATION_ADAPTER_ARGS\n\n  e2e-verify:\n    name: E2E attestation freshness (e2e verify)\n    needs: detect\n    if: ${{ github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"e2e-verify\"')) && (inputs.run_e2e || needs.detect.outputs.e2e_attestation == 'true') }}\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          # `--base` diffs `<base>..HEAD`, so full history is needed and `inputs.base` must resolve.\n          # Check out the PR's head commit, not the ephemeral merge commit, which an attestation\n          # can never name — it is rebuilt on every push.\n          fetch-depth: 0\n          ref: ${{ github.event.pull_request.head.sha }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      - name: Verify the e2e attestation is current\n        env:\n          VERSION: ${{ inputs.version }}\n          PACKAGE_ROOT: ${{ needs.detect.outputs.package_root }}\n          SCAN_PATH: ${{ inputs.source }}\n          BASE: ${{ inputs.base }}\n          EXTRA_SCOPE: ${{ needs.detect.outputs.e2e_extra_scope }}\n          EXCLUDE: ${{ needs.detect.outputs.e2e_exclude }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        # `$EXTRA_SCOPE` / `$EXCLUDE` are deliberately unquoted: empty expands to nothing, and a\n        # rendered value word-splits into the repeated flags.\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} e2e verify \"$PACKAGE_ROOT\" --scope \"$SCAN_PATH\" --base \"$BASE\" $EXTRA_SCOPE $EXCLUDE\n\n  packaging:\n    name: Packaging (no test files in the built artifact)\n    needs: detect\n    if: ${{ (inputs.gates == '' || contains(inputs.gates, '\"packaging\"')) && (inputs.packaging_artifact != '' || needs.detect.outputs.packaging_build != '' || needs.detect.outputs.packaging_dist == 'true') }}\n    runs-on: ubuntu-latest\n    steps:\n      # Checkout must precede the artifact download: actions/checkout deletes the workspace's\n      # existing contents before initializing, so downloading first would wipe the artifact.\n      - name: Check out the repository to build/inspect its distribution, or just to resolve the hermetic-cli download action\n        if: inputs.packaging_artifact == '' || needs.detect.outputs.cli_command != ''\n        uses: actions/checkout@v6\n      - name: Download the uploaded distributions\n        if: inputs.packaging_artifact != ''\n        uses: actions/download-artifact@v8\n        with:\n          name: ${{ inputs.packaging_artifact }}\n          path: _packaging_artifact\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      # cargo must be on PATH first: `cargo package` needs it, and `uv build`/`prepack` may compile a Rust core.\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_build != '' && (needs.detect.outputs.packaging_language == 'rust' || inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true') }}\n        uses: dtolnay/rust-toolchain@stable\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_build != '' && (needs.detect.outputs.packaging_language == 'rust' || inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true') }}\n        name: Cache the Rust build (cargo registry + target)\n        uses: actions/cache@v4\n        with:\n          path: |\n            ~/.cargo/registry\n            ~/.cargo/git\n            ${{ needs.detect.outputs.cargo_target_dir || format('{0}/target', needs.detect.outputs.package_root) }}\n          key: rust-toolchain-build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}\n          restore-keys: |\n            rust-toolchain-build-${{ runner.os }}-\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_language == 'python' }}\n        uses: astral-sh/setup-uv@v7\n        with:\n          enable-cache: true\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_language == 'typescript' && (needs.detect.outputs.ts_package_manager || 'pnpm') == 'pnpm' }}\n        uses: pnpm/action-setup@v5\n        with:\n          version: ${{ needs.detect.outputs.ts_pnpm_version || '>=11' }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_build != '' && needs.detect.outputs.packaging_language == 'typescript' }}\n        name: Install project dependencies\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PM: ${{ needs.detect.outputs.ts_package_manager || 'pnpm' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PM\" = \"pnpm\" ]; then pnpm install --frozen-lockfile; else npm ci; fi\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_build != '' && needs.detect.outputs.build_command != '' }}\n        name: Run the build step (build_command)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          BUILD_COMMAND: ${{ needs.detect.outputs.build_command }}\n        run: |\n          set -euo pipefail\n          eval \"$BUILD_COMMAND\"\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_build != '' }}\n        name: Build the distribution (packaging_build)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PACKAGING_BUILD: ${{ needs.detect.outputs.packaging_build }}\n        run: |\n          set -euo pipefail\n          eval \"$PACKAGING_BUILD\"\n      - name: Check the built distributions ship no test files\n        env:\n          VERSION: ${{ inputs.version }}\n          PACKAGING_ARTIFACT: ${{ inputs.packaging_artifact }}\n          PACKAGE_ROOT: ${{ needs.detect.outputs.package_root }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: |\n          set -euo pipefail\n          # nullglob: an unmatched glob expands to nothing, not the literal; globstar: `**` recurses.\n          shopt -s nullglob globstar\n          pkg=\"${PACKAGE_ROOT:-.}\"\n          if [ -n \"$PACKAGING_ARTIFACT\" ]; then dist_root=_packaging_artifact; crate_root=_packaging_artifact; else dist_root=\"$pkg/dist\"; crate_root=\"$pkg/target/package\"; fi\n          checked=0\n          check () {\n            local lang=\"$1\"; shift\n            for dist in \"$@\"; do\n              echo \"::group::packaging --language $lang $dist\"\n              ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} packaging \"$dist\" --language \"$lang\"\n              echo \"::endgroup::\"\n              checked=$((checked + 1))\n            done\n          }\n          check python \"$dist_root\"/**/*.whl \"$dist_root\"/**/*.tar.gz\n          check typescript \"$dist_root\"/**/*.tgz\n          check rust \"$crate_root\"/**/*.crate\n          if [ \"$checked\" -eq 0 ]; then\n            echo \"::error::no recognized built distribution (.whl / .tar.gz / .tgz / .crate) found in '$dist_root' or '$crate_root'\"\n            exit 1\n          fi\n          echo \"checked $checked built distribution(s); no test files shipped\"\n"
+  },
+  {
+    "method": "downloadTarball",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "ref": "b976a7dc600948aadc7c79fe2383a8a5e27bc173"
+    },
+    "result": {
+      "$binary": "tarball-0.bin"
+    }
+  },
+  {
+    "method": "downloadTarball",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "testing-conventions",
+      "ref": "64f8e7a34f565f665a8d6288ab320be50caf047a"
+    },
+    "result": {
+      "$binary": "tarball-1.bin"
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/lint.yml",
+      "ref": "b976a7dc600948aadc7c79fe2383a8a5e27bc173"
+    },
+    "result": "name: lint\n\non:\n  pull_request: {}\n\nconcurrency:\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  contents: read\n\njobs:\n  lint:\n    name: lint\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v7\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v7\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm lint\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/pr-monitor.yml",
+      "ref": "b976a7dc600948aadc7c79fe2383a8a5e27bc173"
+    },
+    "result": "name: PR Monitor\n\non:\n  pull_request:\n\nconcurrency:\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  actions: read\n  contents: read\n  pull-requests: read\n\njobs:\n  monitor:\n    name: 'CI Gate'\n    runs-on: ubuntu-latest\n    # The action has no timeout of its own (see monitor.ts) — this is the\n    # backstop. If a predicted run never dispatches, the gate waits here\n    # until the job is killed.\n    timeout-minutes: 20\n    steps:\n      - uses: thekevinscott/pr-monitor@v1\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/release.yml",
+      "ref": "b976a7dc600948aadc7c79fe2383a8a5e27bc173"
+    },
+    "result": "name: Release\n\n# putitoutthere's reusable workflow; config lives in `putitoutthere.toml`\n# at the repo root.\n#\n# Auth: the `NPM_TOKEN` secret is the first-publish bootstrap only —\n# Trusted Publishing on npm binds to an already-published package, so\n# the very first publish has no OIDC path. `willfire` is published:\n# register the trusted publisher (repo thekevinscott/willfire,\n# workflow release.yml, environment release), then DELETE the NPM_TOKEN\n# secret; the OIDC exchange takes over.\n#\n# Filename matters: npm's trust policy matches the caller workflow\n# filename. Renaming this file requires re-registering the trusted\n# publisher.\n\non:\n  push:\n    branches: [main]\n  workflow_dispatch:\n    inputs:\n      release_packages:\n        description: >\n          Packages to release manually, bypassing change detection.\n          Comma-separated list of name[@<bump|version>] entries, e.g.\n          \"willfire@minor\" or \"willfire@1.2.0\". Leave empty to fall back\n          to automatic change detection (same as a push).\n        required: false\n        default: ''\n\njobs:\n  release:\n    uses: thekevinscott/putitoutthere/.github/workflows/release.yml@v0\n    with:\n      release_packages: ${{ inputs.release_packages || '' }}\n    secrets:\n      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}\n    permissions:\n      contents: write\n      # Required even for the token-auth bootstrap publish: the\n      # reusable workflow's publish job declares id-token: write, and\n      # a caller granting less is a startup error.\n      id-token: write\n\n  # PyPI upload runs in the caller's workflow context (see\n  # pypi/warehouse#11096). The `if:` gate skips this job for non-PyPI\n  # repos — pasted verbatim per putitoutthere's README regardless of\n  # what the repo publishes.\n  pypi-publish:\n    needs: release\n    if: needs.release.outputs.has_pypi == 'true'\n    runs-on: ubuntu-latest\n    environment: release\n    permissions:\n      id-token: write\n    steps:\n      - uses: actions/download-artifact@v8\n        with:\n          pattern: '*-sdist'\n          path: dist/\n          merge-multiple: true\n      - uses: actions/download-artifact@v8\n        with:\n          pattern: '*-wheel-*'\n          path: dist/\n          merge-multiple: true\n      - uses: pypa/gh-action-pypi-publish@release/v1\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/test.yml",
+      "ref": "b976a7dc600948aadc7c79fe2383a8a5e27bc173"
+    },
+    "result": "name: test\n\n# The repo's own suite, one job per kind so a red names the kind. Only the unit\n# job carries the coverage floor: `src/` reaches 100% from its colocated tests\n# alone, so the integration suite is not propping the number up.\n#\n# The suites are not a set of opinions about how GitHub *should* behave: every\n# workflow-level verdict in `src/predict.test.ts` was read back off a live\n# dispatch on thekevinbot/willrun-probe. See\n# `tests/fixtures/willrun-probe/README.md`.\n\non:\n  pull_request: {}\n  push:\n    branches: [main]\n\nconcurrency:\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  contents: read\n\njobs:\n  typecheck:\n    name: typecheck\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v7\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v7\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm typecheck\n\n  unit:\n    name: unit (100% coverage)\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v7\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v7\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm test:unit\n\n  integration:\n    name: integration\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v7\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v7\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm test:integration\n\n"
+  }
+]
