@@ -58,6 +58,7 @@ export async function runNodeAction(
     env,
     tree: ctx.tree,
     actionRoot,
+    stateKey: ctx.stateKey,
     label,
   });
 }

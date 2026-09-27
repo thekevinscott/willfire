@@ -8,6 +8,7 @@ const ctxOf = (runCommand: RunCommand = ok): WalkCtx => ({
   tree: "/nonexistent-tree",
   hasHistory: false,
   envLayers: [],
+  stateKey: "sk",
   deps: {
     provideTree: async () => null,
     runCommand,

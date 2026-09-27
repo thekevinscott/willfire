@@ -6,6 +6,7 @@
  * with a reason — never a guess.
  */
 
+import { randomUUID } from "node:crypto";
 import type { Scope } from "../expr/val.js";
 import type { WorkflowSource } from "../types.js";
 import { isCheckout } from "./isCheckout.js";
@@ -68,6 +69,9 @@ export function makeExecutor(opts: {
         tree,
         hasHistory: needsHistory,
         envLayers: [wf?.env, job.env],
+        // Fresh per execution, never per jobId: two runs of one job must not
+        // see each other's installs any more than two runner VMs would.
+        stateKey: randomUUID(),
         deps,
         depth: 0,
       });

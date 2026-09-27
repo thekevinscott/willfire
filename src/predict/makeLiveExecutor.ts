@@ -4,7 +4,7 @@ import { makeTreeProvider } from "../execute/makeTreeProvider.js";
 import { runShell } from "../execute/runShell.js";
 import type { JobExecutor, ProvideTree, RunCommand } from "../execute/types.js";
 import type { GithubClient } from "./makeGithubClient.js";
-import { makeSandboxRunner } from "../sandbox/makeSandboxRunner.js";
+import { makeSandboxRunner, type SandboxRunner } from "../sandbox/makeSandboxRunner.js";
 import { SANDBOX_NODE_MAJOR } from "../sandbox/sandboxConfig.js";
 import type { ResolveRef, WorkflowSource } from "../types.js";
 
@@ -50,8 +50,12 @@ export function makeLiveExecutor(
       ? opts.token
       : (process.env.GH_TOKEN ?? process.env.GITHUB_TOKEN ?? null);
   // One runner, so the image is provisioned once and extraction gets the same
-  // isolation as the steps.
-  const runCommand = opts.runCommand ?? makeSandboxRunner();
+  // isolation as the steps. An injected runCommand owns its own state.
+  const sandbox: SandboxRunner =
+    opts.runCommand === undefined
+      ? makeSandboxRunner()
+      : { run: opts.runCommand, dispose: async () => {} };
+  const runCommand = sandbox.run;
   const tarballs = makeTreeProvider(download, runCommand);
   const clones = makeCloneProvider(
     runShell,
@@ -74,6 +78,7 @@ export function makeLiveExecutor(
     cleanup: async () => {
       await tarballs.remove();
       await clones.remove();
+      await sandbox.dispose();
     },
   };
 }

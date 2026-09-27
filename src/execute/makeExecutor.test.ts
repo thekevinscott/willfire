@@ -29,6 +29,10 @@ vi.mock(
   "./runShell.js",
   async () => await vi.importActual<typeof import("./runShell.js")>("./runShell.js"),
 );
+vi.mock(
+  "node:crypto",
+  async () => await vi.importActual<typeof import("node:crypto")>("node:crypto"),
+);
 
 const SHA = "c".repeat(40);
 const REMOTE_SHA = "d".repeat(40);
@@ -563,6 +567,29 @@ describe("executing run steps", () => {
     const ex = executorOf({}); // no trees at all
     const o = await ex.executeJob("detect", { steps: [] }, {}, {});
     expect(failure(o)).toBe(`cannot materialize workspace o/r@${SHA}`);
+  });
+
+  it("threads one stateKey through a job's steps, and a fresh one per execution", async () => {
+    const keys: (string | undefined)[] = [];
+    const tree = await tempTree({});
+    const ex = executorOf(
+      { [`o/r@${SHA}`]: tree },
+      {
+        runCommand: async (spec) => {
+          keys.push(spec.stateKey);
+          return { code: 0, stdout: "", stderr: "" };
+        },
+      },
+    );
+    const job = { steps: [{ run: "true" }, { run: "true" }] };
+    success(await ex.executeJob("detect", job, {}, {}));
+    success(await ex.executeJob("detect", job, {}, {}));
+    expect(keys).toHaveLength(4);
+    expect(keys[0]).toMatch(/^[0-9a-f-]{36}$/);
+    expect(keys[1]).toBe(keys[0]);
+    // A re-execution is a fresh machine, as two runner VMs would be.
+    expect(keys[2]).not.toBe(keys[0]);
+    expect(keys[3]).toBe(keys[2]);
   });
 
   it("falls back to empty PATH and HOME when the parent has neither", async () => {

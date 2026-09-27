@@ -15,6 +15,7 @@ export async function runStepCommand(args: {
   env: Record<string, string>;
   tree: string;
   actionRoot: string | undefined;
+  stateKey: string;
   label: string;
 }): Promise<Res<Record<string, string>>> {
   const sink = await outputSink(args.env);
@@ -29,6 +30,7 @@ export async function runStepCommand(args: {
         ...(args.actionRoot !== undefined ? [{ path: args.actionRoot, writable: false }] : []),
         { path: sink.dir, writable: true },
       ],
+      stateKey: args.stateKey,
     });
     return await stepOutcome(r, sink.file, args.label);
   } finally {

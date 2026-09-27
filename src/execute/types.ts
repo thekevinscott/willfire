@@ -17,6 +17,9 @@ export interface RunSpec {
   /** For runners that isolate: what of the host this run may see. A direct
    * shell ignores this — it already sees everything. */
   mounts?: Mount[];
+  /** Runs sharing a key share machine state a job accretes across its steps —
+   * tool installs, HOME. A run without one gets a blank, unshared world. */
+  stateKey?: string;
 }
 
 export interface RunResult {
@@ -118,6 +121,9 @@ export interface WalkCtx {
   actionRoot?: string;
   /** Raw `env:` blocks from enclosing scopes, outermost first. */
   envLayers: (YamlValue | undefined)[];
+  /** This job's `RunSpec.stateKey`: one machine's worth of state per job, as
+   * on a real runner, where step 1's `npm install -g` is step 2's tool. */
+  stateKey: string;
   deps: ExecDeps;
   depth: number;
 }

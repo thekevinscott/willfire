@@ -32,6 +32,7 @@ const args = (
   env: { K: "v" },
   tree: "/nonexistent-tree",
   actionRoot,
+  stateKey: "sk",
   label: "step 's'",
 });
 
@@ -55,13 +56,14 @@ describe("runStepCommand", () => {
     ]);
   });
 
-  it("passes the script, shell, cwd and env through untouched", async () => {
+  it("passes the script, shell, cwd, env and stateKey through untouched", async () => {
     const { specs, cmd } = capture();
     await runStepCommand(args(cmd));
     expect(specs[0].script).toBe("true");
     expect(specs[0].shell).toBe("bash");
     expect(specs[0].cwd).toBe("/nonexistent-cwd");
     expect(specs[0].env.K).toBe("v");
+    expect(specs[0].stateKey).toBe("sk");
   });
 
   it("runs the command in the cwd, which need not be the mounted tree", async () => {

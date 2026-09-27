@@ -48,6 +48,7 @@ export async function runRun(
     env,
     tree: ctx.tree,
     actionRoot: ctx.actionRoot,
+    stateKey: ctx.stateKey,
     label,
   });
 }
