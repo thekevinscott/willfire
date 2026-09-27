@@ -289,6 +289,25 @@ describe("executing run steps", () => {
     expect(out).toEqual({ x: "pr" });
   });
 
+  it("seeds run_id and run_attempt so run-scoped step env resolves", async () => {
+    const out = success(
+      await execute({
+        steps: [
+          {
+            id: "s",
+            env: {
+              RUN_ID: "${{ github.run_id }}",
+              RUN_ATTEMPT: "${{ github.run_attempt }}",
+            },
+            run: 'echo "v=$RUN_ID/$RUN_ATTEMPT" >> "$GITHUB_OUTPUT"',
+          },
+        ],
+        outputs: { v: "${{ steps.s.outputs.v }}" },
+      }),
+    );
+    expect(out).toEqual({ v: "0/1" });
+  });
+
   it("stops on an if it cannot decide", async () => {
     const o = await execute({ steps: [{ id: "s", if: "env.FOO", run: "true" }] });
     expect(failure(o)).toBe("cannot decide if: for step 's'");

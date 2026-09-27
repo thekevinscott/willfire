@@ -25,6 +25,11 @@ export function makeExecutor(opts: {
   const github: Record<string, string> = {
     event_name: "pull_request",
     repository: `${workspace.owner}/${workspace.repo}`,
+    // No run exists at prediction time: run_id is a fixed synthetic value
+    // (never clock-derived — replays must be stable); run_attempt is GitHub's
+    // first-attempt value.
+    run_id: "0",
+    run_attempt: "1",
   };
   const fail = (reason: string): ExecOutcome => ({ ok: false, reason });
   return {
