@@ -5,7 +5,9 @@ import type { SandboxConfig } from "./sandboxConfig.js";
 /**
  * The complete `docker run` argv for one step. `PATH` and `HOME` in
  * `spec.env` are host facts; the container gets its image's PATH and a
- * writable `HOME=/tmp` instead. `name` is what a deadline kills by.
+ * writable `HOME=/tmp` instead. `name` is what a deadline kills by. Network
+ * stays open, as on GitHub's own runners; the isolation is filesystem and
+ * env, not egress.
  */
 export function sandboxArgv(spec: RunSpec, cfg: SandboxConfig, name: string): string[] {
   const argv = [
@@ -13,8 +15,6 @@ export function sandboxArgv(spec: RunSpec, cfg: SandboxConfig, name: string): st
     "--rm",
     "--name",
     name,
-    "--network",
-    "none",
     "--cap-drop",
     "ALL",
     "--security-opt",

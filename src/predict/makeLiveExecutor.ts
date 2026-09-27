@@ -23,7 +23,8 @@ export interface LiveExecutorOpts {
 /**
  * The executor `predict` uses by default. Repo-authored steps and the `tar`
  * that unpacks a downloaded repo both run in the docker sandbox; `git clone`
- * still runs on the host, since it needs the network the sandbox denies.
+ * runs on the host, where the token can travel per-invocation without ever
+ * riding into the sandbox.
  */
 export function makeLiveExecutor(
   github: Pick<GithubClient, "downloadTarball">,
