@@ -22,7 +22,7 @@ const spec = (over: Partial<RunSpec> = {}): RunSpec => ({
 describe("sandboxArgv", () => {
   const cfg: SandboxConfig = { dockerBin: "docker", uid: 7, gid: 9, dockerfile: "FROM x\n" };
 
-  it("isolates fully and exposes exactly the named mounts and env", () => {
+  it("isolates filesystem and env, keeps network, exposes exactly the named mounts and env", () => {
     const argv = sandboxArgv(
       spec({
         script: "echo hi",
@@ -41,8 +41,6 @@ describe("sandboxArgv", () => {
       "--rm",
       "--name",
       "box",
-      "--network",
-      "none",
       "--cap-drop",
       "ALL",
       "--security-opt",

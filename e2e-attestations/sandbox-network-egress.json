@@ -1,0 +1,7 @@
+{
+  "command": "pnpm run test:e2e",
+  "ran_at": 1790473224,
+  "exit_code": 0,
+  "commit": "2ef4944c39dbb069d1324c4fbf281f8096c8323d",
+  "branch": "fix/sandbox-network-egress"
+}

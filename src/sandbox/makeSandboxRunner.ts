@@ -1,9 +1,10 @@
 /**
- * A `RunCommand` that runs each step inside a hermetic docker container: no
- * network, no capabilities, a read-only root, and only the host paths in
- * `RunSpec.mounts`, bound at their own paths. Code that can reach nothing and
- * keep nothing needs no per-repo grant — this is what lets execution be on by
- * default instead of configured.
+ * A `RunCommand` that runs each step inside a docker container: no
+ * capabilities, a read-only root, none of the host's env or credentials, and
+ * only the host paths in `RunSpec.mounts`, bound at their own paths. Network
+ * stays open — GitHub's runners give steps network, and installs are how jobs
+ * bootstrap. Code that can keep nothing and carries no credentials needs no
+ * per-repo grant — this is what lets execution be on by default.
  */
 
 import { randomUUID } from "node:crypto";
