@@ -1,0 +1,1273 @@
+[
+  {
+    "method": "getPull",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "pull_number": 327
+    },
+    "result": {
+      "url": "https://api.github.com/repos/thekevinscott/skillet/pulls/327",
+      "id": 4324923070,
+      "node_id": "PR_kwDOQnHcf88AAAABAckWvg",
+      "html_url": "https://github.com/thekevinscott/skillet/pull/327",
+      "diff_url": "https://github.com/thekevinscott/skillet/pull/327.diff",
+      "patch_url": "https://github.com/thekevinscott/skillet/pull/327.patch",
+      "issue_url": "https://api.github.com/repos/thekevinscott/skillet/issues/327",
+      "number": 327,
+      "state": "closed",
+      "locked": false,
+      "title": "ci: cancel superseded CI Gate runs, normalize the timeout",
+      "user": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "body": "Adds a `concurrency:` group to the `CI Gate` workflow, and normalizes\n`timeout-minutes`.\n\n**Concurrency.** Push a new commit to a PR and the running gate job keeps going.\nIt resolved its target SHA at startup, so it spends the rest of its life polling\nfor runs on a commit nobody cares about any more, holding a runner the whole\ntime. `cancel-in-progress` kills it when its replacement starts. The group keys\non `github.ref`, which for a `pull_request` event is `refs/pull/N/merge` — so\nit scopes per PR and never cancels across PRs.\n\nThree repos (dirsql, willfire, github-data-file-fetcher) already had this from\nan earlier rollout. This brings the other eleven in line.\n\n**Timeout.** Settling the fleet on a single rule: 20 minutes, raised only where\nthe measured slowest non-gate `pull_request` run gets close. The only repo that\nqualifies is putitoutthere at 16 minutes, which stays at 30. dirsql, willfire\nand github-data-file-fetcher drop from 45 to 20 — their slowest observed runs\nare 7 minutes, under 1 minute, and none-at-all respectively, so 45 just meant a\nwedged gate burned twice as long before anyone noticed.\n\nNo change to gating behavior.\n",
+      "created_at": "2026-08-20T16:56:27Z",
+      "updated_at": "2026-08-20T16:59:49Z",
+      "closed_at": "2026-08-20T16:59:47Z",
+      "merged_at": "2026-08-20T16:59:47Z",
+      "merge_commit_sha": "492d8aba848c5c94224f05ce357ff6d41b28cb37",
+      "assignees": [],
+      "requested_reviewers": [],
+      "requested_teams": [],
+      "labels": [],
+      "milestone": null,
+      "draft": false,
+      "commits_url": "https://api.github.com/repos/thekevinscott/skillet/pulls/327/commits",
+      "review_comments_url": "https://api.github.com/repos/thekevinscott/skillet/pulls/327/comments",
+      "review_comment_url": "https://api.github.com/repos/thekevinscott/skillet/pulls/comments{/number}",
+      "comments_url": "https://api.github.com/repos/thekevinscott/skillet/issues/327/comments",
+      "statuses_url": "https://api.github.com/repos/thekevinscott/skillet/statuses/b8b8a61874f9c675c649d0c7ed58a98b309085aa",
+      "head": {
+        "label": "thekevinscott:ci/gate-concurrency",
+        "ref": "ci/gate-concurrency",
+        "sha": "b8b8a61874f9c675c649d0c7ed58a98b309085aa",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1114758271,
+          "node_id": "R_kgDOQnHcfw",
+          "name": "skillet",
+          "full_name": "thekevinscott/skillet",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/skillet",
+          "description": "Evaluation-driven Claude Code skill development",
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/skillet",
+          "forks_url": "https://api.github.com/repos/thekevinscott/skillet/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/skillet/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/skillet/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/skillet/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/skillet/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/skillet/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/skillet/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/skillet/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/skillet/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/skillet/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/skillet/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/skillet/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/skillet/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/skillet/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/skillet/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/skillet/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/skillet/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/skillet/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/skillet/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/skillet/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/skillet/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/skillet/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/skillet/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/skillet/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/skillet/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/skillet/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/skillet/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/skillet/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/skillet/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/skillet/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/skillet/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/skillet/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/skillet/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/skillet/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/skillet/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/skillet/deployments",
+          "created_at": "2025-12-11T21:00:24Z",
+          "updated_at": "2026-08-20T17:12:43Z",
+          "pushed_at": "2026-08-21T17:03:42Z",
+          "git_url": "git://github.com/thekevinscott/skillet.git",
+          "ssh_url": "git@github.com:thekevinscott/skillet.git",
+          "clone_url": "https://github.com/thekevinscott/skillet.git",
+          "svn_url": "https://github.com/thekevinscott/skillet",
+          "homepage": "https://skillet.run",
+          "size": 1827,
+          "stargazers_count": 2,
+          "watchers_count": 2,
+          "language": "Python",
+          "has_issues": true,
+          "has_projects": false,
+          "has_downloads": false,
+          "has_wiki": false,
+          "has_pages": false,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 4,
+          "license": {
+            "key": "mit",
+            "name": "MIT License",
+            "spdx_id": "MIT",
+            "url": "https://api.github.com/licenses/mit",
+            "node_id": "MDc6TGljZW5zZTEz"
+          },
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [
+            "claude-code",
+            "evaluation",
+            "llm"
+          ],
+          "visibility": "public",
+          "forks": 0,
+          "open_issues": 4,
+          "watchers": 2,
+          "default_branch": "main"
+        }
+      },
+      "base": {
+        "label": "thekevinscott:main",
+        "ref": "main",
+        "sha": "fc5733efc7687805c74c12dc6ddf66b909dbbb71",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1114758271,
+          "node_id": "R_kgDOQnHcfw",
+          "name": "skillet",
+          "full_name": "thekevinscott/skillet",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/skillet",
+          "description": "Evaluation-driven Claude Code skill development",
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/skillet",
+          "forks_url": "https://api.github.com/repos/thekevinscott/skillet/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/skillet/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/skillet/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/skillet/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/skillet/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/skillet/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/skillet/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/skillet/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/skillet/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/skillet/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/skillet/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/skillet/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/skillet/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/skillet/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/skillet/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/skillet/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/skillet/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/skillet/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/skillet/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/skillet/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/skillet/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/skillet/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/skillet/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/skillet/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/skillet/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/skillet/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/skillet/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/skillet/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/skillet/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/skillet/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/skillet/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/skillet/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/skillet/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/skillet/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/skillet/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/skillet/deployments",
+          "created_at": "2025-12-11T21:00:24Z",
+          "updated_at": "2026-08-20T17:12:43Z",
+          "pushed_at": "2026-08-21T17:03:42Z",
+          "git_url": "git://github.com/thekevinscott/skillet.git",
+          "ssh_url": "git@github.com:thekevinscott/skillet.git",
+          "clone_url": "https://github.com/thekevinscott/skillet.git",
+          "svn_url": "https://github.com/thekevinscott/skillet",
+          "homepage": "https://skillet.run",
+          "size": 1827,
+          "stargazers_count": 2,
+          "watchers_count": 2,
+          "language": "Python",
+          "has_issues": true,
+          "has_projects": false,
+          "has_downloads": false,
+          "has_wiki": false,
+          "has_pages": false,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 4,
+          "license": {
+            "key": "mit",
+            "name": "MIT License",
+            "spdx_id": "MIT",
+            "url": "https://api.github.com/licenses/mit",
+            "node_id": "MDc6TGljZW5zZTEz"
+          },
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [
+            "claude-code",
+            "evaluation",
+            "llm"
+          ],
+          "visibility": "public",
+          "forks": 0,
+          "open_issues": 4,
+          "watchers": 2,
+          "default_branch": "main"
+        }
+      },
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/thekevinscott/skillet/pulls/327"
+        },
+        "html": {
+          "href": "https://github.com/thekevinscott/skillet/pull/327"
+        },
+        "issue": {
+          "href": "https://api.github.com/repos/thekevinscott/skillet/issues/327"
+        },
+        "comments": {
+          "href": "https://api.github.com/repos/thekevinscott/skillet/issues/327/comments"
+        },
+        "review_comments": {
+          "href": "https://api.github.com/repos/thekevinscott/skillet/pulls/327/comments"
+        },
+        "review_comment": {
+          "href": "https://api.github.com/repos/thekevinscott/skillet/pulls/comments{/number}"
+        },
+        "commits": {
+          "href": "https://api.github.com/repos/thekevinscott/skillet/pulls/327/commits"
+        },
+        "statuses": {
+          "href": "https://api.github.com/repos/thekevinscott/skillet/statuses/b8b8a61874f9c675c649d0c7ed58a98b309085aa"
+        }
+      },
+      "author_association": "COLLABORATOR",
+      "auto_merge": null,
+      "assignee": null,
+      "active_lock_reason": null,
+      "merged": true,
+      "mergeable": null,
+      "rebaseable": null,
+      "mergeable_state": "unknown",
+      "merged_by": {
+        "login": "thekevinscott",
+        "id": 151596,
+        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinscott",
+        "html_url": "https://github.com/thekevinscott",
+        "followers_url": "https://api.github.com/users/thekevinscott/followers",
+        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+        "repos_url": "https://api.github.com/users/thekevinscott/repos",
+        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "comments": 2,
+      "review_comments": 0,
+      "maintainer_can_modify": false,
+      "commits": 1,
+      "additions": 6,
+      "deletions": 0,
+      "changed_files": 2
+    }
+  },
+  {
+    "method": "listPullFiles",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "pull_number": 327
+    },
+    "result": [
+      {
+        "sha": "53ffed5e7e67d6c3f4b1821c49ecd4603517f34f",
+        "filename": ".github/workflows/pr-monitor.yml",
+        "status": "modified",
+        "additions": 5,
+        "deletions": 0,
+        "changes": 5,
+        "blob_url": "https://github.com/thekevinscott/skillet/blob/b8b8a61874f9c675c649d0c7ed58a98b309085aa/.github%2Fworkflows%2Fpr-monitor.yml",
+        "raw_url": "https://github.com/thekevinscott/skillet/raw/b8b8a61874f9c675c649d0c7ed58a98b309085aa/.github%2Fworkflows%2Fpr-monitor.yml",
+        "contents_url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github%2Fworkflows%2Fpr-monitor.yml?ref=b8b8a61874f9c675c649d0c7ed58a98b309085aa",
+        "patch": "@@ -4,6 +4,11 @@ on:\n   pull_request:\n     types: [opened, synchronize, reopened, labeled, unlabeled]\n \n+concurrency:\n+  # A superseded gate run polls a stale SHA until it finishes. Cancel it.\n+  group: ${{ github.workflow }}-${{ github.ref }}\n+  cancel-in-progress: true\n+\n permissions:\n   actions: read\n   contents: read"
+      },
+      {
+        "sha": "c3ac7b55092d05e7754fca7efce6f048df9fa0a6",
+        "filename": "CHANGELOG.md",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 0,
+        "changes": 1,
+        "blob_url": "https://github.com/thekevinscott/skillet/blob/b8b8a61874f9c675c649d0c7ed58a98b309085aa/CHANGELOG.md",
+        "raw_url": "https://github.com/thekevinscott/skillet/raw/b8b8a61874f9c675c649d0c7ed58a98b309085aa/CHANGELOG.md",
+        "contents_url": "https://api.github.com/repos/thekevinscott/skillet/contents/CHANGELOG.md?ref=b8b8a61874f9c675c649d0c7ed58a98b309085aa",
+        "patch": "@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0\n ## [Unreleased]\n \n ### Changed\n+- CI: the `pr-monitor` gate workflow gains a `concurrency:` group with `cancel-in-progress`. A gate job resolves its target SHA at startup, so pushing a new commit left the old run polling for runs on a superseded commit and holding a runner until it finished. Keyed on `github.ref` (`refs/pull/N/merge` for a `pull_request` event), so it scopes per PR\n - CI: `pr-monitor` is pinned to `thekevinscott/pr-monitor@v1` instead of `clankerbot/pr-monitor@v1`. The old path resolved only through GitHub's owner-rename redirect, and a different account has since claimed the name `clankerbot` — once it holds a repo called `pr-monitor` the redirect is superseded and the workflow would run a stranger's action with our workflow token. Also drops the `job-name` and `excluded-jobs` inputs, neither of which the current action declares; it compares workflow runs rather than check runs, so Netlify's external checks were never in scope for exclusion\n - CI: the `pr-monitor` gate job now declares the permissions the action actually uses (`actions: read` to list workflow runs, `contents: read`, `pull-requests: read` for willfire's prediction). The previous `permissions: checks: read` block set every unlisted scope to `none`, which is latent while this repo is public — a starved token still reads public data — and an outage the day it is not. Adds `timeout-minutes: 20`: the action has no timeout of its own, so the caller's job timeout is the only backstop, and without it a predicted run that never dispatches would hang until GitHub's 6-hour limit\n "
+      }
+    ]
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "ref": "492d8aba848c5c94224f05ce357ff6d41b28cb37"
+    },
+    "result": {
+      "sha": "492d8aba848c5c94224f05ce357ff6d41b28cb37",
+      "node_id": "C_kwDOQnHcf9oAKDQ5MmQ4YWJhODQ4YzVjOTQyMjRmMDVjZTM1N2ZmNmQ0MWIyOGNiMzc",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-08-20T16:59:47Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-08-20T16:59:47Z"
+        },
+        "message": "ci: cancel superseded CI Gate runs, normalize the timeout (#327)\n\nA gate job resolves its target SHA at startup, so once a new commit\nlands on the PR the old run just polls for runs on a commit nobody\ncares about, holding a runner until it finishes. The concurrency group\ncancels it when the replacement starts. Keyed on github.ref, which for\npull_request is refs/pull/N/merge, so it scopes per PR.\n\nTimeout settles on one fleet rule: 20 minutes, raised only where the\nmeasured slowest non-gate pull_request run gets close. putitoutthere is\nthe only repo that qualifies (16 min observed, stays at 30).\n\nSkip-Changelog: true\nSkip-Migration: true\n\nClaude-Session: https://claude.ai/code/session_01GGUxA1SfkcFh4VbuQ9UExQ\n\nCo-authored-by: Claude Opus 5 <noreply@anthropic.com>",
+        "tree": {
+          "sha": "31f14dd038d271dc6910a2727d293e1afc00364f",
+          "url": "https://api.github.com/repos/thekevinscott/skillet/git/trees/31f14dd038d271dc6910a2727d293e1afc00364f"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/skillet/git/commits/492d8aba848c5c94224f05ce357ff6d41b28cb37",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqhzKDCRC1aQ7uu5UhlAAAPmYQAE6Wgm9OovUTkmhxWtCXvjNE\nUL0045xMROyKBmODzaTBIACK9G4u4Zso1FuDHds8inudJlNsfJtF4QUI0J62Gy24\nzaC4YTEJ1d2cSRQMV7hWqssdqDhIABuOw5cv7uLiHvcsA6bb8GwXgxIIke2IxHx4\nC6k/bnx63ey/ykdiEJhJ3BwaZwFI+7LZ080NfjRwWlEawyrTYrk4wYQWuLmy5VqV\nwYr5avr8YMYIFII7POveRzh6PxjEPrCJwxCCCNQ/o6c5vayOhGlIOTmKeRxoaEh1\nFlnOyohlwDA7fjS5DFibrNhpFN/fqbPZpfI/ByVsKpyLcQ2BMONtxrA2lxNpl53C\n8b5WiJjQrZdvFzNnHx0T8dJdxtrgMf9CQH76UsPh92U3oAbC8cxkGpjNKE2BSpbd\nAI7PgmQjyTUx24ZRE9WrbRwIru7WONuFkrQN8UdseGBkd+Q/WBrjVi0nOWSiaTwN\nqntN8BQXoZ715lhRMN+Gf3UUV8MKktiYJEgV+xtSEYPjik3BPfyBzpABkGLG7iGB\nH7B3lBr7z6wmKgpL4xV1Ndk4Dl0jOuzovQLpp8BWYQswd0wqGFpZ+9Fvf1yEgtJw\nts6+92hDdHr78zCCgJql92IgQXqqOaM6bgqFzwF0xPfaqxqzh7vIIGnzMnX2znqA\n3weWiuu89DXng3jUdANX\n=kRCa\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 31f14dd038d271dc6910a2727d293e1afc00364f\nparent fc5733efc7687805c74c12dc6ddf66b909dbbb71\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1787245187 -0400\ncommitter GitHub <noreply@github.com> 1787245187 -0400\n\nci: cancel superseded CI Gate runs, normalize the timeout (#327)\n\nA gate job resolves its target SHA at startup, so once a new commit\nlands on the PR the old run just polls for runs on a commit nobody\ncares about, holding a runner until it finishes. The concurrency group\ncancels it when the replacement starts. Keyed on github.ref, which for\npull_request is refs/pull/N/merge, so it scopes per PR.\n\nTimeout settles on one fleet rule: 20 minutes, raised only where the\nmeasured slowest non-gate pull_request run gets close. putitoutthere is\nthe only repo that qualifies (16 min observed, stays at 30).\n\nSkip-Changelog: true\nSkip-Migration: true\n\nClaude-Session: https://claude.ai/code/session_01GGUxA1SfkcFh4VbuQ9UExQ\n\nCo-authored-by: Claude Opus 5 <noreply@anthropic.com>",
+          "verified_at": "2026-08-20T16:59:47Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/skillet/commits/492d8aba848c5c94224f05ce357ff6d41b28cb37",
+      "html_url": "https://github.com/thekevinscott/skillet/commit/492d8aba848c5c94224f05ce357ff6d41b28cb37",
+      "comments_url": "https://api.github.com/repos/thekevinscott/skillet/commits/492d8aba848c5c94224f05ce357ff6d41b28cb37/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "fc5733efc7687805c74c12dc6ddf66b909dbbb71",
+          "url": "https://api.github.com/repos/thekevinscott/skillet/commits/fc5733efc7687805c74c12dc6ddf66b909dbbb71",
+          "html_url": "https://github.com/thekevinscott/skillet/commit/fc5733efc7687805c74c12dc6ddf66b909dbbb71"
+        }
+      ],
+      "stats": {
+        "total": 6,
+        "additions": 6,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "53ffed5e7e67d6c3f4b1821c49ecd4603517f34f",
+          "filename": ".github/workflows/pr-monitor.yml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github%2Fworkflows%2Fpr-monitor.yml",
+          "raw_url": "https://github.com/thekevinscott/skillet/raw/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github%2Fworkflows%2Fpr-monitor.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github%2Fworkflows%2Fpr-monitor.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+          "patch": "@@ -4,6 +4,11 @@ on:\n   pull_request:\n     types: [opened, synchronize, reopened, labeled, unlabeled]\n \n+concurrency:\n+  # A superseded gate run polls a stale SHA until it finishes. Cancel it.\n+  group: ${{ github.workflow }}-${{ github.ref }}\n+  cancel-in-progress: true\n+\n permissions:\n   actions: read\n   contents: read"
+        },
+        {
+          "sha": "c3ac7b55092d05e7754fca7efce6f048df9fa0a6",
+          "filename": "CHANGELOG.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/CHANGELOG.md",
+          "raw_url": "https://github.com/thekevinscott/skillet/raw/492d8aba848c5c94224f05ce357ff6d41b28cb37/CHANGELOG.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/skillet/contents/CHANGELOG.md?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+          "patch": "@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0\n ## [Unreleased]\n \n ### Changed\n+- CI: the `pr-monitor` gate workflow gains a `concurrency:` group with `cancel-in-progress`. A gate job resolves its target SHA at startup, so pushing a new commit left the old run polling for runs on a superseded commit and holding a runner until it finished. Keyed on `github.ref` (`refs/pull/N/merge` for a `pull_request` event), so it scopes per PR\n - CI: `pr-monitor` is pinned to `thekevinscott/pr-monitor@v1` instead of `clankerbot/pr-monitor@v1`. The old path resolved only through GitHub's owner-rename redirect, and a different account has since claimed the name `clankerbot` — once it holds a repo called `pr-monitor` the redirect is superseded and the workflow would run a stranger's action with our workflow token. Also drops the `job-name` and `excluded-jobs` inputs, neither of which the current action declares; it compares workflow runs rather than check runs, so Netlify's external checks were never in scope for exclusion\n - CI: the `pr-monitor` gate job now declares the permissions the action actually uses (`actions: read` to list workflow runs, `contents: read`, `pull-requests: read` for willfire's prediction). The previous `permissions: checks: read` block set every unlisted scope to `none`, which is latent while this repo is public — a starved token still reads public data — and an outage the day it is not. Adds `timeout-minutes: 20`: the action has no timeout of its own, so the caller's job timeout is the only backstop, and without it a predicted run that never dispatches would hang until GitHub's 6-hour limit\n "
+        }
+      ]
+    }
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "ref": "main"
+    },
+    "result": {
+      "sha": "63b6e1115d6fd9e3ecda77fc1ae31f89ef79af3b",
+      "node_id": "C_kwDOQnHcf9oAKDYzYjZlMTExNWQ2ZmQ5ZTNlY2RhNzdmYzFhZTMxZjg5ZWY3OWFmM2I",
+      "commit": {
+        "author": {
+          "name": "dependabot[bot]",
+          "email": "49699333+dependabot[bot]@users.noreply.github.com",
+          "date": "2026-08-20T17:09:28Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-08-20T17:09:28Z"
+        },
+        "message": "ci: bump codecov/codecov-action from 5 to 7 (#298)\n\nBumps [codecov/codecov-action](https://github.com/codecov/codecov-action) from 5 to 7.\n- [Release notes](https://github.com/codecov/codecov-action/releases)\n- [Changelog](https://github.com/codecov/codecov-action/blob/main/CHANGELOG.md)\n- [Commits](https://github.com/codecov/codecov-action/compare/v5...v7)\n\n---\nupdated-dependencies:\n- dependency-name: codecov/codecov-action\n  dependency-version: '7'\n  dependency-type: direct:production\n  update-type: version-update:semver-major\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+        "tree": {
+          "sha": "261ae084c2e42ceae0882e262489957577cff1e1",
+          "url": "https://api.github.com/repos/thekevinscott/skillet/git/trees/261ae084c2e42ceae0882e262489957577cff1e1"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/skillet/git/commits/63b6e1115d6fd9e3ecda77fc1ae31f89ef79af3b",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqhzTICRC1aQ7uu5UhlAAA6kQQAFSsO1L6LQjJ3TVEUqau+Ytz\nLzilqtCwC4CObBuV7TXDMUoWzZYiIS6o8Z5rVpomgCttJdcZlIO0VqB6jEVJBe/K\nyNNjbxDA2X7U7AXxVwCJoA/wvFJMy+CuHZIzt3h7nYrmkwFAcrshQJNXhEGLXSC5\n8ySWBnMj6u6CBrHkjEG9cpKGjDyhIxQFna5Rf38OdkpOQ+JlF6J79vxZvuLpihTn\nDfKjdzbRpl35vWfQI10zkcStIc711+j3+xGuj280g1AnkEjqYBPNnhaVJDMJXlCS\nrpB36o/AccHNJr36PlBTVHw+8B0jxwvIfyP6C25CERMJmibC6eSEmXUqpXXUr/VD\nIFilltT9fsNMfAfu5mz/XFPs9LYfM88pkmkaLNi6XramnQzcvR7wjBYvAmCXV2Jv\nUWburR18cVRyX3yfxwCwfC9cNbbBlrKxUZkzBY3fm/6AEW+AqJX+AIbqbpEjERTV\n0oYjxbZCb2B+DBEKD3dDHQM2NpiXX1fDOBsxDgw2H9aZ+WpIGFMFfsBv2rFzcMqc\nTYdjpptdRCutZCMTRRaIqxp2YiwqDx7PYYhNIMBQNrZs0BMcmfi1HeKBZVqQhGMW\nFlYe1vxFZTRd1qCGJj5J/+nEKe+rFMtumQt+TRxS1lKA4UJsnj0Qm1YSsSTvhVGZ\nXpiyyoBOp6izDbmRY33n\n=65vi\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 261ae084c2e42ceae0882e262489957577cff1e1\nparent ca5c847ada85820f576f27ec4532c2742b0e00c4\nauthor dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com> 1787245768 +0000\ncommitter GitHub <noreply@github.com> 1787245768 +0000\n\nci: bump codecov/codecov-action from 5 to 7 (#298)\n\nBumps [codecov/codecov-action](https://github.com/codecov/codecov-action) from 5 to 7.\n- [Release notes](https://github.com/codecov/codecov-action/releases)\n- [Changelog](https://github.com/codecov/codecov-action/blob/main/CHANGELOG.md)\n- [Commits](https://github.com/codecov/codecov-action/compare/v5...v7)\n\n---\nupdated-dependencies:\n- dependency-name: codecov/codecov-action\n  dependency-version: '7'\n  dependency-type: direct:production\n  update-type: version-update:semver-major\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "verified_at": "2026-08-20T17:09:29Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/skillet/commits/63b6e1115d6fd9e3ecda77fc1ae31f89ef79af3b",
+      "html_url": "https://github.com/thekevinscott/skillet/commit/63b6e1115d6fd9e3ecda77fc1ae31f89ef79af3b",
+      "comments_url": "https://api.github.com/repos/thekevinscott/skillet/commits/63b6e1115d6fd9e3ecda77fc1ae31f89ef79af3b/comments",
+      "author": {
+        "login": "dependabot[bot]",
+        "id": 49699333,
+        "node_id": "MDM6Qm90NDk2OTkzMzM=",
+        "avatar_url": "https://avatars.githubusercontent.com/in/29110?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/dependabot%5Bbot%5D",
+        "html_url": "https://github.com/apps/dependabot",
+        "followers_url": "https://api.github.com/users/dependabot%5Bbot%5D/followers",
+        "following_url": "https://api.github.com/users/dependabot%5Bbot%5D/following{/other_user}",
+        "gists_url": "https://api.github.com/users/dependabot%5Bbot%5D/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/dependabot%5Bbot%5D/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/dependabot%5Bbot%5D/subscriptions",
+        "organizations_url": "https://api.github.com/users/dependabot%5Bbot%5D/orgs",
+        "repos_url": "https://api.github.com/users/dependabot%5Bbot%5D/repos",
+        "events_url": "https://api.github.com/users/dependabot%5Bbot%5D/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/dependabot%5Bbot%5D/received_events",
+        "type": "Bot",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "ca5c847ada85820f576f27ec4532c2742b0e00c4",
+          "url": "https://api.github.com/repos/thekevinscott/skillet/commits/ca5c847ada85820f576f27ec4532c2742b0e00c4",
+          "html_url": "https://github.com/thekevinscott/skillet/commit/ca5c847ada85820f576f27ec4532c2742b0e00c4"
+        }
+      ],
+      "stats": {
+        "total": 2,
+        "additions": 1,
+        "deletions": 1
+      },
+      "files": [
+        {
+          "sha": "229f2104d4c7dbc6053b2fdcb3d95e176cd22899",
+          "filename": ".github/workflows/test.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/thekevinscott/skillet/blob/63b6e1115d6fd9e3ecda77fc1ae31f89ef79af3b/.github%2Fworkflows%2Ftest.yml",
+          "raw_url": "https://github.com/thekevinscott/skillet/raw/63b6e1115d6fd9e3ecda77fc1ae31f89ef79af3b/.github%2Fworkflows%2Ftest.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github%2Fworkflows%2Ftest.yml?ref=63b6e1115d6fd9e3ecda77fc1ae31f89ef79af3b",
+          "patch": "@@ -38,7 +38,7 @@ jobs:\n         run: uv run just test-ci\n \n       - name: Upload coverage\n-        uses: codecov/codecov-action@v5\n+        uses: codecov/codecov-action@v7\n         with:\n           files: coverage.xml\n           fail_ci_if_error: false"
+        }
+      ]
+    }
+  },
+  {
+    "method": "listPulls",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "state": "open",
+      "head": "thekevinscott:main"
+    },
+    "result": []
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "ref": "b8b8a61874f9c675c649d0c7ed58a98b309085aa"
+    },
+    "result": {
+      "sha": "b8b8a61874f9c675c649d0c7ed58a98b309085aa",
+      "node_id": "C_kwDOQnHcf9oAKGI4YjhhNjE4NzRmOWM2NzVjNjQ5ZDBjN2VkNThhOThiMzA5MDg1YWE",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-08-20T16:56:24Z"
+        },
+        "committer": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-08-20T16:56:24Z"
+        },
+        "message": "ci: cancel superseded CI Gate runs, normalize the timeout\n\nA gate job resolves its target SHA at startup, so once a new commit\nlands on the PR the old run just polls for runs on a commit nobody\ncares about, holding a runner until it finishes. The concurrency group\ncancels it when the replacement starts. Keyed on github.ref, which for\npull_request is refs/pull/N/merge, so it scopes per PR.\n\nTimeout settles on one fleet rule: 20 minutes, raised only where the\nmeasured slowest non-gate pull_request run gets close. putitoutthere is\nthe only repo that qualifies (16 min observed, stays at 30).\n\nSkip-Changelog: true\nSkip-Migration: true\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01GGUxA1SfkcFh4VbuQ9UExQ",
+        "tree": {
+          "sha": "31f14dd038d271dc6910a2727d293e1afc00364f",
+          "url": "https://api.github.com/repos/thekevinscott/skillet/git/trees/31f14dd038d271dc6910a2727d293e1afc00364f"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/skillet/git/commits/b8b8a61874f9c675c649d0c7ed58a98b309085aa",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCgAdFiEEnU3Dh/cnWdmpxUeIBqUoxO3sGUIFAmqHMbgACgkQBqUoxO3s\nGULQehAAoUS4jq1QCx+eGxPeawhMoHCTwyb3A8iu/TNc1quMEOP8Wamm7sCGwlQ4\nWAOGO2qg2SY3qrbvo1q/Znj0fasWh2Vh+rqvA1Q0ydpuc8Osnjhh3EPcC4RjYn/E\nBAieoRaFHl2kT3E0pV8vg20MpPB9fyy44sxp+s7XV+z4LSJ73z3S268vQkTqcKHE\nifEc0iE/pA8TGEUGtW0XHSTDUUV5VIVl23OX7z5GbkUT6Fac0XZ9PWbR/vrts55e\nTqMbnXBSuDCKj4kiN53lZw1yNxrY9n/ypzFybhr5oJgW2GkkBvW0paGearNzjQ1E\nIAkEA09LRF8KZLXkh9ug1LZoIIuBVPb9J82jLAeQxCJkEW/A7pe2P+ek5Hv3HeA1\nACEhVK9KimM9orb50nGlkyaDezwiH66/3EKJNQgbblYcvi7tsiIZxAV9INBsD4jl\nbNpe5tQxCB+PPwtzF/LEgf9lErBx87brmAMIyHmNGAohicRzkcL7mtjcQoM1FpiF\nig16tdII40P4asZa8o09fzF/hB+QErFBYJ9KB8KxZD/6wm6G3MqHSvRQDtMNyfvo\nLBcOURZdlqkurPnb+Tgf5Aus+lpRbjsqLLHQXZOnb9D+aqyBCkTTIe9MfN4LpcqN\nWaA2DUllydcibRQQeKt1yxi9yGEpBSq9O6LAwaZyYM44Oae4Rrc=\n=ytnQ\n-----END PGP SIGNATURE-----",
+          "payload": "tree 31f14dd038d271dc6910a2727d293e1afc00364f\nparent fc5733efc7687805c74c12dc6ddf66b909dbbb71\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1787244984 -0400\ncommitter thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1787244984 -0400\n\nci: cancel superseded CI Gate runs, normalize the timeout\n\nA gate job resolves its target SHA at startup, so once a new commit\nlands on the PR the old run just polls for runs on a commit nobody\ncares about, holding a runner until it finishes. The concurrency group\ncancels it when the replacement starts. Keyed on github.ref, which for\npull_request is refs/pull/N/merge, so it scopes per PR.\n\nTimeout settles on one fleet rule: 20 minutes, raised only where the\nmeasured slowest non-gate pull_request run gets close. putitoutthere is\nthe only repo that qualifies (16 min observed, stays at 30).\n\nSkip-Changelog: true\nSkip-Migration: true\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01GGUxA1SfkcFh4VbuQ9UExQ\n",
+          "verified_at": "2026-08-20T16:56:27Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/skillet/commits/b8b8a61874f9c675c649d0c7ed58a98b309085aa",
+      "html_url": "https://github.com/thekevinscott/skillet/commit/b8b8a61874f9c675c649d0c7ed58a98b309085aa",
+      "comments_url": "https://api.github.com/repos/thekevinscott/skillet/commits/b8b8a61874f9c675c649d0c7ed58a98b309085aa/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "fc5733efc7687805c74c12dc6ddf66b909dbbb71",
+          "url": "https://api.github.com/repos/thekevinscott/skillet/commits/fc5733efc7687805c74c12dc6ddf66b909dbbb71",
+          "html_url": "https://github.com/thekevinscott/skillet/commit/fc5733efc7687805c74c12dc6ddf66b909dbbb71"
+        }
+      ],
+      "stats": {
+        "total": 6,
+        "additions": 6,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "53ffed5e7e67d6c3f4b1821c49ecd4603517f34f",
+          "filename": ".github/workflows/pr-monitor.yml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/thekevinscott/skillet/blob/b8b8a61874f9c675c649d0c7ed58a98b309085aa/.github%2Fworkflows%2Fpr-monitor.yml",
+          "raw_url": "https://github.com/thekevinscott/skillet/raw/b8b8a61874f9c675c649d0c7ed58a98b309085aa/.github%2Fworkflows%2Fpr-monitor.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github%2Fworkflows%2Fpr-monitor.yml?ref=b8b8a61874f9c675c649d0c7ed58a98b309085aa",
+          "patch": "@@ -4,6 +4,11 @@ on:\n   pull_request:\n     types: [opened, synchronize, reopened, labeled, unlabeled]\n \n+concurrency:\n+  # A superseded gate run polls a stale SHA until it finishes. Cancel it.\n+  group: ${{ github.workflow }}-${{ github.ref }}\n+  cancel-in-progress: true\n+\n permissions:\n   actions: read\n   contents: read"
+        },
+        {
+          "sha": "c3ac7b55092d05e7754fca7efce6f048df9fa0a6",
+          "filename": "CHANGELOG.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/skillet/blob/b8b8a61874f9c675c649d0c7ed58a98b309085aa/CHANGELOG.md",
+          "raw_url": "https://github.com/thekevinscott/skillet/raw/b8b8a61874f9c675c649d0c7ed58a98b309085aa/CHANGELOG.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/skillet/contents/CHANGELOG.md?ref=b8b8a61874f9c675c649d0c7ed58a98b309085aa",
+          "patch": "@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0\n ## [Unreleased]\n \n ### Changed\n+- CI: the `pr-monitor` gate workflow gains a `concurrency:` group with `cancel-in-progress`. A gate job resolves its target SHA at startup, so pushing a new commit left the old run polling for runs on a superseded commit and holding a runner until it finished. Keyed on `github.ref` (`refs/pull/N/merge` for a `pull_request` event), so it scopes per PR\n - CI: `pr-monitor` is pinned to `thekevinscott/pr-monitor@v1` instead of `clankerbot/pr-monitor@v1`. The old path resolved only through GitHub's owner-rename redirect, and a different account has since claimed the name `clankerbot` — once it holds a repo called `pr-monitor` the redirect is superseded and the workflow would run a stranger's action with our workflow token. Also drops the `job-name` and `excluded-jobs` inputs, neither of which the current action declares; it compares workflow runs rather than check runs, so Netlify's external checks were never in scope for exclusion\n - CI: the `pr-monitor` gate job now declares the permissions the action actually uses (`actions: read` to list workflow runs, `contents: read`, `pull-requests: read` for willfire's prediction). The previous `permissions: checks: read` block set every unlisted scope to `none`, which is latent while this repo is public — a starved token still reads public data — and an outage the day it is not. Adds `timeout-minutes: 20`: the action has no timeout of its own, so the caller's job timeout is the only backstop, and without it a predicted run that never dispatches would hang until GitHub's 6-hour limit\n "
+        }
+      ]
+    }
+  },
+  {
+    "method": "listWorkflows",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet"
+    },
+    "result": [
+      {
+        "id": 215403035,
+        "node_id": "W_kwDOQnHcf84M1sob",
+        "name": "Build",
+        "path": ".github/workflows/build.yml",
+        "state": "active",
+        "created_at": "2025-12-12T10:58:51.000-05:00",
+        "updated_at": "2025-12-12T11:02:19.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/skillet/actions/workflows/215403035",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/main/.github/workflows/build.yml",
+        "badge_url": "https://github.com/thekevinscott/skillet/workflows/Build/badge.svg"
+      },
+      {
+        "id": 215411519,
+        "node_id": "W_kwDOQnHcf84M1us_",
+        "name": "Changelog",
+        "path": ".github/workflows/changelog.yml",
+        "state": "active",
+        "created_at": "2025-12-12T11:31:41.000-05:00",
+        "updated_at": "2025-12-12T11:36:47.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/skillet/actions/workflows/215411519",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/main/.github/workflows/changelog.yml",
+        "badge_url": "https://github.com/thekevinscott/skillet/workflows/Changelog/badge.svg"
+      },
+      {
+        "id": 215461192,
+        "node_id": "W_kwDOQnHcf84M161I",
+        "name": "Docs",
+        "path": ".github/workflows/docs.yml",
+        "state": "active",
+        "created_at": "2025-12-12T15:05:26.000-05:00",
+        "updated_at": "2025-12-12T15:10:03.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/skillet/actions/workflows/215461192",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/main/.github/workflows/docs.yml",
+        "badge_url": "https://github.com/thekevinscott/skillet/workflows/Docs/badge.svg"
+      },
+      {
+        "id": 215422403,
+        "node_id": "W_kwDOQnHcf84M1xXD",
+        "name": "Integration Tests",
+        "path": ".github/workflows/integration.yml",
+        "state": "active",
+        "created_at": "2025-12-12T12:16:11.000-05:00",
+        "updated_at": "2025-12-12T12:19:42.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/skillet/actions/workflows/215422403",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/main/.github/workflows/integration.yml",
+        "badge_url": "https://github.com/thekevinscott/skillet/workflows/Integration%20Tests/badge.svg"
+      },
+      {
+        "id": 215406659,
+        "node_id": "W_kwDOQnHcf84M1thD",
+        "name": "Lint",
+        "path": ".github/workflows/lint.yml",
+        "state": "active",
+        "created_at": "2025-12-12T11:13:44.000-05:00",
+        "updated_at": "2025-12-12T11:17:57.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/skillet/actions/workflows/215406659",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/main/.github/workflows/lint.yml",
+        "badge_url": "https://github.com/thekevinscott/skillet/workflows/Lint/badge.svg"
+      },
+      {
+        "id": 216202922,
+        "node_id": "W_kwDOQnHcf84M4v6q",
+        "name": "Minor Release",
+        "path": ".github/workflows/minor-release.yml",
+        "state": "active",
+        "created_at": "2025-12-15T20:03:01.000-05:00",
+        "updated_at": "2025-12-15T20:03:01.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/skillet/actions/workflows/216202922",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/main/.github/workflows/minor-release.yml",
+        "badge_url": "https://github.com/thekevinscott/skillet/workflows/Minor%20Release/badge.svg"
+      },
+      {
+        "id": 216202923,
+        "node_id": "W_kwDOQnHcf84M4v6r",
+        "name": "Patch Release",
+        "path": ".github/workflows/patch-release.yml",
+        "state": "disabled_inactivity",
+        "created_at": "2025-12-15T20:03:01.000-05:00",
+        "updated_at": "2026-08-18T22:58:19.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/skillet/actions/workflows/216202923",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/main/.github/workflows/patch-release.yml",
+        "badge_url": "https://github.com/thekevinscott/skillet/workflows/Patch%20Release/badge.svg"
+      },
+      {
+        "id": 215404014,
+        "node_id": "W_kwDOQnHcf84M1s3u",
+        "name": "PR Monitor",
+        "path": ".github/workflows/pr-monitor.yml",
+        "state": "active",
+        "created_at": "2025-12-12T11:03:18.000-05:00",
+        "updated_at": "2025-12-12T11:07:26.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/skillet/actions/workflows/215404014",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/main/.github/workflows/pr-monitor.yml",
+        "badge_url": "https://github.com/thekevinscott/skillet/workflows/PR%20Monitor/badge.svg"
+      },
+      {
+        "id": 216202924,
+        "node_id": "W_kwDOQnHcf84M4v6s",
+        "name": "Publish Release",
+        "path": ".github/workflows/publish.yml",
+        "state": "active",
+        "created_at": "2025-12-15T20:03:01.000-05:00",
+        "updated_at": "2025-12-15T20:03:01.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/skillet/actions/workflows/216202924",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/main/.github/workflows/publish.yml",
+        "badge_url": "https://github.com/thekevinscott/skillet/workflows/Publish%20Release/badge.svg"
+      },
+      {
+        "id": 215416869,
+        "node_id": "W_kwDOQnHcf84M1wAl",
+        "name": "Security",
+        "path": ".github/workflows/security.yml",
+        "state": "active",
+        "created_at": "2025-12-12T11:53:17.000-05:00",
+        "updated_at": "2025-12-12T11:53:42.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/skillet/actions/workflows/215416869",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/main/.github/workflows/security.yml",
+        "badge_url": "https://github.com/thekevinscott/skillet/workflows/Security/badge.svg"
+      },
+      {
+        "id": 215407155,
+        "node_id": "W_kwDOQnHcf84M1toz",
+        "name": "Test",
+        "path": ".github/workflows/test.yml",
+        "state": "active",
+        "created_at": "2025-12-12T11:15:57.000-05:00",
+        "updated_at": "2025-12-12T11:26:49.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/skillet/actions/workflows/215407155",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/main/.github/workflows/test.yml",
+        "badge_url": "https://github.com/thekevinscott/skillet/workflows/Test/badge.svg"
+      },
+      {
+        "id": 215418118,
+        "node_id": "W_kwDOQnHcf84M1wUG",
+        "name": "Type Check",
+        "path": ".github/workflows/typecheck.yml",
+        "state": "active",
+        "created_at": "2025-12-12T11:58:11.000-05:00",
+        "updated_at": "2025-12-12T11:58:50.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/skillet/actions/workflows/215418118",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/main/.github/workflows/typecheck.yml",
+        "badge_url": "https://github.com/thekevinscott/skillet/workflows/Type%20Check/badge.svg"
+      },
+      {
+        "id": 215420742,
+        "node_id": "W_kwDOQnHcf84M1w9G",
+        "name": "Dependabot Updates",
+        "path": "dynamic/dependabot/dependabot-updates",
+        "state": "active",
+        "created_at": "2025-12-12T12:08:55.000-05:00",
+        "updated_at": "2025-12-12T12:08:55.000-05:00",
+        "url": "https://api.github.com/repos/thekevinscott/skillet/actions/workflows/215420742",
+        "html_url": "https://github.com/thekevinscott/skillet/actions/workflows/dependabot/dependabot-updates",
+        "badge_url": "https://github.com/thekevinscott/skillet/actions/workflows/dependabot/dependabot-updates/badge.svg"
+      }
+    ]
+  },
+  {
+    "method": "listWorkflowFiles",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "ref": "492d8aba848c5c94224f05ce357ff6d41b28cb37"
+    },
+    "result": [
+      {
+        "name": "build.yml",
+        "path": ".github/workflows/build.yml",
+        "sha": "4df2a0e2ef0aac42ea24445243dd75594716d4e5",
+        "size": 557,
+        "url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/build.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/build.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/4df2a0e2ef0aac42ea24445243dd75594716d4e5",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/skillet/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/build.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/build.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+          "git": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/4df2a0e2ef0aac42ea24445243dd75594716d4e5",
+          "html": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/build.yml"
+        }
+      },
+      {
+        "name": "changelog.yml",
+        "path": ".github/workflows/changelog.yml",
+        "sha": "d785a2ccf2c65255d22956e74462806c944c5935",
+        "size": 1017,
+        "url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/changelog.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/changelog.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/d785a2ccf2c65255d22956e74462806c944c5935",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/skillet/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/changelog.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/changelog.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+          "git": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/d785a2ccf2c65255d22956e74462806c944c5935",
+          "html": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/changelog.yml"
+        }
+      },
+      {
+        "name": "docs.yml",
+        "path": ".github/workflows/docs.yml",
+        "sha": "30314ebfe48b2e0817bb73e7d0794eca003d1847",
+        "size": 1273,
+        "url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/docs.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/docs.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/30314ebfe48b2e0817bb73e7d0794eca003d1847",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/skillet/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/docs.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/docs.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+          "git": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/30314ebfe48b2e0817bb73e7d0794eca003d1847",
+          "html": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/docs.yml"
+        }
+      },
+      {
+        "name": "integration.yml",
+        "path": ".github/workflows/integration.yml",
+        "sha": "95515362e53b52e67ae1365c8532d97357ba8622",
+        "size": 668,
+        "url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/integration.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/integration.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/95515362e53b52e67ae1365c8532d97357ba8622",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/skillet/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/integration.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/integration.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+          "git": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/95515362e53b52e67ae1365c8532d97357ba8622",
+          "html": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/integration.yml"
+        }
+      },
+      {
+        "name": "lint.yml",
+        "path": ".github/workflows/lint.yml",
+        "sha": "8d5d583ebcfbddfb0122561f63d30419c770cb54",
+        "size": 771,
+        "url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/lint.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/lint.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/8d5d583ebcfbddfb0122561f63d30419c770cb54",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/skillet/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/lint.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/lint.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+          "git": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/8d5d583ebcfbddfb0122561f63d30419c770cb54",
+          "html": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/lint.yml"
+        }
+      },
+      {
+        "name": "minor-release.yml",
+        "path": ".github/workflows/minor-release.yml",
+        "sha": "9bb325ca087de8b77be4b4fdbee50e96075c07d8",
+        "size": 200,
+        "url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/minor-release.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/minor-release.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/9bb325ca087de8b77be4b4fdbee50e96075c07d8",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/skillet/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/minor-release.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/minor-release.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+          "git": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/9bb325ca087de8b77be4b4fdbee50e96075c07d8",
+          "html": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/minor-release.yml"
+        }
+      },
+      {
+        "name": "patch-release.yml",
+        "path": ".github/workflows/patch-release.yml",
+        "sha": "2f2dd9b30fb4636169e804a8261615c9f97ce61c",
+        "size": 1314,
+        "url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/patch-release.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/patch-release.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/2f2dd9b30fb4636169e804a8261615c9f97ce61c",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/skillet/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/patch-release.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/patch-release.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+          "git": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/2f2dd9b30fb4636169e804a8261615c9f97ce61c",
+          "html": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/patch-release.yml"
+        }
+      },
+      {
+        "name": "pr-monitor.yml",
+        "path": ".github/workflows/pr-monitor.yml",
+        "sha": "53ffed5e7e67d6c3f4b1821c49ecd4603517f34f",
+        "size": 741,
+        "url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/pr-monitor.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/pr-monitor.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/53ffed5e7e67d6c3f4b1821c49ecd4603517f34f",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/skillet/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/pr-monitor.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/pr-monitor.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+          "git": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/53ffed5e7e67d6c3f4b1821c49ecd4603517f34f",
+          "html": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/pr-monitor.yml"
+        }
+      },
+      {
+        "name": "publish.yml",
+        "path": ".github/workflows/publish.yml",
+        "sha": "0f2ffe864d1906c1bae6b4632291724aec6ffb77",
+        "size": 4631,
+        "url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/publish.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/publish.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/0f2ffe864d1906c1bae6b4632291724aec6ffb77",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/skillet/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/publish.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/publish.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+          "git": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/0f2ffe864d1906c1bae6b4632291724aec6ffb77",
+          "html": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/publish.yml"
+        }
+      },
+      {
+        "name": "security.yml",
+        "path": ".github/workflows/security.yml",
+        "sha": "ac214d88ce9ef2110f37021da590ea509d161334",
+        "size": 538,
+        "url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/security.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/security.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/ac214d88ce9ef2110f37021da590ea509d161334",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/skillet/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/security.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/security.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+          "git": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/ac214d88ce9ef2110f37021da590ea509d161334",
+          "html": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/security.yml"
+        }
+      },
+      {
+        "name": "test.yml",
+        "path": ".github/workflows/test.yml",
+        "sha": "6cfecb7b033dd9197672e0efa91c126ef24cfb9d",
+        "size": 876,
+        "url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/test.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/test.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/6cfecb7b033dd9197672e0efa91c126ef24cfb9d",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/skillet/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/test.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/test.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+          "git": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/6cfecb7b033dd9197672e0efa91c126ef24cfb9d",
+          "html": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/test.yml"
+        }
+      },
+      {
+        "name": "typecheck.yml",
+        "path": ".github/workflows/typecheck.yml",
+        "sha": "2d408cc7b992133738945773b7075df064748494",
+        "size": 539,
+        "url": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/typecheck.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+        "html_url": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/typecheck.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/2d408cc7b992133738945773b7075df064748494",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/skillet/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/typecheck.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/skillet/contents/.github/workflows/typecheck.yml?ref=492d8aba848c5c94224f05ce357ff6d41b28cb37",
+          "git": "https://api.github.com/repos/thekevinscott/skillet/git/blobs/2d408cc7b992133738945773b7075df064748494",
+          "html": "https://github.com/thekevinscott/skillet/blob/492d8aba848c5c94224f05ce357ff6d41b28cb37/.github/workflows/typecheck.yml"
+        }
+      }
+    ]
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "path": ".github/workflows/build.yml",
+      "ref": "492d8aba848c5c94224f05ce357ff6d41b28cb37"
+    },
+    "result": "name: Build\n\non:\n  push:\n    branches: [main]\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - '.github/workflows/build.yml'\n  pull_request:\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - '.github/workflows/build.yml'\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n\n      - name: Install uv\n        uses: astral-sh/setup-uv@v7\n\n      - name: Install dependencies\n        run: uv sync --extra dev\n\n      - name: Build package\n        run: uv run just build\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "path": ".github/workflows/changelog.yml",
+      "ref": "492d8aba848c5c94224f05ce357ff6d41b28cb37"
+    },
+    "result": "name: Changelog\n\non:\n  pull_request:\n    types: [opened, synchronize, reopened, labeled, unlabeled]\n\njobs:\n  check:\n    runs-on: ubuntu-latest\n    # Skip for dependabot PRs and PRs with skip-changelog label\n    if: github.actor != 'dependabot[bot]'\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          fetch-depth: 0\n\n      - name: Skip if labeled\n        if: contains(github.event.pull_request.labels.*.name, 'skip-changelog')\n        run: echo \"Skipping changelog check (skip-changelog label present)\"\n\n      - name: Install uv\n        if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-changelog') }}\n        uses: astral-sh/setup-uv@v7\n\n      - name: Install dependencies\n        if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-changelog') }}\n        run: uv sync --extra dev\n\n      - name: Check changelog\n        if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-changelog') }}\n        run: uv run just check-changelog origin/${{ github.base_ref }}\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "path": ".github/workflows/docs.yml",
+      "ref": "492d8aba848c5c94224f05ce357ff6d41b28cb37"
+    },
+    "result": "name: Docs\n\non:\n  push:\n    branches: [main]\n    paths:\n      - 'docs/**'\n      - 'netlify.toml'\n  pull_request:\n    paths:\n      - 'docs/**'\n      - 'netlify.toml'\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n    permissions:\n      contents: read\n      pull-requests: write\n    defaults:\n      run:\n        working-directory: docs\n    steps:\n      - uses: actions/checkout@v6\n\n      - name: Setup Node.js\n        uses: actions/setup-node@v6\n        with:\n          node-version: '20'\n\n      - name: Install dependencies\n        run: npm install\n\n      - name: Check required files exist\n        run: |\n          test -f .vitepress/config.ts\n          test -f index.md\n          test -f favicon.svg\n\n      - name: Build VitePress\n        run: npm run build\n\n      - name: Deploy to Netlify\n        uses: nwtgck/actions-netlify@v3\n        with:\n          publish-dir: docs/.vitepress/dist\n          production-deploy: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}\n          github-token: ${{ secrets.GITHUB_TOKEN }}\n          deploy-message: ${{ github.event.head_commit.message || github.event.pull_request.title }}\n        env:\n          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}\n          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "path": ".github/workflows/integration.yml",
+      "ref": "492d8aba848c5c94224f05ce357ff6d41b28cb37"
+    },
+    "result": "name: Integration Tests\n\non:\n  push:\n    branches: [main]\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - 'tests/integration/**'\n      - '.github/workflows/integration.yml'\n  pull_request:\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - 'tests/integration/**'\n      - '.github/workflows/integration.yml'\n\njobs:\n  integration:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n\n      - name: Install uv\n        uses: astral-sh/setup-uv@v7\n\n      - name: Install dependencies\n        run: uv sync --extra dev\n\n      - name: Run integration tests\n        run: uv run just test-integration\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "path": ".github/workflows/lint.yml",
+      "ref": "492d8aba848c5c94224f05ce357ff6d41b28cb37"
+    },
+    "result": "name: Lint\n\non:\n  push:\n    branches: [main]\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - '.github/workflows/lint.yml'\n  pull_request:\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - '.github/workflows/lint.yml'\n\njobs:\n  lint:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n\n      - name: Install uv\n        uses: astral-sh/setup-uv@v7\n\n      - name: Install dependencies\n        run: uv sync --extra dev\n\n      - name: Lint\n        run: uv run just lint\n\n      - name: Format check\n        run: uv run just format-check\n\n      - name: Check conventions\n        run: uv run just check-conventions\n\n      - name: Check test conventions\n        run: uv run just check-test-conventions\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "path": ".github/workflows/minor-release.yml",
+      "ref": "492d8aba848c5c94224f05ce357ff6d41b28cb37"
+    },
+    "result": "name: Minor Release\n\non:\n  workflow_dispatch:\n\njobs:\n  release:\n    uses: ./.github/workflows/publish.yml\n    with:\n      bump_type: minor\n    permissions:\n      contents: write\n      id-token: write\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "path": ".github/workflows/pr-monitor.yml",
+      "ref": "492d8aba848c5c94224f05ce357ff6d41b28cb37"
+    },
+    "result": "name: PR Monitor\n\non:\n  pull_request:\n    types: [opened, synchronize, reopened, labeled, unlabeled]\n\nconcurrency:\n  # A superseded gate run polls a stale SHA until it finishes. Cancel it.\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  actions: read\n  contents: read\n  # willfire reads the PR and its changed files to predict which workflows dispatch.\n  pull-requests: read\n\njobs:\n  monitor:\n    name: 'CI Gate'\n    runs-on: ubuntu-latest\n    # The action has no timeout of its own (see monitor.ts) -- this is the\n    # backstop. If a predicted run never dispatches, the gate waits here\n    # until the job is killed.\n    timeout-minutes: 20\n    steps:\n      - uses: thekevinscott/pr-monitor@v1\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "path": ".github/workflows/publish.yml",
+      "ref": "492d8aba848c5c94224f05ce357ff6d41b28cb37"
+    },
+    "result": "name: Publish Release\n\non:\n  workflow_call:\n    inputs:\n      bump_type:\n        description: 'Version bump type: patch or minor'\n        required: true\n        type: string\n\njobs:\n  release:\n    runs-on: ubuntu-latest\n    permissions:\n      contents: write\n      id-token: write  # Required for PyPI trusted publishing\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          fetch-depth: 0\n\n      - name: Get current version\n        id: current\n        run: |\n          latest_tag=$(git tag --sort=-v:refname | grep -E '^v[0-9]' | head -n1)\n\n          if [ -z \"$latest_tag\" ]; then\n            echo \"No tags found\"\n            echo \"version=0.0.0\" >> $GITHUB_OUTPUT\n            echo \"has_tags=false\" >> $GITHUB_OUTPUT\n          else\n            echo \"Latest tag: $latest_tag\"\n            echo \"version=${latest_tag#v}\" >> $GITHUB_OUTPUT\n            echo \"has_tags=true\" >> $GITHUB_OUTPUT\n\n            # Check for commits since last tag (for patch releases)\n            commits_since_tag=$(git rev-list ${latest_tag}..HEAD --count)\n            echo \"commits_since_tag=$commits_since_tag\" >> $GITHUB_OUTPUT\n          fi\n\n      - name: Check for changes (patch only)\n        if: inputs.bump_type == 'patch' && steps.current.outputs.has_tags == 'true'\n        id: check_changes\n        run: |\n          if [ \"${{ steps.current.outputs.commits_since_tag }}\" -eq 0 ]; then\n            echo \"No new commits since last tag, skipping release\"\n            echo \"should_release=false\" >> $GITHUB_OUTPUT\n          else\n            echo \"Found ${{ steps.current.outputs.commits_since_tag }} commits since last tag\"\n            echo \"should_release=true\" >> $GITHUB_OUTPUT\n          fi\n\n      - name: Calculate new version\n        id: version\n        run: |\n          current=\"${{ steps.current.outputs.version }}\"\n          IFS='.' read -r major minor patch <<< \"$current\"\n\n          if [ \"${{ inputs.bump_type }}\" == \"minor\" ]; then\n            new_version=\"${major}.$((minor + 1)).0\"\n          else\n            new_version=\"${major}.${minor}.$((patch + 1))\"\n          fi\n\n          echo \"new_version=$new_version\" >> $GITHUB_OUTPUT\n          echo \"New version will be: $new_version\"\n\n      - name: Check if tag exists\n        id: tag_check\n        run: |\n          if git ls-remote --tags origin | grep -q \"refs/tags/v${{ steps.version.outputs.new_version }}$\"; then\n            echo \"Tag v${{ steps.version.outputs.new_version }} already exists on remote\"\n            echo \"exists=true\" >> $GITHUB_OUTPUT\n          else\n            echo \"exists=false\" >> $GITHUB_OUTPUT\n          fi\n\n      - name: Determine if release should proceed\n        id: should_release\n        run: |\n          # Skip if tag exists\n          if [ \"${{ steps.tag_check.outputs.exists }}\" == \"true\" ]; then\n            echo \"proceed=false\" >> $GITHUB_OUTPUT\n            exit 0\n          fi\n\n          # For patch releases, skip if no changes\n          if [ \"${{ inputs.bump_type }}\" == \"patch\" ] && [ \"${{ steps.current.outputs.has_tags }}\" == \"true\" ]; then\n            if [ \"${{ steps.check_changes.outputs.should_release }}\" == \"false\" ]; then\n              echo \"proceed=false\" >> $GITHUB_OUTPUT\n              exit 0\n            fi\n          fi\n\n          echo \"proceed=true\" >> $GITHUB_OUTPUT\n\n      - name: Create and push tag\n        if: steps.should_release.outputs.proceed == 'true'\n        id: tag\n        run: |\n          git config user.name \"github-actions[bot]\"\n          git config user.email \"github-actions[bot]@users.noreply.github.com\"\n          git tag -a \"v${{ steps.version.outputs.new_version }}\" -m \"Release v${{ steps.version.outputs.new_version }}\"\n          git push origin \"v${{ steps.version.outputs.new_version }}\"\n          echo \"created=true\" >> $GITHUB_OUTPUT\n\n      - name: Install uv\n        if: steps.tag.outputs.created == 'true'\n        uses: astral-sh/setup-uv@v7\n\n      - name: Build package\n        if: steps.tag.outputs.created == 'true'\n        run: uv build\n\n      - name: Publish to PyPI\n        if: steps.tag.outputs.created == 'true'\n        run: |\n          for attempt in 1 2 3; do\n            echo \"Publish attempt $attempt of 3\"\n            if uv publish --trusted-publishing always --check-url https://pypi.org/simple/; then\n              exit 0\n            fi\n            if [ \"$attempt\" -lt 3 ]; then\n              echo \"Retrying in 15 seconds...\"\n              sleep 15\n            fi\n          done\n          exit 1\n\n      - name: Rollback tag on failure\n        if: failure() && steps.tag.outputs.created == 'true'\n        run: git push --delete origin \"v${{ steps.version.outputs.new_version }}\"\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "path": ".github/workflows/security.yml",
+      "ref": "492d8aba848c5c94224f05ce357ff6d41b28cb37"
+    },
+    "result": "name: Security\n\non:\n  push:\n    branches: [main]\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - '.github/workflows/security.yml'\n  pull_request:\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - '.github/workflows/security.yml'\n\njobs:\n  bandit:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n\n      - name: Install uv\n        uses: astral-sh/setup-uv@v7\n\n      - name: Install dependencies\n        run: uv sync --extra dev\n\n      - name: Run security scan\n        run: uv run just security\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "path": ".github/workflows/test.yml",
+      "ref": "492d8aba848c5c94224f05ce357ff6d41b28cb37"
+    },
+    "result": "name: Test\n\non:\n  push:\n    branches: [main]\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - 'tests/**'\n      - '.github/workflows/test.yml'\n  pull_request:\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - 'uv.lock'\n      - 'tests/**'\n      - '.github/workflows/test.yml'\n\njobs:\n  test:\n    runs-on: ubuntu-latest\n    strategy:\n      matrix:\n        python-version: [\"3.12\", \"3.13\"]\n    steps:\n      - uses: actions/checkout@v6\n\n      - name: Install uv\n        uses: astral-sh/setup-uv@v7\n        with:\n          python-version: ${{ matrix.python-version }}\n\n      - name: Install dependencies\n        run: uv sync --extra dev\n\n      - name: Run tests\n        run: uv run just test-ci\n\n      - name: Upload coverage\n        uses: codecov/codecov-action@v5\n        with:\n          files: coverage.xml\n          fail_ci_if_error: false\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "skillet",
+      "path": ".github/workflows/typecheck.yml",
+      "ref": "492d8aba848c5c94224f05ce357ff6d41b28cb37"
+    },
+    "result": "name: Type Check\n\non:\n  push:\n    branches: [main]\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - '.github/workflows/typecheck.yml'\n  pull_request:\n    paths:\n      - '**.py'\n      - 'pyproject.toml'\n      - '.github/workflows/typecheck.yml'\n\njobs:\n  typecheck:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n\n      - name: Install uv\n        uses: astral-sh/setup-uv@v7\n\n      - name: Install dependencies\n        run: uv sync --extra dev\n\n      - name: Type check\n        run: uv run just typecheck\n"
+  }
+]

