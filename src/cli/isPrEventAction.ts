@@ -1,4 +1,4 @@
-import type { PrEventAction } from "../types.js";
+import { PR_EVENT_ACTIONS, type PrEventAction } from "../types.js";
 
 export const isPrEventAction = (v: string): v is PrEventAction =>
-  v === "opened" || v === "synchronize" || v === "reopened";
+  (PR_EVENT_ACTIONS as readonly string[]).includes(v);
