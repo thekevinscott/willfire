@@ -1,0 +1,42 @@
+name: needs-order
+
+on: pull_request
+
+jobs:
+  needs-first:
+    needs: [gone]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x, y]
+    steps:
+      - run: 'true'
+
+  caller-first:
+    needs: [gone]
+    uses: ./.github/workflows/no-callee.yml
+
+  gone:
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
+
+  ctl-gone:
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
+
+  ctl-needs:
+    needs: [ctl-gone]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x, y]
+    steps:
+      - run: 'true'
+
+  ctl-caller:
+    needs: [ctl-gone]
+    uses: ./.github/workflows/no-callee.yml

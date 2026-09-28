@@ -1,0 +1,14 @@
+name: no-callee
+
+on: workflow_call
+
+jobs:
+  inner-a:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
+
+  inner-b:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
