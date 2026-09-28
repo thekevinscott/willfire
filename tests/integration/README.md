@@ -16,7 +16,7 @@ A capture is two recordings taken from GitHub in one sitting, landed in
 
 - `calls.json` — every `GithubClient` call a live prediction made, verbatim.
 - `fixture.json` — the check names GitHub actually dispatched: a bare JSON
-  array of strings, deduplicated and sorted. Ground truth, read from the
+  array of strings, sorted, one per job. Ground truth, read from the
   Actions API, never from willfire's own answer. Same format as
   `tests/e2e/responses/`; both suites load it through `tests/getResponse.ts`.
 
@@ -100,7 +100,9 @@ gh api "repos/$OWNER/$REPO/actions/runs/$RUN_ID/jobs" \
   --paginate --jq '.jobs[].name'
 ```
 
-`fixture.json` is those job names, deduplicated and sorted.
+`fixture.json` is those job names sorted, one entry per job. Do not deduplicate
+— GitHub creates two identically named checks when a matrix job's `name:` does
+not vary per combination (run 36430883584), and the prediction repeats them.
 
 One head SHA can carry more than one dispatch: a draft PR marked ready fires
 `opened` and then `ready_for_review` on the same commit. A prediction answers
