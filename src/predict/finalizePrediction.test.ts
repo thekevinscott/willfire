@@ -41,9 +41,16 @@ describe("finalizePrediction", () => {
     expect(finalizePrediction(drafts, null, new Map()).checkNames).toEqual(["A", "B", "C"]);
   });
 
-  it("excludes an unknown entry's checkName from checkNames", () => {
+  it("includes an unknown entry that resolved a checkName", () => {
     const drafts: DraftEntry[] = [
-      { workflow: WF, job: j("a"), checkName: "A", status: "unknown", reason: "dynamic matrix" },
+      { workflow: WF, job: j("a"), checkName: "A", status: "unknown", reason: "if: undecided" },
+    ];
+    expect(finalizePrediction(drafts, null, new Map()).checkNames).toEqual(["A"]);
+  });
+
+  it("excludes an entry that resolved no checkName", () => {
+    const drafts: DraftEntry[] = [
+      { workflow: WF, job: j("a"), status: "unknown", reason: "dynamic matrix" },
     ];
     expect(finalizePrediction(drafts, null, new Map()).checkNames).toEqual([]);
   });

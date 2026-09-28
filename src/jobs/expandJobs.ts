@@ -155,11 +155,14 @@ export async function expandJobs(args: ExpandJobsArgs): Promise<ExpandedJob[]> {
         reason,
       });
     } else if (status === "unknown" && "uses" in job) {
-      // An undecided caller may not dispatch at all, so its callee's names
-      // must not surface as run (#269): the verdict stops at the caller.
+      // The guard picks between two check sets: the caller's own name if it
+      // skips (probe willfire#352 ran `callvars`), the callee's if it
+      // dispatches. Only the caller's is nameable, so the callee's stay out
+      // (#269) and the caller's no longer goes missing.
+      const name = prefix + skippedDisplayName(jobId, job).name;
       entries.push({
-        job: prefix + jobId,
-        checkName: null,
+        job: name,
+        checkName: prefixResolved ? name : null,
         status,
         reason,
       });

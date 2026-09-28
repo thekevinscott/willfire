@@ -629,12 +629,13 @@ describe("reusable workflows", () => {
     expect(fetched).toEqual([]);
   });
 
-  it("stops at a caller whose `if` it cannot decide, without expanding it", async () => {
+  it("names an undecided caller after itself, without expanding it", async () => {
     // GitHub may skip the whole call, so the callee's names must not surface
-    // as run (#269): the verdict stops at the caller, undecided.
+    // as run (#269) — but the caller's own check is dispatched when it skips
+    // (probe willfire#352), so it keeps its name.
     const fetched: string[] = [];
     const entries = await expand(
-      { call: { if: "${{ secrets.SOME_TOKEN != '' }}", uses: "./.github/workflows/sub.yml" } },
+      { call: { if: "${{ vars.ABSENT != '' }}", uses: "./.github/workflows/sub.yml" } },
       readerOf(async (path) => {
         fetched.push(path);
         return JSON.stringify({ on: { workflow_call: null }, jobs: { inner: {} } });
@@ -643,12 +644,43 @@ describe("reusable workflows", () => {
     expect(entries).toEqual([
       {
         job: "call",
-        checkName: null,
+        checkName: "call",
         status: "unknown",
-        reason: `if: "\${{ secrets.SOME_TOKEN != '' }}"`,
+        reason: `if: "\${{ vars.ABSENT != '' }}"`,
       },
     ]);
     expect(fetched).toEqual([]);
+  });
+
+  it("takes an undecided caller's name: override, uninterpolated", async () => {
+    const entries = await expand({
+      call: {
+        name: "custom ${{ github.event_name }}",
+        if: "${{ vars.ABSENT != '' }}",
+        uses: "./.github/workflows/sub.yml",
+      },
+    });
+    expect(entries[0]).toMatchObject({
+      job: "custom ${{ github.event_name }}",
+      checkName: "custom ${{ github.event_name }}",
+    });
+  });
+
+  it("nulls the name of an undecided caller inside an unresolvable caller", async () => {
+    const entries = await expand(
+      { call: { name: "${{ inputs.flavour }}", uses: "./.github/workflows/sub.yml" } },
+      readerFor({
+        [SUB]: JSON.stringify({
+          on: { workflow_call: null },
+          jobs: { nested: { if: "${{ vars.ABSENT != '' }}", uses: "./.github/workflows/d.yml" } },
+        }),
+      }),
+    );
+    expect(entries[0]).toMatchObject({
+      job: "${{ inputs.flavour }} / nested",
+      checkName: null,
+      status: "unknown",
+    });
   });
 
   it("reports a uses: it cannot turn into a fetch target", async () => {

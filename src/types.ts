@@ -66,8 +66,9 @@ export type Entry = WorkflowEntry | JobEntry;
 export interface Prediction {
   entries: Entry[];
   /**
-   * Convenience aggregate: sorted, deduplicated names for dispatched entries
-   * whose check names resolved. Unresolved entries remain in `entries`.
+   * Convenience aggregate: sorted, deduplicated names of every entry whose
+   * check name resolved, whatever its status — a skipped or undecided job
+   * still gets a check under that name. Unnamed entries remain in `entries`.
    */
   checkNames: string[];
   skip: string | null; // set when a skip instruction suppresses everything
