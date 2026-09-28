@@ -31,6 +31,24 @@ describe("workflowDispatches", () => {
     expect(workflowDispatches(onPr(null), CTX)).toEqual([true, "trigger matched"]);
   });
 
+  // The default is exactly opened/synchronize/reopened: a widened action still
+  // needs a `types:` that names it.
+  it("declines a non-default action when no types are declared", () => {
+    const ctx: Ctx = { ...CTX, action: "ready_for_review" };
+    expect(workflowDispatches(onPr(null), ctx)).toEqual([
+      false,
+      "action 'ready_for_review' not in types [opened,synchronize,reopened]",
+    ]);
+  });
+
+  it("accepts a non-default action the declared types name", () => {
+    const ctx: Ctx = { ...CTX, action: "ready_for_review" };
+    expect(workflowDispatches(onPr({ types: ["ready_for_review"] }), ctx)).toEqual([
+      true,
+      "trigger matched",
+    ]);
+  });
+
   // Both-filters is invalid config. GitHub does not fall back to "no filter"
   // and does not skip the workflow: it creates the run and concludes
   // `startup_failure`. The run exists, so the workflow dispatches (#7).

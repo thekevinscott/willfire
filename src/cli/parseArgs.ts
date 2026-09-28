@@ -4,7 +4,7 @@ import type { PrEventAction } from "../types.js";
 import { isPrEventAction } from "./isPrEventAction.js";
 
 const USAGE =
-  "usage: predict --repo owner/name --pr N [--action opened|synchronize|reopened]" +
+  "usage: predict --repo owner/name --pr N [--action <pull_request activity type>]" +
   ' [--callback "<command>"]... [--json]';
 
 const SPEC = {

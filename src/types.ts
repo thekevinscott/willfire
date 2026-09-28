@@ -98,15 +98,36 @@ export type DraftJobEntry = Omit<JobEntry, "checkName"> & { checkName?: string |
 export type DraftEntry = DraftWorkflowEntry | DraftJobEntry;
 
 /**
- * The `pull_request` actions a caller can name.
- *
- * Deliberately the three default types and no more. `pull_request` fires on
- * around twenty actions — `ready_for_review`, `edited`, `labeled` — and a
- * workflow that narrows `types:` to one of those is not predictable today
- * regardless of what is passed here. Widening this union later is a
- * non-breaking change; narrowing it would not be, so it starts narrow.
+ * The `pull_request` actions a caller can name: all 21 activity types GitHub
+ * documents for the trigger. A workflow that declares no `types:` still
+ * reacts to only opened/synchronize/reopened — that default lives in the
+ * trigger match, not here.
  */
-export type PrEventAction = "opened" | "synchronize" | "reopened";
+export const PR_EVENT_ACTIONS = [
+  "assigned",
+  "auto_merge_disabled",
+  "auto_merge_enabled",
+  "closed",
+  "converted_to_draft",
+  "demilestoned",
+  "dequeued",
+  "edited",
+  "enqueued",
+  "labeled",
+  "locked",
+  "milestoned",
+  "opened",
+  "ready_for_review",
+  "reopened",
+  "review_request_removed",
+  "review_requested",
+  "synchronize",
+  "unassigned",
+  "unlabeled",
+  "unlocked",
+] as const;
+
+export type PrEventAction = (typeof PR_EVENT_ACTIONS)[number];
 
 /** Options every caller may omit. */
 export interface PredictOptions {

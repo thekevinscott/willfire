@@ -244,10 +244,31 @@ describe("root barrel", () => {
     const options: PredictOptions = { action: "opened", executor: null, callbacks: ["cb"] };
     expect(options.action).toBe("opened");
 
-    // Widening this union later is fine (per types.ts); narrowing it is not,
-    // so every current member is pinned.
-    const actions: PrEventAction[] = ["opened", "synchronize", "reopened"];
-    expect(actions).toHaveLength(3);
+    // Narrowing this union is a breaking change, so every member is pinned.
+    const actions: PrEventAction[] = [
+      "assigned",
+      "auto_merge_disabled",
+      "auto_merge_enabled",
+      "closed",
+      "converted_to_draft",
+      "demilestoned",
+      "dequeued",
+      "edited",
+      "enqueued",
+      "labeled",
+      "locked",
+      "milestoned",
+      "opened",
+      "ready_for_review",
+      "reopened",
+      "review_request_removed",
+      "review_requested",
+      "synchronize",
+      "unassigned",
+      "unlabeled",
+      "unlocked",
+    ];
+    expect(actions).toHaveLength(21);
 
     const ctx: Ctx = { action: "opened", baseRef: "main", stackTarget: "main", files: ["a.ts"] };
     expect(ctx.files).toEqual(["a.ts"]);

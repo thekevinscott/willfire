@@ -66,12 +66,18 @@ describe("parseArgs", () => {
     );
   });
 
+  it("accepts a non-default activity type", () => {
+    expect(
+      parseArgs(["--repo", "o/r", "--pr", "3", "--action", "ready_for_review"]).action,
+    ).toBe("ready_for_review");
+  });
+
   it("exits 2 with a usage line when --repo or --pr is missing", () => {
     expect(() => parseArgs(["--pr", "1"])).toThrow("exited");
     expect(process.exit).toHaveBeenCalledWith(2);
     expect(vi.mocked(console.error).mock.calls[0][0]).toMatch(/^usage: predict /);
     expect(vi.mocked(console.error).mock.calls[0][0]).toContain(
-      "--action opened|synchronize|reopened",
+      "--action <pull_request activity type>",
     );
   });
 
