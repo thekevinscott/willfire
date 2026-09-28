@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*putitoutthere)\"",
+  "ran_at": 1790606822,
+  "exit_code": 0,
+  "commit": "b55e587d0f87476afe8fea120a896230b3e742e6",
+  "branch": "fix/mergeable-false-keeps-existing-runs"
+}
