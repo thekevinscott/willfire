@@ -1,0 +1,7 @@
+name: probe-skip-a1
+on: pull_request
+jobs:
+  probea1:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
