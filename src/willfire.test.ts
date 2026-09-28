@@ -748,7 +748,7 @@ describe("willfire", () => {
   });
 
   it("suppresses everything on a skip-checks trailer", async () => {
-    const message = "feat: thing\n\nskip-checks: true\n";
+    const message = "feat: thing\n\n\nskip-checks: true";
     expect(await run("on: pull_request\njobs:\n  a: {}\n", { message })).toEqual({
       entries: [],
       checkNames: [],
@@ -759,13 +759,13 @@ describe("willfire", () => {
   });
 
   it("reads the skip-checks trailer case-insensitively", async () => {
-    const message = "feat: thing\n\nSKIP-CHECKS: TRUE\n";
+    const message = "feat: thing\n\n\nSKIP-CHECKS: TRUE";
     const { skip } = await run("on: pull_request\njobs:\n  a: {}\n", { message });
     expect(skip).toBe("head commit message contains a skip instruction");
   });
 
   it("does not suppress on a skip-checks mention that is not a trailer", async () => {
-    const message = "feat: thing\n\nsee the docs on skip-checks: true handling\n";
+    const message = "feat: thing\n\n\nsee the docs on skip-checks: true handling";
     expect(await only("on: pull_request\njobs:\n  a: {}\n", { message })).toEqual({
       workflow: WF,
       job: "a",
