@@ -1,0 +1,16 @@
+name: needs-cycle
+
+on: pull_request
+
+jobs:
+  cyc-a:
+    needs: [cyc-b]
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
+
+  cyc-b:
+    needs: [cyc-a]
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
