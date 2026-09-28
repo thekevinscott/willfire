@@ -1,0 +1,7 @@
+name: probe-skip-g
+on: pull_request
+jobs:
+  probeg:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
