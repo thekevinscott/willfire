@@ -20,6 +20,23 @@ describe("patternToRegex", () => {
     expect(re.test("src/nested/app.ts")).toBe(true);
   });
 
+  it("treats a leading **/ as zero or more directories", () => {
+    // GitHub dispatched `**/*.txt` for a top-level file: probe run 36429114415.
+    const re = patternToRegex("**/*.md");
+    expect(re.test("README.md")).toBe(true);
+    expect(re.test("docs/a.md")).toBe(true);
+    expect(re.test("docs/nested/a.md")).toBe(true);
+    expect(re.test("README.txt")).toBe(false);
+  });
+
+  it("treats a **/ away from the start as zero or more directories too", () => {
+    // Same for `gdocs/**/*.md` against `gdocs/m.md`: probe run 36429340492.
+    const re = patternToRegex("docs/**/*.md");
+    expect(re.test("docs/a.md")).toBe(true);
+    expect(re.test("docs/nested/a.md")).toBe(true);
+    expect(re.test("a.md")).toBe(false);
+  });
+
   it("passes ? through as zero-or-one of the preceding character", () => {
     const re = patternToRegex("releases?");
     expect(re.test("release")).toBe(true);
