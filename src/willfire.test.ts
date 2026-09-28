@@ -111,6 +111,8 @@ interface Fixture {
   headRef?: string;
   /** The PR's draft state. */
   draft?: boolean;
+  /** Label names attached to the PR. */
+  labels?: string[];
   /** The head repo's full name; `null` models a deleted fork. */
   headRepo?: string | null;
 }
@@ -165,6 +167,7 @@ function fakeGithub(f: Fixture): GithubClient {
         merge_commit_sha: f.mergeSha ?? null,
         mergeable: f.mergeable ?? null,
         draft: f.draft ?? false,
+        labels: (f.labels ?? []).map((name) => ({ name })),
         user: { login: f.author ?? "octocat" },
       };
     },
@@ -1193,6 +1196,24 @@ describe("PR facts seeded into the expression scope (#322)", () => {
       ["to-main", "run"],
       ["from-topic", "skipped"],
       ["owned", "run"],
+    ]);
+  });
+
+  it("decides a label filter from the labels attached to the pull", async () => {
+    // Probe #383: run 36430454044 ran the guard with `skip-ci` attached and
+    // skipped the same job's absent-label twin; run 36430375629, dispatched
+    // before the label existed, skipped both.
+    const jobs = {
+      present: { if: "contains(github.event.pull_request.labels.*.name, 'skip-ci')" },
+      absent: { if: "contains(github.event.pull_request.labels.*.name, 'nope')" },
+    };
+    expect(await statuses({ jobs }, { labels: ["skip-ci"] })).toEqual([
+      ["present", "run"],
+      ["absent", "skipped"],
+    ]);
+    expect(await statuses({ jobs })).toEqual([
+      ["present", "skipped"],
+      ["absent", "skipped"],
     ]);
   });
 

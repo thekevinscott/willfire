@@ -233,6 +233,10 @@ export async function willfire(
       head_ref: pr.head.ref,
       "event.action": ctx.action,
       "event.pull_request.draft": pr.draft,
+      // The label set the run sees is the one attached when it dispatched —
+      // probe #383 run 36430375629 skipped the guard before the label existed
+      // and run 36430454044 ran it after.
+      "event.pull_request.labels.*.name": pr.labels.map((l) => l.name),
       ...(pr.head.repo === null
         ? {}
         : { "event.pull_request.head.repo.full_name": pr.head.repo.full_name }),

@@ -13,7 +13,10 @@ export function lookup(scope: Scope, path: string): Val {
   }
   if (head === "github") {
     const v = scope.github?.[rest];
-    return v === undefined ? UNKNOWN : { kind: "value", v };
+    if (v === undefined) {
+      return UNKNOWN;
+    }
+    return Array.isArray(v) ? { kind: "json", v } : { kind: "value", v };
   }
   if (head === "needs") {
     // Only `needs.<job>.outputs.<name>` is modelled. `needs.<job>.result`
