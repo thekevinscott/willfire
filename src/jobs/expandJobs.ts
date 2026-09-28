@@ -6,6 +6,7 @@ import type { CallbackMap } from "../callback/parseCallbackMap.js";
 import type { Scope } from "../expr/val.js";
 import type { JobExecutor } from "../execute/types.js";
 import { expandMatrixDetailed } from "../matrix/expandMatrixDetailed.js";
+import { capDisplayName } from "../names/capDisplayName.js";
 import { jobDisplayName } from "../names/jobDisplayName.js";
 import { skippedDisplayName } from "../names/skippedDisplayName.js";
 import { parseUses } from "../uses/parseUses.js";
@@ -273,7 +274,7 @@ export async function expandJobs(args: ExpandJobsArgs): Promise<ExpandedJob[]> {
       } else {
         for (const combo of combos) {
           const disp = jobDisplayName(jobId, job, combo);
-          const name = prefix + disp.name;
+          const name = prefix + capDisplayName(disp.name);
           entries.push({
             job: name,
             checkName: prefixResolved && disp.resolved ? name : null,

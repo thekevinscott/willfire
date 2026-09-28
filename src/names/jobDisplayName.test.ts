@@ -41,8 +41,10 @@ describe("jobDisplayName", () => {
     expect(d).toEqual({ name: "x ${{ inputs.f }}", resolved: false });
   });
 
-  it("caps the rendered name at GitHub's 100-character display limit", () => {
+  it("leaves a name past the 100-character display limit uncut", () => {
+    // Capping here would cut a reusable caller's segment too, which GitHub
+    // does not do (probe run 36429562958).
     const d = jobDisplayName("a", { name: "y".repeat(120) }, null);
-    expect(d).toEqual({ name: `${"y".repeat(97)}...`, resolved: true });
+    expect(d).toEqual({ name: "y".repeat(120), resolved: true });
   });
 });

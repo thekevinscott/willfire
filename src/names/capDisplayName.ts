@@ -1,7 +1,9 @@
 /**
  * GitHub cuts a display name over 100 characters to 97 plus `...`. Verified on
  * dirsql PR #1013: the cap applies to the leaf name before any reusable-call
- * prefixing, so it lives here, not on the entry.
+ * prefixing, so it lives here, not on the entry. A *caller* segment is exempt —
+ * probe run 36429562958 dispatched a 139-character `<130-char caller> / leaf-a`
+ * uncut — so only a leaf may call this.
  */
 export function capDisplayName(name: string): string {
   return name.length > 100 ? `${name.slice(0, 97)}...` : name;

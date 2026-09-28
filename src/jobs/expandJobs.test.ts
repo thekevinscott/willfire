@@ -440,6 +440,39 @@ describe("reusable workflows", () => {
     ]);
   });
 
+  it("leaves an overlong caller segment uncut", async () => {
+    // Probe run 36429562958: a 130-character caller dispatched
+    // `<full 130 chars> / leaf-a`, 139 characters long. The 100-character cap
+    // is a leaf rule, and capping the prefix under-predicted both names.
+    const caller = "y".repeat(130);
+    const entries = await expand(
+      { call: { name: caller, uses: "./.github/workflows/sub.yml" } },
+      readerFor({
+        ".github/workflows/sub.yml": JSON.stringify({
+          on: { workflow_call: null },
+          jobs: { "leaf-a": {} },
+        }),
+      }),
+    );
+    const name = `${caller} / leaf-a`;
+    expect(entries).toEqual([{ job: name, checkName: name, status: "run", reason: "" }]);
+  });
+
+  it("still cuts an overlong callee job name", async () => {
+    const leaf = "z".repeat(130);
+    const entries = await expand(
+      { call: { uses: "./.github/workflows/sub.yml" } },
+      readerFor({
+        ".github/workflows/sub.yml": JSON.stringify({
+          on: { workflow_call: null },
+          jobs: { leaf: { name: leaf } },
+        }),
+      }),
+    );
+    const name = `call / ${"z".repeat(97)}...`;
+    expect(entries).toEqual([{ job: name, checkName: name, status: "run", reason: "" }]);
+  });
+
   it("reports a dynamic matrix on the calling job as unknown", async () => {
     // The caller's matrix multiplies the whole callee set, so an unknown
     // multiplier makes the entire subtree unpredictable: one unknown entry
