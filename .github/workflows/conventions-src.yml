@@ -3,9 +3,10 @@ name: Testing Conventions (willfire)
 # Runs the upstream testing-conventions gates over the root `willfire` package,
 # pinned to the rolling `v0` tag (the same convention as check.yml).
 #
-# Every gate runs (`gates` left at its empty default): mutation's Stryker deps
-# are in devDependencies, and `e2e-attestations/` holds the receipt the
-# e2e-verify gate checks.
+# `gates` allowlists every gate except `unit-coverage`, which carries both the
+# whole-tree and the changed-lines coverage jobs: willfire has no coverage
+# requirement. Mutation's Stryker deps are in devDependencies, and
+# `e2e-attestations/` holds the receipt the e2e-verify gate checks.
 #
 # One workflow file per workspace package (docs/monorepo.md), because `paths:`
 # is per-file and each package's lane has a different trigger set.
@@ -45,3 +46,6 @@ jobs:
     with:
       languages: '["typescript"]'
       source: src
+      gates: >-
+        ["colocated-test", "one-function-per-file", "unit-lint",
+        "integration-lint", "mutation", "packaging", "e2e-verify", "changelog"]
