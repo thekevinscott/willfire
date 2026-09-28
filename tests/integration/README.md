@@ -80,12 +80,17 @@ set. Before writing `calls.json`, swap each `ArrayBuffer` result for a
 ### Read the dispatched list
 
 Runs hang off the pull request's **head** commit, not the test merge commit
-willfire reads workflow files from. No `event=` filter: filtering to
-`pull_request` drops `pull_request_target`, `push`, and `merge_group` runs.
+willfire reads workflow files from. Enumerate every run for the head SHA — a
+bare `event=pull_request` filter drops `pull_request_target` runs — then keep
+by event. willfire predicts the PR-attached check set: `pull_request` and
+`pull_request_target` runs are in; `push` runs on the PR branch do not attach
+to the PR and are out. `merge_group` runs land on the queue's own commit,
+never the head SHA.
 
 ```sh
 gh api "repos/$OWNER/$REPO/actions/runs?head_sha=$HEAD_SHA" \
-  --paginate --jq '.workflow_runs[].id'
+  --paginate \
+  --jq '.workflow_runs[] | select(.event == "pull_request" or .event == "pull_request_target") | .id'
 gh api "repos/$OWNER/$REPO/actions/runs/$RUN_ID/jobs" \
   --paginate --jq '.jobs[].name'
 ```

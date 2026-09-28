@@ -17,9 +17,15 @@ then confirm the recorded list against that commit's checks before committing
 it — `pnpm predict` answers what willfire believes, which is the thing under
 test, not the answer.
 
+Enumerate every run for the head SHA — a bare `event=pull_request` filter
+drops `pull_request_target` runs — then keep by event. willfire predicts the
+PR-attached check set: `pull_request` and `pull_request_target` runs are in;
+`push` runs on the PR branch do not attach to the PR and are out.
+
 ```sh
-gh api "repos/$OWNER/$REPO/actions/runs?head_sha=$HEAD_SHA&event=pull_request" \
-  --paginate --jq '.workflow_runs[].id' \
+gh api "repos/$OWNER/$REPO/actions/runs?head_sha=$HEAD_SHA" \
+  --paginate \
+  --jq '.workflow_runs[] | select(.event == "pull_request" or .event == "pull_request_target") | .id' \
   | xargs -I{} gh api "repos/$OWNER/$REPO/actions/runs/{}/jobs" --paginate --jq '.jobs[].name'
 ```
 
