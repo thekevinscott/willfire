@@ -25,7 +25,7 @@ const { entries, checkNames, skip, sources } = await willfire(
   makeGithubClient(),
   "owner/repo",
   123,
-  { action: context.payload.action }, // "opened" | "synchronize" | "reopened"
+  { action: context.payload.action }, // e.g. "opened", "labeled", "ready_for_review"
 );
 // checkNames: sorted, deduped checkName of every entry with status "run"
 // sources: every repo read, and the commit each ref resolved to
@@ -43,7 +43,7 @@ dispatches at all.
 | variant | `job` | `checkName` | `status` |
 | --- | --- | --- | --- |
 | `WorkflowEntry` | `"*"` | always `null` | `"run" \| "skipped" \| "no-dispatch"` |
-| `JobEntry` | the job id | the check name, or `null` | `"run" \| "skipped" \| "unknown" \| "no-dispatch"` |
+| `JobEntry` | the job id | the check name, or `null` | `"run" \| "skipped" \| "unknown"` |
 
 `"unknown"` is job-level only: every workflow-level verdict is decidable, so a
 `WorkflowEntry` cannot express one. Narrow with the exported `isWorkflowEntry`
@@ -59,8 +59,7 @@ single name is knowable ahead of the run:
   execution could not resolve, reported as one `unknown` entry for that job
   and nothing else — see "Executing needed jobs" below;
 - a reusable workflow we cannot read — private, deleted, a ref that does not
-  exist, a `uses:` built from an expression, or one nested past the ten
-  workflows GitHub.com chains;
+  exist, or a `uses:` built from an expression;
 - a `name:` interpolating something we cannot evaluate statically.
 
 `sources` is the provenance of the answer: the PR's own repo at the head
@@ -85,7 +84,7 @@ Auth is any token with `contents: read`, `actions: read`, and
 
 ```sh
 GH_TOKEN=... npx willfire --repo owner/repo --pr 123 \
-  [--action opened|synchronize|reopened] [--callback "<command>"]... [--json]
+  [--action <pull_request activity type>] [--callback "<command>"]... [--json]
 ```
 
 Plain-text output is one line per entry, then a `# read owner/repo@ref -> sha`
@@ -337,7 +336,7 @@ Scope notes: `synchronize` live events and diffs far beyond 301 files are not
 yet probe-verified. `labeled` is, on both sides — a `types: [labeled]` workflow
 fires on the label and nothing under default `types:` does (case P9). So is
 `branches-ignore`, along with the decline side of `branches:`, on a non-`main`
-base (case D16). Reusable-workflow name prefixing is probe-verified to three
-levels; deeper nesting is inferred. The cross-repo probe calls back into the
+base (case D16). Reusable-workflow name prefixing ran through ten local levels
+(run 36416635296). The cross-repo probe calls back into the
 probe repo itself by full `owner/repo@ref` reference, so it pins ref
 resolution but not the owner/repo half of the address.
