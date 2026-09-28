@@ -1,0 +1,7 @@
+name: probe-r12b-r20
+on: workflow_call
+jobs:
+  leaf:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
