@@ -23,6 +23,11 @@ describe("applyFunction", () => {
     expect(applyFunction("failure", [], { skippedNeed: false })).toEqual({ kind: "unknown" });
   });
 
+  it("settles only the job-status functions against a skipped need", () => {
+    expect(applyFunction("tojson", [], { skippedNeed: true })).toEqual({ kind: "unknown" });
+    expect(applyFunction("format", [], { skippedNeed: true })).toEqual({ kind: "unknown" });
+  });
+
   it("refuses arguments on a job-status function", () => {
     expect(applyFunction("success", [S("x")], { skippedNeed: true })).toEqual({
       kind: "unknown",

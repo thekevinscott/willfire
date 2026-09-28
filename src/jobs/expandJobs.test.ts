@@ -210,6 +210,38 @@ describe("job expansion", () => {
       ]);
     });
 
+    it("settles a status function written with a space before its parenthesis", async () => {
+      const entries = await expand({
+        a: { if: false },
+        b: { needs: ["a"], if: "!cancelled ()" },
+      });
+      expect(entries[1]).toMatchObject({ job: "b", status: "run" });
+    });
+
+    it("leaves a status function unsettled when no need was skipped", async () => {
+      const entries = await expand({
+        a: {},
+        b: { needs: ["a"], if: "!cancelled()" },
+      });
+      expect(entries.map((e) => [e.job, e.status])).toEqual([
+        ["a", "run"],
+        ["b", "unknown"],
+      ]);
+    });
+
+    it("settles a status function when only one of several needs was skipped", async () => {
+      const entries = await expand({
+        a: { if: false },
+        b: {},
+        c: { needs: ["a", "b"], if: "!cancelled()" },
+      });
+      expect(entries.map((e) => [e.job, e.status])).toEqual([
+        ["a", "skipped"],
+        ["b", "run"],
+        ["c", "run"],
+      ]);
+    });
+
     it("stays unknown when the rest of a status-function condition is undecidable", async () => {
       const entries = await expand({
         a: { if: false },
