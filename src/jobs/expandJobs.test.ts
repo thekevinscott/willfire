@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { expandJobs } from "./expandJobs.js";
+import { isStartupFailure } from "./isStartupFailure.js";
 import type { Scope } from "../expr/val.js";
 
 // The isolation gate wants collaborators mocked; input resolution and job
@@ -468,33 +469,22 @@ describe("reusable workflows", () => {
     expect(fetched).toEqual([]);
   });
 
-  it("reports a callee that does not parse as unknown", async () => {
-    const entries = await expand(
-      { call: { uses: "./.github/workflows/sub.yml" } },
-      readerFor({ [SUB]: "jobs:\n  a: [unclosed\n" }),
-    );
-    expect(entries[0]).toMatchObject({ job: "call", checkName: null, status: "unknown" });
-    expect(entries[0].reason).toMatch(
-      /^YAML parse error in \.\/\.github\/workflows\/sub\.yml: /,
-    );
+  it("fails the run on a callee that does not parse", async () => {
+    await expect(
+      expand(
+        { call: { uses: "./.github/workflows/sub.yml" } },
+        readerFor({ [SUB]: "jobs:\n  a: [unclosed\n" }),
+      ),
+    ).rejects.toThrow(/^YAML parse error in \.\/\.github\/workflows\/sub\.yml: /);
   });
 
-  it("reports a callee that parses to nothing as unresolvable", async () => {
+  it("fails the run on a callee that parses to nothing", async () => {
     // An empty file is not a fetch failure and not a parse error: it parses
     // cleanly to null. There is still no workflow to expand, so the call has
     // to land somewhere rather than fall through as a resolved zero-job set.
-    const entries = await expand(
-      { call: { uses: "./.github/workflows/sub.yml" } },
-      readerFor({ [SUB]: "" }),
-    );
-    expect(entries).toEqual([
-      {
-        job: "call",
-        checkName: null,
-        status: "unknown",
-        reason: "cannot resolve ./.github/workflows/sub.yml",
-      },
-    ]);
+    await expect(
+      expand({ call: { uses: "./.github/workflows/sub.yml" } }, readerFor({ [SUB]: "" })),
+    ).rejects.toThrow("cannot resolve ./.github/workflows/sub.yml");
   });
 
   it("nulls the name of a skipped job inside an unresolvable caller", async () => {
@@ -518,61 +508,67 @@ describe("reusable workflows", () => {
   // then read the file at it. Either step can fail, and they fail differently,
   // so each has its own case. The path where both succeed is pinned against
   // live dispatches in tests/integration/names.test.ts.
-  it("reports a cross-repo reusable whose ref will not resolve", async () => {
+  it("fails the run when a cross-repo ref will not resolve", async () => {
     // The resolver answers null the way a deleted tag or a private repo does.
     // Falling back to reading the mutable ref is exactly what must not happen:
     // the answer would be unnameable afterwards.
     const uses = "octo/repo/.github/workflows/x.yml@v1";
-    const entries = await expand(
-      { call: { uses } },
-      readerOf(
-        async () => null,
-        async () => null,
+    await expect(
+      expand(
+        { call: { uses } },
+        readerOf(
+          async () => null,
+          async () => null,
+        ),
       ),
-    );
-    expect(entries[0]).toMatchObject({
-      job: "call",
-      status: "unknown",
-      reason: `cannot resolve ref for ${uses}`,
-    });
+    ).rejects.toThrow(`cannot resolve ref for ${uses}`);
   });
 
-  it("reports a cross-repo reusable it resolved but cannot fetch", async () => {
+  it("fails the run when a resolved cross-repo callee cannot be fetched", async () => {
     const uses = "octo/repo/.github/workflows/x.yml@v1";
-    const entries = await expand(
-      { call: { uses } },
-      readerOf(
-        async () => null,
-        async () => REMOTE_SHA,
+    await expect(
+      expand(
+        { call: { uses } },
+        readerOf(
+          async () => null,
+          async () => REMOTE_SHA,
+        ),
       ),
-    );
-    expect(entries[0]).toMatchObject({
-      job: "call",
-      status: "unknown",
-      reason: `cannot fetch ${uses}`,
-    });
+    ).rejects.toThrow(`cannot fetch ${uses}`);
+  });
+
+  it("takes the broken call's siblings down with it", async () => {
+    // Probe PR #369, run 36429562730: a workflow with an unresolvable
+    // cross-repo call and two ordinary sibling jobs concluded `failure` with
+    // zero jobs, so no sibling may survive as a predicted check.
+    await expect(
+      expand(
+        { bad: { uses: "octo/gone/.github/workflows/x.yml@v0" }, "sib-a": {}, "sib-b": {} },
+        readerOf(
+          async () => null,
+          async () => null,
+        ),
+      ),
+    ).rejects.toSatisfy(isStartupFailure);
   });
 
   it("skips resolution for a `uses:` already pinned to a commit", async () => {
     // Nothing to look up: the ref is the commit. Asking anyway would spend a
     // request per call site on an answer already written down.
     const uses = `octo/repo/.github/workflows/x.yml@${REMOTE_SHA}`;
-    const entries = await expand(
-      { call: { uses } },
-      readerOf(
-        async () => null,
-        async () => {
-          throw new Error("resolution must not run for a pinned sha");
-        },
+    await expect(
+      expand(
+        { call: { uses } },
+        readerOf(
+          async () => null,
+          async () => {
+            throw new Error("resolution must not run for a pinned sha");
+          },
+        ),
       ),
-    );
-    expect(entries[0]).toMatchObject({
-      job: "call",
-      status: "unknown",
       // `cannot fetch`, not `cannot resolve`: resolution never ran, and this
       // fixture serves no file that would have let the fetch succeed.
-      reason: `cannot fetch ${uses}`,
-    });
+    ).rejects.toThrow(`cannot fetch ${uses}`);
   });
 
   it("resolves a remote callee's own `./` calls in the callee's repo", async () => {
@@ -605,13 +601,12 @@ describe("reusable workflows", () => {
     ]);
   });
 
-  it("reports a local reusable that is missing at head", async () => {
-    const entries = await expand({ call: { uses: "./.github/workflows/sub.yml" } });
-    expect(entries[0]).toMatchObject({
-      job: "call",
-      status: "unknown",
-      reason: "cannot fetch ./.github/workflows/sub.yml",
-    });
+  it("fails the run when a local reusable is missing at head", async () => {
+    // Probe PR #369, run 36429562502: the local callee file is absent and the
+    // run concludes `failure` with zero jobs, same as the cross-repo case.
+    await expect(expand({ call: { uses: "./.github/workflows/sub.yml" } })).rejects.toThrow(
+      "cannot fetch ./.github/workflows/sub.yml",
+    );
   });
 
   it("skips a caller job whose `if` is false without expanding it", async () => {
@@ -651,13 +646,10 @@ describe("reusable workflows", () => {
     expect(fetched).toEqual([]);
   });
 
-  it("reports a uses: it cannot turn into a fetch target", async () => {
-    const entries = await expand({ call: { uses: "not-a-reference" } });
-    expect(entries[0]).toMatchObject({
-      job: "call",
-      status: "unknown",
-      reason: "unresolvable reusable reference: not-a-reference",
-    });
+  it("fails the run on a uses: it cannot turn into a fetch target", async () => {
+    await expect(expand({ call: { uses: "not-a-reference" } })).rejects.toThrow(
+      "unresolvable reusable reference: not-a-reference",
+    );
   });
 });
 

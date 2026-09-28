@@ -399,6 +399,27 @@ describe("workflow-level verdicts", () => {
     expect(entry.reason).toMatch(/^YAML parse error: /);
   });
 
+  it("names no sibling of a reusable call it cannot read", async () => {
+    // Probe PR #369, runs 36429562730 and 36429562502: GitHub builds the call
+    // graph before scheduling, so the run concludes `failure` with zero jobs
+    // and `sib-a`/`sib-b` never exist. Predicting them hangs the gate.
+    const wf =
+      "on: pull_request\njobs:\n" +
+      "  bad:\n    uses: octo/gone/.github/workflows/x.yml@v0\n" +
+      "  sib-a: {}\n  sib-b: {}\n";
+    const { entries, checkNames } = await run(wf);
+    expect(entries).toEqual([
+      {
+        workflow: WF,
+        job: "*",
+        checkName: null,
+        status: "run",
+        reason: "cannot resolve ref for octo/gone/.github/workflows/x.yml@v0",
+      },
+    ]);
+    expect(checkNames).toEqual([]);
+  });
+
   // ---- branch and path filters ----
 
   it("declines a base branch outside `branches`", async () => {
@@ -892,11 +913,21 @@ describe("the commits a prediction was read from", () => {
 
   const CALLEE = "on:\n  workflow_call:\njobs:\n  inner:\n    runs-on: ubuntu-latest\n";
 
-  /** Two jobs naming one cross-repo ref, so the second consults the cache. */
-  const TWICE_NAMED =
-    "on: pull_request\njobs:\n" +
-    "  a:\n    uses: octo/repo/.github/workflows/x.yml@v1\n" +
-    "  b:\n    uses: octo/repo/.github/workflows/x.yml@v1\n";
+  /**
+   * One cross-repo ref named from two workflows, so the second consults the
+   * cache. Two files rather than two jobs in one: a callee that will not
+   * resolve fails its whole workflow, which would leave the second job
+   * unreached and the cache unexercised.
+   */
+  const WF2 = ".github/workflows/w2.yml";
+  const NAMES_V1 = "on: pull_request\njobs:\n  a:\n    uses: octo/repo/.github/workflows/x.yml@v1\n";
+  const TWICE_NAMED: Fixture = {
+    contents: { [WF]: NAMES_V1, [WF2]: NAMES_V1 },
+    workflows: [
+      { path: WF, state: "active" },
+      { path: WF2, state: "active" },
+    ],
+  };
 
   it("names only the head when nothing else is read", async () => {
     const { sources } = await run("on: pull_request\njobs:\n  a: {}\n");
@@ -925,8 +956,8 @@ describe("the commits a prediction was read from", () => {
   });
 
   it("does not name a source whose ref would not resolve", async () => {
-    // The entry behind it is unknown, which turns the gate red. Naming a source
-    // here would claim a commit was read when none was.
+    // The workflow behind it names nothing at all. Naming a source here would
+    // claim a commit was read when none was.
     const body = caller("octo/repo/.github/workflows/x.yml@v1");
     const { sources } = await run(body, { contents: { [WF]: body } });
     expect(sources).toEqual([HEAD_SOURCE]);
@@ -947,9 +978,10 @@ describe("the commits a prediction was read from", () => {
     );
   });
 
-  it("resolves a ref once however many jobs name it", async () => {
+  it("resolves a ref once however many workflows name it", async () => {
     const github = fakeGithub({
-      contents: { [WF]: TWICE_NAMED, ".github/workflows/x.yml": CALLEE },
+      ...TWICE_NAMED,
+      contents: { ...TWICE_NAMED.contents, ".github/workflows/x.yml": CALLEE },
       refs: { "octo/repo@v1": REMOTE_SHA },
     });
     const getCommit = vi.spyOn(github, "getCommit");
@@ -963,35 +995,38 @@ describe("the commits a prediction was read from", () => {
   it("remembers a ref that 404s rather than asking again", async () => {
     // A deleted tag, or a private repo GitHub masks as one. Neither starts
     // resolving mid-prediction, so the miss is worth keeping.
-    const github = fakeGithub({ contents: { [WF]: TWICE_NAMED } });
+    const github = fakeGithub(TWICE_NAMED);
     const getCommit = vi.spyOn(github, "getCommit");
     const { entries } = await willfire(github, "o/r", 1);
     expect(getCommit).toHaveBeenCalledTimes(2);
-    expect(entries.map((e) => e.status)).toEqual(["unknown", "unknown"]);
+    expect(entries.map((e) => e.job)).toEqual(["*", "*"]);
   });
 
   it("asks again after a transient failure to resolve a ref", async () => {
     // One 403 cached is eight workflows told the ref is unresolvable.
     const github = fakeGithub({
-      contents: { [WF]: TWICE_NAMED, ".github/workflows/x.yml": CALLEE },
+      ...TWICE_NAMED,
+      contents: { ...TWICE_NAMED.contents, ".github/workflows/x.yml": CALLEE },
       refErrors: { "octo/repo@v1": 403 },
     });
     const getCommit = vi.spyOn(github, "getCommit");
     const { entries } = await willfire(github, "o/r", 1);
-    // The head commit, then `v1` once per job: the second is a retry, not a hit.
+    // The head commit, then `v1` once per workflow: the second is a retry,
+    // not a hit.
     expect(getCommit).toHaveBeenCalledTimes(3);
-    expect(entries.map((e) => e.status)).toEqual(["unknown", "unknown"]);
+    expect(entries.map((e) => e.job)).toEqual(["*", "*"]);
   });
 
   it("asks again after a resolution failure that carries no status", async () => {
     const github = fakeGithub({
-      contents: { [WF]: TWICE_NAMED, ".github/workflows/x.yml": CALLEE },
+      ...TWICE_NAMED,
+      contents: { ...TWICE_NAMED.contents, ".github/workflows/x.yml": CALLEE },
       refErrors: { "octo/repo@v1": null },
     });
     const getCommit = vi.spyOn(github, "getCommit");
     const { entries } = await willfire(github, "o/r", 1);
     expect(getCommit).toHaveBeenCalledTimes(3);
-    expect(entries.map((e) => e.status)).toEqual(["unknown", "unknown"]);
+    expect(entries.map((e) => e.job)).toEqual(["*", "*"]);
   });
 
   it("reads a callee once when two refs name the same commit", async () => {
@@ -1525,6 +1560,20 @@ describe("a workflow file that cannot be read", () => {
     await expect(willfire(rejecting(new Error("fetch failed")), "o/r", 1)).rejects.toThrow(
       "fetch failed",
     );
+  });
+
+  it("fails the prediction when a callee read fails, rather than collapsing the workflow", async () => {
+    // An unreadable callee is not an unresolvable one: a 503 means "ask
+    // again", and answering zero checks would read as a settled verdict.
+    const caller = "on: pull_request\njobs:\n  call:\n    uses: ./.github/workflows/sub.yml\n";
+    const github = fakeGithub({ contents: { [WF]: caller } });
+    vi.spyOn(github, "getContent").mockImplementation(async ({ path }) => {
+      if (path === WF) {
+        return caller;
+      }
+      throw apiError(503, path);
+    });
+    await expect(willfire(github, "o/r", 1)).rejects.toThrow(`GitHub API 503 for ${SUB}`);
   });
 
   it("keeps the no-dispatch verdict for a 404, and logs what it discarded", async () => {

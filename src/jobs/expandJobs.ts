@@ -15,6 +15,7 @@ import { evalIf } from "./evalIf.js";
 import { neededJobIds } from "./neededJobIds.js";
 import { readsVars } from "./readsVars.js";
 import { prScope } from "./prScope.js";
+import { startupFailure } from "./startupFailure.js";
 import type {
   ExpandedJob,
   JobSite,
@@ -178,6 +179,18 @@ export async function expandJobs(args: ExpandJobsArgs): Promise<ExpandedJob[]> {
           status: "unknown",
           reason: "dynamic matrix on reusable workflow call" + execNote(needs),
         });
+      } else if (depth + 1 > MAX_REUSABLE_DEPTH) {
+        // The one graph error whose dispatch shape has never been read off a
+        // live run, so it still stops at the caller rather than taking the
+        // workflow with it.
+        for (const combo of combos) {
+          entries.push({
+            job: prefix + jobDisplayName(jobId, job, combo).name,
+            checkName: null,
+            status: "unknown",
+            reason: `reusable workflow nested deeper than ${MAX_REUSABLE_DEPTH} levels`,
+          });
+        }
       } else {
         // Resolve the called workflow once, not once per matrix combination.
         let subWf: Workflow | null = null;
@@ -187,9 +200,7 @@ export async function expandJobs(args: ExpandJobsArgs): Promise<ExpandedJob[]> {
         // pinned ref; a local one keeps the caller's.
         let subSite: JobSite = site;
         const target = parseUses(uses);
-        if (depth + 1 > MAX_REUSABLE_DEPTH) {
-          failure = `reusable workflow nested deeper than ${MAX_REUSABLE_DEPTH} levels`;
-        } else if (target === null) {
+        if (target === null) {
           failure = `unresolvable reusable reference: ${uses}`;
         } else {
           // A local `./` call stays on the caller's source, which is already
@@ -220,45 +231,41 @@ export async function expandJobs(args: ExpandJobsArgs): Promise<ExpandedJob[]> {
           }
         }
 
+        // A callee GitHub cannot read fails the whole run before any job is
+        // scheduled, so this cannot stay a verdict on the calling job alone.
+        if (subWf === null) {
+          throw startupFailure(failure ?? `cannot resolve ${uses}`);
+        }
+
         for (const combo of combos) {
           const disp = jobDisplayName(jobId, job, combo);
           const baseName = prefix + disp.name;
           const nameResolved = prefixResolved && disp.resolved;
-          if (subWf === null) {
-            entries.push({
-              job: baseName,
-              checkName: null,
-              status: "unknown",
-              reason: failure ?? `cannot resolve ${uses}`,
-            });
-          } else {
-            // `inputs.*` changes at the call boundary; `github.*` and `vars.*`
-            // do not. A callee's jobs run in the caller's repo, so the facts
-            // seeded at the top of the prediction stay true all the way down.
-            // Evaluated per combination: a `with:` may read `matrix.*`, and
-            // each combination dispatches its own callee run with its own
-            // inputs.
-            const subScope: Scope = {
-              inputs: calleeInputs(
-                job.with,
-                subWf,
-                combo === null ? scoped : { ...scoped, matrix: combo.values },
-              ),
-              github: scoped.github,
-              vars: scoped.vars,
-            };
-            entries.push(
-              ...(await expandJobs({
-                ...args,
-                wf: subWf,
-                site: subSite,
-                depth: depth + 1,
-                prefix: `${baseName} / `,
-                prefixResolved: nameResolved,
-                scope: subScope,
-              })),
-            );
-          }
+          // `inputs.*` changes at the call boundary; `github.*` and `vars.*`
+          // do not. A callee's jobs run in the caller's repo, so the facts
+          // seeded at the top of the prediction stay true all the way down.
+          // Evaluated per combination: a `with:` may read `matrix.*`, and each
+          // combination dispatches its own callee run with its own inputs.
+          const subScope: Scope = {
+            inputs: calleeInputs(
+              job.with,
+              subWf,
+              combo === null ? scoped : { ...scoped, matrix: combo.values },
+            ),
+            github: scoped.github,
+            vars: scoped.vars,
+          };
+          entries.push(
+            ...(await expandJobs({
+              ...args,
+              wf: subWf,
+              site: subSite,
+              depth: depth + 1,
+              prefix: `${baseName} / `,
+              prefixResolved: nameResolved,
+              scope: subScope,
+            })),
+          );
         }
       }
     } else {
