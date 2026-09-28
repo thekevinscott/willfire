@@ -1,0 +1,1 @@
+NAMES: the check-name surface of `names.yml` and `names-caller.yml`, replayed from the willrun-probe workflows that `tests/integration/names.test.ts` was measured against before dbc607c deleted it. Scratch PR #375 was closed unmerged after its head dispatch completed.
