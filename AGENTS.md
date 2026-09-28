@@ -15,10 +15,18 @@ on, or otherwise consumes that list belongs to the caller.
 
 ## Testing
 
-Unit tests are **colocated** with their source (`foo.ts` ↔ `foo.test.ts`) at
-100% coverage, per the
-[testing-conventions](https://github.com/thekevinscott/testing-conventions)
-standard, enforced by `.github/workflows/conventions.yml`.
+Unit tests are **colocated** with their source (`foo.ts` ↔ `foo.test.ts`), per
+the [testing-conventions](https://github.com/thekevinscott/testing-conventions)
+standard. There is **no coverage requirement** — no floor, no changed-lines
+ratio, no number at any level.
+
+A unit test asserts what its author believed, so it is never evidence about
+GitHub. Only the integration and e2e fixtures — recordings of live CI — verify
+willfire's contract, the exact list of check-name strings. Any claim about
+GitHub's behavior needs a captured fixture or a cited live run.
+`src/jobs/expandJobs.test.ts` asserted a ten-level reusable chain never runs,
+with a comment claiming it was measured; probe PR #340 (run 36416635296) showed
+GitHub runs it, and the suite was green throughout.
 
 The expectations in `src/willfire.test.ts` are **not** opinions about how GitHub
 ought to behave. Every workflow-level verdict was read off a live dispatch on

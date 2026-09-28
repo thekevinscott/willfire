@@ -39,10 +39,10 @@
     "lint": "eslint .",
     "predict": "tsx src/cli.ts",
     "prepare": "pnpm build",
-    "test:coverage": "pnpm test:unit && pnpm test:integration",
+    "test:coverage": "vitest run --coverage src",
     "test:e2e": "pnpm build && vitest run --config tests/e2e/vitest.config.mts",
     "test:integration": "pnpm build && vitest run tests/integration",
-    "test:unit": "vitest run --coverage src",
+    "test:unit": "vitest run src",
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {

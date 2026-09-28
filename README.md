@@ -293,14 +293,13 @@ willfire.
 pnpm install
 pnpm typecheck        # tsc over src/, tests included
 pnpm test             # vitest, once
-pnpm test:coverage    # the 100% floor CI enforces
+pnpm test:coverage    # a coverage report, on demand
 ```
 
-Unit tests are colocated with their source (`foo.ts` ↔ `foo.test.ts`) at 100%
-coverage, per the
+Unit tests are colocated with their source (`foo.ts` ↔ `foo.test.ts`), per the
 [testing-conventions](https://github.com/thekevinscott/testing-conventions)
-standard. `.github/workflows/conventions.yml` enforces that in CI, at the
-upstream thresholds and with no exemptions.
+standard, which `.github/workflows/conventions-src.yml` runs in CI. There is no
+coverage requirement: that call's `gates` allowlist leaves out `unit-coverage`.
 
 ## Verification
 

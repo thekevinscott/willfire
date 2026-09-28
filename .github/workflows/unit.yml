@@ -1,8 +1,6 @@
 name: unit
 
-# Colocated tests over `src` alone. Only this job carries the coverage floor:
-# `src/` reaches 100% from its colocated tests, so the integration suite is
-# not propping the number up.
+# Colocated tests over `src` alone.
 on:
   pull_request:
     paths:
@@ -25,7 +23,7 @@ permissions:
 
 jobs:
   unit:
-    name: unit (100% coverage)
+    name: unit
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
