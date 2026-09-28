@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "vitest";
 import { predict } from "willfire";
@@ -29,15 +29,17 @@ const recordingKey = (c: Case): string => {
   return `${c.owner}/${c.repo}#${c.pr}:${c.action ?? ""}:${h.digest("hex")}`;
 };
 
-const predictions = new Map<string, Promise<string[]>>();
+type Prediction = Awaited<ReturnType<typeof predict>>;
 
-const predictOnce = (c: Case): Promise<string[]> => {
+const predictions = new Map<string, Promise<Prediction>>();
+
+const predictOnce = (c: Case): Promise<Prediction> => {
   const key = recordingKey(c);
   let prediction = predictions.get(key);
   if (prediction === undefined) {
     prediction = predict(replayClient(getCalls(c.dir)), `${c.owner}/${c.repo}`, c.pr, {
       action: c.action,
-    }).then(({ checkNames }) => checkNames);
+    });
     predictions.set(key, prediction);
   }
   return prediction;
@@ -46,9 +48,33 @@ const predictOnce = (c: Case): Promise<string[]> => {
 test.each(CASES)(
   "$title predicts the dispatched check list exactly",
   async (c) => {
-    expect(await predictOnce(c)).toEqual(getResponse(c.dir));
+    expect((await predictOnce(c)).checkNames).toEqual(getResponse(c.dir));
   },
   // A replay with a runtime-computed matrix runs the docker sandbox, and CI
   // provisions the image inside the first such test.
+  300_000,
+);
+
+// A skipped job still gets a check run, so a matching name list can hide a
+// wrong verdict. `statuses.json` records what GitHub reported per dispatched
+// check — `skipped`, or run — for the cases where that distinction is the case.
+const STATUS_CASES = CASES.filter((c) => existsSync(join(c.dir, "statuses.json")));
+
+test.each(STATUS_CASES)(
+  "$title predicts each dispatched check's status",
+  async (c) => {
+    const expected = JSON.parse(readFileSync(join(c.dir, "statuses.json"), "utf8")) as Record<
+      string,
+      string
+    >;
+    const { entries } = await predictOnce(c);
+    const actual = Object.fromEntries(
+      Object.keys(expected).map((name) => [
+        name,
+        entries.find((e) => e.checkName === name)?.status,
+      ]),
+    );
+    expect(actual).toEqual(expected);
+  },
   300_000,
 );
