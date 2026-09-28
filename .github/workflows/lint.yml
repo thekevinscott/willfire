@@ -1,7 +1,15 @@
 name: lint
 
 on:
-  pull_request: {}
+  pull_request:
+    # eslint.config.js only matches src/**/*.ts and scripts/*/src/**/*.ts.
+    paths:
+      - 'src/**'
+      - 'scripts/*/src/**'
+      - 'eslint.config.js'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/lint.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
