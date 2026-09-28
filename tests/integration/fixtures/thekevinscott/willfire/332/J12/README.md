@@ -1,0 +1,1 @@
+The caller name is 61 characters and the callee job name is 115. GitHub caps the callee at 97 characters plus `...`, then prefixes the caller and ` / `; the full check name is longer than 100 characters.
