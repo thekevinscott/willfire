@@ -22,5 +22,5 @@ export function parseCall(cur: Cursor, scope: Scope, name: string): Val {
       }
     }
   }
-  return applyFunction(name.toLowerCase(), args);
+  return applyFunction(name.toLowerCase(), args, scope);
 }

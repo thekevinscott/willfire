@@ -14,6 +14,14 @@ describe("parseCall", () => {
     expect(parseCall(cur, {}, "always")).toEqual({ kind: "value", v: true });
   });
 
+  it("hands the scope to the function it applies", () => {
+    const cur = new Cursor([{ t: "op", v: ")" }]);
+    expect(parseCall(cur, { skippedNeed: true }, "cancelled")).toEqual({
+      kind: "value",
+      v: false,
+    });
+  });
+
   it("parses comma-separated arguments and applies the function", () => {
     const cur = new Cursor([
       { t: "str", v: "ab" },

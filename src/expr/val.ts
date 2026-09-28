@@ -77,4 +77,10 @@ export interface Scope {
    * the matrix is expanded.
    */
   matrix?: YamlMap;
+  /**
+   * True when every job this one `needs` has settled and at least one was
+   * skipped. In that state `success()`, `failure()` and `cancelled()` all
+   * return false — measured on probe PR #341, run 36416679059.
+   */
+  skippedNeed?: boolean;
 }

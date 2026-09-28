@@ -1,17 +1,25 @@
 import { asBool } from "./asBool.js";
 import { formatCall } from "./formatCall.js";
 import { fromJson } from "./fromJson.js";
-import { UNKNOWN, type Val } from "./val.js";
+import { UNKNOWN, type Scope, type Val } from "./val.js";
 
 /**
  * `always()` is true by definition, `fromJSON` is what a dynamic matrix axis
  * is built out of, and `format` is what a conditional `name:` suffix is built
- * out of. The job-status functions depend on jobs that have not run, so they
- * are unknown — as is every function not modelled here.
+ * out of. The other job-status functions depend on jobs that have not run, so
+ * they are unknown unless the scope settles them — as is every function not
+ * modelled here.
  */
-export function applyFunction(name: string, args: Val[]): Val {
+export function applyFunction(name: string, args: Val[], scope: Scope): Val {
   if (name === "always") {
     return { kind: "value", v: true };
+  }
+  if (
+    (name === "success" || name === "failure" || name === "cancelled") &&
+    args.length === 0 &&
+    scope.skippedNeed === true
+  ) {
+    return asBool(false);
   }
   if (name === "fromjson" && args.length === 1) {
     return fromJson(args[0]);

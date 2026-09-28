@@ -47,9 +47,11 @@ describe("the value lattice", () => {
       needs: { detect: { outputs: { x: "y" } } },
       steps: { scan: { outputs: {} } },
       matrix: { os: "linux", cfg: { arch: "x64" } },
+      skippedNeed: true,
     };
     expect(scope.inputs?.mode).toEqual({ kind: "value", v: "fast" });
     expect(scope.matrix).toEqual({ os: "linux", cfg: { arch: "x64" } });
+    expect(scope.skippedNeed).toBe(true);
   });
 
   it("admits a scope with no matrix, which is every scope but a name's", () => {
