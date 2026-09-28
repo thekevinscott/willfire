@@ -3,7 +3,7 @@ on:
   pull_request:
 jobs:
   j11:
-    name: j11 (${{ matrix.os }}, ${{ matrix.node }}, ${{ matrix.extra || 'none' }})
+    name: j11 (${{ matrix.os }}, ${{ matrix.node }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
