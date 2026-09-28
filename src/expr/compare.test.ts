@@ -14,8 +14,31 @@ describe("compare", () => {
     expect(compare(">=", S(1), S(2))).toEqual(S(false));
   });
 
-  it("refuses mixed primitive types", () => {
-    expect(compare("==", S("1"), S(1))).toEqual({ kind: "unknown" });
+  // Probe #383, runs 36430453573 and 36431899972. Every row was read off a
+  // live job's conclusion: success is true, skipped is false.
+  it("casts a mixed-type comparison to numbers", () => {
+    expect(compare("==", S("1"), S(1))).toEqual(S(true));
+    expect(compare("==", S(""), S(0))).toEqual(S(true));
+    expect(compare("==", S("  "), S(0))).toEqual(S(true));
+    expect(compare("==", S("0x1f"), S(31))).toEqual(S(true));
+    expect(compare("==", S(0), S(false))).toEqual(S(true));
+    expect(compare("<", S("2"), S(10))).toEqual(S(true));
+    expect(compare(">=", S("2"), S(2))).toEqual(S(true));
+    expect(compare(">", S("10"), S(9))).toEqual(S(true));
+  });
+
+  it("makes a NaN cast false under == and ordering, true under !=", () => {
+    expect(compare("==", S("abc"), S(0))).toEqual(S(false));
+    expect(compare("==", S(true), S("true"))).toEqual(S(false));
+    expect(compare("!=", S("abc"), S(0))).toEqual(S(true));
+    expect(compare("!=", S(true), S("true"))).toEqual(S(true));
+    expect(compare("!=", S(""), S(0))).toEqual(S(false));
+    expect(compare("<", S("abc"), S(0))).toEqual(S(false));
+    expect(compare(">", S("abc"), S(0))).toEqual(S(false));
+    expect(compare(">=", S("abc"), S(0))).toEqual(S(false));
+    // `<=` is the one direction the probe did not dispatch; the other three
+    // came back false and `!=` came back as the negation of `==`.
+    expect(compare("<=", S("abc"), S(0))).toEqual(S(false));
   });
 
   it("refuses to order booleans", () => {

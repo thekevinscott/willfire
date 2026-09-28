@@ -38,8 +38,8 @@ export interface Scope {
   /**
    * `github.*` values that are fixed for the run being predicted, keyed by the
    * dotted remainder after `github.` (`event.action`). A boolean stays a
-   * boolean: GitHub's `==` refuses mixed types, so `draft == false` only
-   * decides against a real boolean.
+   * boolean: a mixed-type `==` casts both sides to a number, so seeding
+   * `draft` as `'false'` would read `draft == false` as `NaN == 0`.
    */
   github?: Record<string, string | boolean>;
   /**

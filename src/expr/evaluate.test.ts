@@ -119,12 +119,14 @@ describe("comparison", () => {
     expect(evaluate(src)).toBe(want);
   });
 
-  it("refuses to compare across types", () => {
-    // GitHub coerces here and the corner cases are surprising (`'' == 0` is
-    // true). Not modelling the table is the honest option, not a gap.
-    expect(evaluate("'1' == 1")).toBe(null);
-    expect(evaluate("'' == 0")).toBe(null);
-    expect(evaluate("true == 'true'")).toBe(null);
+  it("compares across types by casting both sides to a number", () => {
+    // Probe #383, runs 36430453573 and 36431899972. `'' == 0` is true and
+    // `true == 'true'` is false, because `'true'` casts to NaN.
+    expect(evaluate("'1' == 1")).toBe(true);
+    expect(evaluate("'' == 0")).toBe(true);
+    expect(evaluate("true == 'true'")).toBe(false);
+    expect(evaluate("'abc' == 0")).toBe(false);
+    expect(evaluate("'abc' != 0")).toBe(true);
   });
 });
 

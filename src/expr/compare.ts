@@ -1,11 +1,8 @@
 import { asBool } from "./asBool.js";
+import { order } from "./order.js";
+import { toNumber } from "./toNumber.js";
 import { UNKNOWN, type Val } from "./val.js";
 
-/**
- * Both sides must be concrete and of the same primitive type. GitHub coerces
- * across types and the corner cases surprise (`'' == 0` is true), so modelling
- * that table would add risk without reach. Mixed types return unknown.
- */
 export function compare(op: string, left: Val, right: Val): Val {
   // GitHub compares arrays and objects by instance, and two written sides are
   // never the same instance: `==` is false, `!=` is true, ordering unknowable.
@@ -24,7 +21,15 @@ export function compare(op: string, left: Val, right: Val): Val {
   const a = left.v;
   const b = right.v;
   if (typeof a !== typeof b) {
-    return UNKNOWN;
+    const x = toNumber(a);
+    const y = toNumber(b);
+    if (op === "==") {
+      return asBool(x === y);
+    }
+    if (op === "!=") {
+      return asBool(x !== y);
+    }
+    return order(op, x, y);
   }
   if (op === "==") {
     return asBool(a === b);
@@ -37,14 +42,5 @@ export function compare(op: string, left: Val, right: Val): Val {
   if (typeof a === "boolean" || typeof b === "boolean") {
     return UNKNOWN;
   }
-  if (op === "<") {
-    return asBool(a < b);
-  }
-  if (op === "<=") {
-    return asBool(a <= b);
-  }
-  if (op === ">") {
-    return asBool(a > b);
-  }
-  return asBool(a >= b);
+  return order(op, a, b);
 }
