@@ -1,0 +1,11 @@
+name: names-mid
+on:
+  workflow_call: {}
+jobs:
+  mid:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo mid
+  mid-call:
+    name: Mid Call
+    uses: ./.github/workflows/names-reusable.yml

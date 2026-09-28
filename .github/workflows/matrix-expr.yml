@@ -1,0 +1,23 @@
+name: matrix-expr
+on:
+  pull_request:
+    paths:
+      - src/matrix-expr.txt
+jobs:
+  axis-expr:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [plain, "${{ github.event_name }}"]
+    steps:
+      - run: echo "a=${{ matrix.a }}"
+
+  include-expr:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        b: [plain]
+        include:
+          - b: "${{ github.event_name }}"
+    steps:
+      - run: echo "b=${{ matrix.b }}"
