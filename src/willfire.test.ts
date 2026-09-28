@@ -74,6 +74,18 @@ interface Fixture {
   contents?: Record<string, string>;
   /** Contents at `mergeSha`, served instead of `contents`. Missing key: 404. */
   mergeContents?: Record<string, string>;
+  /** The repo's default branch. Defaults to `main`. */
+  defaultBranch?: string;
+  /**
+   * Contents at `DEFAULT_SHA`, the default branch tip. Reaching them needs a
+   * `refs` entry resolving the default branch — the pass that reads them
+   * resolves the branch first, and an unresolvable branch is its own failure.
+   */
+  defaultContents?: Record<string, string>;
+  /** Tree entries at `DEFAULT_SHA`. Defaults to mirroring `defaultContents`. */
+  defaultTreeFiles?: { path: string; type: string }[];
+  /** Status `listWorkflowFiles` throws at `DEFAULT_SHA`. `null`: no status. */
+  defaultTreeError?: number | null;
   /**
    * What a cross-repo ref resolves to, keyed `owner/repo@ref`. A ref that is
    * not listed 404s, which is the answer a deleted tag or a private repo gives.
@@ -132,6 +144,10 @@ const HEAD_SOURCE = { owner: "o", repo: "r", ref: HEAD_SHA, sha: HEAD_SHA };
 const MERGE_SHA = "f".repeat(40);
 const MERGE_SOURCE = { owner: "o", repo: "r", ref: MERGE_SHA, sha: MERGE_SHA };
 
+/** The default branch tip, for fixtures whose `refs` resolve `o/r@main` to it. */
+const DEFAULT_SHA = "c".repeat(40);
+const DEFAULT_SOURCE = { owner: "o", repo: "r", ref: "main", sha: DEFAULT_SHA };
+
 /**
  * A commit in some other repo, spelled the full 40 hex digits.
  *
@@ -156,7 +172,7 @@ function fakeGithub(f: Fixture): GithubClient {
       }
       return {
         commits: f.commits ?? 1,
-        base: { ref: f.baseRef ?? "main" },
+        base: { ref: f.baseRef ?? "main", repo: { default_branch: f.defaultBranch ?? "main" } },
         head: {
           sha: HEAD_SHA,
           ref: f.headRef ?? "topic",
@@ -199,7 +215,12 @@ function fakeGithub(f: Fixture): GithubClient {
       return { sha, commit: { message: "" }, parents };
     },
     getContent: async ({ path, ref }) => {
-      const at = f.mergeContents !== undefined && ref === f.mergeSha ? f.mergeContents : contents;
+      const at =
+        f.mergeContents !== undefined && ref === f.mergeSha
+          ? f.mergeContents
+          : f.defaultContents !== undefined && ref === DEFAULT_SHA
+            ? f.defaultContents
+            : contents;
       if (!(path in at)) {
         throw apiError(404, path);
       }
@@ -222,7 +243,18 @@ function fakeGithub(f: Fixture): GithubClient {
       return f.variables;
     },
     listWorkflows: async () => f.workflows ?? [{ path: WF, state: "active" }],
-    listWorkflowFiles: async () => {
+    listWorkflowFiles: async ({ ref }) => {
+      if (ref === DEFAULT_SHA) {
+        if (f.defaultTreeError !== undefined) {
+          throw f.defaultTreeError === null
+            ? new Error("network failure listing .github/workflows")
+            : apiError(f.defaultTreeError, ".github/workflows");
+        }
+        if (f.defaultTreeFiles !== undefined) {
+          return f.defaultTreeFiles;
+        }
+        return Object.keys(f.defaultContents ?? {}).map((path) => ({ path, type: "file" }));
+      }
       if (f.treeError !== undefined) {
         throw f.treeError === null
           ? new Error("network failure listing .github/workflows")
@@ -1533,5 +1565,287 @@ describe("a workflow file that cannot be read", () => {
     expect(vi.mocked(console.warn).mock.calls[0][0]).toBe(
       `willfire: no file at o/r/${WF}@${HEAD_SHA} (Error: GitHub API 404 for ${WF})`,
     );
+  });
+});
+
+// --------------------------------------------------- pull_request_target (#321)
+
+describe("pull_request_target workflows", () => {
+  // GitHub reads a pull_request_target workflow from the default branch tip,
+  // never the PR (its GITHUB_SHA is the default branch's last commit), so the
+  // fixtures serve a distinct copy at DEFAULT_SHA and the PR's own copy of the
+  // file decides nothing.
+  const TARGET = "on: pull_request_target\njobs:\n  label: {}\n";
+  const resolved: Fixture = { refs: { "o/r@main": DEFAULT_SHA } };
+
+  const HEAD_DECLINE = {
+    workflow: WF,
+    job: "*",
+    checkName: null,
+    status: "no-dispatch",
+    reason: "no pull_request trigger",
+  };
+
+  it("predicts the jobs of a default-branch pull_request_target workflow", async () => {
+    const { entries, checkNames } = await run(TARGET, {
+      ...resolved,
+      defaultContents: { [WF]: TARGET },
+    });
+    expect(entries).toEqual([
+      HEAD_DECLINE,
+      { workflow: WF, job: "label", checkName: "label", status: "run", reason: "trigger matched" },
+    ]);
+    expect(checkNames).toEqual(["label"]);
+  });
+
+  it("reads the default branch copy of the workflow, not the PR's", async () => {
+    const prCopy = "on: pull_request_target\njobs:\n  added: {}\n";
+    const { checkNames } = await run(prCopy, { ...resolved, defaultContents: { [WF]: TARGET } });
+    expect(checkNames).toEqual(["label"]);
+  });
+
+  it("never predicts a pull_request_target workflow that exists only in the PR head", async () => {
+    const { entries, checkNames } = await run(TARGET, { ...resolved, defaultContents: {} });
+    expect(checkNames).toEqual([]);
+    expect(entries).toEqual([HEAD_DECLINE]);
+  });
+
+  it("ignores a default-branch copy that does not declare the trigger", async () => {
+    // The PR adds the trigger; until that lands on the default branch no
+    // target run exists to predict.
+    const { entries } = await run(TARGET, {
+      ...resolved,
+      defaultContents: { [WF]: "on: pull_request\njobs:\n  a: {}\n" },
+    });
+    expect(entries).toEqual([HEAD_DECLINE]);
+  });
+
+  it("applies the trigger's filters against the same PR context", async () => {
+    const gated = "on:\n  pull_request_target:\n    types: [labeled]\njobs:\n  a: {}\n";
+    const { entries } = await run(gated, { ...resolved, defaultContents: { [WF]: gated } });
+    expect(entries).toEqual([
+      HEAD_DECLINE,
+      {
+        workflow: WF,
+        job: "*",
+        checkName: null,
+        status: "no-dispatch",
+        reason: "action 'opened' not in types [labeled]",
+      },
+    ]);
+  });
+
+  it("decides github.event_name as pull_request_target inside the target pass", async () => {
+    const guarded = JSON.stringify({
+      on: { pull_request: null, pull_request_target: null },
+      jobs: {
+        pr: { if: "github.event_name == 'pull_request'" },
+        target: { if: "github.event_name == 'pull_request_target'" },
+      },
+    });
+    const { entries } = await run(guarded, { ...resolved, defaultContents: { [WF]: guarded } });
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["pr", "run"],
+      ["target", "skipped"],
+      ["pr", "skipped"],
+      ["target", "run"],
+    ]);
+  });
+
+  it("expands the target workflow under the default branch source", async () => {
+    vi.mocked(expandJobs).mockClear();
+    await run(TARGET, { ...resolved, defaultContents: { [WF]: TARGET } });
+    const call = vi.mocked(expandJobs).mock.calls.at(-1)?.[0];
+    expect(call?.site).toEqual({ path: WF, source: DEFAULT_SOURCE });
+    // The PR's facts carry into the target pass; only what the event itself
+    // changes is overridden, and `github.workflow` seeds the same way.
+    expect(call?.scope?.github).toMatchObject({
+      repository: "o/r",
+      actor: "octocat",
+      base_ref: "main",
+      workflow: WF,
+      event_name: "pull_request_target",
+      sha: DEFAULT_SHA,
+    });
+  });
+
+  it("names the default branch among the sources it read", async () => {
+    const { sources } = await run(TARGET, { ...resolved, defaultContents: { [WF]: TARGET } });
+    expect(sources).toEqual([HEAD_SOURCE, DEFAULT_SOURCE]);
+  });
+
+  it("reads the default branch even when the PR targets another branch", async () => {
+    const { checkNames } = await run(TARGET, {
+      ...resolved,
+      baseRef: "dev",
+      defaultContents: { [WF]: TARGET },
+    });
+    expect(checkNames).toEqual(["label"]);
+  });
+
+  it("fails the prediction when the default branch cannot be resolved", async () => {
+    // Predicting nothing instead would under-predict every target run silently.
+    await expect(run(TARGET, { defaultBranch: "trunk" })).rejects.toThrow(
+      "cannot resolve default branch 'trunk' of o/r",
+    );
+  });
+
+  it("treats a missing workflows directory at the default branch as empty", async () => {
+    const { entries } = await run(TARGET, { ...resolved, defaultTreeError: 404 });
+    expect(entries).toEqual([HEAD_DECLINE]);
+  });
+
+  it("fails when listing the default branch tree fails with anything but a 404", async () => {
+    await expect(run(TARGET, { ...resolved, defaultTreeError: 503 })).rejects.toThrow(
+      "GitHub API 503 for .github/workflows",
+    );
+  });
+
+  it("skips a disabled workflow in the target pass", async () => {
+    const github = fakeGithub({
+      workflows: [
+        { path: WF, state: "active" },
+        { path: SUB, state: "disabled_manually" },
+      ],
+      contents: { [WF]: TARGET },
+      refs: { "o/r@main": DEFAULT_SHA },
+      defaultContents: { [WF]: TARGET, [SUB]: TARGET },
+    });
+    const { entries } = await willfire(github, "o/r", 1);
+    expect(entries).toEqual([
+      HEAD_DECLINE,
+      {
+        workflow: SUB,
+        job: "*",
+        checkName: null,
+        status: "no-dispatch",
+        reason: "workflow state: disabled_manually",
+      },
+      { workflow: WF, job: "label", checkName: "label", status: "run", reason: "trigger matched" },
+    ]);
+  });
+
+  it("treats a default-branch workflow the Actions API has not listed as active", async () => {
+    const { checkNames } = await run(TARGET, {
+      ...resolved,
+      defaultContents: { [WF]: TARGET, [SUB]: "on: pull_request_target\njobs:\n  extra: {}\n" },
+    });
+    expect(checkNames).toEqual(["extra", "label"]);
+  });
+
+  it("ignores non-file and non-YAML entries in the default branch tree", async () => {
+    // Each ignored entry serves a target workflow too, so reading one produces a
+    // check name — `.yml.bak` in particular only stays out because the suffix is
+    // anchored to the end of the path.
+    const DOC = ".github/workflows/README.md";
+    const BAK = ".github/workflows/w.yml.bak";
+    const { entries } = await run(TARGET, {
+      ...resolved,
+      defaultContents: { [WF]: TARGET, [SUB]: TARGET, [DOC]: TARGET, [BAK]: TARGET },
+      defaultTreeFiles: [
+        { path: WF, type: "file" },
+        { path: SUB, type: "dir" },
+        { path: DOC, type: "file" },
+        { path: BAK, type: "file" },
+      ],
+    });
+    expect(entries).toEqual([
+      HEAD_DECLINE,
+      { workflow: WF, job: "label", checkName: "label", status: "run", reason: "trigger matched" },
+    ]);
+  });
+
+  it("skips a default-branch workflow listed in the tree but absent on read", async () => {
+    const { entries } = await run(TARGET, {
+      ...resolved,
+      defaultContents: {},
+      defaultTreeFiles: [{ path: WF, type: "file" }],
+    });
+    expect(entries).toEqual([HEAD_DECLINE]);
+  });
+
+  it("skips an unparseable default-branch copy", async () => {
+    // Its triggers are unreadable, so no target run is enumerable from it.
+    const { entries } = await run(TARGET, {
+      ...resolved,
+      defaultContents: { [WF]: "on: pull_request_target\njobs:\n  a: [\n" },
+    });
+    expect(entries).toEqual([HEAD_DECLINE]);
+  });
+
+  const DYNAMIC_TARGET = JSON.stringify({
+    on: "pull_request_target",
+    jobs: {
+      detect: { steps: [] },
+      cover: {
+        needs: "detect",
+        strategy: { matrix: { language: "${{ fromJSON(needs.detect.outputs.langs) }}" } },
+      },
+    },
+  });
+
+  it("hands the target pass the injected executor and cleans it up once", async () => {
+    const order: string[] = [];
+    const { checkNames } = await willfire(
+      fakeGithub({
+        contents: { [WF]: DYNAMIC_TARGET },
+        refs: { "o/r@main": DEFAULT_SHA },
+        defaultContents: { [WF]: DYNAMIC_TARGET },
+      }),
+      "o/r",
+      1,
+      {
+        executor: {
+          executeJob: async (jobId) => {
+            order.push(jobId);
+            return { ok: true, outputs: { langs: '["ts"]' } };
+          },
+          cleanup: async () => {
+            order.push("cleanup");
+          },
+        },
+      },
+    );
+    expect(checkNames).toEqual(["cover (ts)", "detect"]);
+    expect(order).toEqual(["detect", "cleanup"]);
+  });
+
+  it("builds the target pass its own executor when none was injected", async () => {
+    // The two passes check out different refs, so a default run cannot hand the
+    // target pass the executor rooted at the PR head.
+    const both = JSON.stringify({ on: { pull_request: null, pull_request_target: null } });
+    vi.mocked(expandJobs).mockClear();
+    await run(both, { ...resolved, defaultContents: { [WF]: both } });
+    const calls = vi.mocked(expandJobs).mock.calls;
+    expect(calls).toHaveLength(2);
+    expect(calls[1][0].executor).not.toBe(calls[0][0].executor);
+  });
+
+  it("cleans up an injected executor that declares no cleanup", async () => {
+    const { checkNames } = await willfire(
+      fakeGithub({
+        contents: { [WF]: TARGET },
+        refs: { "o/r@main": DEFAULT_SHA },
+        defaultContents: { [WF]: TARGET },
+      }),
+      "o/r",
+      1,
+      { executor: { executeJob: async () => ({ ok: true, outputs: {} }) } },
+    );
+    expect(checkNames).toEqual(["label"]);
+  });
+
+  it("leaves the target pass without an executor under executor: null", async () => {
+    const { entries } = await willfire(
+      fakeGithub({
+        contents: { [WF]: DYNAMIC_TARGET },
+        refs: { "o/r@main": DEFAULT_SHA },
+        defaultContents: { [WF]: DYNAMIC_TARGET },
+      }),
+      "o/r",
+      1,
+      { executor: null },
+    );
+    expect(entries.at(-1)).toMatchObject({ status: "unknown", reason: "dynamic matrix" });
   });
 });

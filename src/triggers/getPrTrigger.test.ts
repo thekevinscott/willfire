@@ -62,4 +62,28 @@ describe("getPrTrigger", () => {
     const trig = { types: ["labeled"] };
     expect(getPrTrigger({ on: { pull_request: trig } } as Workflow)).toBe(trig);
   });
+
+  describe("asked for pull_request_target", () => {
+    it("reads that trigger's own map, not pull_request's", () => {
+      const trig = { types: ["labeled"] };
+      const wf = { on: { pull_request: {}, pull_request_target: trig } } as Workflow;
+      expect(getPrTrigger(wf, "pull_request_target")).toBe(trig);
+    });
+
+    it("is MISSING when only pull_request is declared", () => {
+      const wf = { on: { pull_request: null } } as Workflow;
+      expect(getPrTrigger(wf, "pull_request_target")).toBe(MISSING);
+    });
+
+    it("accepts the string spelling", () => {
+      expect(getPrTrigger({ on: "pull_request_target" } as Workflow, "pull_request_target")).toEqual(
+        {},
+      );
+    });
+
+    it("accepts the list spelling", () => {
+      const wf = { on: ["push", "pull_request_target"] } as Workflow;
+      expect(getPrTrigger(wf, "pull_request_target")).toEqual({});
+    });
+  });
 });

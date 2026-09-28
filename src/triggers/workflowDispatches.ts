@@ -1,5 +1,5 @@
 import { matchFilters } from "../filters/matchFilters.js";
-import { getPrTrigger, MISSING } from "./getPrTrigger.js";
+import { getPrTrigger, MISSING, type PrEvent } from "./getPrTrigger.js";
 import type { Ctx, Workflow } from "../types.js";
 
 const DEFAULT_TYPES = ["opened", "synchronize", "reopened"];
@@ -8,13 +8,16 @@ const DEFAULT_TYPES = ["opened", "synchronize", "reopened"];
 // verdict is decidable, so there is no third answer to express. Only job
 // expansion can be genuinely undecidable (dynamic matrix, an unreadable
 // reusable workflow, unresolvable `if`), and that is a per-entry status.
+// `pull_request_target` shares the default types and every filter with
+// `pull_request` (docs: events-that-trigger-workflows#pull_request_target).
 export function workflowDispatches(
   wf: Workflow,
   ctx: Ctx,
+  event: PrEvent = "pull_request",
 ): [dispatches: boolean, reason: string] {
-  const trig = getPrTrigger(wf);
+  const trig = getPrTrigger(wf, event);
   if (trig === MISSING) {
-    return [false, "no pull_request trigger"];
+    return [false, `no ${event} trigger`];
   }
 
   const types = (trig["types"] ?? DEFAULT_TYPES) as string[];

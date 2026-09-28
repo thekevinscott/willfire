@@ -3,7 +3,10 @@ import type { YamlMap } from "../yamlValue.js";
 
 export const MISSING = Symbol("missing");
 
-export function getPrTrigger(wf: Workflow): YamlMap | typeof MISSING {
+/** The two PR-shaped events. They differ only in which ref the file is read from. */
+export type PrEvent = "pull_request" | "pull_request_target";
+
+export function getPrTrigger(wf: Workflow, event: PrEvent = "pull_request"): YamlMap | typeof MISSING {
   // YAML 1.1 parsers read `on` as boolean true; the `yaml` package (1.2)
   // keeps it a string key. Handle both.
   const on = wf["on"] ?? wf["true"];
@@ -11,14 +14,14 @@ export function getPrTrigger(wf: Workflow): YamlMap | typeof MISSING {
     return MISSING;
   }
   if (typeof on === "string") {
-    return on === "pull_request" ? {} : MISSING;
+    return on === event ? {} : MISSING;
   }
   if (Array.isArray(on)) {
-    return on.includes("pull_request") ? {} : MISSING;
+    return on.includes(event) ? {} : MISSING;
   }
   if (typeof on === "object") {
-    if ("pull_request" in on) {
-      return (on["pull_request"] ?? {}) as YamlMap;
+    if (event in on) {
+      return (on[event] ?? {}) as YamlMap;
     }
     return MISSING;
   }

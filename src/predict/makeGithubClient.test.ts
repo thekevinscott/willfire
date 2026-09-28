@@ -67,7 +67,7 @@ describe("makeGithubClient", () => {
   it("gets a pull request", async () => {
     const pr = {
       commits: 1,
-      base: { ref: "main" },
+      base: { ref: "main", repo: { default_branch: "main" } },
       head: { ref: "topic", sha: "abc", repo: { full_name: "o/r" } },
       merge_commit_sha: null,
       mergeable: null,

@@ -1,0 +1,5 @@
+[[typescript.exempt]]
+path = "willfire.ts"
+rules = ["mutation"]
+lines = [369]
+reason = "the null guard is defensive — the path was just listed in the same commit's tree, and `parseYaml(null)` throws into the catch beside it, so dropping the guard is unobservable"

@@ -11,7 +11,9 @@ import { resolveCallbackMap } from "./callback/resolveCallbackMap.js";
 import { jobName } from "./entries/jobName.js";
 import { errorStatus } from "./predict/errorStatus.js";
 import type { Scope } from "./expr/val.js";
+import type { JobExecutor } from "./execute/types.js";
 import { expandJobs } from "./jobs/expandJobs.js";
+import { getPrTrigger, MISSING } from "./triggers/getPrTrigger.js";
 import { workflowDispatches } from "./triggers/workflowDispatches.js";
 import { finalizePrediction } from "./predict/finalizePrediction.js";
 import type { GithubClient } from "./predict/makeGithubClient.js";
@@ -241,6 +243,49 @@ export async function willfire(
     },
   };
 
+  const expandAt = async (
+    path: string,
+    wf: Workflow,
+    source: WorkflowSource,
+    facts: Scope,
+    jobExecutor: JobExecutor | undefined,
+    reason: string,
+  ): Promise<DraftEntry[]> => {
+    // `github.workflow` is the top-level workflow's `name:` — the path when
+    // unnamed — all the way down its reusable call tree, so it seeds per
+    // workflow here and travels into callees with the rest of the facts.
+    const wfName = wf["name"] ?? path;
+    const jobs = await expandJobs({
+      wf,
+      reader,
+      site: { path, source },
+      scope: {
+        github: {
+          ...facts.github,
+          ...(typeof wfName === "string" ? { workflow: wfName } : {}),
+        },
+      },
+      vars: repoVars,
+      executor: jobExecutor,
+      callbacks: callbackMap,
+    });
+    return jobs.map((j) => ({
+      workflow: path,
+      job: jobName(j.job),
+      checkName: j.checkName,
+      status: j.status,
+      reason: j.reason || reason,
+    }));
+  };
+
+  // Whether any workflow at the read ref names `pull_request_target`. The read
+  // ref carries the base branch tip, so a target workflow the PR did not delete
+  // is visible there — which is what lets the default-branch pass below stay
+  // off, costing no API calls, for the repos that have none. It stands in for
+  // the default branch, so a PR that deletes the file, or one based on a branch
+  // that predates it, still misses the run (#321).
+  let targetTriggered = false;
+
   const workflowEntries = async (path: string, state: string): Promise<DraftEntry[]> => {
     if (state !== "active") {
       return [
@@ -270,35 +315,73 @@ export async function willfire(
       // workflow-level "it dispatches" with nothing to expand.
       return [{ workflow: path, job: "*", status: "run", reason: `YAML parse error: ${e}` }];
     }
+    if (getPrTrigger(wf, "pull_request_target") !== MISSING) {
+      targetTriggered = true;
+    }
     const [dispatches, reason] = workflowDispatches(wf, ctx);
     if (!dispatches) {
       return [{ workflow: path, job: "*", status: "no-dispatch", reason }];
     }
-    // `github.workflow` is the top-level workflow's `name:` — the path when
-    // unnamed — all the way down its reusable call tree, so it seeds per
-    // workflow here and travels into callees with the rest of the facts.
-    const wfName = wf["name"] ?? path;
-    const jobs = await expandJobs({
-      wf,
-      reader,
-      site: { path, source: readSource },
-      scope: {
-        github: {
-          ...prFacts.github,
-          ...(typeof wfName === "string" ? { workflow: wfName } : {}),
-        },
-      },
-      vars: repoVars,
-      executor,
-      callbacks: callbackMap,
-    });
-    return jobs.map((j) => ({
-      workflow: path,
-      job: jobName(j.job),
-      checkName: j.checkName,
-      status: j.status,
-      reason: j.reason || reason,
-    }));
+    return expandAt(path, wf, readSource, prFacts, executor, reason);
+  };
+
+  // GitHub reads a `pull_request_target` workflow from the default branch tip
+  // (GITHUB_SHA is its last commit), never from the PR, so the default branch
+  // is a second source and the PR's own copy of the file decides nothing.
+  let targetExecutor: JobExecutor | undefined;
+  const targetEntries = async (): Promise<DraftEntry[]> => {
+    const defaultBranch = pr.base.repo.default_branch;
+    const sha = await resolveRef({ owner, repo: name, ref: defaultBranch });
+    if (sha === null) {
+      // Silently predicting nothing here would under-predict every target run.
+      throw new Error(`cannot resolve default branch '${defaultBranch}' of ${repo}`);
+    }
+    const targetSource: WorkflowSource = { owner, repo: name, ref: defaultBranch, sha };
+    let files: { path: string; type: string }[];
+    try {
+      files = await github.listWorkflowFiles({ ...base, ref: sha });
+    } catch (e) {
+      if (errorStatus(e) !== 404) {
+        throw e;
+      }
+      return [];
+    }
+    targetExecutor =
+      opts.executor === undefined ? makeLiveExecutor(github, targetSource, resolveRef) : executor;
+    const states = new Map(workflows.map((w) => [w.path, w.state]));
+    // GITHUB_SHA is the default branch tip here, not the test merge the
+    // `pull_request` pass seeds.
+    const targetFacts: Scope = {
+      github: { ...prFacts.github, event_name: "pull_request_target", sha },
+    };
+    const out: DraftEntry[] = [];
+    const paths = files
+      .filter((f) => f.type === "file" && /\.ya?ml$/i.test(f.path))
+      .map((f) => f.path)
+      .filter((p) => (states.get(p) ?? "active") === "active");
+    for (const path of paths) {
+      const content = await fetchWorkflow(path, targetSource);
+      // Absent or unparseable at the tip, no trigger is readable, so no target
+      // run is enumerable; the same path's `pull_request` side was already
+      // answered by the main loop.
+      let wf: Workflow | null = null;
+      try {
+        wf = content === null ? null : parseYaml(content);
+      } catch {
+        // Unparseable: `wf` stays null.
+      }
+      if (wf !== null && getPrTrigger(wf, "pull_request_target") !== MISSING) {
+        const [dispatches, reason] = workflowDispatches(wf, ctx, "pull_request_target");
+        if (!dispatches) {
+          out.push({ workflow: path, job: "*", status: "no-dispatch", reason });
+        } else {
+          out.push(
+            ...(await expandAt(path, wf, targetSource, targetFacts, targetExecutor, reason)),
+          );
+        }
+      }
+    }
+    return out;
   };
 
   const entries: DraftEntry[] = [];
@@ -310,8 +393,15 @@ export async function willfire(
         entries.push(...(await workflowEntries(w.path, w.state)));
       }
     }
+    if (targetTriggered) {
+      entries.push(...(await targetEntries()));
+    }
   } finally {
-    await executor?.cleanup?.();
+    // The two passes share one executor when the caller injected it, so the set
+    // is what keeps that one from being cleaned up twice.
+    for (const exec of new Set([executor, targetExecutor])) {
+      await exec?.cleanup?.();
+    }
   }
   return finalizePrediction(entries, null, sources);
 }

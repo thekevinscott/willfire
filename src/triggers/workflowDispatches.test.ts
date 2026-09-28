@@ -163,4 +163,33 @@ describe("workflowDispatches", () => {
       "stack target 'main' in branches-ignore",
     ]);
   });
+
+  // The target event shares the default types and every filter with
+  // pull_request; only the trigger key differs.
+
+  describe("asked for pull_request_target", () => {
+    const onTarget = (trigger: YamlValue): Workflow => ({
+      on: { pull_request_target: trigger },
+    });
+
+    it("declines a workflow with no pull_request_target trigger, naming the event", () => {
+      expect(workflowDispatches(onPr(null), CTX, "pull_request_target")).toEqual([
+        false,
+        "no pull_request_target trigger",
+      ]);
+    });
+
+    it("dispatches on the target trigger's default types", () => {
+      expect(workflowDispatches(onTarget(null), CTX, "pull_request_target")).toEqual([
+        true,
+        "trigger matched",
+      ]);
+    });
+
+    it("evaluates the target trigger's own filters", () => {
+      expect(
+        workflowDispatches(onTarget({ types: ["labeled"] }), CTX, "pull_request_target"),
+      ).toEqual([false, "action 'opened' not in types [labeled]"]);
+    });
+  });
 });
