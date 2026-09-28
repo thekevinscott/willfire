@@ -30,6 +30,12 @@ import type {
  */
 const MAX_REUSABLE_DEPTH = 9;
 
+/**
+ * A status function in a job `if:` replaces GitHub's implicit `success()`
+ * gate, so its presence decides whether a skipped need skips the job outright.
+ */
+const STATUS_FN_RE = /\b(?:success|failure|cancelled|always)\s*\(/i;
+
 /** `ref` is already a commit id, so resolving it is a no-op. */
 const SHA_RE = /^[0-9a-f]{40}$/i;
 
@@ -105,13 +111,20 @@ export async function expandJobs(args: ExpandJobsArgs): Promise<ExpandedJob[]> {
 
   for (const [jobId, jobRaw] of Object.entries(jobs)) {
     const job = jobRaw ?? {};
-    let status = evalIf(job.if, scoped);
-    let reason = job.if !== undefined && job.if !== null ? `if: ${JSON.stringify(job.if)}` : "";
     const needsRaw = job["needs"];
     const needs: string[] =
       typeof needsRaw === "string" ? [needsRaw] : ((needsRaw ?? []) as string[]);
     const cond = String(job.if ?? "");
-    if (status !== "skipped" && !cond.includes("always()")) {
+    // Every need settled and one was skipped: a status-function condition is
+    // decidable against that state (probe PR #341, run 36416679059), where a
+    // condition without one falls to the implicit success() gate below.
+    const settledSkip =
+      needs.some((n) => statuses[n] === "skipped") &&
+      needs.every((n) => statuses[n] !== "unknown") &&
+      STATUS_FN_RE.test(cond);
+    let status = evalIf(job.if, settledSkip ? { ...scoped, skippedNeed: true } : scoped);
+    let reason = job.if !== undefined && job.if !== null ? `if: ${JSON.stringify(job.if)}` : "";
+    if (!settledSkip && status !== "skipped" && !cond.includes("always()")) {
       for (const n of needs) {
         if (statuses[n] === "skipped") {
           status = "skipped";

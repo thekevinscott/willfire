@@ -192,6 +192,45 @@ describe("job expansion", () => {
       expect(entries[1]).toMatchObject({ job: "b", status: "run" });
     });
 
+    it("mirrors probe #341: status functions downstream of a skipped need", async () => {
+      // Measured on scratch PR #341, run 36416679059: after a skipped need,
+      // cancelled() is false, always() is true, success() and failure() are
+      // both false.
+      const entries = await expand({
+        a: { if: false },
+        b: { needs: ["a"], if: "${{ !cancelled() }}" },
+        c: { needs: ["a"], if: "${{ always() }}" },
+        d: { needs: ["a"], if: "${{ success() || failure() }}" },
+      });
+      expect(entries.map((e) => [e.job, e.status])).toEqual([
+        ["a", "skipped"],
+        ["b", "run"],
+        ["c", "run"],
+        ["d", "skipped"],
+      ]);
+    });
+
+    it("stays unknown when the rest of a status-function condition is undecidable", async () => {
+      const entries = await expand({
+        a: { if: false },
+        b: { needs: ["a"], if: "!cancelled() && inputs.x == 'y'" },
+      });
+      expect(entries[1]).toMatchObject({ job: "b", status: "unknown" });
+    });
+
+    it("does not settle a status function while another need is unknown", async () => {
+      const entries = await expand({
+        a: { if: false },
+        u: { if: "github.ref == 'x'" },
+        b: { needs: ["a", "u"], if: "!cancelled()" },
+      });
+      expect(entries[2]).toMatchObject({
+        job: "b",
+        status: "skipped",
+        reason: "needs 'a' which is skipped",
+      });
+    });
+
     it("leaves an already-skipped job alone rather than re-deriving it", async () => {
       const entries = await expand({
         a: { if: false },
