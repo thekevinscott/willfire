@@ -1,0 +1,18 @@
+name: g-mid-nest
+
+# Scratch probe for #359: measure GitHub's filter-glob semantics against a
+# real dispatch. Not for merge.
+on:
+  pull_request:
+    paths:
+      - 'gother/**/*.txt'
+
+permissions: {}
+
+jobs:
+  g-mid-nest:
+    name: g-mid-nest
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
