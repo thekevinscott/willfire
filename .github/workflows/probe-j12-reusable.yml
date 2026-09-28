@@ -1,0 +1,9 @@
+name: probe J12 reusable workflow name abcdefghijklmnopqrstuvwxyz
+on:
+  workflow_call:
+jobs:
+  callee:
+    name: j12 callee abcdefghijklmnopqrstuvwxyz 0123456789 abcdefghijkl
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
