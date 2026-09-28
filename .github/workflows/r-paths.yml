@@ -1,0 +1,13 @@
+name: r-paths
+
+on:
+  pull_request:
+    paths: ['docs/old.md']
+
+jobs:
+  r-paths:
+    name: r-paths
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

@@ -1,0 +1,13 @@
+name: r-ignore
+
+on:
+  pull_request:
+    paths-ignore: ['docs/new.md']
+
+jobs:
+  r-ignore:
+    name: r-ignore
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
