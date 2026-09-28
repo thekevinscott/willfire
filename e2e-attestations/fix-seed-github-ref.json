@@ -1,0 +1,7 @@
+{
+  "command": "pnpm exec vitest run --config tests/e2e/vitest.config.mts --testTimeout=1800000",
+  "ran_at": 1790675992,
+  "exit_code": 0,
+  "commit": "89bff42f5f79f46e4639939f0c79bbd0c2c98897",
+  "branch": "fix/seed-github-ref"
+}
