@@ -1,0 +1,7 @@
+name: probe-skip-f
+on: pull_request
+jobs:
+  probef:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
