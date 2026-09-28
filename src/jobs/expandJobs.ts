@@ -135,6 +135,15 @@ export async function expandJobs(args: ExpandJobsArgs): Promise<ExpandedJob[]> {
         status,
         reason,
       });
+    } else if (status === "unknown" && "uses" in job) {
+      // An undecided caller may not dispatch at all, so its callee's names
+      // must not surface as run (#269): the verdict stops at the caller.
+      entries.push({
+        job: prefix + jobId,
+        checkName: null,
+        status,
+        reason,
+      });
     } else if ("uses" in job) {
       // Reusable workflow call. The calling job produces no check of its own;
       // each called job becomes `<calling job name> / <called job name>`, and

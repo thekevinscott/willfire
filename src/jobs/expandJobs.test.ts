@@ -558,6 +558,28 @@ describe("reusable workflows", () => {
     expect(fetched).toEqual([]);
   });
 
+  it("stops at a caller whose `if` it cannot decide, without expanding it", async () => {
+    // GitHub may skip the whole call, so the callee's names must not surface
+    // as run (#269): the verdict stops at the caller, undecided.
+    const fetched: string[] = [];
+    const entries = await expand(
+      { call: { if: "${{ secrets.SOME_TOKEN != '' }}", uses: "./.github/workflows/sub.yml" } },
+      readerOf(async (path) => {
+        fetched.push(path);
+        return JSON.stringify({ on: { workflow_call: null }, jobs: { inner: {} } });
+      }),
+    );
+    expect(entries).toEqual([
+      {
+        job: "call",
+        checkName: null,
+        status: "unknown",
+        reason: `if: "\${{ secrets.SOME_TOKEN != '' }}"`,
+      },
+    ]);
+    expect(fetched).toEqual([]);
+  });
+
   it("reports a uses: it cannot turn into a fetch target", async () => {
     const entries = await expand({ call: { uses: "not-a-reference" } });
     expect(entries[0]).toMatchObject({
