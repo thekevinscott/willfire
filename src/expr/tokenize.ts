@@ -50,7 +50,11 @@ export function tokenize(src: string): Tok[] | null {
         out.push({ t: "op", v: op });
         i += op.length;
       } else {
-        const word = /^[A-Za-z_][A-Za-z0-9_.\-]*/.exec(src.slice(i));
+        // `*` is a path character, not an operator: the language has no
+        // arithmetic, and the only `*` a condition carries is an object filter
+        // (`labels.*.name`). Without it the whole expression fails to tokenize
+        // and the job loses its check name.
+        const word = /^[A-Za-z_][A-Za-z0-9_.\-*]*/.exec(src.slice(i));
         if (word !== null) {
           const w = word[0];
           i += w.length;

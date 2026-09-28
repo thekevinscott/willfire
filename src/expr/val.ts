@@ -40,8 +40,12 @@ export interface Scope {
    * dotted remainder after `github.` (`event.action`). A boolean stays a
    * boolean: a mixed-type `==` casts both sides to a number, so seeding
    * `draft` as `'false'` would read `draft == false` as `NaN == 0`.
+   *
+   * An object filter is keyed by the path as written, star included
+   * (`event.pull_request.labels.*.name`), and its value is the array the
+   * filter collects.
    */
-  github?: Record<string, string | boolean>;
+  github?: Record<string, string | boolean | string[]>;
   /**
    * Repo-level Actions variables, read from the API at prediction time.
    * Unlike `needs` and `steps`, this set is never complete: org- and

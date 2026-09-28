@@ -39,6 +39,18 @@ describe("tokenize", () => {
     ]);
   });
 
+  it("keeps an object filter's star inside the path", () => {
+    expect(tokenize("github.event.pull_request.labels.*.name")).toEqual([
+      { t: "path", v: "github.event.pull_request.labels.*.name" },
+    ]);
+  });
+
+  it("refuses a star that starts a token", () => {
+    // A path still has to begin with a letter or underscore, so a bare `*` is
+    // no more a token than it was.
+    expect(tokenize("*")).toBe(null);
+  });
+
   it("refuses a character it has no token for", () => {
     expect(tokenize("true @")).toBe(null);
     // A bare `=` starts no operator (only `==` is one), no word, and no

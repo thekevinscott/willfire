@@ -34,6 +34,14 @@ describe("lookup", () => {
     });
   });
 
+  it("reads a seeded object filter as an array", () => {
+    const scope: Scope = { github: { "event.pull_request.labels.*.name": ["skip-ci"] } };
+    expect(lookup(scope, "github.event.pull_request.labels.*.name")).toEqual({
+      kind: "json",
+      v: ["skip-ci"],
+    });
+  });
+
   it("models only needs.<job>.outputs.<name>", () => {
     expect(lookup(SCOPE, "needs.detect.outputs.x")).toEqual({ kind: "value", v: "y" });
     // A supplied job's missing output is the empty string, per the
