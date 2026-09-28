@@ -42,7 +42,7 @@ export interface SandboxRunner {
 export function makeSandboxRunner(opts: Partial<SandboxConfig> = {}): SandboxRunner {
   const cfg = sandboxConfig(opts);
   const tag = imageTag(cfg.dockerfile);
-  const states = new Map<string, StateVolumes>();
+  const stateKeys = new Set<string>();
   let ensured: Promise<string | null> | null = null;
   const ensureImage = (): Promise<string | null> => {
     ensured ??= (async () => {
@@ -67,11 +67,8 @@ export function makeSandboxRunner(opts: Partial<SandboxConfig> = {}): SandboxRun
     }
     let state: StateVolumes | undefined;
     if (spec.stateKey !== undefined) {
-      state = states.get(spec.stateKey);
-      if (state === undefined) {
-        state = stateVolumes(spec.stateKey);
-        states.set(spec.stateKey, state);
-      }
+      stateKeys.add(spec.stateKey);
+      state = stateVolumes(spec.stateKey);
     }
     const name = `willfire-${randomUUID()}`;
     let expired = false;
@@ -93,8 +90,11 @@ export function makeSandboxRunner(opts: Partial<SandboxConfig> = {}): SandboxRun
   return {
     run,
     dispose: async () => {
-      const names = [...states.values()].flatMap((s) => [s.usr, s.tmp]);
-      states.clear();
+      const names = [...stateKeys].flatMap((k) => {
+        const s = stateVolumes(k);
+        return [s.usr, s.tmp];
+      });
+      stateKeys.clear();
       if (names.length > 0) {
         await runDocker(cfg.dockerBin, ["volume", "rm", "-f", ...names]);
       }
