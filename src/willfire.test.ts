@@ -1231,11 +1231,18 @@ describe("PR facts seeded into the expression scope (#322)", () => {
   });
 
   it("seeds sha from the test merge, and only from a real one", async () => {
-    const jobs = { at: { if: `github.sha == '${MERGE_SHA}'` } };
-    expect(await statuses({ jobs }, { mergeSha: MERGE_SHA })).toEqual([["at", "run"]]);
+    const jobs = { at: { if: `github.sha == '${MERGE_SHA}'` }, has: { if: "github.sha" } };
+    expect(await statuses({ jobs }, { mergeSha: MERGE_SHA })).toEqual([
+      ["at", "run"],
+      ["has", "run"],
+    ]);
     // No merge commit computed yet: the dispatch-time sha is one nothing
-    // fetched names, so the guard stays undecided rather than guessed.
-    expect(await statuses({ jobs })).toEqual([["at", "unknown"]]);
+    // fetched names, so the guards stay undecided rather than guessed. The
+    // bare-truthiness guard is what separates "unseeded" from "seeded null".
+    expect(await statuses({ jobs })).toEqual([
+      ["at", "unknown"],
+      ["has", "unknown"],
+    ]);
   });
 
   it("seeds workflow from `name:`, falling back to the path", async () => {
@@ -1246,7 +1253,10 @@ describe("PR facts seeded into the expression scope (#322)", () => {
   });
 
   it("leaves workflow unseeded when `name:` is not a string", async () => {
-    const jobs = { here: { if: "github.workflow == '3'" } };
+    // Bare truthiness, not `== '3'`: a number seeded anyway would still be
+    // unknown under `==` (mixed types), but truthy here — so this is the
+    // guard that tells unseeded apart from wrongly seeded.
+    const jobs = { here: { if: "github.workflow" } };
     expect(await statuses({ name: 3, jobs })).toEqual([["here", "unknown"]]);
   });
 

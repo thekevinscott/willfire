@@ -68,9 +68,10 @@ describe("makeGithubClient", () => {
     const pr = {
       commits: 1,
       base: { ref: "main" },
-      head: { sha: "abc" },
+      head: { ref: "topic", sha: "abc", repo: { full_name: "o/r" } },
       merge_commit_sha: null,
       mergeable: null,
+      draft: false,
       user: { login: "octocat" },
     };
     stage(json(pr));
