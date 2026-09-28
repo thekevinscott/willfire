@@ -7,6 +7,7 @@ const ctxOf = (over: Partial<WalkCtx> = {}, deps: Partial<WalkCtx["deps"]> = {})
   hasHistory: false,
   envLayers: [],
   stateKey: "sk",
+  jobEnv: {},
   deps: {
     provideTree: async () => null,
     runCommand: async () => ({ code: 0, stdout: "", stderr: "" }),

@@ -7,6 +7,7 @@ const ctxOf = (runCommand: RunCommand): WalkCtx => ({
   hasHistory: false,
   envLayers: [],
   stateKey: "sk",
+  jobEnv: {},
   deps: {
     provideTree: async () => null,
     runCommand,
@@ -121,5 +122,17 @@ describe("runNodeAction", () => {
     expect(specs[0].cwd).toBe("/nonexistent-tree");
     expect(specs[0].mounts).toContainEqual({ path: "/root", writable: false });
     expect(specs[0].stateKey).toBe("sk");
+  });
+
+  it("lands the action's GITHUB_ENV writes in the job env", async () => {
+    const cmd: RunCommand = async (spec) => {
+      const { appendFile } = await import("node:fs/promises");
+      await appendFile(spec.env.GITHUB_ENV, "K=written\n");
+      return { code: 0, stdout: "", stderr: "" };
+    };
+    const ctx = ctxOf(cmd);
+    const action = { runs: { using: "node24", main: "index.js" } };
+    await runNodeAction({}, "step '#1'", "./a", action, "/d", undefined, 24, {}, ctx);
+    expect(ctx.jobEnv).toEqual({ K: "written" });
   });
 });

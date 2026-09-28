@@ -33,6 +33,7 @@ const args = (
   tree: "/nonexistent-tree",
   actionRoot,
   stateKey: "sk",
+  jobEnv: {},
   label: "step 's'",
 });
 
@@ -44,6 +45,7 @@ describe("runStepCommand", () => {
       { path: "/nonexistent-tree", writable: true },
       { path: dirname(specs[0].env.GITHUB_OUTPUT), writable: true },
     ]);
+    expect(dirname(specs[0].env.GITHUB_ENV)).toBe(dirname(specs[0].env.GITHUB_OUTPUT));
   });
 
   it("mounts the action root read-only, between the tree and the sink", async () => {
@@ -80,6 +82,42 @@ describe("runStepCommand", () => {
       return { code: 0, stdout: "", stderr: "" };
     };
     expect(await runStepCommand(args(cmd))).toEqual({ ok: true, v: { who: "bound" } });
+  });
+
+  it("merges GITHUB_ENV writes into the job env on exit 0", async () => {
+    const cmd: RunCommand = async (spec) => {
+      const { appendFile } = await import("node:fs/promises");
+      await appendFile(spec.env.GITHUB_ENV, "PNPM_HOME=/pnpm\nEXTRA<<EOF\ntwo\nlines\nEOF\n");
+      return { code: 0, stdout: "", stderr: "" };
+    };
+    const jobEnv: Record<string, string> = { PRIOR: "kept" };
+    await runStepCommand({ ...args(cmd), jobEnv });
+    expect(jobEnv).toEqual({ PRIOR: "kept", PNPM_HOME: "/pnpm", EXTRA: "two\nlines" });
+  });
+
+  it("fails the step on a malformed GITHUB_ENV line, leaving the job env alone", async () => {
+    const cmd: RunCommand = async (spec) => {
+      const { appendFile } = await import("node:fs/promises");
+      await appendFile(spec.env.GITHUB_ENV, "no equals sign\n");
+      return { code: 0, stdout: "", stderr: "" };
+    };
+    const jobEnv: Record<string, string> = {};
+    expect(await runStepCommand({ ...args(cmd), jobEnv })).toEqual({
+      ok: false,
+      reason: "step 's': malformed GITHUB_ENV",
+    });
+    expect(jobEnv).toEqual({});
+  });
+
+  it("discards GITHUB_ENV writes from a failed step", async () => {
+    const cmd: RunCommand = async (spec) => {
+      const { appendFile } = await import("node:fs/promises");
+      await appendFile(spec.env.GITHUB_ENV, "K=v\n");
+      return { code: 3, stdout: "", stderr: "boom\n" };
+    };
+    const jobEnv: Record<string, string> = {};
+    await runStepCommand({ ...args(cmd), jobEnv });
+    expect(jobEnv).toEqual({});
   });
 
   it("reports the failure tail when the command exits non-zero", async () => {

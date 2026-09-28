@@ -28,12 +28,20 @@ export function stepEnv(
     env.GITHUB_EVENT_NAME = scope.github.event_name;
   }
   Object.assign(env, pre);
-  for (const layer of [...ctx.envLayers, step.env]) {
+  for (const layer of ctx.envLayers) {
     const rendered = renderEnvLayer(layer, scope);
     if (!rendered.ok) {
       return err(`${label}: ${rendered.reason}`);
     }
     Object.assign(env, rendered.v);
   }
+  // $GITHUB_ENV writes outrank the file's env: blocks; the step's own env:
+  // still wins, as on a runner.
+  Object.assign(env, ctx.jobEnv);
+  const own = renderEnvLayer(step.env, scope);
+  if (!own.ok) {
+    return err(`${label}: ${own.reason}`);
+  }
+  Object.assign(env, own.v);
   return { ok: true, v: env };
 }
