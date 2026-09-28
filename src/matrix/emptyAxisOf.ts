@@ -6,7 +6,9 @@ export function emptyAxisOf(job: Workflow): string | null {
   const strategy = job["strategy"];
   const matrix =
     strategy !== null && typeof strategy === "object" ? (strategy as YamlMap)["matrix"] : undefined;
-  if (matrix === null || matrix === undefined || typeof matrix !== "object") {
+  // `typeof null` is `"object"`, so null needs its own arm; the typeof test
+  // covers `undefined` and every scalar.
+  if (matrix === null || typeof matrix !== "object") {
     return null;
   }
   const empty = Object.entries(matrix as YamlMap).find(
