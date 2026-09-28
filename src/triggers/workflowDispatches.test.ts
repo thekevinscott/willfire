@@ -49,30 +49,29 @@ describe("workflowDispatches", () => {
     ]);
   });
 
-  // Both-filters is invalid config. GitHub does not fall back to "no filter"
-  // and does not skip the workflow: it creates the run and concludes
-  // `startup_failure`. The run exists, so the workflow dispatches (#7).
+  // Both-filters is invalid config. Measured on willfire#379: GitHub produced
+  // no `pull_request` run for either twin workflow, only a jobless
+  // startup-failure run hung off the `push` (runs 36430303598, 36430305268).
+  // A push run is not a PR check, so the workflow contributes nothing (#363).
 
-  it("dispatches when both branches and branches-ignore are set", () => {
+  it("declines when both branches and branches-ignore are set", () => {
     expect(
       workflowDispatches(onPr({ branches: ["main"], "branches-ignore": ["main"] }), CTX),
-    ).toEqual([true, "both branches and branches-ignore set: startup failure"]);
+    ).toEqual([false, "both branches and branches-ignore set: invalid workflow"]);
   });
 
-  it("dispatches when both paths and paths-ignore are set", () => {
+  it("declines when both paths and paths-ignore are set", () => {
     expect(
       workflowDispatches(onPr({ paths: ["**"], "paths-ignore": ["**"] }), CTX),
-    ).toEqual([true, "both paths and paths-ignore set: startup failure"]);
+    ).toEqual([false, "both paths and paths-ignore set: invalid workflow"]);
   });
 
   it("checks the conflicting filters before evaluating either one", () => {
-    // `branches: [dev]` alone would decline on a `main` base. The
-    // startup-failure verdict has to win.
-    const [dispatches] = workflowDispatches(
-      onPr({ branches: ["dev"], "branches-ignore": ["dev"] }),
-      CTX,
-    );
-    expect(dispatches).toBe(true);
+    // `branches: [main]` alone would accept on a `main` base, so only the
+    // conflict rule can produce this decline.
+    expect(
+      workflowDispatches(onPr({ branches: ["main"], "branches-ignore": ["dev"] }), CTX),
+    ).toEqual([false, "both branches and branches-ignore set: invalid workflow"]);
   });
 
   it("declines a base branch outside branches", () => {

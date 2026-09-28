@@ -23,10 +23,11 @@ export function workflowDispatches(
   }
 
   // Setting a filter and its -ignore twin on one trigger is invalid config.
-  // GitHub does not fall back to "no filter" or skip the workflow: it creates
-  // the run and concludes `startup_failure`. The run exists, so it dispatches.
+  // GitHub hangs the resulting startup failure off the `push` that introduced
+  // the file, not the pull request, and that run carries no jobs — so the PR
+  // gets no check at all (willfire#379, runs 36430303598 and 36430305268).
   if ("branches" in trig && "branches-ignore" in trig) {
-    return [true, "both branches and branches-ignore set: startup failure"];
+    return [false, "both branches and branches-ignore set: invalid workflow"];
   }
   const branchRef = ctx.stackTarget ?? ctx.baseRef;
   if ("branches" in trig && !matchFilters(branchRef, trig["branches"] as string[])) {
@@ -43,7 +44,7 @@ export function workflowDispatches(
   }
 
   if ("paths" in trig && "paths-ignore" in trig) {
-    return [true, "both paths and paths-ignore set: startup failure"];
+    return [false, "both paths and paths-ignore set: invalid workflow"];
   }
   if ("paths" in trig && !ctx.files.some((f) => matchFilters(f, trig["paths"] as string[]))) {
     return [false, "no changed file matches paths"];
