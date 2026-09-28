@@ -36,9 +36,10 @@ describe("compare", () => {
     expect(compare("<", S("abc"), S(0))).toEqual(S(false));
     expect(compare(">", S("abc"), S(0))).toEqual(S(false));
     expect(compare(">=", S("abc"), S(0))).toEqual(S(false));
-    // `<=` is the one direction the probe did not dispatch; the other three
-    // came back false and `!=` came back as the negation of `==`.
+    // All four directions were dispatched: probe #383 run 36437675623 skipped
+    // `'abc' <= 0` and ran `'' <= 0`, so NaN is false under `<=` too.
     expect(compare("<=", S("abc"), S(0))).toEqual(S(false));
+    expect(compare("<=", S(""), S(0))).toEqual(S(true));
   });
 
   it("refuses to order booleans", () => {
