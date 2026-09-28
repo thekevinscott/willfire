@@ -1,0 +1,62 @@
+name: coerce-c8
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  c8-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c8-array-partial:
+    if: contains(fromJSON('["abc"]'), 'ab')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c8-array-number-needle:
+    if: contains(fromJSON('[1,2]'), 1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c8-array-string-for-number:
+    if: contains(fromJSON('[1,2]'), '1')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c8-label-partial:
+    if: contains(github.event.pull_request.labels.*.name, 'skip')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c8-json-eq-zero:
+    if: fromJSON('[]') == 0
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c8-json-ne-zero:
+    if: fromJSON('[]') != 0
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c8-star-join:
+    name: c8-labels-${{ join(github.event.pull_request.labels.*.name, '|') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

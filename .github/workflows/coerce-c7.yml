@@ -1,0 +1,83 @@
+name: coerce-c7
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  c7-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c7-empty-ne-zero:
+    if: "'' != 0"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c7-abc-ne-zero:
+    if: "'abc' != 0"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c7-abc-lt-zero:
+    if: "'abc' < 0"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c7-abc-gt-zero:
+    if: "'abc' > 0"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c7-abc-ge-zero:
+    if: "'abc' >= 0"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c7-true-ne-strtrue:
+    if: "true != 'true'"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c7-str2-ge-num2:
+    if: "'2' >= 2"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c7-str10-gt-num9:
+    if: "'10' > 9"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c7-spaces-eq-zero:
+    if: "'  ' == 0"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c7-hex-eq-num:
+    if: "'0x1f' == 31"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
