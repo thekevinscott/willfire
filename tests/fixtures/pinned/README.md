@@ -34,7 +34,11 @@ to write while any run for the head commit is still in flight.
 ## What cannot be re-recorded
 
 A pin is only reproducible while the state that produced the dispatch is still
-current. dirsql's `release-ci.yml` computes its release matrix in a `plan` job
+current.
+
+### A version that comes from a live registry (dirsql)
+
+dirsql's `release-ci.yml` computes its release matrix in a `plan` job
 that runs putitoutthere's action, and that action derives each row's version
 from the **live registry** — npm, PyPI and crates.io — not from anything in the
 repo (dirsql's own `package.json` says `0.0.1`). Every dirsql release therefore
@@ -47,3 +51,19 @@ different dirsql PR buys the same hours — the drift is not a property of the P
 So there is no dirsql PR that pins this shape, which is why none is pinned here.
 Covering a runtime-computed release matrix needs a repo whose registry state
 does not move; relaxing the comparison is not the answer.
+
+### A check name that carries the run's own identity (putitoutthere)
+
+putitoutthere#647 and #649 were pinned for a reusable-workflow fan-out and
+removed in #232. Their `e2e (<fixture>) / build` job declared no `name:`, so
+GitHub generated one from the whole matrix row — and the row is materialized by
+`e2e-fixture-job.yml`'s `plan` job from `github.run_id` and a `0.0.{unix
+seconds}` version stamp. 64 of #647's 122 non-skipped names carry one or both;
+`32498706533` in the first-publish names is the run id of the E2E run on the
+pin's own head commit. Nothing can predict either value, so no callback answer
+and no re-recording of those PRs makes the assertion hold.
+
+putitoutthere has since given that job an explicit `name:` over three stable
+row fields, citing the same mechanism. A current putitoutthere PR is therefore
+pinnable again — its row *count* still needs the `plan` job's outputs, so the
+pin would have to supply them through a callback (#243).
