@@ -1,0 +1,20 @@
+name: probe J11 matrix exclude include
+on:
+  pull_request:
+jobs:
+  j11:
+    name: j11 (${{ matrix.os }}, ${{ matrix.node }}, ${{ matrix.extra || 'none' }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [a, b]
+        node: [1, 2]
+        exclude:
+          - os: a
+            node: 1
+        include:
+          - os: a
+            node: 1
+            extra: x
+    steps:
+      - run: 'true'
