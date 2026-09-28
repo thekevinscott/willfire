@@ -1196,6 +1196,21 @@ describe("PR facts seeded into the expression scope (#322)", () => {
     ]);
   });
 
+  it("decides a github.ref guard", async () => {
+    // `refs/pull/<n>/merge` on a pull_request run — probe #383 run 36430453531
+    // put the value in a check name: `c3-ref-is-refs/pull/383/merge`.
+    const jobs = {
+      merge: { if: "github.ref == 'refs/pull/1/merge'" },
+      pull: { if: "startsWith(github.ref, 'refs/pull/')" },
+      branch: { if: "startsWith(github.ref, 'refs/heads/')" },
+    };
+    expect(await statuses({ jobs })).toEqual([
+      ["merge", "run"],
+      ["pull", "run"],
+      ["branch", "skipped"],
+    ]);
+  });
+
   it("decides an event.action guard from the action in effect", async () => {
     const jobs = {
       fresh: { if: "github.event.action == 'opened'" },

@@ -231,6 +231,11 @@ export async function willfire(
       repository_owner: owner,
       base_ref: pr.base.ref,
       head_ref: pr.head.ref,
+      // Every trigger willfire matches is `pull_request`, and on one of those
+      // `github.ref` is the merge ref — measured on probe #383, run
+      // 36430453531. Whoever adds `pull_request_target` (#356) has to thread
+      // the trigger kind here: on that event the ref is the base branch.
+      ref: `refs/pull/${prNumber}/merge`,
       "event.action": ctx.action,
       "event.pull_request.draft": pr.draft,
       ...(pr.head.repo === null
