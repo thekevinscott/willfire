@@ -1,0 +1,10 @@
+[
+  "CI Gate",
+  "actor thekevinbot",
+  "fork-only",
+  "head-repo thekevinbot/willfire",
+  "prt-noop",
+  "repository thekevinscott/willfire",
+  "repository-owner thekevinscott",
+  "same-repo-only"
+]

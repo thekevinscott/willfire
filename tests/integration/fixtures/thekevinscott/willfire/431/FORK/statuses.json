@@ -1,0 +1,10 @@
+{
+  "CI Gate": "run",
+  "actor thekevinbot": "run",
+  "fork-only": "run",
+  "head-repo thekevinbot/willfire": "run",
+  "prt-noop": "run",
+  "repository thekevinscott/willfire": "run",
+  "repository-owner thekevinscott": "run",
+  "same-repo-only": "skipped"
+}
