@@ -1,0 +1,15 @@
+name: probe M7 leading empty substitution
+on:
+  pull_request:
+jobs:
+  m7-name:
+    name: ${{ matrix.label }} build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x, y]
+        include:
+          - a: x
+            label: L
+    steps:
+      - run: 'true'
