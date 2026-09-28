@@ -52,6 +52,31 @@ describe("expandMatrixDetailed", () => {
     ]);
   });
 
+  it("collapses to one unsuffixed combination when exclude removes the whole product", () => {
+    // Measured on probe PR #372, run 36431257507: `m3-wiped` dispatched under
+    // its bare job id beside its plain sibling.
+    expect(expandMatrixDetailed({ matrix: { a: ["x"], exclude: [{ a: "x" }] } })).toEqual([null]);
+    expect(
+      expandMatrixDetailed({
+        matrix: { a: ["x", "y"], exclude: [{ a: "x" }, { a: "y" }] },
+      }),
+    ).toEqual([null]);
+  });
+
+  it("keeps the include-created combination when exclude removes the whole product", () => {
+    expect(
+      expandMatrixDetailed({
+        matrix: { a: ["x"], exclude: [{ a: "x" }], include: [{ a: "z" }] },
+      }),
+    ).toEqual([{ values: { a: "z" }, displayKeys: ["a"] }]);
+  });
+
+  it("keeps zero combinations for an empty axis, which exclude did not cause", () => {
+    expect(expandMatrixDetailed({ matrix: { a: [] } })).toEqual([]);
+    expect(expandMatrixDetailed({ matrix: { a: [], b: ["x"] } })).toEqual([]);
+    expect(expandMatrixDetailed({ matrix: {} })).toEqual([]);
+  });
+
   it("gives up on a matrix that is an expression", () => {
     expect(expandMatrixDetailed({ matrix: "${{ fromJSON(x) }}" })).toBeNull();
   });

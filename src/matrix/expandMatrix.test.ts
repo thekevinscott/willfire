@@ -83,8 +83,8 @@ describe("expandMatrix", () => {
     ).toEqual([{ os: "linux" }]);
   });
 
-  it("returns no combinations when everything is excluded", () => {
-    expect(expandMatrix({ matrix: { os: ["linux"], exclude: [{ os: "linux" }] } })).toEqual([]);
+  it("returns one unsuffixed combination when everything is excluded", () => {
+    expect(expandMatrix({ matrix: { os: ["linux"], exclude: [{ os: "linux" }] } })).toEqual([null]);
   });
 
   it("returns no combinations when any axis is empty", () => {

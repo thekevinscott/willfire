@@ -47,6 +47,7 @@ export function expandMatrixDetailed(
   if (axisKeys.length === 0) {
     combos = [];
   }
+  const product = combos.length;
   combos = combos.filter(
     (c) => !exclude.some((ex) => Object.entries(ex).every(([k, v]) => c.values[k] === v)),
   );
@@ -73,8 +74,15 @@ export function expandMatrixDetailed(
     }
   }
   combos.push(...extra);
-  // Zero combinations is a real answer, not a missing one: an empty axis, or an
-  // `exclude` that removes everything, schedules no jobs at all. Only an absent
-  // `matrix:` key means "one unsuffixed job", and that returned above.
+  // An `exclude` that removes a whole non-empty product does not cancel the
+  // job: GitHub schedules it once with no matrix values and no parenthetical.
+  // Probe PR #372 run 36431257507 dispatched `m3-wiped` for `a: [x]` excluding
+  // `a: x`, beside its plain sibling.
+  if (combos.length === 0 && product > 0) {
+    return [null];
+  }
+  // Zero combinations is a real answer, not a missing one: an empty axis
+  // schedules no jobs at all. Only an absent `matrix:` key means "one
+  // unsuffixed job", and that returned above.
   return combos;
 }
