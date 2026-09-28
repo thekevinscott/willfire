@@ -1,0 +1,13 @@
+name: d-labeled
+
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  d-labeled:
+    name: d-labeled
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

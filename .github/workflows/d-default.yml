@@ -1,0 +1,12 @@
+name: d-default
+
+on:
+  pull_request:
+
+jobs:
+  d-default:
+    name: d-default
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

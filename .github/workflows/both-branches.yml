@@ -1,0 +1,20 @@
+name: both-branches
+
+on:
+  pull_request:
+    branches: [main]
+    branches-ignore: [main]
+
+jobs:
+  bb-a:
+    name: bb-a
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+  bb-b:
+    name: bb-b
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

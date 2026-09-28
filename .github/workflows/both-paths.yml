@@ -1,0 +1,20 @@
+name: both-paths
+
+on:
+  pull_request:
+    paths: ['**']
+    paths-ignore: ['**']
+
+jobs:
+  bp-a:
+    name: bp-a
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+  bp-b:
+    name: bp-b
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
