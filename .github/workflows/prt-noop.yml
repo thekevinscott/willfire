@@ -1,0 +1,17 @@
+name: prt-noop
+
+# Permanent probe for case D13 (#328): pull_request_target is read from the
+# default branch, so the only way a prediction of it can be exercised is a
+# workflow that lives here forever.
+on:
+  pull_request_target:
+
+permissions: {}
+
+jobs:
+  prt-noop:
+    name: prt-noop
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
