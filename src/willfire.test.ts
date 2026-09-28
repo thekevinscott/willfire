@@ -379,7 +379,7 @@ describe("workflow-level verdicts", () => {
       "on:\n  pull_request:\njobs:\n  sibling: {}\n  m:\n    strategy:\n      matrix:\n        a: []\n";
     expect(await only(wf)).toMatchObject({
       job: "*",
-      status: "run",
+      status: "no-dispatch",
       reason: "empty matrix axis 'a': startup failure",
     });
     expect((await run(wf)).checkNames).toEqual([]);
