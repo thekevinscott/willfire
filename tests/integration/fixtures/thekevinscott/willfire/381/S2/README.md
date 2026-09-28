@@ -1,0 +1,1 @@
+Head commit message carries `skip-checks: true` on its own line with prose after it. GitHub dispatched runs 36430359113 (`probe-skip-a2.yml`) and 36430359055 (`pr-monitor.yml`). The old `/^skip-checks:\s*true/im` matched here and zeroed the prediction; this is the case that settled it.

@@ -1,0 +1,1 @@
+First commit `chore: probe c workflow [skip ci]`, head commit clean. GitHub dispatched runs 36430384202 (`probe-skip-c.yml`) and 36430384117 (`pr-monitor.yml`), so the head commit is the surface a skip instruction is read from — not the earliest commit, and not the test merge commit (whose own message is `Merge ... into ...` and can never carry one).

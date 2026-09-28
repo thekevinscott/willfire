@@ -1,0 +1,1 @@
+Two empty lines before the trailer, but prose follows it, so it is not the end of the message. GitHub dispatched runs 36431216647 (`probe-skip-g.yml`) and 36431216583 (`pr-monitor.yml`). The complement of #391.

@@ -1,0 +1,1 @@
+Head commit message `chore: probe f\n\nskip-checks: true` — trailer last, but one empty line before it instead of two. GitHub dispatched runs 36431199736 (`probe-skip-f.yml`) and 36431199457 (`pr-monitor.yml`). With #392 this pins both halves of the position rule as independently necessary.

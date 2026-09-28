@@ -1,0 +1,785 @@
+[
+  {
+    "method": "getPull",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "pull_number": 380
+    },
+    "result": {
+      "url": "https://api.github.com/repos/thekevinscott/willfire/pulls/380",
+      "id": 4664481064,
+      "node_id": "PR_kwDOT9j2e88AAAABFgZVKA",
+      "html_url": "https://github.com/thekevinscott/willfire/pull/380",
+      "diff_url": "https://github.com/thekevinscott/willfire/pull/380.diff",
+      "patch_url": "https://github.com/thekevinscott/willfire/pull/380.patch",
+      "issue_url": "https://api.github.com/repos/thekevinscott/willfire/issues/380",
+      "number": 380,
+      "state": "open",
+      "locked": false,
+      "title": "scratch probe: skip-checks trailer in documented position (#361)",
+      "user": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "body": "Scratch probe for #361. Do not merge; closed unmerged once its head dispatch concludes.\n\nHead commit message ends with two empty lines then `skip-checks: true` — the position GitHub documents. Question: does GitHub honour it on `pull_request`?",
+      "created_at": "2026-09-28T13:40:55Z",
+      "updated_at": "2026-09-28T13:40:55Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "1a27b638d7c466f79353ab886b01ba0731f4a8c7",
+      "assignees": [],
+      "requested_reviewers": [],
+      "requested_teams": [],
+      "labels": [],
+      "milestone": null,
+      "draft": false,
+      "commits_url": "https://api.github.com/repos/thekevinscott/willfire/pulls/380/commits",
+      "review_comments_url": "https://api.github.com/repos/thekevinscott/willfire/pulls/380/comments",
+      "review_comment_url": "https://api.github.com/repos/thekevinscott/willfire/pulls/comments{/number}",
+      "comments_url": "https://api.github.com/repos/thekevinscott/willfire/issues/380/comments",
+      "statuses_url": "https://api.github.com/repos/thekevinscott/willfire/statuses/1fb362b60f5c29ec7d2308b50ff26c5935bcf14e",
+      "head": {
+        "label": "thekevinscott:probe/skip-a1",
+        "ref": "probe/skip-a1",
+        "sha": "1fb362b60f5c29ec7d2308b50ff26c5935bcf14e",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1339618939,
+          "node_id": "R_kgDOT9j2ew",
+          "name": "willfire",
+          "full_name": "thekevinscott/willfire",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/willfire",
+          "description": "Predict the set of CI check entries GitHub Actions will create for a PR",
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/willfire",
+          "forks_url": "https://api.github.com/repos/thekevinscott/willfire/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/willfire/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/willfire/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/willfire/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/willfire/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/willfire/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/willfire/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/willfire/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/willfire/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/willfire/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/willfire/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/willfire/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/willfire/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/willfire/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/willfire/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/willfire/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/willfire/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/willfire/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/willfire/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/willfire/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/willfire/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/willfire/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/willfire/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/willfire/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/willfire/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/willfire/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/willfire/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/willfire/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/willfire/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/willfire/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/willfire/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/willfire/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/willfire/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/willfire/deployments",
+          "created_at": "2026-08-19T13:30:06Z",
+          "updated_at": "2026-09-28T13:50:57Z",
+          "pushed_at": "2026-09-28T13:54:57Z",
+          "git_url": "git://github.com/thekevinscott/willfire.git",
+          "ssh_url": "git@github.com:thekevinscott/willfire.git",
+          "clone_url": "https://github.com/thekevinscott/willfire.git",
+          "svn_url": "https://github.com/thekevinscott/willfire",
+          "homepage": null,
+          "size": 32561,
+          "stargazers_count": 1,
+          "watchers_count": 1,
+          "language": "TypeScript",
+          "has_issues": true,
+          "has_projects": true,
+          "has_downloads": false,
+          "has_wiki": true,
+          "has_pages": false,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 55,
+          "license": {
+            "key": "mit",
+            "name": "MIT License",
+            "spdx_id": "MIT",
+            "url": "https://api.github.com/licenses/mit",
+            "node_id": "MDc6TGljZW5zZTEz"
+          },
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [],
+          "visibility": "public",
+          "forks": 0,
+          "open_issues": 55,
+          "watchers": 1,
+          "default_branch": "main"
+        }
+      },
+      "base": {
+        "label": "thekevinscott:main",
+        "ref": "main",
+        "sha": "54f79035795af6ccf29aa6a43e7f31769001059e",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1339618939,
+          "node_id": "R_kgDOT9j2ew",
+          "name": "willfire",
+          "full_name": "thekevinscott/willfire",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/willfire",
+          "description": "Predict the set of CI check entries GitHub Actions will create for a PR",
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/willfire",
+          "forks_url": "https://api.github.com/repos/thekevinscott/willfire/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/willfire/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/willfire/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/willfire/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/willfire/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/willfire/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/willfire/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/willfire/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/willfire/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/willfire/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/willfire/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/willfire/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/willfire/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/willfire/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/willfire/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/willfire/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/willfire/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/willfire/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/willfire/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/willfire/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/willfire/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/willfire/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/willfire/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/willfire/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/willfire/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/willfire/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/willfire/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/willfire/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/willfire/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/willfire/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/willfire/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/willfire/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/willfire/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/willfire/deployments",
+          "created_at": "2026-08-19T13:30:06Z",
+          "updated_at": "2026-09-28T13:50:57Z",
+          "pushed_at": "2026-09-28T13:54:57Z",
+          "git_url": "git://github.com/thekevinscott/willfire.git",
+          "ssh_url": "git@github.com:thekevinscott/willfire.git",
+          "clone_url": "https://github.com/thekevinscott/willfire.git",
+          "svn_url": "https://github.com/thekevinscott/willfire",
+          "homepage": null,
+          "size": 32561,
+          "stargazers_count": 1,
+          "watchers_count": 1,
+          "language": "TypeScript",
+          "has_issues": true,
+          "has_projects": true,
+          "has_downloads": false,
+          "has_wiki": true,
+          "has_pages": false,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 55,
+          "license": {
+            "key": "mit",
+            "name": "MIT License",
+            "spdx_id": "MIT",
+            "url": "https://api.github.com/licenses/mit",
+            "node_id": "MDc6TGljZW5zZTEz"
+          },
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [],
+          "visibility": "public",
+          "forks": 0,
+          "open_issues": 55,
+          "watchers": 1,
+          "default_branch": "main"
+        }
+      },
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/pulls/380"
+        },
+        "html": {
+          "href": "https://github.com/thekevinscott/willfire/pull/380"
+        },
+        "issue": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/issues/380"
+        },
+        "comments": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/issues/380/comments"
+        },
+        "review_comments": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/pulls/380/comments"
+        },
+        "review_comment": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/pulls/comments{/number}"
+        },
+        "commits": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/pulls/380/commits"
+        },
+        "statuses": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/statuses/1fb362b60f5c29ec7d2308b50ff26c5935bcf14e"
+        }
+      },
+      "author_association": "COLLABORATOR",
+      "auto_merge": null,
+      "assignee": null,
+      "active_lock_reason": null,
+      "merged": false,
+      "mergeable": null,
+      "rebaseable": null,
+      "mergeable_state": "unknown",
+      "merged_by": null,
+      "comments": 0,
+      "review_comments": 0,
+      "maintainer_can_modify": false,
+      "commits": 2,
+      "additions": 8,
+      "deletions": 0,
+      "changed_files": 2
+    }
+  },
+  {
+    "method": "listPullFiles",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "pull_number": 380
+    },
+    "result": [
+      {
+        "sha": "32e6e9688b6ed43136d5ca5abdf6c7df9234dd01",
+        "filename": ".github/workflows/probe-skip-a1.yml",
+        "status": "added",
+        "additions": 7,
+        "deletions": 0,
+        "changes": 7,
+        "blob_url": "https://github.com/thekevinscott/willfire/blob/1fb362b60f5c29ec7d2308b50ff26c5935bcf14e/.github%2Fworkflows%2Fprobe-skip-a1.yml",
+        "raw_url": "https://github.com/thekevinscott/willfire/raw/1fb362b60f5c29ec7d2308b50ff26c5935bcf14e/.github%2Fworkflows%2Fprobe-skip-a1.yml",
+        "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github%2Fworkflows%2Fprobe-skip-a1.yml?ref=1fb362b60f5c29ec7d2308b50ff26c5935bcf14e",
+        "patch": "@@ -0,0 +1,7 @@\n+name: probe-skip-a1\n+on: pull_request\n+jobs:\n+  probea1:\n+    runs-on: ubuntu-latest\n+    steps:\n+      - run: 'true'"
+      },
+      {
+        "sha": "d131b0900cd30692cb8ab1c9cc397de07ff945fd",
+        "filename": "tests/fixtures/probe/a1.txt",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0,
+        "changes": 1,
+        "blob_url": "https://github.com/thekevinscott/willfire/blob/1fb362b60f5c29ec7d2308b50ff26c5935bcf14e/tests%2Ffixtures%2Fprobe%2Fa1.txt",
+        "raw_url": "https://github.com/thekevinscott/willfire/raw/1fb362b60f5c29ec7d2308b50ff26c5935bcf14e/tests%2Ffixtures%2Fprobe%2Fa1.txt",
+        "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/tests%2Ffixtures%2Fprobe%2Fa1.txt?ref=1fb362b60f5c29ec7d2308b50ff26c5935bcf14e",
+        "patch": "@@ -0,0 +1 @@\n+probe a1"
+      }
+    ]
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "ref": "1a27b638d7c466f79353ab886b01ba0731f4a8c7"
+    },
+    "result": {
+      "sha": "1a27b638d7c466f79353ab886b01ba0731f4a8c7",
+      "node_id": "C_kwDOT9j2e9oAKDFhMjdiNjM4ZDdjNDY2Zjc5MzUzYWI4ODZiMDFiYTA3MzFmNGE4Yzc",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-28T13:40:56Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-09-28T13:40:56Z"
+        },
+        "message": "Merge 1fb362b60f5c29ec7d2308b50ff26c5935bcf14e into 54f79035795af6ccf29aa6a43e7f31769001059e",
+        "tree": {
+          "sha": "dd26d367a8340c0a7cdaa860832ad4b21a5e0aa0",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/git/trees/dd26d367a8340c0a7cdaa860832ad4b21a5e0aa0"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/willfire/git/commits/1a27b638d7c466f79353ab886b01ba0731f4a8c7",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqum5oCRC1aQ7uu5UhlAAAZ1sQAKRakGorGwSLM/ajEntlbv1M\nWkrros+d2vgadUoWxQC64PKyPavxoRp49bGirKOCyXUxmJ1wxhbglkHMiIKnObDE\nhFbEXhIke1kkARUCUbxqC3/+zm1PPkUSM8qkTb7Axl6IqNPQVuwIuOS7XZMSMgkO\nF2HLf+D7O9iwN36bQrOB2U+Z2o6MbURz833sBnTwJXVy3cduNgOsSKwsbfu1vrgp\nt5bxFDZ4fq9Vy4t1ep4/P6PTU9pnJn/HUJyltV9CaPZTKJ0E2/whvSW7Ks/xWSj6\n82JpuokiBc327HSTrf/TT/RHN9SXJfHEeS+Z+1FyLjuYGO4W7FWQziSeMArnFOp/\nnXkNL5kNCsOrhlQlXGsDkOokK+NRbcqdaFPr+N5mOxnYnrWMGLeSFpswLJESomyf\nuycIebNeaU9jCvQmn18aPmMdFcPNF7zONwz/1BqaSmpaUecFHBgjTd4YSorLpuIG\nJuxRY3Hygyc6bQTVOQOYyfDqAfoGCU5XZ4MuYC3wQZAJKQeyfQaCDVlT7VPWyu9x\nhnm89KsSjXFW33ESYSUOBu0MQywSqWbInsM5+a5Ovj/ChnwTTMB8lFohG0Z4PYdx\nF6zzxZaa9TQifn8vydLKrcp25sDiJZRmXBx7b7KO48Z7n2DWL7VsW8hsPQIpiwSK\nfj4gCefxz03HIgCtLtDj\n=jhI2\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree dd26d367a8340c0a7cdaa860832ad4b21a5e0aa0\nparent 54f79035795af6ccf29aa6a43e7f31769001059e\nparent 1fb362b60f5c29ec7d2308b50ff26c5935bcf14e\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790602856 -0400\ncommitter GitHub <noreply@github.com> 1790602856 -0400\n\nMerge 1fb362b60f5c29ec7d2308b50ff26c5935bcf14e into 54f79035795af6ccf29aa6a43e7f31769001059e\n",
+          "verified_at": "2026-09-28T13:40:58Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/willfire/commits/1a27b638d7c466f79353ab886b01ba0731f4a8c7",
+      "html_url": "https://github.com/thekevinscott/willfire/commit/1a27b638d7c466f79353ab886b01ba0731f4a8c7",
+      "comments_url": "https://api.github.com/repos/thekevinscott/willfire/commits/1a27b638d7c466f79353ab886b01ba0731f4a8c7/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "54f79035795af6ccf29aa6a43e7f31769001059e",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/54f79035795af6ccf29aa6a43e7f31769001059e",
+          "html_url": "https://github.com/thekevinscott/willfire/commit/54f79035795af6ccf29aa6a43e7f31769001059e"
+        },
+        {
+          "sha": "1fb362b60f5c29ec7d2308b50ff26c5935bcf14e",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/1fb362b60f5c29ec7d2308b50ff26c5935bcf14e",
+          "html_url": "https://github.com/thekevinscott/willfire/commit/1fb362b60f5c29ec7d2308b50ff26c5935bcf14e"
+        }
+      ],
+      "stats": {
+        "total": 8,
+        "additions": 8,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "32e6e9688b6ed43136d5ca5abdf6c7df9234dd01",
+          "filename": ".github/workflows/probe-skip-a1.yml",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/thekevinscott/willfire/blob/1a27b638d7c466f79353ab886b01ba0731f4a8c7/.github%2Fworkflows%2Fprobe-skip-a1.yml",
+          "raw_url": "https://github.com/thekevinscott/willfire/raw/1a27b638d7c466f79353ab886b01ba0731f4a8c7/.github%2Fworkflows%2Fprobe-skip-a1.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github%2Fworkflows%2Fprobe-skip-a1.yml?ref=1a27b638d7c466f79353ab886b01ba0731f4a8c7",
+          "patch": "@@ -0,0 +1,7 @@\n+name: probe-skip-a1\n+on: pull_request\n+jobs:\n+  probea1:\n+    runs-on: ubuntu-latest\n+    steps:\n+      - run: 'true'"
+        },
+        {
+          "sha": "d131b0900cd30692cb8ab1c9cc397de07ff945fd",
+          "filename": "tests/fixtures/probe/a1.txt",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/willfire/blob/1a27b638d7c466f79353ab886b01ba0731f4a8c7/tests%2Ffixtures%2Fprobe%2Fa1.txt",
+          "raw_url": "https://github.com/thekevinscott/willfire/raw/1a27b638d7c466f79353ab886b01ba0731f4a8c7/tests%2Ffixtures%2Fprobe%2Fa1.txt",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/tests%2Ffixtures%2Fprobe%2Fa1.txt?ref=1a27b638d7c466f79353ab886b01ba0731f4a8c7",
+          "patch": "@@ -0,0 +1 @@\n+probe a1"
+        }
+      ]
+    }
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "ref": "main"
+    },
+    "result": {
+      "sha": "d8e58345c812c5e5a66ce8cb1e61f742213ffad0",
+      "node_id": "C_kwDOT9j2e9oAKGQ4ZTU4MzQ1YzgxMmM1ZTVhNjZjZThjYjFlNjFmNzQyMjEzZmZhZDA",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-28T13:50:48Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-09-28T13:50:48Z"
+        },
+        "message": "Read a `**/` in a paths filter as zero or more directories (#389)\n\n* Read a `**/` in a paths filter as zero or more directories\n\n`patternToRegex` compiled `**` positionally, so `**/*.md` became\n`^.*\\/[^/]*\\.md$` and never matched a top-level file. GitHub fires the\nworkflow anyway, so willfire dropped that workflow's whole check set whenever\nthe only matching change was top-level — under-prediction, the direction that\nopens a silent hole in a pr-monitor gate.\n\nMeasured on #360: `**/*.txt` and `gdocs/**/*.md` both dispatched against\ntop-level files. The same probe confirms `?` and `+` already match GitHub\n(zero-or-one and one-or-more of the preceding character), so they are\nunchanged.\n\nFixes #359\n\nrelease: minor\n\n* e2e attestation for fix/glob-doublestar-slash\n\nrelease: minor",
+        "tree": {
+          "sha": "26129cb8c0af7c449b246a0627dd01a564983484",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/git/trees/26129cb8c0af7c449b246a0627dd01a564983484"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/willfire/git/commits/d8e58345c812c5e5a66ce8cb1e61f742213ffad0",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqunC4CRC1aQ7uu5UhlAAATYcQAAe779R/j9FqL2bDXsx0WgdT\nGLmnjhj6bBn4yrDyys6nhSYL7+W1WLxatk0YVfODNZR4oNNDX1BFmBN1wWpgY3G0\n3mYQ+65UMzofAeHL4VaW93Myv0wpNhw8p02Ap6IfMTRwySk6vfNaZG39qdGG7vMr\nSxBo1WYdIQlZlO3v0LRCzihgUSeqQKG6VDWdXClY4jODNFZ2RvEpvsXO/kfjQjTj\ns+1RKHz5ZF6pNYnDuM23wNzdlGj7OrUjO/MRL2tMrQ89q/1FddFm9pWRV6Hq63wA\nPbTX8VIPC/szJB/OQrurn4po7Pa//cVb/d7NfDKxvv7sHr4aZQ1KqCpQR9EGkIb2\nZvu4FMtER63ipfdoyRjQsbd/1d/kBMWp+srGlDpZZqIZGF9iVAMKH0B/9apWIaao\nA3KnoXFvpdAq5DpGhMBkBu8Eud1MP2zqSEJ2fhbU9SonuLmNhMYEvjewA13hI74h\n8JTqgTEwI26iaa6lKCpLJy/9AEo2BX717rdyJg1Xu01lcB4fNcghtGrtqe72eBVb\nF9v2AksCikNTebx3l9L0+Gjy1UuR8NXl4ZMX45KjbnI3JRdzKHnIQnSoRLpDmqv4\ns5i38nH8CbejY0h7BXweWvYw1s9y/PIa6L9abZ9IwnfvUXoYiJGpdGCpwkokrgzz\nKmjlzCG6QZt5jg0lv0kR\n=6D8m\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 26129cb8c0af7c449b246a0627dd01a564983484\nparent cbc8897ff3acfb8e9ed32429fedc0da904205bbe\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790603448 -0400\ncommitter GitHub <noreply@github.com> 1790603448 +0000\n\nRead a `**/` in a paths filter as zero or more directories (#389)\n\n* Read a `**/` in a paths filter as zero or more directories\n\n`patternToRegex` compiled `**` positionally, so `**/*.md` became\n`^.*\\/[^/]*\\.md$` and never matched a top-level file. GitHub fires the\nworkflow anyway, so willfire dropped that workflow's whole check set whenever\nthe only matching change was top-level — under-prediction, the direction that\nopens a silent hole in a pr-monitor gate.\n\nMeasured on #360: `**/*.txt` and `gdocs/**/*.md` both dispatched against\ntop-level files. The same probe confirms `?` and `+` already match GitHub\n(zero-or-one and one-or-more of the preceding character), so they are\nunchanged.\n\nFixes #359\n\nrelease: minor\n\n* e2e attestation for fix/glob-doublestar-slash\n\nrelease: minor",
+          "verified_at": "2026-09-28T13:50:49Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/willfire/commits/d8e58345c812c5e5a66ce8cb1e61f742213ffad0",
+      "html_url": "https://github.com/thekevinscott/willfire/commit/d8e58345c812c5e5a66ce8cb1e61f742213ffad0",
+      "comments_url": "https://api.github.com/repos/thekevinscott/willfire/commits/d8e58345c812c5e5a66ce8cb1e61f742213ffad0/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "cbc8897ff3acfb8e9ed32429fedc0da904205bbe",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/cbc8897ff3acfb8e9ed32429fedc0da904205bbe",
+          "html_url": "https://github.com/thekevinscott/willfire/commit/cbc8897ff3acfb8e9ed32429fedc0da904205bbe"
+        }
+      ],
+      "stats": {
+        "total": 39,
+        "additions": 35,
+        "deletions": 4
+      },
+      "files": [
+        {
+          "sha": "e61ea3cb7ce2cf6f3f0e3251364fff85932122d9",
+          "filename": "e2e-attestations/fix-glob-doublestar-slash.json",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/thekevinscott/willfire/blob/d8e58345c812c5e5a66ce8cb1e61f742213ffad0/e2e-attestations%2Ffix-glob-doublestar-slash.json",
+          "raw_url": "https://github.com/thekevinscott/willfire/raw/d8e58345c812c5e5a66ce8cb1e61f742213ffad0/e2e-attestations%2Ffix-glob-doublestar-slash.json",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/e2e-attestations%2Ffix-glob-doublestar-slash.json?ref=d8e58345c812c5e5a66ce8cb1e61f742213ffad0",
+          "patch": "@@ -0,0 +1,7 @@\n+{\n+  \"command\": \"pnpm test:e2e\",\n+  \"ran_at\": 1790602800,\n+  \"exit_code\": 0,\n+  \"commit\": \"81d66afa48757b86fb1315b9505f4db5169981bf\",\n+  \"branch\": \"fix/glob-doublestar-slash\"\n+}"
+        },
+        {
+          "sha": "08aec8af8ed1e670790e49cb1aea15cb4b07726d",
+          "filename": "src/filters/patternToRegex.test.ts",
+          "status": "modified",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/thekevinscott/willfire/blob/d8e58345c812c5e5a66ce8cb1e61f742213ffad0/src%2Ffilters%2FpatternToRegex.test.ts",
+          "raw_url": "https://github.com/thekevinscott/willfire/raw/d8e58345c812c5e5a66ce8cb1e61f742213ffad0/src%2Ffilters%2FpatternToRegex.test.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/src%2Ffilters%2FpatternToRegex.test.ts?ref=d8e58345c812c5e5a66ce8cb1e61f742213ffad0",
+          "patch": "@@ -20,6 +20,23 @@ describe(\"patternToRegex\", () => {\n     expect(re.test(\"src/nested/app.ts\")).toBe(true);\n   });\n \n+  it(\"treats a leading **/ as zero or more directories\", () => {\n+    // GitHub dispatched `**/*.txt` for a top-level file: probe run 36429114415.\n+    const re = patternToRegex(\"**/*.md\");\n+    expect(re.test(\"README.md\")).toBe(true);\n+    expect(re.test(\"docs/a.md\")).toBe(true);\n+    expect(re.test(\"docs/nested/a.md\")).toBe(true);\n+    expect(re.test(\"README.txt\")).toBe(false);\n+  });\n+\n+  it(\"treats a **/ away from the start as zero or more directories too\", () => {\n+    // Same for `gdocs/**/*.md` against `gdocs/m.md`: probe run 36429340492.\n+    const re = patternToRegex(\"docs/**/*.md\");\n+    expect(re.test(\"docs/a.md\")).toBe(true);\n+    expect(re.test(\"docs/nested/a.md\")).toBe(true);\n+    expect(re.test(\"a.md\")).toBe(false);\n+  });\n+\n   it(\"passes ? through as zero-or-one of the preceding character\", () => {\n     const re = patternToRegex(\"releases?\");\n     expect(re.test(\"release\")).toBe(true);"
+        },
+        {
+          "sha": "23cb08fc09d2b6b2e4b4468a78304354cf1849cf",
+          "filename": "src/filters/patternToRegex.ts",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 4,
+          "changes": 15,
+          "blob_url": "https://github.com/thekevinscott/willfire/blob/d8e58345c812c5e5a66ce8cb1e61f742213ffad0/src%2Ffilters%2FpatternToRegex.ts",
+          "raw_url": "https://github.com/thekevinscott/willfire/raw/d8e58345c812c5e5a66ce8cb1e61f742213ffad0/src%2Ffilters%2FpatternToRegex.ts",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/src%2Ffilters%2FpatternToRegex.ts?ref=d8e58345c812c5e5a66ce8cb1e61f742213ffad0",
+          "patch": "@@ -1,6 +1,6 @@\n // GitHub filter pattern glob. Grammar per docs: * (any chars except /),\n-// ** (any chars), ? (zero or one of preceding char), + (one or more of\n-// preceding char), [ranges], leading ! negates.\n+// ** (any chars), **/ (zero or more directories), ? (zero or one of preceding\n+// char), + (one or more of preceding char), [ranges], leading ! negates.\n \n const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\\]\\\\]/g, \"\\\\$&\");\n \n@@ -10,8 +10,15 @@ export function patternToRegex(pat: string): RegExp {\n     const c = pat[i];\n     if (c === \"*\") {\n       if (pat[i + 1] === \"*\") {\n-        out += \".*\";\n-        i++;\n+        if (pat[i + 2] === \"/\") {\n+          // `**/` is zero or more directories, so the separator is optional:\n+          // `**/*.txt` fires for a top-level file (probe run 36429114415).\n+          out += \"(?:.*/)?\";\n+          i += 2;\n+        } else {\n+          out += \".*\";\n+          i++;\n+        }\n       } else {\n         out += \"[^/]*\";\n       }"
+        }
+      ]
+    }
+  },
+  {
+    "method": "listPulls",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "state": "open",
+      "head": "thekevinscott:main"
+    },
+    "result": []
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "ref": "1fb362b60f5c29ec7d2308b50ff26c5935bcf14e"
+    },
+    "result": {
+      "sha": "1fb362b60f5c29ec7d2308b50ff26c5935bcf14e",
+      "node_id": "C_kwDOT9j2e9oAKDFmYjM2MmI2MGY1YzI5ZWM3ZDIzMDhiNTBmZjI2YzU5MzViY2YxNGU",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-28T13:40:23Z"
+        },
+        "committer": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-28T13:40:23Z"
+        },
+        "message": "chore: probe a1\n\n\nskip-checks: true",
+        "tree": {
+          "sha": "dd26d367a8340c0a7cdaa860832ad4b21a5e0aa0",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/git/trees/dd26d367a8340c0a7cdaa860832ad4b21a5e0aa0"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/willfire/git/commits/1fb362b60f5c29ec7d2308b50ff26c5935bcf14e",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCgAdFiEEnU3Dh/cnWdmpxUeIBqUoxO3sGUIFAmq6bkcACgkQBqUoxO3s\nGULKxg/+MSiGqQXUBZHyjjW3UWZFaE8U2ZgBqroQ9WWBxCjxzDltb8a/O/EXVWFZ\n6ZdorrjEG3RybGf7G29L0/aiJhFF1m+ZuTu/SXzJncy4dl8pO1zML0YAzJtC0s/z\nA28LH+Rdv8qN/XeUTGpCdjseQGmqzPXHFXtMyRfTG4lcfJS0txqQ92+/YVfoTs9j\nOLsoU8Z/E4wo1nt1xbl4R4XwLumhwxLBmq7e6Z157QIoYxsjckxBmqB02k50Ihgg\nIRfcdy9nr6Dpucf42O2oIsukMmgSNluRx5j5tJv8/G7E7bQmwDmpFYUAbbmaZtdK\nuFwXxH+PKdxPj2e/7BrciE68hbWyzm6misxzj6efTz+jfYecViSzxLROUcgic7Fk\nTrJm7C318o1xuPXgiD6pTR5GRt5MHq6+TxxcoyiTFm1IKUGH69CiYpdrPGNPOXiT\nqmhZC7YP522qIX1gmUXuIdFeQsofkCc6KYgIKvIdOd546vjbxwyXEc3PlvAXKJYI\nrmDF+gvGPX2YQ32uaL55FfHKiaRD0ptqRzXEZH3YRA17Vaj6d3de7xW+7z/dWMIA\nO2yBT231Ad7okvje8wbr5mde6mKNoMRhxFtPKiVN+XEP/L16RaagUvK/9mY5svCy\nUaeITEQ03QvJmeeFFD2XJMOQnU9xB/SZbDCHMWvXmcRVZmzCCPA=\n=b8KN\n-----END PGP SIGNATURE-----",
+          "payload": "tree dd26d367a8340c0a7cdaa860832ad4b21a5e0aa0\nparent ac2df36f2e62e6275a3cc3dfda6311568c7f2a90\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790602823 -0400\ncommitter thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790602823 -0400\n\nchore: probe a1\n\n\nskip-checks: true\n",
+          "verified_at": "2026-09-28T13:40:25Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/willfire/commits/1fb362b60f5c29ec7d2308b50ff26c5935bcf14e",
+      "html_url": "https://github.com/thekevinscott/willfire/commit/1fb362b60f5c29ec7d2308b50ff26c5935bcf14e",
+      "comments_url": "https://api.github.com/repos/thekevinscott/willfire/commits/1fb362b60f5c29ec7d2308b50ff26c5935bcf14e/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "ac2df36f2e62e6275a3cc3dfda6311568c7f2a90",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/ac2df36f2e62e6275a3cc3dfda6311568c7f2a90",
+          "html_url": "https://github.com/thekevinscott/willfire/commit/ac2df36f2e62e6275a3cc3dfda6311568c7f2a90"
+        }
+      ],
+      "stats": {
+        "total": 1,
+        "additions": 1,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "d131b0900cd30692cb8ab1c9cc397de07ff945fd",
+          "filename": "tests/fixtures/probe/a1.txt",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/thekevinscott/willfire/blob/1fb362b60f5c29ec7d2308b50ff26c5935bcf14e/tests%2Ffixtures%2Fprobe%2Fa1.txt",
+          "raw_url": "https://github.com/thekevinscott/willfire/raw/1fb362b60f5c29ec7d2308b50ff26c5935bcf14e/tests%2Ffixtures%2Fprobe%2Fa1.txt",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/tests%2Ffixtures%2Fprobe%2Fa1.txt?ref=1fb362b60f5c29ec7d2308b50ff26c5935bcf14e",
+          "patch": "@@ -0,0 +1 @@\n+probe a1"
+        }
+      ]
+    }
+  }
+]
