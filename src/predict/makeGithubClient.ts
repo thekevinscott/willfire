@@ -58,6 +58,11 @@ export interface GithubJob {
   conclusion: string | null;
 }
 
+export interface GithubVariable {
+  name: string;
+  value: string;
+}
+
 export interface GithubClient {
   getPull(params: RepoParams & { pull_number: number }): Promise<GithubPull>;
   listPulls(params: RepoParams & { state: string; head: string }): Promise<GithubPullSummary[]>;
@@ -71,6 +76,7 @@ export interface GithubClient {
     params: RepoParams & { head_sha: string; event: string },
   ): Promise<GithubWorkflowRun[]>;
   listRunJobs(params: RepoParams & { run_id: number }): Promise<GithubJob[]>;
+  listRepoVariables(params: RepoParams): Promise<GithubVariable[]>;
 }
 
 const PER_PAGE = 100;
@@ -119,14 +125,15 @@ export function makeGithubClient(): GithubClient {
     path: string,
     pick: (body: B) => T[],
     query: Query = {},
+    perPage = PER_PAGE,
   ): Promise<T[]> => {
     const all: T[] = [];
     let page = 1;
     let full = true;
     while (full) {
-      const items = pick(await json<B>(path, { ...query, per_page: PER_PAGE, page }));
+      const items = pick(await json<B>(path, { ...query, per_page: perPage, page }));
       all.push(...items);
-      full = items.length === PER_PAGE;
+      full = items.length === perPage;
       page += 1;
     }
     return all;
@@ -180,6 +187,15 @@ export function makeGithubClient(): GithubClient {
       pages(
         `/repos/${owner}/${repo}/actions/runs/${run_id}/jobs`,
         (b: { jobs: GithubJob[] }) => b.jobs,
+      ),
+    // Unlike every route above, the variables endpoint caps per_page at 30;
+    // asking for 100 gets a silently clamped page that would end the walk early.
+    listRepoVariables: ({ owner, repo }) =>
+      pages(
+        `/repos/${owner}/${repo}/actions/variables`,
+        (b: { variables: GithubVariable[] }) => b.variables,
+        {},
+        30,
       ),
   };
 }

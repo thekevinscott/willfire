@@ -43,6 +43,13 @@ export interface Scope {
    */
   github?: Record<string, string | boolean>;
   /**
+   * Repo-level Actions variables, read from the API at prediction time.
+   * Unlike `needs` and `steps`, this set is never complete: org- and
+   * environment-level variables are invisible to the repo listing, so an
+   * unlisted name stays unknown rather than becoming the empty string.
+   */
+  vars?: Record<string, string>;
+  /**
    * Outputs of jobs this workflow's jobs `needs`, keyed by job id.
    *
    * `outputs` is the *complete* set for that job, which is what makes a key

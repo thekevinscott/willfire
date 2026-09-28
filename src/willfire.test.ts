@@ -98,6 +98,13 @@ interface Fixture {
   parents?: Record<string, string[]>;
   /** Open PRs, for the stack walk's `listPulls` lookup by head branch. */
   openPrs?: { headRef: string; baseRef: string; mergeSha: string | null }[];
+  /**
+   * Repo-level Actions variables. Absent means the route is unserved, which
+   * pins the read as lazy: a prediction meeting no `vars.*` never pays for it.
+   */
+  variables?: { name: string; value: string }[];
+  /** Status `listRepoVariables` throws instead of answering. */
+  variablesError?: number;
   /** The PR's author login. */
   author?: string;
   /** The PR's head branch name. */
@@ -204,6 +211,15 @@ function fakeGithub(f: Fixture): GithubClient {
         throw new Error(`404 tarball ${owner}/${repo}@${ref}`);
       }
       return bytes.buffer;
+    },
+    listRepoVariables: async () => {
+      if (f.variablesError !== undefined) {
+        throw apiError(f.variablesError, "/repos/o/r/actions/variables");
+      }
+      if (f.variables === undefined) {
+        return unserved("listRepoVariables")();
+      }
+      return f.variables;
     },
     listWorkflows: async () => f.workflows ?? [{ path: WF, state: "active" }],
     listWorkflowFiles: async () => {
@@ -833,6 +849,7 @@ describe("the commit workflow files are read at", () => {
       "reader",
       "site",
       "scope",
+      "vars",
       "executor",
       "callbacks",
     ]);
@@ -1274,6 +1291,104 @@ describe("PR facts seeded into the expression scope (#322)", () => {
     const { checkNames } = await willfire(github, "o/r", 1);
     expect(checkNames).toEqual(["call / inner"]);
   });
+});
+
+describe("repo variables as a prediction-wide fact (#323)", () => {
+  const GUARDED = JSON.stringify({
+    on: "pull_request",
+    jobs: {
+      extra: { if: "vars.RUN_EXTRA == 'true'" },
+      base: {},
+    },
+  });
+
+  it("decides a vars guard from the repo's variable listing", async () => {
+    const { entries } = await willfire(
+      fakeGithub({
+        contents: { [WF]: GUARDED },
+        variables: [{ name: "RUN_EXTRA", value: "true" }],
+      }),
+      "o/r",
+      1,
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["extra", "run"],
+      ["base", "run"],
+    ]);
+  });
+
+  it("skips on the same guard when the variable says so", async () => {
+    const { entries } = await willfire(
+      fakeGithub({
+        contents: { [WF]: GUARDED },
+        variables: [{ name: "RUN_EXTRA", value: "false" }],
+      }),
+      "o/r",
+      1,
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["extra", "skipped"],
+      ["base", "run"],
+    ]);
+  });
+
+  it("leaves an unlisted name unknown: org-level variables are invisible here", async () => {
+    const { entries } = await willfire(
+      fakeGithub({ contents: { [WF]: GUARDED }, variables: [] }),
+      "o/r",
+      1,
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["extra", "unknown"],
+      ["base", "run"],
+    ]);
+  });
+
+  it.each([403, 404])("stays unknown when the listing answers %d", async (status) => {
+    const { entries } = await willfire(
+      fakeGithub({ contents: { [WF]: GUARDED }, variablesError: status }),
+      "o/r",
+      1,
+    );
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["extra", "unknown"],
+      ["base", "run"],
+    ]);
+    expect(console.warn).toHaveBeenCalledWith(
+      expect.stringContaining("cannot list variables for o/r"),
+    );
+  });
+
+  it("aborts on any other listing failure rather than degrading the guard", async () => {
+    await expect(
+      willfire(fakeGithub({ contents: { [WF]: GUARDED }, variablesError: 500 }), "o/r", 1),
+    ).rejects.toThrow("GitHub API 500");
+  });
+
+  it("reads the listing once, however many workflows ask", async () => {
+    const other = ".github/workflows/x.yml";
+    let reads = 0;
+    const github = fakeGithub({
+      workflows: [
+        { path: WF, state: "active" },
+        { path: other, state: "active" },
+      ],
+      contents: { [WF]: GUARDED, [other]: GUARDED },
+    });
+    const counting: GithubClient = {
+      ...github,
+      listRepoVariables: async () => {
+        reads += 1;
+        return [{ name: "RUN_EXTRA", value: "true" }];
+      },
+    };
+    const { entries } = await willfire(counting, "o/r", 1);
+    expect(entries.filter((e) => e.status === "run")).toHaveLength(4);
+    expect(reads).toBe(1);
+  });
+
+  // Every fixture without `variables` already pins the other half: the route
+  // is unserved there, so any eager read would fail those tests loudly.
 });
 
 describe("the executor seam through willfire", () => {

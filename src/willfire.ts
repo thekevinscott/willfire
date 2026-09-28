@@ -163,6 +163,27 @@ export async function willfire(
 
   const reader: WorkflowReader = { fetchWorkflow, resolveRef };
 
+  // Repo variables decide `vars.*` guards, at most one read per prediction and
+  // none for a prediction that never meets one. A 403 or 404 is settled — the
+  // token cannot see the variables — so every lookup honestly stays unknown;
+  // anything else is "could not read" and aborts rather than degrading a
+  // decidable guard to unknown only on bad days.
+  let varsRead: Promise<Record<string, string>> | undefined;
+  const repoVars = (): Promise<Record<string, string>> => {
+    varsRead ??= github.listRepoVariables(base).then(
+      (vars) => Object.fromEntries(vars.map((v) => [v.name, v.value])),
+      (e) => {
+        const status = errorStatus(e);
+        if (status !== 403 && status !== 404) {
+          throw e;
+        }
+        console.warn(`willfire: cannot list variables for ${repo} (${String(e)})`);
+        return {};
+      },
+    );
+    return varsRead;
+  };
+
   // Execution is on by default and costs nothing until a workflow needs it.
   const executor =
     opts.executor === undefined
@@ -267,6 +288,7 @@ export async function willfire(
           ...(typeof wfName === "string" ? { workflow: wfName } : {}),
         },
       },
+      vars: repoVars,
       executor,
       callbacks: callbackMap,
     });

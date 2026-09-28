@@ -67,7 +67,26 @@ describe("lookup", () => {
 
   it("leaves every runtime context unknown", () => {
     expect(lookup(SCOPE, "env.FOO")).toEqual({ kind: "unknown" });
+    expect(lookup(SCOPE, "secrets.FOO")).toEqual({ kind: "unknown" });
     // A supplied combination is not a fallback for another context's key.
     expect(lookup({ matrix: { FOO: "x" } }, "env.FOO")).toEqual({ kind: "unknown" });
+  });
+
+  it("resolves vars case-insensitively, the way GitHub matches variable names", () => {
+    const scope: Scope = { vars: { RUN_EXTRA: "true" } };
+    expect(lookup(scope, "vars.RUN_EXTRA")).toEqual({ kind: "value", v: "true" });
+    expect(lookup(scope, "vars.run_extra")).toEqual({ kind: "value", v: "true" });
+    expect(lookup({ vars: { mixed_Case: "x" } }, "vars.MIXED_CASE")).toEqual({
+      kind: "value",
+      v: "x",
+    });
+  });
+
+  it("leaves an unlisted variable unknown: the repo listing is not the whole set", () => {
+    // Org- and environment-level variables never appear in it, so absence
+    // decides nothing — with or without a fetched (even empty) listing.
+    expect(lookup({ vars: { OTHER: "x" } }, "vars.RUN_EXTRA")).toEqual({ kind: "unknown" });
+    expect(lookup({ vars: {} }, "vars.RUN_EXTRA")).toEqual({ kind: "unknown" });
+    expect(lookup(SCOPE, "vars.RUN_EXTRA")).toEqual({ kind: "unknown" });
   });
 });

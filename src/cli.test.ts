@@ -81,6 +81,7 @@ function fakeGithub(f: Fixture): GithubClient {
     downloadTarball: unserved("downloadTarball"),
     listWorkflowRuns: unserved("listWorkflowRuns"),
     listRunJobs: unserved("listRunJobs"),
+    listRepoVariables: unserved("listRepoVariables"),
     getPull: async () => ({
       commits: f.commits ?? 1,
       base: { ref: "main" },

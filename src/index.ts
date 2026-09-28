@@ -10,7 +10,7 @@ export { parseUses } from "./uses/parseUses.js";
 export { makeGithubClient } from "./predict/makeGithubClient.js";
 export { willfire } from "./willfire.js";
 export { predict } from "./predict/predict.js";
-export type { GithubClient } from "./predict/makeGithubClient.js";
+export type { GithubClient, GithubVariable } from "./predict/makeGithubClient.js";
 export type { ExecOutcome, JobExecutor } from "./execute/types.js";
 export type {
   JobName,
