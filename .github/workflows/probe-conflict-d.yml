@@ -1,0 +1,7 @@
+name: probe-conflict-d
+on: pull_request
+jobs:
+  probed:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
