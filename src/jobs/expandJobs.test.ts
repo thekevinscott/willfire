@@ -285,17 +285,17 @@ describe("job expansion", () => {
       expect(entries.map((e) => e.job)).toEqual(["build linux", "build mac"]);
     });
 
-    it("leaves an unset matrix key in place rather than guessing at it", async () => {
-      // #9 stopped rendering an unevaluable expression as the empty string. It
-      // survives into the name verbatim and nulls `checkName` instead: a wrong
-      // name reads as a MISS against a check that really ran, whereas an absent
-      // one is something verify.ts can report as unresolved and move on.
+    it("names a job whose expression reads a matrix key the combination lacks", async () => {
+      // GitHub substitutes nothing and trims: probe PR #372 run 36431257532
+      // dispatched `build` for `name: build ${{ matrix.label }}` over the
+      // combination carrying no `label`. #9's verbatim-name rule still holds
+      // for an expression nothing in scope can settle; this one is settled.
       const entries = await expand({
         a: { name: "build ${{ matrix.nope }}", strategy: { matrix: { os: ["linux"] } } },
       });
       expect(entries[0]).toMatchObject({
-        job: "build ${{ matrix.nope }}",
-        checkName: null,
+        job: "build",
+        checkName: "build",
       });
     });
 

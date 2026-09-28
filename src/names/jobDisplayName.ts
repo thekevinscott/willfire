@@ -29,5 +29,9 @@ export function jobDisplayName(
   }
   const { text, resolved } = renderName(raw, combo?.values ?? null);
   const suffix = combo && !EXPRESSION_RE.test(raw) ? matrixSuffix(combo) : "";
-  return { name: capDisplayName(text + suffix), resolved };
+  // GitHub trims the rendered name, so an expression that substitutes nothing
+  // leaves no edge whitespace: probe PR #372 dispatched `build` for
+  // `build ${{ matrix.label }}` (run 36431257532) and for
+  // `${{ matrix.label }} build` (run 36431257588), both checked with `cat -A`.
+  return { name: capDisplayName((text + suffix).trim()), resolved };
 }

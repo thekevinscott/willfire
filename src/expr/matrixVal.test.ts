@@ -23,8 +23,11 @@ describe("matrixVal", () => {
     expect(matrixVal({ os: null }, "os")).toEqual({ kind: "value", v: "" });
   });
 
-  it("leaves an axis the combination does not carry unknown", () => {
-    expect(matrixVal({ os: "linux" }, "nope")).toEqual({ kind: "unknown" });
+  it("reads an axis the combination does not carry as the empty string", () => {
+    // Probe PR #372 run 36431257532: `build ${{ matrix.label }}` over a
+    // combination with no `label` dispatched as `build`.
+    expect(matrixVal({ os: "linux" }, "nope")).toEqual({ kind: "value", v: "" });
+    expect(matrixVal({ cfg: { os: "linux" } }, "cfg.nope")).toEqual({ kind: "value", v: "" });
   });
 
   it("leaves everything unknown with no combination at all", () => {

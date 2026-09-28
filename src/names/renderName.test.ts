@@ -16,8 +16,19 @@ describe("renderName", () => {
     });
   });
 
-  it("stays unresolved when the combination lacks the key", () => {
+  it("substitutes nothing for a key the combination lacks", () => {
+    // Probe PR #372 run 36431257532. The edge space survives here; trimming is
+    // jobDisplayName's, because the parenthetical is appended after this.
     expect(renderName("build ${{ matrix.nope }}", { os: "linux" })).toEqual({
+      text: "build ",
+      resolved: true,
+    });
+  });
+
+  it("stays unresolved reading the matrix with no combination at all", () => {
+    // A job `if:` is evaluated before the matrix expands, so there is nothing
+    // for the key to be absent from.
+    expect(renderName("build ${{ matrix.nope }}", null)).toEqual({
       text: "build ${{ matrix.nope }}",
       resolved: false,
     });
@@ -76,15 +87,13 @@ describe("renderName", () => {
     });
   });
 
-  it("stays unresolved when a conditional slot reads an axis the leg lacks", () => {
-    // An absent axis is unknown, not empty, so the whole slot is undecided.
+  it("decides a conditional slot that reads an axis the leg lacks", () => {
+    // An absent axis is the empty string, so the `&&` is falsy and the `||`
+    // leg wins. This is the shape the fleet writes for an optional axis.
     expect(
       renderName("build${{ matrix.build && format(' {0}', matrix.build) || '' }}", {
         os: "linux",
       }),
-    ).toEqual({
-      text: "build${{ matrix.build && format(' {0}', matrix.build) || '' }}",
-      resolved: false,
-    });
+    ).toEqual({ text: "build", resolved: true });
   });
 });
