@@ -30,7 +30,7 @@ vi.mock("./sandbox/makeSandboxRunner.js", async () => {
   const { runShell } = await vi.importActual<typeof import("./execute/runShell.js")>(
     "./execute/runShell.js",
   );
-  return { makeSandboxRunner: () => runShell };
+  return { makeSandboxRunner: () => ({ run: runShell, dispose: async () => {} }) };
 });
 
 // A spy over the real resolution, so callback tests can answer a map or fail

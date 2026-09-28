@@ -1,6 +1,7 @@
 import type { RunSpec } from "../execute/types.js";
 import { imageTag } from "./imageTag.js";
 import type { SandboxConfig } from "./sandboxConfig.js";
+import type { StateVolumes } from "./stateVolumes.js";
 
 /**
  * The complete `docker run` argv for one step. `PATH` and `HOME` in
@@ -9,7 +10,12 @@ import type { SandboxConfig } from "./sandboxConfig.js";
  * stays open, as on GitHub's own runners; the isolation is filesystem and
  * env, not egress.
  */
-export function sandboxArgv(spec: RunSpec, cfg: SandboxConfig, name: string): string[] {
+export function sandboxArgv(
+  spec: RunSpec,
+  cfg: SandboxConfig,
+  name: string,
+  state?: StateVolumes,
+): string[] {
   const argv = [
     "run",
     "--rm",
@@ -28,13 +34,18 @@ export function sandboxArgv(spec: RunSpec, cfg: SandboxConfig, name: string): st
     "512",
     "--cpus",
     "2",
+  ];
+  if (state === undefined) {
     // A tmpfs write is host memory, and `/tmp` is the container's HOME. Docker
     // keeps its nosuid/nodev/noexec defaults when an option is added.
-    "--tmpfs",
-    "/tmp:size=1g",
-    "--user",
-    `${cfg.uid}:${cfg.gid}`,
-  ];
+    argv.push("--tmpfs", "/tmp:size=1g");
+  } else {
+    // The job's machine state, outliving this step's container: docker
+    // populates an empty named volume from the image (so /usr/local keeps its
+    // node), and the next step with the same key mounts the accreted result.
+    argv.push("-v", `${state.usr}:/usr/local`, "-v", `${state.tmp}:/tmp`);
+  }
+  argv.push("--user", `${cfg.uid}:${cfg.gid}`);
   for (const m of spec.mounts ?? []) {
     argv.push("-v", `${m.path}:${m.path}${m.writable ? "" : ":ro"}`);
   }

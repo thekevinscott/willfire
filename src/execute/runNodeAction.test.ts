@@ -6,6 +6,7 @@ const ctxOf = (runCommand: RunCommand): WalkCtx => ({
   tree: "/nonexistent-tree",
   hasHistory: false,
   envLayers: [],
+  stateKey: "sk",
   deps: {
     provideTree: async () => null,
     runCommand,
@@ -119,5 +120,6 @@ describe("runNodeAction", () => {
     expect(specs[0].script).toBe('exec node "$WILLFIRE_ACTION_MAIN"');
     expect(specs[0].cwd).toBe("/nonexistent-tree");
     expect(specs[0].mounts).toContainEqual({ path: "/root", writable: false });
+    expect(specs[0].stateKey).toBe("sk");
   });
 });

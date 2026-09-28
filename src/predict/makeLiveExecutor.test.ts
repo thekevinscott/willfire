@@ -13,6 +13,7 @@ const hoisted = vi.hoisted(() => ({
   makeExecutor: vi.fn(),
   makeSandboxRunner: vi.fn(),
   makeTreeProvider: vi.fn(),
+  sandboxDispose: vi.fn(),
 }));
 
 // Real subprocesses are what the end-to-end cases below pin, so this mock
@@ -57,12 +58,19 @@ vi.mock("../execute/makeTreeProvider.js", async () => {
   return { makeTreeProvider: hoisted.makeTreeProvider };
 });
 
-// Likewise, a spy on `makeSandboxRunner` to observe the default run command.
+// Likewise, a spy on `makeSandboxRunner` to observe the default run command,
+// with a spy on the runner's dispose to see cleanup reach it.
 vi.mock("../sandbox/makeSandboxRunner.js", async () => {
   const actual = await vi.importActual<typeof import("../sandbox/makeSandboxRunner.js")>(
     "../sandbox/makeSandboxRunner.js",
   );
-  hoisted.makeSandboxRunner.mockImplementation(actual.makeSandboxRunner);
+  hoisted.makeSandboxRunner.mockImplementation(
+    (...args: Parameters<typeof actual.makeSandboxRunner>) => {
+      const runner = actual.makeSandboxRunner(...args);
+      hoisted.sandboxDispose.mockImplementation(runner.dispose);
+      return { ...runner, dispose: hoisted.sandboxDispose };
+    },
+  );
   return { makeSandboxRunner: hoisted.makeSandboxRunner };
 });
 
@@ -196,6 +204,13 @@ describe("makeLiveExecutor", () => {
     expect(hoisted.makeExecutor).toHaveBeenCalledWith(
       expect.objectContaining({ deps: expect.objectContaining({ runCommand }) }),
     );
+  });
+
+  it("disposes the sandbox's job state at cleanup", async () => {
+    hoisted.sandboxDispose.mockClear();
+    const ex = makeLiveExecutor(githubOf({}), WORKSPACE, resolveRef, { token: null });
+    await ex.cleanup!();
+    expect(hoisted.sandboxDispose).toHaveBeenCalledTimes(1);
   });
 
   it("hands makeExecutor the caller's workspace", () => {

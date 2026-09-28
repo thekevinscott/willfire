@@ -6,6 +6,7 @@ const ctxOf = (runCommand: RunCommand): WalkCtx => ({
   tree: "/nonexistent-tree",
   hasHistory: false,
   envLayers: [],
+  stateKey: "sk",
   deps: {
     provideTree: async () => null,
     runCommand,
@@ -49,6 +50,12 @@ describe("runRun", () => {
     const { specs, cmd } = capture();
     await runRun({ run: "true" }, "step 's'", {}, ctxOf(cmd));
     expect(specs[0].env).not.toHaveProperty("GITHUB_ACTION_PATH");
+  });
+
+  it("hands the job's stateKey to the command", async () => {
+    const { specs, cmd } = capture();
+    await runRun({ run: "true" }, "step 's'", {}, ctxOf(cmd));
+    expect(specs[0].stateKey).toBe("sk");
   });
 
   it("points GITHUB_ACTION_PATH at the action and hands the root on to be mounted", async () => {

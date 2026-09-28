@@ -10,6 +10,10 @@ describe("sandboxConfig", () => {
     expect(cfg.dockerfile).toBe(DOCKERFILE);
   });
 
+  it("ships an image whose /usr/local dirs take a non-root `npm install -g`", () => {
+    expect(DOCKERFILE).toContain("find /usr/local -type d -exec chmod a+w {} +");
+  });
+
   it("takes every override", () => {
     const cfg = sandboxConfig({ dockerBin: "/x/docker", uid: 7, gid: 9, dockerfile: "FROM x\n" });
     expect(cfg).toEqual({ dockerBin: "/x/docker", uid: 7, gid: 9, dockerfile: "FROM x\n" });

@@ -84,4 +84,13 @@ describe("sandboxArgv", () => {
     expect(argv).not.toContain("-v");
     expect(argv.slice(-4)).toEqual(["sh", "-e", "-c", "true"]);
   });
+
+  it("swaps the tmpfs for the state volumes when a job's state is handed in", () => {
+    const argv = sandboxArgv(spec(), cfg, "box", { usr: "vu", tmp: "vt" });
+    expect(argv).not.toContain("--tmpfs");
+    const flags = argv.flatMap((a, i) => (a === "-v" ? [argv[i + 1]] : []));
+    expect(flags).toEqual(["vu:/usr/local", "vt:/tmp"]);
+    // Still a read-only root: the volumes are the only writable rootfs paths.
+    expect(argv).toContain("--read-only");
+  });
 });
