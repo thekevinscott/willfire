@@ -1,0 +1,7 @@
+name: probe-skip-c
+on: pull_request
+jobs:
+  probec:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
