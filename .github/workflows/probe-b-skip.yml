@@ -1,0 +1,32 @@
+name: probe-b-skip
+
+# What does a skipped reusable-workflow call name: the caller alone, or
+# `caller / <callee job>` per callee job? And does a `name:` override or a
+# matrix on the skipped caller change that?
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  ctl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  skip-call:
+    if: false
+    uses: ./.github/workflows/probe-b-callee.yml
+
+  skip-named:
+    if: false
+    name: Named Skip
+    uses: ./.github/workflows/probe-b-callee.yml
+
+  skip-mx:
+    if: false
+    strategy:
+      matrix:
+        cfg: [x, y]
+    uses: ./.github/workflows/probe-b-callee.yml

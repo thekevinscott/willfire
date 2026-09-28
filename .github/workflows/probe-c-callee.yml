@@ -1,0 +1,19 @@
+name: probe-c-callee
+
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  leaf-a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  leaf-b:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

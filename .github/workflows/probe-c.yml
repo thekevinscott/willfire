@@ -1,0 +1,55 @@
+name: probe-c
+
+# Three name-formation questions in one dispatch: the matrix parenthetical on a
+# reusable caller, the 100-character display-name cap on a caller segment, and
+# the cap boundary itself at 99/100/101.
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  mx:
+    strategy:
+      matrix:
+        cfg: [a, b]
+    uses: ./.github/workflows/probe-c-callee.yml
+
+  mx-named:
+    name: fixed label
+    strategy:
+      matrix:
+        cfg: [a, b]
+    uses: ./.github/workflows/probe-c-callee.yml
+
+  mx-expr:
+    name: 'm ${{ matrix.cfg }}'
+    strategy:
+      matrix:
+        cfg: [a, b]
+    uses: ./.github/workflows/probe-c-callee.yml
+
+  longcaller:
+    name: 'CLONGabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghija-END'
+    uses: ./.github/workflows/probe-c-callee.yml
+
+  len99:
+    name: 'C99abcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijab-END'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  len100:
+    name: 'C100abcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijab-END'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  len101:
+    name: 'C101abcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabc-END'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

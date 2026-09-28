@@ -1,0 +1,23 @@
+name: probe-a-local-bad
+
+# Same question as probe-a-remote-bad, for a local `./` callee that is absent.
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  bad:
+    uses: ./.github/workflows/probe-a-does-not-exist.yml
+
+  sib-a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  sib-b:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

@@ -1,0 +1,23 @@
+name: probe-a-remote-bad
+
+# Does an unresolvable cross-repo `uses:` take its sibling jobs down with it?
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  bad:
+    uses: thekevinbot/willfire-probe-no-such-repo/.github/workflows/x.yml@v0
+
+  sib-a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  sib-b:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

@@ -1,0 +1,19 @@
+name: probe-b-callee
+
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  inner-a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  inner-b:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
