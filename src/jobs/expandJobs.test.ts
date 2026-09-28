@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
 import { expandJobs } from "./expandJobs.js";
-import { isStartupFailure } from "./isStartupFailure.js";
 import type { Scope } from "../expr/val.js";
 
 // The isolation gate wants collaborators mocked; input resolution and job
@@ -549,7 +548,7 @@ describe("reusable workflows", () => {
           async () => null,
         ),
       ),
-    ).rejects.toSatisfy(isStartupFailure);
+    ).rejects.toMatchObject({ startupFailure: true });
   });
 
   it("skips resolution for a `uses:` already pinned to a commit", async () => {

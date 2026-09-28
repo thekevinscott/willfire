@@ -9,5 +9,8 @@ export interface StartupFailure extends Error {
   readonly startupFailure: true;
 }
 
-export const startupFailure = (message: string): StartupFailure =>
-  Object.assign(new Error(message), { startupFailure: true as const });
+// Declared, not an arrow const: the mutation gate cannot attribute per-test
+// coverage to an arrow const and reports its mutants as survivors.
+export function startupFailure(message: string): StartupFailure {
+  return Object.assign(new Error(message), { startupFailure: true as const });
+}

@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { isStartupFailure } from "./isStartupFailure.js";
-import { startupFailure } from "./startupFailure.js";
 
 describe("isStartupFailure", () => {
   it("recognises its own", () => {
-    expect(isStartupFailure(startupFailure("boom"))).toBe(true);
+    expect(isStartupFailure(Object.assign(new Error("boom"), { startupFailure: true }))).toBe(true);
   });
 
   it("does not claim an ordinary error", () => {
