@@ -5,7 +5,7 @@ name: g-mid-flat
 on:
   pull_request:
     paths:
-      - 'gdocs/**/*.txt'
+      - 'gdocs/**/*.md'
 
 permissions: {}
 
