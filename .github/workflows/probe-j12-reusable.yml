@@ -3,7 +3,7 @@ on:
   workflow_call:
 jobs:
   callee:
-    name: j12 callee abcdefghijklmnopqrstuvwxyz 0123456789 abcdefghijkl
+    name: j12 callee abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz
     runs-on: ubuntu-latest
     steps:
       - run: 'true'
