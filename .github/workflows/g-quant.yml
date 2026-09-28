@@ -1,0 +1,19 @@
+name: g-quant
+
+# Scratch probe for #359: measure GitHub's filter-glob semantics against a
+# real dispatch. Not for merge.
+on:
+  pull_request:
+    paths:
+      - 'probe?.txt'
+      - 'v1+.txt'
+
+permissions: {}
+
+jobs:
+  g-quant:
+    name: g-quant
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

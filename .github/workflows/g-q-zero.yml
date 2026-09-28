@@ -1,0 +1,18 @@
+name: g-q-zero
+
+# Scratch probe for #359: measure GitHub's filter-glob semantics against a
+# real dispatch. Not for merge.
+on:
+  pull_request:
+    paths:
+      - 'aa?.txt'
+
+permissions: {}
+
+jobs:
+  g-q-zero:
+    name: g-q-zero
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

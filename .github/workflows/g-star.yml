@@ -1,0 +1,18 @@
+name: g-star
+
+# Scratch probe for #359: measure GitHub's filter-glob semantics against a
+# real dispatch. Not for merge.
+on:
+  pull_request:
+    paths:
+      - '**/*.txt'
+
+permissions: {}
+
+jobs:
+  g-star:
+    name: g-star
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

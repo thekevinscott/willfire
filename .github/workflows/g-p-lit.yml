@@ -1,0 +1,18 @@
+name: g-p-lit
+
+# Scratch probe for #359: measure GitHub's filter-glob semantics against a
+# real dispatch. Not for merge.
+on:
+  pull_request:
+    paths:
+      - 'd+.txt'
+
+permissions: {}
+
+jobs:
+  g-p-lit:
+    name: g-p-lit
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
