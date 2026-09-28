@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1790602675,
+  "exit_code": 0,
+  "commit": "2f16c5445beee49e1b6947773e35b0797c1fe5be",
+  "branch": "feat/vars-from-repo-variables"
+}

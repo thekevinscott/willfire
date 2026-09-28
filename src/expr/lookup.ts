@@ -50,7 +50,17 @@ export function lookup(scope: Scope, path: string): Val {
   if (head === "matrix") {
     return matrixVal(scope.matrix, rest);
   }
-  // `env.*`, `vars.*`, `secrets.*`: all require something that has not
-  // happened yet at prediction time.
+  if (head === "vars") {
+    // Variable names are case-insensitive on GitHub. An unlisted name is not
+    // settled — see the Scope contract — so only a hit decides anything.
+    for (const [name, v] of Object.entries(scope.vars ?? {})) {
+      if (name.toUpperCase() === rest.toUpperCase()) {
+        return { kind: "value", v };
+      }
+    }
+    return UNKNOWN;
+  }
+  // `env.*` and `secrets.*`: both require something that has not happened
+  // yet at prediction time.
   return UNKNOWN;
 }

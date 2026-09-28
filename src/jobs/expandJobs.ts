@@ -13,6 +13,7 @@ import { absentInputs } from "./absentInputs.js";
 import { calleeInputs } from "./calleeInputs.js";
 import { evalIf } from "./evalIf.js";
 import { neededJobIds } from "./neededJobIds.js";
+import { readsVars } from "./readsVars.js";
 import { prScope } from "./prScope.js";
 import type {
   ExpandedJob,
@@ -43,6 +44,12 @@ export interface ExpandJobsArgs {
   prefix?: string;
   prefixResolved?: boolean;
   scope?: Scope;
+  /**
+   * Memoized repo-variables read, awaited only for a workflow that mentions
+   * `vars` in its jobs — which keeps the API call off every prediction that
+   * never needs it.
+   */
+  vars?: () => Promise<Record<string, string>>;
   executor?: JobExecutor;
   callbacks?: CallbackMap;
 }
@@ -67,6 +74,9 @@ export async function expandJobs(args: ExpandJobsArgs): Promise<ExpandedJob[]> {
   // and nothing supplied reads as the empty string (#125) — laid under, never
   // over, whatever the caller bound.
   let scoped: Scope = { ...scope, inputs: { ...absentInputs(wf), ...scope.inputs } };
+  if (scoped.vars === undefined && args.vars !== undefined && readsVars(jobs)) {
+    scoped = { ...scoped, vars: await args.vars() };
+  }
 
   // Selection is derived, never configured: execute exactly the jobs some
   // sibling's `needs.*.outputs` read depends on, under the same `evalIf`
@@ -222,11 +232,12 @@ export async function expandJobs(args: ExpandJobsArgs): Promise<ExpandedJob[]> {
               reason: failure ?? `cannot resolve ${uses}`,
             });
           } else {
-            // `inputs.*` changes at the call boundary; `github.*` does not.
-            // A callee's jobs run in the caller's repo, so the facts seeded at
-            // the top of the prediction stay true all the way down. Evaluated
-            // per combination: a `with:` may read `matrix.*`, and each
-            // combination dispatches its own callee run with its own inputs.
+            // `inputs.*` changes at the call boundary; `github.*` and `vars.*`
+            // do not. A callee's jobs run in the caller's repo, so the facts
+            // seeded at the top of the prediction stay true all the way down.
+            // Evaluated per combination: a `with:` may read `matrix.*`, and
+            // each combination dispatches its own callee run with its own
+            // inputs.
             const subScope: Scope = {
               inputs: calleeInputs(
                 job.with,
@@ -234,6 +245,7 @@ export async function expandJobs(args: ExpandJobsArgs): Promise<ExpandedJob[]> {
                 combo === null ? scoped : { ...scoped, matrix: combo.values },
               ),
               github: scoped.github,
+              vars: scoped.vars,
             };
             entries.push(
               ...(await expandJobs({

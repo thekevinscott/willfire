@@ -83,7 +83,7 @@ describe("root barrel", () => {
     });
   });
 
-  it("pins GithubClient's nine methods — #174 changed this shape behind an unchanged name", async () => {
+  it("pins GithubClient's ten methods — #174 changed this shape behind an unchanged name", async () => {
     const client: GithubClient = {
       getPull: async () => ({
         base: { ref: "main" },
@@ -103,6 +103,7 @@ describe("root barrel", () => {
       listWorkflowFiles: async () => [{ path: ".github/workflows/x.yml", type: "file" }],
       listWorkflowRuns: async () => [{ id: 1, path: ".github/workflows/x.yml", status: "completed" }],
       listRunJobs: async () => [{ name: "test", conclusion: "success" }],
+      listRepoVariables: async () => [{ name: "RUN_EXTRA", value: "true" }],
     };
 
     // Each call's argument literal pins the parameter shape; each awaited
@@ -145,6 +146,9 @@ describe("root barrel", () => {
     await expect(client.listRunJobs({ owner: "o", repo: "r", run_id: 1 })).resolves.toEqual([
       { name: "test", conclusion: "success" },
     ]);
+    await expect(client.listRepoVariables({ owner: "o", repo: "r" })).resolves.toEqual([
+      { name: "RUN_EXTRA", value: "true" },
+    ]);
   });
 
   it("pins GithubClient exactly, so a widened field cannot slip past the literal above", () => {
@@ -185,6 +189,7 @@ describe("root barrel", () => {
       listRunJobs(
         params: Repo & { run_id: number },
       ): Promise<{ name: string; conclusion: string | null }[]>;
+      listRepoVariables(params: Repo): Promise<{ name: string; value: string }[]>;
     }>();
   });
 

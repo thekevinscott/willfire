@@ -170,6 +170,17 @@ describe("makeGithubClient", () => {
     );
   });
 
+  it("unwraps the variables envelope, paging by this route's cap of 30", async () => {
+    const full = Array.from({ length: 30 }, (_, i) => ({ name: `V${i}`, value: "x" }));
+    stage(json({ total_count: 31, variables: full }), json({ total_count: 31, variables: [{ name: "LAST", value: "y" }] }));
+    const vars = await client().listRepoVariables(REPO);
+    expect(vars.map((v) => v.name)).toEqual([...full.map((v) => v.name), "LAST"]);
+    expect(calls.map((call) => call.url)).toEqual([
+      "https://api.github.com/repos/o/r/actions/variables?per_page=30&page=1",
+      "https://api.github.com/repos/o/r/actions/variables?per_page=30&page=2",
+    ]);
+  });
+
   it("throws on a non-2xx, naming the path and never the token", async () => {
     stage(new Response("gone", { status: 404 }));
     await expect(client().getPull({ ...REPO, pull_number: 5 })).rejects.toThrow(

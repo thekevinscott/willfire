@@ -1176,3 +1176,70 @@ describe("inputs the event never supplied", () => {
     ]);
   });
 });
+
+describe("repo variables in job guards (#323)", () => {
+  const SUB = ".github/workflows/sub.yml";
+  const GUARD = "vars.RUN_EXTRA == 'true'";
+
+  it("awaits the read for a workflow that reads vars, and decides the guard", async () => {
+    const vars = vi.fn(async () => ({ RUN_EXTRA: "true" }));
+    const entries = await expandJobs({
+      wf: { on: { pull_request: null }, jobs: { extra: { if: GUARD } } } as Workflow,
+      reader: readerFor({}),
+      site: SITE,
+      vars,
+    });
+    expect(entries.map((e) => [e.job, e.status])).toEqual([["extra", "run"]]);
+    expect(vars).toHaveBeenCalledTimes(1);
+  });
+
+  it("never awaits the read when no job mentions the context", async () => {
+    const vars = vi.fn(async () => ({}));
+    await expandJobs({
+      wf: { on: { pull_request: null }, jobs: { a: {} } } as Workflow,
+      reader: readerFor({}),
+      site: SITE,
+      vars,
+    });
+    expect(vars).not.toHaveBeenCalled();
+  });
+
+  it("leaves the guard unknown with no read wired", async () => {
+    const entries = await expand({ extra: { if: GUARD } });
+    expect(entries.map((e) => [e.job, e.status])).toEqual([["extra", "unknown"]]);
+  });
+
+  it("carries fetched variables across the call boundary without a second read", async () => {
+    const vars = vi.fn(async () => ({ RUN_EXTRA: "true" }));
+    const entries = await expandJobs({
+      wf: {
+        on: { pull_request: null },
+        jobs: { gate: { if: GUARD }, call: { uses: `./${SUB}` } },
+      } as Workflow,
+      reader: readerFor({
+        [SUB]: JSON.stringify({ on: { workflow_call: null }, jobs: { inner: { if: GUARD } } }),
+      }),
+      site: SITE,
+      vars,
+    });
+    expect(entries.map((e) => [e.job, e.status])).toEqual([
+      ["gate", "run"],
+      ["call / inner", "run"],
+    ]);
+    expect(vars).toHaveBeenCalledTimes(1);
+  });
+
+  it("reads for a callee even when its caller never mentions vars", async () => {
+    const vars = vi.fn(async () => ({ RUN_EXTRA: "false" }));
+    const entries = await expandJobs({
+      wf: { on: { pull_request: null }, jobs: { call: { uses: `./${SUB}` } } } as Workflow,
+      reader: readerFor({
+        [SUB]: JSON.stringify({ on: { workflow_call: null }, jobs: { inner: { if: GUARD } } }),
+      }),
+      site: SITE,
+      vars,
+    });
+    expect(entries.map((e) => [e.job, e.status])).toEqual([["call / inner", "skipped"]]);
+    expect(vars).toHaveBeenCalledTimes(1);
+  });
+});
