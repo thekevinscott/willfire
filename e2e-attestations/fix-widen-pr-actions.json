@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1790596176,
+  "exit_code": 0,
+  "commit": "738ee3b8e2e15a4e4260b7b3f3d30cea9450475e",
+  "branch": "fix/widen-pr-actions"
+}
