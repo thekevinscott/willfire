@@ -22,4 +22,8 @@ describe("readsVars", () => {
   it("does not fire on a name that merely ends in vars", () => {
     expect(readsVars(jobs({ a: { if: "inputs.myvars.x" } }))).toBe(false);
   });
+
+  it("does not fire on a name that merely starts with vars", () => {
+    expect(readsVars(jobs({ a: { if: "varsity.x == 'a'" } }))).toBe(false);
+  });
 });

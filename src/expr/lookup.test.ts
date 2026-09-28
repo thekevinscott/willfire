@@ -82,6 +82,11 @@ describe("lookup", () => {
     });
   });
 
+  it("never serves a variable to another context's key", () => {
+    expect(lookup({ vars: { FOO: "x" } }, "env.FOO")).toEqual({ kind: "unknown" });
+    expect(lookup({ vars: { FOO: "x" } }, "secrets.FOO")).toEqual({ kind: "unknown" });
+  });
+
   it("leaves an unlisted variable unknown: the repo listing is not the whole set", () => {
     // Org- and environment-level variables never appear in it, so absence
     // decides nothing — with or without a fetched (even empty) listing.

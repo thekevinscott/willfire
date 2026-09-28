@@ -6,5 +6,6 @@ import type { Workflow } from "../types.js";
  * already dropped comments, so a stray match in a run script costs only that
  * one read.
  */
-export const readsVars = (jobs: Record<string, Workflow>): boolean =>
-  /\bvars\s*[.[]/.test(JSON.stringify(jobs));
+export function readsVars(jobs: Record<string, Workflow>): boolean {
+  return /\bvars\s*[.[]/.test(JSON.stringify(jobs));
+}
