@@ -21,10 +21,10 @@ export function stepEnv(
     HOME: process.env.HOME ?? "",
     GITHUB_WORKSPACE: ctx.tree,
   };
-  if (scope.github?.repository !== undefined) {
+  if (typeof scope.github?.repository === "string") {
     env.GITHUB_REPOSITORY = scope.github.repository;
   }
-  if (scope.github?.event_name !== undefined) {
+  if (typeof scope.github?.event_name === "string") {
     env.GITHUB_EVENT_NAME = scope.github.event_name;
   }
   Object.assign(env, pre);

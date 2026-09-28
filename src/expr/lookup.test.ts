@@ -26,6 +26,14 @@ describe("lookup", () => {
     expect(lookup({}, "github.ref")).toEqual({ kind: "unknown" });
   });
 
+  it("resolves a dotted github key whole, a boolean staying a boolean", () => {
+    const scope: Scope = { github: { "event.pull_request.draft": false } };
+    expect(lookup(scope, "github.event.pull_request.draft")).toEqual({
+      kind: "value",
+      v: false,
+    });
+  });
+
   it("models only needs.<job>.outputs.<name>", () => {
     expect(lookup(SCOPE, "needs.detect.outputs.x")).toEqual({ kind: "value", v: "y" });
     // A supplied job's missing output is the empty string, per the

@@ -100,6 +100,12 @@ interface Fixture {
   openPrs?: { headRef: string; baseRef: string; mergeSha: string | null }[];
   /** The PR's author login. */
   author?: string;
+  /** The PR's head branch name. */
+  headRef?: string;
+  /** The PR's draft state. */
+  draft?: boolean;
+  /** The head repo's full name; `null` models a deleted fork. */
+  headRepo?: string | null;
 }
 
 /**
@@ -144,9 +150,14 @@ function fakeGithub(f: Fixture): GithubClient {
       return {
         commits: f.commits ?? 1,
         base: { ref: f.baseRef ?? "main" },
-        head: { sha: HEAD_SHA },
+        head: {
+          sha: HEAD_SHA,
+          ref: f.headRef ?? "topic",
+          repo: f.headRepo === null ? null : { full_name: f.headRepo ?? "o/r" },
+        },
         merge_commit_sha: f.mergeSha ?? null,
         mergeable: f.mergeable ?? null,
+        draft: f.draft ?? false,
         user: { login: f.author ?? "octocat" },
       };
     },
@@ -1146,6 +1157,112 @@ describe("github.actor as a prediction-wide fact", () => {
       ["human", "unknown"],
       ["bot", "unknown"],
     ]);
+  });
+});
+
+describe("PR facts seeded into the expression scope (#322)", () => {
+  const statuses = async (wf: object, f: Fixture = {}): Promise<[string, string][]> => {
+    const { entries } = await run(JSON.stringify({ on: "pull_request", ...wf }), f);
+    return entries.map((e) => [e.job, e.status]);
+  };
+
+  it("decides base_ref, head_ref and repository_owner guards from the pull", async () => {
+    const jobs = {
+      "to-main": { if: "github.base_ref == 'main'" },
+      "from-topic": { if: "github.head_ref != 'topic'" },
+      owned: { if: "github.repository_owner == 'o'" },
+    };
+    expect(await statuses({ jobs })).toEqual([
+      ["to-main", "run"],
+      ["from-topic", "skipped"],
+      ["owned", "run"],
+    ]);
+  });
+
+  it("decides an event.action guard from the action in effect", async () => {
+    const jobs = {
+      fresh: { if: "github.event.action == 'opened'" },
+      repush: { if: "github.event.action == 'synchronize'" },
+    };
+    expect(await statuses({ jobs })).toEqual([
+      ["fresh", "run"],
+      ["repush", "skipped"],
+    ]);
+    expect(await statuses({ jobs }, { commits: 3 })).toEqual([
+      ["fresh", "skipped"],
+      ["repush", "run"],
+    ]);
+  });
+
+  it("decides a draft guard, boolean against boolean", async () => {
+    // `== false` only decides against a real boolean: GitHub's `==` refuses
+    // mixed types, so a stringified "false" would leave this unknown.
+    const jobs = {
+      ready: { if: "github.event.pull_request.draft == false" },
+      wip: { if: "github.event.pull_request.draft" },
+    };
+    expect(await statuses({ jobs })).toEqual([
+      ["ready", "run"],
+      ["wip", "skipped"],
+    ]);
+    expect(await statuses({ jobs }, { draft: true })).toEqual([
+      ["ready", "skipped"],
+      ["wip", "run"],
+    ]);
+  });
+
+  it("decides a fork guard from the head repo's full name", async () => {
+    const jobs = {
+      trusted: {
+        if: "github.event.pull_request.head.repo.full_name == github.repository",
+      },
+    };
+    expect(await statuses({ jobs })).toEqual([["trusted", "run"]]);
+    expect(await statuses({ jobs }, { headRepo: "f/r" })).toEqual([["trusted", "skipped"]]);
+  });
+
+  it("leaves the fork guard undecided when the fork was deleted", async () => {
+    const jobs = {
+      trusted: {
+        if: "github.event.pull_request.head.repo.full_name == github.repository",
+      },
+    };
+    expect(await statuses({ jobs }, { headRepo: null })).toEqual([["trusted", "unknown"]]);
+  });
+
+  it("seeds sha from the test merge, and only from a real one", async () => {
+    const jobs = { at: { if: `github.sha == '${MERGE_SHA}'` } };
+    expect(await statuses({ jobs }, { mergeSha: MERGE_SHA })).toEqual([["at", "run"]]);
+    // No merge commit computed yet: the dispatch-time sha is one nothing
+    // fetched names, so the guard stays undecided rather than guessed.
+    expect(await statuses({ jobs })).toEqual([["at", "unknown"]]);
+  });
+
+  it("seeds workflow from `name:`, falling back to the path", async () => {
+    const jobs = { here: { if: `github.workflow == 'CI'` } };
+    expect(await statuses({ name: "CI", jobs })).toEqual([["here", "run"]]);
+    const byPath = { here: { if: `github.workflow == '${WF}'` } };
+    expect(await statuses({ jobs: byPath })).toEqual([["here", "run"]]);
+  });
+
+  it("leaves workflow unseeded when `name:` is not a string", async () => {
+    const jobs = { here: { if: "github.workflow == '3'" } };
+    expect(await statuses({ name: 3, jobs })).toEqual([["here", "unknown"]]);
+  });
+
+  it("carries the facts across a reusable workflow call", async () => {
+    const sub = JSON.stringify({
+      on: { workflow_call: null },
+      jobs: { inner: { if: "github.workflow == 'CI' && github.base_ref == 'main'" } },
+    });
+    const wf = JSON.stringify({
+      name: "CI",
+      on: "pull_request",
+      jobs: { call: { uses: "./.github/workflows/sub.yml" } },
+    });
+    const github = fakeGithub({ contents: { [WF]: wf, [SUB]: sub } });
+    const { checkNames } = await willfire(github, "o/r", 1);
+    expect(checkNames).toEqual(["call / inner"]);
   });
 });
 

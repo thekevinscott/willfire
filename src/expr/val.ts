@@ -35,8 +35,13 @@ export interface Scope {
    * as a `${{ }}` template we cannot evaluate. That is different from absent.
    */
   inputs?: Record<string, Val>;
-  /** `github.*` values that are fixed for the run being predicted. */
-  github?: Record<string, string>;
+  /**
+   * `github.*` values that are fixed for the run being predicted, keyed by the
+   * dotted remainder after `github.` (`event.action`). A boolean stays a
+   * boolean: GitHub's `==` refuses mixed types, so `draft == false` only
+   * decides against a real boolean.
+   */
+  github?: Record<string, string | boolean>;
   /**
    * Outputs of jobs this workflow's jobs `needs`, keyed by job id.
    *
