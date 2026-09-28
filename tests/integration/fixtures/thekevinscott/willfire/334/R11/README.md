@@ -1,0 +1,1 @@
+The caller invokes `r1`, each reusable workflow invokes the next through `r9`, and `r9` runs the leaf. GitHub dispatched the full `r1 / ... / r9 / leaf` check. The scratch PR's PR Monitor failed because its installed willfire@0.2.1 still enforced a four-level limit; the current source prediction agrees with the dispatched list.
