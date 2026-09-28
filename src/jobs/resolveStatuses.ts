@@ -9,8 +9,6 @@ export interface JobVerdict {
   needs: string[];
 }
 
-const STATUS_FN_RE = /\b(?:success|failure|cancelled|always)\s*\(/i;
-
 /**
  * Settle every job's status against its `needs:`, in dependency order.
  *
@@ -48,12 +46,13 @@ export function resolveStatuses(
     // Every need settled and one was skipped: a status-function condition is
     // decidable against that state (probe PR #341, run 36416679059), where a
     // condition without one falls to the implicit success() gate below. The
-    // pattern is inline because the mutation gate covers no module-level
-    // initializer.
+    // pattern stays inside the call because a module-level initializer runs at
+    // import time, which the mutation gate's per-test coverage never attributes
+    // to a test.
     const settledSkip =
       upstream.some((s) => s === "skipped") &&
       upstream.every((s) => s !== "unknown") &&
-      STATUS_FN_RE.test(cond);
+      /\b(?:success|failure|cancelled|always)\s*\(/i.test(cond);
     let status = evalIf(job.if, settledSkip ? { ...scoped, skippedNeed: true } : scoped);
     let reason = job.if !== undefined && job.if !== null ? `if: ${JSON.stringify(job.if)}` : "";
     if (!settledSkip && status !== "skipped" && !cond.includes("always()")) {
