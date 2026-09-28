@@ -1,0 +1,15 @@
+name: probe M1 empty literal axis
+on:
+  pull_request:
+jobs:
+  m1-sibling:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
+  m1-empty-literal:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: []
+    steps:
+      - run: 'true'

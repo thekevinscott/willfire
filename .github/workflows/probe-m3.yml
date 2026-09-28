@@ -1,0 +1,17 @@
+name: probe M3 full exclude wipe
+on:
+  pull_request:
+jobs:
+  m3-sibling:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
+  m3-wiped:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x]
+        exclude:
+          - a: x
+    steps:
+      - run: 'true'

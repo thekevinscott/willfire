@@ -1,0 +1,30 @@
+name: probe M4 include key display
+on:
+  pull_request:
+jobs:
+  m4-readd:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [a, b]
+        node: [1, 2]
+        exclude:
+          - os: a
+            node: 1
+        include:
+          - os: a
+            node: 1
+            extra: x
+    steps:
+      - run: 'true'
+  m4-overwrite:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x, y]
+        b: [p]
+        include:
+          - a: x
+            b: q
+    steps:
+      - run: 'true'

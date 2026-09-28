@@ -1,0 +1,19 @@
+name: probe M6 absent matrix key in job if
+on:
+  pull_request:
+jobs:
+  m6-sibling:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
+  m6-if:
+    if: ${{ matrix.label == '' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        a: [x, y]
+        include:
+          - a: x
+            label: L
+    steps:
+      - run: 'true'
