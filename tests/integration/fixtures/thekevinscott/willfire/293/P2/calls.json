@@ -828,5 +828,15 @@
       "ref": "1251ed630ca694317804d68c23bd12df61c568c8"
     },
     "result": "name: test\n\n# The repo's own suite, one job per kind so a red names the kind. Only the unit\n# job carries the coverage floor: `src/` reaches 100% from its colocated tests\n# alone, so the integration suite is not propping the number up.\n#\n# The suites are not a set of opinions about how GitHub *should* behave: every\n# workflow-level verdict in `src/predict.test.ts` was read back off a live\n# dispatch on thekevinbot/willrun-probe. See\n# `tests/fixtures/willrun-probe/README.md`.\n\non:\n  pull_request: {}\n  push:\n    branches: [main]\n\nconcurrency:\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  contents: read\n\njobs:\n  typecheck:\n    name: typecheck\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v7\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v7\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm typecheck\n\n  unit:\n    name: unit (100% coverage)\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v7\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v7\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm test:unit\n\n  integration:\n    name: integration\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v7\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v7\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm test:integration\n\n"
+  },
+  {
+    "method": "listWorkflowRuns",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "head_sha": "1251ed630ca694317804d68c23bd12df61c568c8",
+      "event": "pull_request"
+    },
+    "result": []
   }
 ]

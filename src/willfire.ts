@@ -42,7 +42,17 @@ export async function willfire(
 
   const pr = await github.getPull({ ...base, pull_number: prNumber });
   if (pr.mergeable === false) {
-    return finalizePrediction([], null, new Map());
+    // A conflict stops the next dispatch; it does not retract runs GitHub
+    // already made. Probe #386 opened conflicted and got none; #388 conflicted
+    // after its run and kept every check (36430507327, 36430507309).
+    const dispatched = await github.listWorkflowRuns({
+      ...base,
+      head_sha: pr.head.sha,
+      event: "pull_request",
+    });
+    if (dispatched.length === 0) {
+      return finalizePrediction([], null, new Map());
+    }
   }
 
   const files = await github.listPullFiles({ ...base, pull_number: prNumber });
