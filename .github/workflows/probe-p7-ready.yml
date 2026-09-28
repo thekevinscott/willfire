@@ -1,0 +1,15 @@
+name: probe-p7-ready
+
+on:
+  pull_request:
+    types: [ready_for_review]
+
+permissions: {}
+
+jobs:
+  p7-ready:
+    name: p7-ready
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

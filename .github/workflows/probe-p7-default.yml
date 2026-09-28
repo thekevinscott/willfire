@@ -1,0 +1,14 @@
+name: probe-p7-default
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  p7-default:
+    name: p7-default
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
