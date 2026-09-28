@@ -125,8 +125,7 @@ export async function expandJobs(args: ExpandJobsArgs): Promise<ExpandedJob[]> {
     // propagation loop below does not apply to it. The pattern is inline
     // because the mutation gate covers no module-level initializer.
     const guarded = /\b(?:success|failure|cancelled|always)\s*\(/i.test(cond);
-    const settled = needsSettled(needs, statuses);
-    const ifScope = settled === undefined ? scoped : { ...scoped, needsSettled: settled };
+    const ifScope = { ...scoped, needsSettled: needsSettled(needs, statuses) };
     let status = evalIf(job.if, ifScope);
     let reason = job.if !== undefined && job.if !== null ? `if: ${JSON.stringify(job.if)}` : "";
     if (!guarded && status !== "skipped") {
