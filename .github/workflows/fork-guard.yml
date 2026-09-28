@@ -1,0 +1,23 @@
+name: fork-guard
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  same-repo-only:
+    name: same-repo-only
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  fork-only:
+    name: fork-only
+    if: github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

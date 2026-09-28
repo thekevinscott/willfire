@@ -1,0 +1,35 @@
+name: fork-ctx
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  repository:
+    name: repository ${{ github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  repository-owner:
+    name: repository-owner ${{ github.repository_owner }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  actor:
+    name: actor ${{ github.actor }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  head-repo:
+    name: head-repo ${{ github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
