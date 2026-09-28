@@ -1,0 +1,32 @@
+name: coerce-c9
+on: pull_request
+jobs:
+  c9-control:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ok
+  c9-abc-le-zero:
+    if: "'abc' <= 0"
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ok
+  c9-empty-le-zero:
+    if: "'' <= 0"
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ok
+  c9-contains-object:
+    if: contains(fromJSON('{"a":1}'), 'a')
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ok
+  c9-contains-null-element:
+    if: contains(fromJSON('[null]'), '')
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ok
+  c9-contains-nested-element:
+    if: contains(fromJSON('[["a"]]'), 'a')
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ok
