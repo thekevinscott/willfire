@@ -371,6 +371,20 @@ describe("workflow-level verdicts", () => {
     expect(await only(wf, { baseRef: "main" })).toMatchObject({ status: "run" });
   });
 
+  it("gives a workflow with a literal empty matrix axis no job checks", async () => {
+    // GitHub rejects the file before scheduling anything, so the plain sibling
+    // gets no check either. Probe PR #372, run 36431252913: `probe-m1.yml`
+    // produced zero jobs and no `pull_request` run at all.
+    const wf =
+      "on:\n  pull_request:\njobs:\n  sibling: {}\n  m:\n    strategy:\n      matrix:\n        a: []\n";
+    expect(await only(wf)).toMatchObject({
+      job: "*",
+      status: "run",
+      reason: "empty matrix axis 'a': startup failure",
+    });
+    expect((await run(wf)).checkNames).toEqual([]);
+  });
+
   it("reports a workflow with no file at head as no-dispatch (#7)", async () => {
     // The Actions API keeps listing a workflow as `active` after its file is
     // deleted on the branch. Nothing can dispatch from a file that is not there.

@@ -12,6 +12,7 @@ import { jobName } from "./entries/jobName.js";
 import { errorStatus } from "./predict/errorStatus.js";
 import type { Scope } from "./expr/val.js";
 import { expandJobs } from "./jobs/expandJobs.js";
+import { emptyMatrixAxis } from "./matrix/emptyMatrixAxis.js";
 import { workflowDispatches } from "./triggers/workflowDispatches.js";
 import { finalizePrediction } from "./predict/finalizePrediction.js";
 import type { GithubClient } from "./predict/makeGithubClient.js";
@@ -273,6 +274,22 @@ export async function willfire(
     const [dispatches, reason] = workflowDispatches(wf, ctx);
     if (!dispatches) {
       return [{ workflow: path, job: "*", status: "no-dispatch", reason }];
+    }
+    // A literal empty matrix axis is rejected before any job is scheduled, so
+    // no job in the file gets a check — the sibling included (probe PR #372,
+    // run 36431252913). Unlike the both-filters startup failures, whose
+    // entries #7 deliberately left expanding, this one is cheap to answer
+    // exactly and the sibling is a real over-prediction.
+    const emptyAxis = emptyMatrixAxis(wf);
+    if (emptyAxis !== null) {
+      return [
+        {
+          workflow: path,
+          job: "*",
+          status: "run",
+          reason: `empty matrix axis '${emptyAxis}': startup failure`,
+        },
+      ];
     }
     // `github.workflow` is the top-level workflow's `name:` — the path when
     // unnamed — all the way down its reusable call tree, so it seeds per
