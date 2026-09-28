@@ -1,0 +1,8 @@
+name: probe U5 undecidable uses caller
+on:
+  pull_request:
+jobs:
+  call:
+    name: call
+    if: ${{ secrets.WILLFIRE_U5_ABSENT != '' }}
+    uses: ./.github/workflows/probe-u5-callee.yml

@@ -1,0 +1,9 @@
+name: probe U5 callee
+on:
+  workflow_call:
+jobs:
+  inner:
+    name: inner
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
