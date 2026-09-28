@@ -52,6 +52,13 @@ describe("resolveStatuses", () => {
       );
     });
 
+    it("settles a status function written with a space before its parenthesis", () => {
+      expect(statuses({ b: { needs: ["a"], if: "!cancelled ()" }, a: { if: false } })).toEqual({
+        b: "run",
+        a: "skipped",
+      });
+    });
+
     it("carries a skip down a chain declared back to front", () => {
       expect(statuses({ c: { needs: ["b"] }, b: { needs: ["a"] }, a: { if: false } })).toEqual({
         c: "skipped",
