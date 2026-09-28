@@ -15,6 +15,7 @@ import { evalIf } from "./evalIf.js";
 import { neededJobIds } from "./neededJobIds.js";
 import { readsVars } from "./readsVars.js";
 import { prScope } from "./prScope.js";
+import { resolveStatuses } from "./resolveStatuses.js";
 import type {
   ExpandedJob,
   JobSite,
@@ -68,7 +69,6 @@ export async function expandJobs(args: ExpandJobsArgs): Promise<ExpandedJob[]> {
   } = args;
   const entries: ExpandedJob[] = [];
   const jobs = (wf["jobs"] ?? {}) as Record<string, Workflow>;
-  const statuses: Record<string, string> = {};
 
   // Nothing dispatched or called this run, so an input this workflow declares
   // and nothing supplied reads as the empty string (#125) — laid under, never
@@ -113,35 +113,13 @@ export async function expandJobs(args: ExpandJobsArgs): Promise<ExpandedJob[]> {
     return failed === undefined ? "" : `; ${execFailures[failed]}`;
   };
 
+  // Statuses settle ahead of the emit loop because `needs:` may point at a job
+  // declared later in the file; entries stay in declaration order.
+  const verdicts = resolveStatuses(jobs, scoped);
+
   for (const [jobId, jobRaw] of Object.entries(jobs)) {
     const job = jobRaw ?? {};
-    const needsRaw = job["needs"];
-    const needs: string[] =
-      typeof needsRaw === "string" ? [needsRaw] : ((needsRaw ?? []) as string[]);
-    const cond = String(job.if ?? "");
-    // Every need settled and one was skipped: a status-function condition is
-    // decidable against that state (probe PR #341, run 36416679059), where a
-    // condition without one falls to the implicit success() gate below. The
-    // pattern is inline because the mutation gate covers no module-level
-    // initializer.
-    const settledSkip =
-      needs.some((n) => statuses[n] === "skipped") &&
-      needs.every((n) => statuses[n] !== "unknown") &&
-      /\b(?:success|failure|cancelled|always)\s*\(/i.test(cond);
-    let status = evalIf(job.if, settledSkip ? { ...scoped, skippedNeed: true } : scoped);
-    let reason = job.if !== undefined && job.if !== null ? `if: ${JSON.stringify(job.if)}` : "";
-    if (!settledSkip && status !== "skipped" && !cond.includes("always()")) {
-      for (const n of needs) {
-        if (statuses[n] === "skipped") {
-          status = "skipped";
-          reason = `needs '${n}' which is skipped`;
-        } else if (statuses[n] === "unknown" && status === "run") {
-          status = "unknown";
-          reason = `needs '${n}' whose status is unknown`;
-        }
-      }
-    }
-    statuses[jobId] = status;
+    const { status, reason, needs } = verdicts[jobId];
 
     // A skipped job never expands its matrix and never dispatches a called
     // workflow: it collapses to a single check under the bare job name.

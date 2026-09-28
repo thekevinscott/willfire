@@ -13,6 +13,10 @@ vi.mock(
   "./neededJobIds.js",
   async () => await vi.importActual<typeof import("./neededJobIds.js")>("./neededJobIds.js"),
 );
+vi.mock(
+  "./resolveStatuses.js",
+  async () => await vi.importActual<typeof import("./resolveStatuses.js")>("./resolveStatuses.js"),
+);
 import type { CallbackMap } from "../callback/parseCallbackMap.js";
 import type { JobExecutor } from "../execute/types.js";
 import type {
@@ -261,6 +265,31 @@ describe("job expansion", () => {
         status: "skipped",
         reason: "needs 'a' which is skipped",
       });
+    });
+
+    it("collapses a dependent declared before the job it needs", async () => {
+      // Probe PR #373, run 36430122487: `needs-first` and `caller-first`, both
+      // above the `if: false` job they need, each dispatched as one skipped
+      // check — no matrix rows, no callee names.
+      const reader = readerFor({
+        ".github/workflows/no-callee.yml": JSON.stringify({
+          on: { workflow_call: null },
+          jobs: { "inner-a": {}, "inner-b": {} },
+        }),
+      });
+      const entries = await expand(
+        {
+          "needs-first": { needs: ["gone"], strategy: { matrix: { a: ["x", "y"] } } },
+          "caller-first": { needs: ["gone"], uses: "./.github/workflows/no-callee.yml" },
+          gone: { if: false },
+        },
+        reader,
+      );
+      expect(entries.map((e) => [e.job, e.checkName, e.status])).toEqual([
+        ["needs-first", "needs-first", "skipped"],
+        ["caller-first", "caller-first", "skipped"],
+        ["gone", "gone", "skipped"],
+      ]);
     });
 
     it("leaves an already-skipped job alone rather than re-deriving it", async () => {
