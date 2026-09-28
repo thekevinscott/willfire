@@ -1,0 +1,9 @@
+name: probe R11 reusable r9
+on:
+  workflow_call:
+jobs:
+  leaf:
+    name: leaf
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'

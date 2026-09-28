@@ -1,0 +1,7 @@
+name: probe R11 nine reusable levels
+on:
+  pull_request:
+jobs:
+  r1:
+    name: r1
+    uses: ./.github/workflows/probe-r11-r1.yml

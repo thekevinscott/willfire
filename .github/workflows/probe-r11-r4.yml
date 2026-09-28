@@ -1,0 +1,7 @@
+name: probe R11 reusable r4
+on:
+  workflow_call:
+jobs:
+  r5:
+    name: r5
+    uses: ./.github/workflows/probe-r11-r5.yml
