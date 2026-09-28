@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1790602673,
+  "exit_code": 0,
+  "commit": "67791bd55ead55fa99e98e9c42957ef64da5ab2f",
+  "branch": "fix/reusable-depth-measured"
+}
