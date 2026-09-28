@@ -1,0 +1,78 @@
+name: sf-probe
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  b:
+    needs: a
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c:
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  d:
+    needs: a
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  e:
+    needs: a
+    if: ${{ success() || failure() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  f:
+    needs: a
+    if: ${{ !cancelled() }}
+    strategy:
+      matrix:
+        x: [1, 2]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  g:
+    needs: a
+    if: ${{ !cancelled() }}
+    uses: ./.github/workflows/sf-callee.yml
+
+  skipped:
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  h:
+    needs: skipped
+    if: ${{ !cancelled() }}
+    strategy:
+      matrix:
+        x: [1, 2]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

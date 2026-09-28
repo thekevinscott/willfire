@@ -1,0 +1,19 @@
+name: sf-callee
+
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  cj1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  cj2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
