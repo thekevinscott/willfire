@@ -1,0 +1,13 @@
+name: b-main
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  b-main:
+    name: b-main
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

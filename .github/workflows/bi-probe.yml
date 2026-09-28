@@ -1,0 +1,13 @@
+name: bi-probe
+
+on:
+  pull_request:
+    branches-ignore: [probe-base]
+
+jobs:
+  bi-probe:
+    name: bi-probe
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

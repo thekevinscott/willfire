@@ -1,0 +1,13 @@
+name: b-probe
+
+on:
+  pull_request:
+    branches: [probe-base]
+
+jobs:
+  b-probe:
+    name: b-probe
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
