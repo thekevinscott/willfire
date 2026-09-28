@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*putitoutthere)\"",
+  "ran_at": 1790606774,
+  "exit_code": 0,
+  "commit": "c11058929b06dfb702b06eff4ccc5b2a1906f424",
+  "branch": "fix/skip-checks-trailer-position"
+}
