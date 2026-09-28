@@ -1,0 +1,31 @@
+name: coerce-callee
+
+on:
+  workflow_call:
+    inputs:
+      flag:
+        type: boolean
+        required: true
+
+permissions: {}
+
+jobs:
+  callee-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  callee-eq-string:
+    if: inputs.flag == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  callee-truthy:
+    if: inputs.flag
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

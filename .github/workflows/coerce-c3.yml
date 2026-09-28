@@ -1,0 +1,27 @@
+name: coerce-c3
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  c3-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c3-reveal:
+    name: c3-ref-is-${{ github.ref }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c3-startswith:
+    if: startsWith(github.ref, 'refs/pull/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

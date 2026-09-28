@@ -1,0 +1,34 @@
+name: coerce-c4
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  c4-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c4-json-array:
+    if: fromJSON('[1]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c4-json-empty-array:
+    if: fromJSON('[]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c4-json-object:
+    if: fromJSON('{"a":1}')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

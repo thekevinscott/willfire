@@ -1,0 +1,27 @@
+name: coerce-c2
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  c2-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c2-array-hit:
+    if: contains(fromJSON('["a","b"]'), 'a')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c2-array-miss:
+    if: contains(fromJSON('["a","b"]'), 'c')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

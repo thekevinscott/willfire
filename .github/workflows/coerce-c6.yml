@@ -1,0 +1,18 @@
+name: coerce-c6
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  c6-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c6:
+    uses: ./.github/workflows/coerce-callee.yml
+    with:
+      flag: true

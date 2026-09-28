@@ -1,0 +1,27 @@
+name: coerce-c1
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  c1-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c1-star-present:
+    if: contains(github.event.pull_request.labels.*.name, 'skip-ci')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c1-star-absent:
+    if: contains(github.event.pull_request.labels.*.name, 'no-such-label')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'

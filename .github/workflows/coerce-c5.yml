@@ -1,0 +1,62 @@
+name: coerce-c5
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  c5-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c5-empty-eq-zero:
+    if: "'' == 0"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c5-str1-eq-num1:
+    if: "'1' == 1"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c5-abc-eq-zero:
+    if: "'abc' == 0"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c5-true-eq-strtrue:
+    if: "true == 'true'"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c5-zero-eq-false:
+    if: "0 == false"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c5-null-eq-empty:
+    if: "null == ''"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
+
+  c5-str2-lt-num10:
+    if: "'2' < 10"
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
