@@ -35,8 +35,8 @@ not decide. Never guess a name to make an entry look decided; never emit an
 
 ## e2e attestations
 
-A PR touching `src/**` lands a receipt in `e2e-attestations/` recording the
-command actually run and its real exit code.
+The e2e suite does not run in CI. A PR touching `src/**` lands a receipt in
+`e2e-attestations/` recording the command actually run and its real exit code.
 `tests/integration/attestations.test.ts` fails the suite on a nonzero one. Run
 it unpiped: `| tail` makes the shell report the pipe's status, and a receipt
 recording `exit_code: 0` for a run that printed `3 failed` defeats that check
