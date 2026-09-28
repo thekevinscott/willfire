@@ -29,6 +29,12 @@ in `calls.json` as `{ "$binary": "tarball-0.bin" }` with the bytes in a
 sibling file; `getCalls` reads the reference back into an `ArrayBuffer` at
 replay, and a missing sibling fails loudly.
 
+A case may also carry `statuses.json`, an object mapping each dispatched check
+name to `run` or `skipped`, derived from that job's GitHub conclusion. The
+name list alone cannot see a boolean decided backwards — a job willfire
+wrongly thinks runs still contributes its name — so a case about what an `if:`
+evaluates to pins the statuses too. Absent, only the name list is asserted.
+
 A case recorded under a non-default event action (`ready_for_review`,
 `labeled`, …) declares it in a sibling `action.json` holding a bare JSON
 string, e.g. `"ready_for_review"`; replay passes it as the prediction's
