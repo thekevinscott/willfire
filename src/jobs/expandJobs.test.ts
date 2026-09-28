@@ -218,14 +218,21 @@ describe("job expansion", () => {
       expect(entries[1]).toMatchObject({ job: "b", status: "run" });
     });
 
-    it("leaves a status function unsettled when no need was skipped", async () => {
+    // Jobs `a`/`b`, `c`, `d` and `e` on probe PR #376, run 36430193559.
+    it("settles the status functions against needs that all ran", async () => {
       const entries = await expand({
         a: {},
         b: { needs: ["a"], if: "!cancelled()" },
+        c: { if: "success()" },
+        d: { needs: ["a"], if: "failure()" },
+        e: { needs: ["a"], if: "success() || failure()" },
       });
       expect(entries.map((e) => [e.job, e.status])).toEqual([
         ["a", "run"],
-        ["b", "unknown"],
+        ["b", "run"],
+        ["c", "run"],
+        ["d", "skipped"],
+        ["e", "run"],
       ]);
     });
 
@@ -250,7 +257,11 @@ describe("job expansion", () => {
       expect(entries[1]).toMatchObject({ job: "b", status: "unknown" });
     });
 
-    it("does not settle a status function while another need is unknown", async () => {
+    // A status-function condition replaces the implicit success() gate, so an
+    // undecided need cannot drag the job down: `!cancelled()` ran downstream of
+    // a skipped need (job `h`, probe PR #376, run 36430193559) and downstream of
+    // one that ran (job `b`, same run).
+    it("keeps a status function settled while another need is unknown", async () => {
       const entries = await expand({
         a: { if: false },
         u: { if: "github.ref == 'x'" },
@@ -258,9 +269,38 @@ describe("job expansion", () => {
       });
       expect(entries[2]).toMatchObject({
         job: "b",
-        status: "skipped",
-        reason: "needs 'a' which is skipped",
+        status: "run",
+        reason: 'if: "!cancelled()"',
       });
+    });
+
+    // Jobs `f` and `g` on probe PR #376, run 36430193559: `f (1)`/`f (2)` and
+    // `g / cj1`/`g / cj2` all dispatched under a `!cancelled()` guard.
+    it("expands a matrix and a callee tree under a status-function guard", async () => {
+      const callee = "on: { workflow_call: null }\njobs:\n  cj1: {}\n  cj2: {}\n";
+      const entries = await expand(
+        {
+          a: {},
+          f: { needs: ["a"], if: "!cancelled()", strategy: { matrix: { x: [1, 2] } } },
+          g: { needs: ["a"], if: "!cancelled()", uses: "./.github/workflows/sf-callee.yml" },
+        },
+        readerFor({ ".github/workflows/sf-callee.yml": callee }),
+      );
+      expect(entries.map((e) => e.checkName)).toEqual([
+        "a",
+        "f (1)",
+        "f (2)",
+        "g / cj1",
+        "g / cj2",
+      ]);
+    });
+
+    it("leaves success unknown while a need is unknown", async () => {
+      const entries = await expand({
+        u: { if: "github.ref == 'x'" },
+        b: { needs: ["u"], if: "success()" },
+      });
+      expect(entries[1]).toMatchObject({ job: "b", status: "unknown" });
     });
 
     it("leaves an already-skipped job alone rather than re-deriving it", async () => {

@@ -13,6 +13,7 @@ import { absentInputs } from "./absentInputs.js";
 import { calleeInputs } from "./calleeInputs.js";
 import { evalIf } from "./evalIf.js";
 import { neededJobIds } from "./neededJobIds.js";
+import { needsSettled } from "./needsSettled.js";
 import { readsVars } from "./readsVars.js";
 import { prScope } from "./prScope.js";
 import type {
@@ -119,18 +120,16 @@ export async function expandJobs(args: ExpandJobsArgs): Promise<ExpandedJob[]> {
     const needs: string[] =
       typeof needsRaw === "string" ? [needsRaw] : ((needsRaw ?? []) as string[]);
     const cond = String(job.if ?? "");
-    // Every need settled and one was skipped: a status-function condition is
-    // decidable against that state (probe PR #341, run 36416679059), where a
-    // condition without one falls to the implicit success() gate below. The
-    // pattern is inline because the mutation gate covers no module-level
-    // initializer.
-    const settledSkip =
-      needs.some((n) => statuses[n] === "skipped") &&
-      needs.every((n) => statuses[n] !== "unknown") &&
-      /\b(?:success|failure|cancelled|always)\s*\(/i.test(cond);
-    let status = evalIf(job.if, settledSkip ? { ...scoped, skippedNeed: true } : scoped);
+    // A condition naming a status-check function replaces the implicit
+    // success() gate on `needs` rather than being ANDed with it, so the
+    // propagation loop below does not apply to it. The pattern is inline
+    // because the mutation gate covers no module-level initializer.
+    const guarded = /\b(?:success|failure|cancelled|always)\s*\(/i.test(cond);
+    const settled = needsSettled(needs, statuses);
+    const ifScope = settled === undefined ? scoped : { ...scoped, needsSettled: settled };
+    let status = evalIf(job.if, ifScope);
     let reason = job.if !== undefined && job.if !== null ? `if: ${JSON.stringify(job.if)}` : "";
-    if (!settledSkip && status !== "skipped" && !cond.includes("always()")) {
+    if (!guarded && status !== "skipped") {
       for (const n of needs) {
         if (statuses[n] === "skipped") {
           status = "skipped";

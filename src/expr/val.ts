@@ -85,9 +85,10 @@ export interface Scope {
    */
   matrix?: YamlMap;
   /**
-   * True when every job this one `needs` has settled and at least one was
-   * skipped. In that state `success()`, `failure()` and `cancelled()` all
-   * return false — measured on probe PR #341, run 36416679059.
+   * How the jobs this one `needs` settled, when every one of them did.
+   * `"all-run"` makes `success()` true and `failure()` false; `"some-skipped"`
+   * makes both false — measured on probe PR #341, run 36416679059. Absent
+   * means at least one need is undecided, so neither is answerable.
    */
-  skippedNeed?: boolean;
+  needsSettled?: "all-run" | "some-skipped";
 }

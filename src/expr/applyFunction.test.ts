@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { applyFunction } from "./applyFunction.js";
-import type { Val } from "./val.js";
+import type { Scope, Val } from "./val.js";
 
 const S = (v: string | number | boolean): Val => ({ kind: "value", v });
 
@@ -10,28 +10,45 @@ describe("applyFunction", () => {
     expect(applyFunction("always", [], {})).toEqual(S(true));
   });
 
-  it("settles the job-status functions false against a skipped need", () => {
+  it("settles success and failure false against a skipped need", () => {
     // Measured on probe PR #341, run 36416679059.
-    const scope = { skippedNeed: true };
+    const scope: Scope = { needsSettled: "some-skipped" };
     expect(applyFunction("success", [], scope)).toEqual(S(false));
     expect(applyFunction("failure", [], scope)).toEqual(S(false));
-    expect(applyFunction("cancelled", [], scope)).toEqual(S(false));
   });
 
-  it("leaves a job-status function unknown when the needs state is unsettled", () => {
-    expect(applyFunction("cancelled", [], {})).toEqual({ kind: "unknown" });
-    expect(applyFunction("failure", [], { skippedNeed: false })).toEqual({ kind: "unknown" });
+  it("settles success true and failure false when every need ran", () => {
+    // Jobs `c` and `d` on probe PR #376, run 36430193559: `success()` ran, and
+    // `failure()` produced a check run whose conclusion was `skipped`.
+    const scope: Scope = { needsSettled: "all-run" };
+    expect(applyFunction("success", [], scope)).toEqual(S(true));
+    expect(applyFunction("failure", [], scope)).toEqual(S(false));
   });
 
-  it("settles only the job-status functions against a skipped need", () => {
-    expect(applyFunction("tojson", [], { skippedNeed: true })).toEqual({ kind: "unknown" });
-    expect(applyFunction("format", [], { skippedNeed: true })).toEqual({ kind: "unknown" });
+  it("settles cancelled false whatever the needs state", () => {
+    // willfire answers for a dispatch that happens: job `b` on probe PR #376,
+    // run 36430193559, and job `h` there downstream of a skipped need.
+    expect(applyFunction("cancelled", [], {})).toEqual(S(false));
+    expect(applyFunction("cancelled", [], { needsSettled: "all-run" })).toEqual(S(false));
+    expect(applyFunction("cancelled", [], { needsSettled: "some-skipped" })).toEqual(S(false));
+  });
+
+  it("leaves success and failure unknown when the needs state is unsettled", () => {
+    expect(applyFunction("success", [], {})).toEqual({ kind: "unknown" });
+    expect(applyFunction("failure", [], {})).toEqual({ kind: "unknown" });
+  });
+
+  it("settles only the job-status functions against a needs state", () => {
+    const scope: Scope = { needsSettled: "all-run" };
+    expect(applyFunction("tojson", [], scope)).toEqual({ kind: "unknown" });
+    expect(applyFunction("format", [], scope)).toEqual({ kind: "unknown" });
   });
 
   it("refuses arguments on a job-status function", () => {
-    expect(applyFunction("success", [S("x")], { skippedNeed: true })).toEqual({
+    expect(applyFunction("success", [S("x")], { needsSettled: "all-run" })).toEqual({
       kind: "unknown",
     });
+    expect(applyFunction("cancelled", [S("x")], {})).toEqual({ kind: "unknown" });
   });
 
   it("dispatches fromjson at arity one only", () => {
