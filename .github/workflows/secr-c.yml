@@ -1,0 +1,9 @@
+name: secr-c
+on: pull_request
+jobs:
+  secr-c-step:
+    runs-on: ubuntu-latest
+    steps:
+      - if: ${{ secrets.WILLFIRE_SECR_C != '' }}
+        run: 'true'
+      - run: 'true'

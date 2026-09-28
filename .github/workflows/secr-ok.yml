@@ -1,0 +1,7 @@
+name: secr-ok
+on: pull_request
+jobs:
+  secr-ok-control:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'

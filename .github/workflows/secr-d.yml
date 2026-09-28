@@ -1,0 +1,14 @@
+name: secr-d
+on: pull_request
+env:
+  SECR_D: set
+jobs:
+  secr-d-env:
+    if: ${{ env.SECR_D != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
+  secr-d-sibling:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
