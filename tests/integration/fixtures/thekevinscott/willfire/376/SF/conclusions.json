@@ -1,0 +1,16 @@
+{
+  "CI Gate": "failure",
+  "a": "success",
+  "b": "success",
+  "c": "success",
+  "d": "skipped",
+  "e": "success",
+  "f (1)": "success",
+  "f (2)": "success",
+  "g / cj1": "success",
+  "g / cj2": "success",
+  "h (1)": "success",
+  "h (2)": "success",
+  "prt-noop": "success",
+  "skipped": "skipped"
+}
