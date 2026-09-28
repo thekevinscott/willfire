@@ -1,4 +1,4 @@
-name: probe-r12b-r20
+name: probe-r12c-h20
 on: workflow_call
 jobs:
   leaf:

@@ -1,0 +1,5 @@
+name: probe-r12c-d10
+on: pull_request
+jobs:
+  root:
+    uses: ./.github/workflows/probe-r12c-h11.yml

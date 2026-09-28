@@ -1,0 +1,5 @@
+name: probe-r12c-h11
+on: workflow_call
+jobs:
+  hop:
+    uses: ./.github/workflows/probe-r12c-h12.yml
