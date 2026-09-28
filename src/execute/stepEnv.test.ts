@@ -45,6 +45,15 @@ describe("stepEnv", () => {
     expect(built.ok && built.v).not.toHaveProperty("GITHUB_EVENT_NAME");
   });
 
+  it("exports only string facts — a boolean seed never becomes an env value", () => {
+    // The scope carries booleans since #322 (`event.pull_request.draft`); env
+    // values are strings, so a non-string fact is left out, not stringified.
+    const scope = { github: { repository: false, event_name: false } };
+    const built = stepEnv({}, scope, ctxOf(), "step 's'");
+    expect(built.ok && built.v).not.toHaveProperty("GITHUB_REPOSITORY");
+    expect(built.ok && built.v).not.toHaveProperty("GITHUB_EVENT_NAME");
+  });
+
   it("gives PATH and HOME empty values when the host has neither", () => {
     vi.stubEnv("PATH", undefined);
     vi.stubEnv("HOME", undefined);

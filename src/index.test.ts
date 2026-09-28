@@ -90,7 +90,8 @@ describe("root barrel", () => {
         merge_commit_sha: null,
         mergeable: null,
         commits: 1,
-        head: { sha: "abc" },
+        draft: false,
+        head: { ref: "topic", sha: "abc", repo: { full_name: "o/r" } },
         user: { login: "octocat" },
       }),
       listPulls: async () => [{ base: { ref: "main" }, merge_commit_sha: null }],
@@ -112,7 +113,8 @@ describe("root barrel", () => {
       merge_commit_sha: null,
       mergeable: null,
       commits: 1,
-      head: { sha: "abc" },
+      draft: false,
+      head: { ref: "topic", sha: "abc", repo: { full_name: "o/r" } },
       user: { login: "octocat" },
     });
     await expect(
@@ -160,7 +162,8 @@ describe("root barrel", () => {
         merge_commit_sha: string | null;
         mergeable: boolean | null;
         commits: number;
-        head: { sha: string };
+        draft: boolean;
+        head: { ref: string; sha: string; repo: { full_name: string } | null };
         user: { login: string };
       }>;
       listPulls(

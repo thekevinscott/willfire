@@ -84,9 +84,10 @@ function fakeGithub(f: Fixture): GithubClient {
     getPull: async () => ({
       commits: f.commits ?? 1,
       base: { ref: "main" },
-      head: { sha: HEAD_SHA },
+      head: { ref: "topic", sha: HEAD_SHA, repo: { full_name: "o/r" } },
       merge_commit_sha: null,
       mergeable: null,
+      draft: false,
       user: { login: "octocat" },
     }),
     listPullFiles: async () => [{ filename: "src/app.ts" }],

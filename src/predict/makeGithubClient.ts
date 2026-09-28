@@ -19,7 +19,9 @@ export interface GithubPullSummary {
 export interface GithubPull extends GithubPullSummary {
   mergeable: boolean | null;
   commits: number;
-  head: { sha: string };
+  draft: boolean;
+  /** `repo` is null when the fork the head branch lived in was deleted. */
+  head: { ref: string; sha: string; repo: { full_name: string } | null };
   user: { login: string };
 }
 

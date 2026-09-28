@@ -196,17 +196,26 @@ export async function willfire(
     treeOnly = [];
   }
 
-  // `github.repository` is fixed for everything predicted here: reusable
-  // workflows and composite actions all run in the repo the PR is against.
-  // Seeding it once makes guards like the fleet's hermetic-vs-published
-  // `github.repository ==` checks decidable everywhere, granted or not.
-  // `github.actor` is whoever triggered the run: the opener on `opened`, but
-  // the head pusher on `synchronize` — an identity nothing in the PR payload
-  // or its commits names (probe willrun-probe#17; live putitoutthere#657) —
-  // so only `opened` seeds it.
+  // Facts fixed for every workflow predicted here, read off the PR itself
+  // (#322). `github.repository` makes guards like the fleet's
+  // hermetic-vs-published `github.repository ==` checks decidable everywhere.
+  // `sha` is the test merge GitHub dispatches at, so it seeds only when the
+  // pull names one. `github.actor` is whoever triggered the run: the opener on
+  // `opened`, but the head pusher on `synchronize` — an identity nothing in
+  // the PR payload or its commits names (probe willrun-probe#17; live
+  // putitoutthere#657) — so only `opened` seeds it.
   const prFacts: Scope = {
     github: {
       repository: `${headSource.owner}/${headSource.repo}`,
+      repository_owner: owner,
+      base_ref: pr.base.ref,
+      head_ref: pr.head.ref,
+      "event.action": ctx.action,
+      "event.pull_request.draft": pr.draft,
+      ...(pr.head.repo === null
+        ? {}
+        : { "event.pull_request.head.repo.full_name": pr.head.repo.full_name }),
+      ...(mergeSha === null ? {} : { sha: mergeSha }),
       ...(ctx.action === "opened" ? { actor: pr.user.login } : {}),
     },
   };
@@ -244,11 +253,20 @@ export async function willfire(
     if (!dispatches) {
       return [{ workflow: path, job: "*", status: "no-dispatch", reason }];
     }
+    // `github.workflow` is the top-level workflow's `name:` — the path when
+    // unnamed — all the way down its reusable call tree, so it seeds per
+    // workflow here and travels into callees with the rest of the facts.
+    const wfName = wf["name"] ?? path;
     const jobs = await expandJobs({
       wf,
       reader,
       site: { path, source: readSource },
-      scope: prFacts,
+      scope: {
+        github: {
+          ...prFacts.github,
+          ...(typeof wfName === "string" ? { workflow: wfName } : {}),
+        },
+      },
       executor,
       callbacks: callbackMap,
     });
