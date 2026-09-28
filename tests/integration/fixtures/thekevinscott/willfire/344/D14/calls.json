@@ -1,0 +1,1747 @@
+[
+  {
+    "method": "getPull",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "pull_number": 344
+    },
+    "result": {
+      "url": "https://api.github.com/repos/thekevinscott/willfire/pulls/344",
+      "id": 4663187544,
+      "node_id": "PR_kwDOT9j2e88AAAABFfKYWA",
+      "html_url": "https://github.com/thekevinscott/willfire/pull/344",
+      "diff_url": "https://github.com/thekevinscott/willfire/pull/344.diff",
+      "patch_url": "https://github.com/thekevinscott/willfire/pull/344.patch",
+      "issue_url": "https://api.github.com/repos/thekevinscott/willfire/issues/344",
+      "number": 344,
+      "state": "open",
+      "locked": false,
+      "title": "Probe: D14 dual push/pull_request trigger",
+      "user": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "body": "Scratch PR for capture case D14 (#328): one workflow triggering on both push (to this branch) and pull_request. Pins which runs attach to the PR versus the branch push. Will be closed unmerged once every run on the head SHA concludes.\n\nConsumer note: pr-monitor enumerates runs by head SHA (src/github/fetchWorkflowRuns.ts, listWorkflowRunsForRepo with head_sha) and keeps only `r.event === 'pull_request'` (src/monitor.ts:82 at 7bb6c0f) — the push run this PR produces is invisible to it.",
+      "created_at": "2026-09-28T11:46:01Z",
+      "updated_at": "2026-09-28T11:46:01Z",
+      "closed_at": null,
+      "merged_at": null,
+      "merge_commit_sha": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+      "assignees": [],
+      "requested_reviewers": [],
+      "requested_teams": [],
+      "labels": [],
+      "milestone": null,
+      "draft": false,
+      "commits_url": "https://api.github.com/repos/thekevinscott/willfire/pulls/344/commits",
+      "review_comments_url": "https://api.github.com/repos/thekevinscott/willfire/pulls/344/comments",
+      "review_comment_url": "https://api.github.com/repos/thekevinscott/willfire/pulls/comments{/number}",
+      "comments_url": "https://api.github.com/repos/thekevinscott/willfire/issues/344/comments",
+      "statuses_url": "https://api.github.com/repos/thekevinscott/willfire/statuses/e200d441e88ab4ac2fc891d8e62e9be232051440",
+      "head": {
+        "label": "thekevinscott:probe/d14-dual-trigger",
+        "ref": "probe/d14-dual-trigger",
+        "sha": "e200d441e88ab4ac2fc891d8e62e9be232051440",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1339618939,
+          "node_id": "R_kgDOT9j2ew",
+          "name": "willfire",
+          "full_name": "thekevinscott/willfire",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/willfire",
+          "description": "Predict the set of CI check entries GitHub Actions will create for a PR",
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/willfire",
+          "forks_url": "https://api.github.com/repos/thekevinscott/willfire/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/willfire/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/willfire/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/willfire/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/willfire/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/willfire/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/willfire/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/willfire/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/willfire/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/willfire/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/willfire/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/willfire/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/willfire/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/willfire/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/willfire/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/willfire/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/willfire/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/willfire/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/willfire/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/willfire/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/willfire/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/willfire/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/willfire/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/willfire/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/willfire/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/willfire/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/willfire/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/willfire/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/willfire/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/willfire/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/willfire/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/willfire/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/willfire/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/willfire/deployments",
+          "created_at": "2026-08-19T13:30:06Z",
+          "updated_at": "2026-09-28T11:36:35Z",
+          "pushed_at": "2026-09-28T11:45:57Z",
+          "git_url": "git://github.com/thekevinscott/willfire.git",
+          "ssh_url": "git@github.com:thekevinscott/willfire.git",
+          "clone_url": "https://github.com/thekevinscott/willfire.git",
+          "svn_url": "https://github.com/thekevinscott/willfire",
+          "homepage": null,
+          "size": 32507,
+          "stargazers_count": 1,
+          "watchers_count": 1,
+          "language": "TypeScript",
+          "has_issues": true,
+          "has_projects": true,
+          "has_downloads": false,
+          "has_wiki": true,
+          "has_pages": false,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 29,
+          "license": {
+            "key": "mit",
+            "name": "MIT License",
+            "spdx_id": "MIT",
+            "url": "https://api.github.com/licenses/mit",
+            "node_id": "MDc6TGljZW5zZTEz"
+          },
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [],
+          "visibility": "public",
+          "forks": 0,
+          "open_issues": 29,
+          "watchers": 1,
+          "default_branch": "main"
+        }
+      },
+      "base": {
+        "label": "thekevinscott:main",
+        "ref": "main",
+        "sha": "e96b6abccf6cf24f7b0dfb47be8d491459baec5b",
+        "user": {
+          "login": "thekevinscott",
+          "id": 151596,
+          "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+          "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/thekevinscott",
+          "html_url": "https://github.com/thekevinscott",
+          "followers_url": "https://api.github.com/users/thekevinscott/followers",
+          "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+          "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+          "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+          "repos_url": "https://api.github.com/users/thekevinscott/repos",
+          "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "repo": {
+          "id": 1339618939,
+          "node_id": "R_kgDOT9j2ew",
+          "name": "willfire",
+          "full_name": "thekevinscott/willfire",
+          "private": false,
+          "owner": {
+            "login": "thekevinscott",
+            "id": 151596,
+            "node_id": "MDQ6VXNlcjE1MTU5Ng==",
+            "avatar_url": "https://avatars.githubusercontent.com/u/151596?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/thekevinscott",
+            "html_url": "https://github.com/thekevinscott",
+            "followers_url": "https://api.github.com/users/thekevinscott/followers",
+            "following_url": "https://api.github.com/users/thekevinscott/following{/other_user}",
+            "gists_url": "https://api.github.com/users/thekevinscott/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/thekevinscott/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/thekevinscott/subscriptions",
+            "organizations_url": "https://api.github.com/users/thekevinscott/orgs",
+            "repos_url": "https://api.github.com/users/thekevinscott/repos",
+            "events_url": "https://api.github.com/users/thekevinscott/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/thekevinscott/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "html_url": "https://github.com/thekevinscott/willfire",
+          "description": "Predict the set of CI check entries GitHub Actions will create for a PR",
+          "fork": false,
+          "url": "https://api.github.com/repos/thekevinscott/willfire",
+          "forks_url": "https://api.github.com/repos/thekevinscott/willfire/forks",
+          "keys_url": "https://api.github.com/repos/thekevinscott/willfire/keys{/key_id}",
+          "collaborators_url": "https://api.github.com/repos/thekevinscott/willfire/collaborators{/collaborator}",
+          "teams_url": "https://api.github.com/repos/thekevinscott/willfire/teams",
+          "hooks_url": "https://api.github.com/repos/thekevinscott/willfire/hooks",
+          "issue_events_url": "https://api.github.com/repos/thekevinscott/willfire/issues/events{/number}",
+          "events_url": "https://api.github.com/repos/thekevinscott/willfire/events",
+          "assignees_url": "https://api.github.com/repos/thekevinscott/willfire/assignees{/user}",
+          "branches_url": "https://api.github.com/repos/thekevinscott/willfire/branches{/branch}",
+          "tags_url": "https://api.github.com/repos/thekevinscott/willfire/tags",
+          "blobs_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs{/sha}",
+          "git_tags_url": "https://api.github.com/repos/thekevinscott/willfire/git/tags{/sha}",
+          "git_refs_url": "https://api.github.com/repos/thekevinscott/willfire/git/refs{/sha}",
+          "trees_url": "https://api.github.com/repos/thekevinscott/willfire/git/trees{/sha}",
+          "statuses_url": "https://api.github.com/repos/thekevinscott/willfire/statuses/{sha}",
+          "languages_url": "https://api.github.com/repos/thekevinscott/willfire/languages",
+          "stargazers_url": "https://api.github.com/repos/thekevinscott/willfire/stargazers",
+          "contributors_url": "https://api.github.com/repos/thekevinscott/willfire/contributors",
+          "subscribers_url": "https://api.github.com/repos/thekevinscott/willfire/subscribers",
+          "subscription_url": "https://api.github.com/repos/thekevinscott/willfire/subscription",
+          "commits_url": "https://api.github.com/repos/thekevinscott/willfire/commits{/sha}",
+          "git_commits_url": "https://api.github.com/repos/thekevinscott/willfire/git/commits{/sha}",
+          "comments_url": "https://api.github.com/repos/thekevinscott/willfire/comments{/number}",
+          "issue_comment_url": "https://api.github.com/repos/thekevinscott/willfire/issues/comments{/number}",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/{+path}",
+          "compare_url": "https://api.github.com/repos/thekevinscott/willfire/compare/{base}...{head}",
+          "merges_url": "https://api.github.com/repos/thekevinscott/willfire/merges",
+          "archive_url": "https://api.github.com/repos/thekevinscott/willfire/{archive_format}{/ref}",
+          "downloads_url": "https://api.github.com/repos/thekevinscott/willfire/downloads",
+          "issues_url": "https://api.github.com/repos/thekevinscott/willfire/issues{/number}",
+          "pulls_url": "https://api.github.com/repos/thekevinscott/willfire/pulls{/number}",
+          "milestones_url": "https://api.github.com/repos/thekevinscott/willfire/milestones{/number}",
+          "notifications_url": "https://api.github.com/repos/thekevinscott/willfire/notifications{?since,all,participating}",
+          "labels_url": "https://api.github.com/repos/thekevinscott/willfire/labels{/name}",
+          "releases_url": "https://api.github.com/repos/thekevinscott/willfire/releases{/id}",
+          "deployments_url": "https://api.github.com/repos/thekevinscott/willfire/deployments",
+          "created_at": "2026-08-19T13:30:06Z",
+          "updated_at": "2026-09-28T11:36:35Z",
+          "pushed_at": "2026-09-28T11:45:57Z",
+          "git_url": "git://github.com/thekevinscott/willfire.git",
+          "ssh_url": "git@github.com:thekevinscott/willfire.git",
+          "clone_url": "https://github.com/thekevinscott/willfire.git",
+          "svn_url": "https://github.com/thekevinscott/willfire",
+          "homepage": null,
+          "size": 32507,
+          "stargazers_count": 1,
+          "watchers_count": 1,
+          "language": "TypeScript",
+          "has_issues": true,
+          "has_projects": true,
+          "has_downloads": false,
+          "has_wiki": true,
+          "has_pages": false,
+          "has_discussions": false,
+          "forks_count": 0,
+          "mirror_url": null,
+          "archived": false,
+          "disabled": false,
+          "open_issues_count": 29,
+          "license": {
+            "key": "mit",
+            "name": "MIT License",
+            "spdx_id": "MIT",
+            "url": "https://api.github.com/licenses/mit",
+            "node_id": "MDc6TGljZW5zZTEz"
+          },
+          "allow_forking": true,
+          "is_template": false,
+          "web_commit_signoff_required": false,
+          "has_pull_requests": true,
+          "pull_request_creation_policy": "all",
+          "topics": [],
+          "visibility": "public",
+          "forks": 0,
+          "open_issues": 29,
+          "watchers": 1,
+          "default_branch": "main"
+        }
+      },
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/pulls/344"
+        },
+        "html": {
+          "href": "https://github.com/thekevinscott/willfire/pull/344"
+        },
+        "issue": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/issues/344"
+        },
+        "comments": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/issues/344/comments"
+        },
+        "review_comments": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/pulls/344/comments"
+        },
+        "review_comment": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/pulls/comments{/number}"
+        },
+        "commits": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/pulls/344/commits"
+        },
+        "statuses": {
+          "href": "https://api.github.com/repos/thekevinscott/willfire/statuses/e200d441e88ab4ac2fc891d8e62e9be232051440"
+        }
+      },
+      "author_association": "COLLABORATOR",
+      "auto_merge": null,
+      "assignee": null,
+      "active_lock_reason": null,
+      "merged": false,
+      "mergeable": true,
+      "rebaseable": true,
+      "mergeable_state": "clean",
+      "merged_by": null,
+      "comments": 0,
+      "review_comments": 0,
+      "maintainer_can_modify": false,
+      "commits": 1,
+      "additions": 16,
+      "deletions": 0,
+      "changed_files": 1
+    }
+  },
+  {
+    "method": "listPullFiles",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "pull_number": 344
+    },
+    "result": [
+      {
+        "sha": "f02a8c033a5b8e5461a033774908d9cd059f7187",
+        "filename": ".github/workflows/d14-dual-trigger.yml",
+        "status": "added",
+        "additions": 16,
+        "deletions": 0,
+        "changes": 16,
+        "blob_url": "https://github.com/thekevinscott/willfire/blob/e200d441e88ab4ac2fc891d8e62e9be232051440/.github%2Fworkflows%2Fd14-dual-trigger.yml",
+        "raw_url": "https://github.com/thekevinscott/willfire/raw/e200d441e88ab4ac2fc891d8e62e9be232051440/.github%2Fworkflows%2Fd14-dual-trigger.yml",
+        "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github%2Fworkflows%2Fd14-dual-trigger.yml?ref=e200d441e88ab4ac2fc891d8e62e9be232051440",
+        "patch": "@@ -0,0 +1,16 @@\n+name: d14-dual-trigger\n+\n+on:\n+  push:\n+    branches: [probe/d14-dual-trigger]\n+  pull_request:\n+\n+permissions: {}\n+\n+jobs:\n+  d14-dual:\n+    name: d14-dual\n+    runs-on: ubuntu-latest\n+    timeout-minutes: 2\n+    steps:\n+      - run: 'true'"
+      }
+    ]
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "sha": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+      "node_id": "C_kwDOT9j2e9oAKGQwY2Y1MDY1NzJkMjE1ZWUxYmNlNmJiMGZjN2U4ZDk1YjlmMTAwYjI",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-28T11:46:02Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-09-28T11:46:02Z"
+        },
+        "message": "Merge e200d441e88ab4ac2fc891d8e62e9be232051440 into e96b6abccf6cf24f7b0dfb47be8d491459baec5b",
+        "tree": {
+          "sha": "e31af8145f2eeaaafe1d4323c8e5cec6b96e9df7",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/git/trees/e31af8145f2eeaaafe1d4323c8e5cec6b96e9df7"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/willfire/git/commits/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqulN6CRC1aQ7uu5UhlAAA/1QQAECLAQAdVXGC5fOEVey2waiZ\n3KgJcs8tySvc6BUhy+XcGCcjf4JS4d+ymFR+tB2aSKuxrjrzTpWNdZJH6Jgu94Tv\nNMLlqnCORcGuRDZEzLDS2kCf0pBVOZMx/VyIFHh3HkLYQRl+W8eaACaccR2Hg5+c\nNltaF8JGndcgylbNPV4ce1FmVNhTg3Z3J6CIIqnk4ux+jHaI/eeR8Oj+mtc9oLPr\nT4oaE8bmAv9SiOGSazCaWREew320gRlsxreaJ0iN3Hewr4LKefTrjOTgV+wRXj9D\nlrw0LUmhvKgx8UBJuZS28V5oAH0s9M4uMZ/eMGVkbAem4D0+t8lp5yZOcIfXzKDh\n+UstbTrQySsitFOOUe5UWOm1Kbs4e4Y++72jNcX5o1Tvumgy5AwDGHp0niR+DaX/\nC/vXTf4FS79LJj9m/2EsvDuNPYf90J/SfpkZ6IkrkESYL7gqjpUbYxaEeu0Uw1/A\nqygnn/H02XZ8fxpuKSkUyADfFY5fm4UEX5U8EWM9DBBUfPWjQ4YzwD4vs4ZWKV+C\nLohq0+PkYeN0lwsij0UUsZ0RJo3RSvoBuu5dWw8ziG0loERDyJA0I4MZrXJLMrrk\np+7LeKi/dxZsnv/mGZxATgR/iAgh259qTW0rmfg1YnhoTKCkuIAVZb0ikfeCpDjA\ndUfNukwa4b+LQTEuKgyq\n=ZNIm\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree e31af8145f2eeaaafe1d4323c8e5cec6b96e9df7\nparent e96b6abccf6cf24f7b0dfb47be8d491459baec5b\nparent e200d441e88ab4ac2fc891d8e62e9be232051440\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790595962 -0400\ncommitter GitHub <noreply@github.com> 1790595962 -0400\n\nMerge e200d441e88ab4ac2fc891d8e62e9be232051440 into e96b6abccf6cf24f7b0dfb47be8d491459baec5b\n",
+          "verified_at": "2026-09-28T11:46:02Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/willfire/commits/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+      "html_url": "https://github.com/thekevinscott/willfire/commit/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+      "comments_url": "https://api.github.com/repos/thekevinscott/willfire/commits/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "e96b6abccf6cf24f7b0dfb47be8d491459baec5b",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/e96b6abccf6cf24f7b0dfb47be8d491459baec5b",
+          "html_url": "https://github.com/thekevinscott/willfire/commit/e96b6abccf6cf24f7b0dfb47be8d491459baec5b"
+        },
+        {
+          "sha": "e200d441e88ab4ac2fc891d8e62e9be232051440",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/e200d441e88ab4ac2fc891d8e62e9be232051440",
+          "html_url": "https://github.com/thekevinscott/willfire/commit/e200d441e88ab4ac2fc891d8e62e9be232051440"
+        }
+      ],
+      "stats": {
+        "total": 16,
+        "additions": 16,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "f02a8c033a5b8e5461a033774908d9cd059f7187",
+          "filename": ".github/workflows/d14-dual-trigger.yml",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github%2Fworkflows%2Fd14-dual-trigger.yml",
+          "raw_url": "https://github.com/thekevinscott/willfire/raw/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github%2Fworkflows%2Fd14-dual-trigger.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github%2Fworkflows%2Fd14-dual-trigger.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+          "patch": "@@ -0,0 +1,16 @@\n+name: d14-dual-trigger\n+\n+on:\n+  push:\n+    branches: [probe/d14-dual-trigger]\n+  pull_request:\n+\n+permissions: {}\n+\n+jobs:\n+  d14-dual:\n+    name: d14-dual\n+    runs-on: ubuntu-latest\n+    timeout-minutes: 2\n+    steps:\n+      - run: 'true'"
+        }
+      ]
+    }
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "ref": "main"
+    },
+    "result": {
+      "sha": "e96b6abccf6cf24f7b0dfb47be8d491459baec5b",
+      "node_id": "C_kwDOT9j2e9oAKGU5NmI2YWJjY2Y2Y2YyNGY3YjBkZmI0N2JlOGQ0OTE0NTliYWVjNWI",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-28T11:36:29Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-09-28T11:36:29Z"
+        },
+        "message": "Permanent pull_request_target no-op for case D13 (#338)\n\npull_request_target reads from the default branch, so the D13 capture\n(#328) needs this to live on main. No checkout, no permissions, no-op.\n\nrelease: skip",
+        "tree": {
+          "sha": "b8efaaaffa00eaf8b278521fcf7f9765214b086e",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/git/trees/b8efaaaffa00eaf8b278521fcf7f9765214b086e"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/willfire/git/commits/e96b6abccf6cf24f7b0dfb47be8d491459baec5b",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqulE9CRC1aQ7uu5UhlAAAKEEQAINVKRrKdaAgfTOZYznizPuW\nXW+K4/8a1raRgVNKGn/Ko3Gu85u9PjIkBC8Y9Yw+My8BsM3whpZEqc65g9zJv0/5\nai80TnS1ZHEB0nVQItSl7zq3C2Ru53aKcnjTT2TyFfliQHHA4A3GgH6B0g/MhVob\nFBz6tSjXijvJ1zrmX0XmdshPBtnpISlyLdljjPxxnKH9hQzIGvgDGnHvT8NzAfvu\noiQz6HacWpbjxJucio7ScC1LxFfhwPu+wz6OOCkEG7KlwtVt/LylNeVrnyY4rflk\nHv9B9CD2D9Xzwn/t0ESNP95k+uhWrCILczwx34ybxqDWfA4dZiDG7z8SDacVbU9Y\nRQmCnGLIFyE2d87jaimH9EA3KK12AKdU0BVR21Zndska5piMsOMbG5M2m+fF31oe\n40WqTB+uwRJ1up0b1uERxor6kg1jbYi5yAMb0HdZNjf+nV/2Xntdzr6vBodUZTkX\nGONQqNy8AyPX+yS5bCgW3ohG9/I9GTNeO6uN7WeMLVaclcBQxAfLzdR3drYf+n/V\nkAj9tU6lQAApQDe279GIEdUE3+e8m1gY907re3342muPBBrmTtdcpSNYNx+7YNFK\ny10xv8VQPXOVbfSfX8PcxnXz3ZM7Yp8tByb6fM824oj1htkP69d1Dp6juHz7ujv8\n72/e5zfdwEUxrfe9Auif\n=y8Iz\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree b8efaaaffa00eaf8b278521fcf7f9765214b086e\nparent 4bba2640e97e79fed517e52be33b820fcfe10f01\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790595389 -0400\ncommitter GitHub <noreply@github.com> 1790595389 +0000\n\nPermanent pull_request_target no-op for case D13 (#338)\n\npull_request_target reads from the default branch, so the D13 capture\n(#328) needs this to live on main. No checkout, no permissions, no-op.\n\nrelease: skip",
+          "verified_at": "2026-09-28T11:36:30Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/willfire/commits/e96b6abccf6cf24f7b0dfb47be8d491459baec5b",
+      "html_url": "https://github.com/thekevinscott/willfire/commit/e96b6abccf6cf24f7b0dfb47be8d491459baec5b",
+      "comments_url": "https://api.github.com/repos/thekevinscott/willfire/commits/e96b6abccf6cf24f7b0dfb47be8d491459baec5b/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "4bba2640e97e79fed517e52be33b820fcfe10f01",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/4bba2640e97e79fed517e52be33b820fcfe10f01",
+          "html_url": "https://github.com/thekevinscott/willfire/commit/4bba2640e97e79fed517e52be33b820fcfe10f01"
+        }
+      ],
+      "stats": {
+        "total": 17,
+        "additions": 17,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "b043948102324f2ef7445d49333562d361b5f069",
+          "filename": ".github/workflows/prt-noop.yml",
+          "status": "added",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/thekevinscott/willfire/blob/e96b6abccf6cf24f7b0dfb47be8d491459baec5b/.github%2Fworkflows%2Fprt-noop.yml",
+          "raw_url": "https://github.com/thekevinscott/willfire/raw/e96b6abccf6cf24f7b0dfb47be8d491459baec5b/.github%2Fworkflows%2Fprt-noop.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github%2Fworkflows%2Fprt-noop.yml?ref=e96b6abccf6cf24f7b0dfb47be8d491459baec5b",
+          "patch": "@@ -0,0 +1,17 @@\n+name: prt-noop\n+\n+# Permanent probe for case D13 (#328): pull_request_target is read from the\n+# default branch, so the only way a prediction of it can be exercised is a\n+# workflow that lives here forever.\n+on:\n+  pull_request_target:\n+\n+permissions: {}\n+\n+jobs:\n+  prt-noop:\n+    name: prt-noop\n+    runs-on: ubuntu-latest\n+    timeout-minutes: 2\n+    steps:\n+      - run: 'true'"
+        }
+      ]
+    }
+  },
+  {
+    "method": "getCommit",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "ref": "e200d441e88ab4ac2fc891d8e62e9be232051440"
+    },
+    "result": {
+      "sha": "e200d441e88ab4ac2fc891d8e62e9be232051440",
+      "node_id": "C_kwDOT9j2e9oAKGUyMDBkNDQxZTg4YWI0YWMyZmM4OTFkOGU2MmU5YmUyMzIwNTE0NDA",
+      "commit": {
+        "author": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-28T11:45:47Z"
+        },
+        "committer": {
+          "name": "thekevinbot",
+          "email": "248217931+thekevinbot@users.noreply.github.com",
+          "date": "2026-09-28T11:45:47Z"
+        },
+        "message": "Probe workflow for case D14: push + pull_request on one workflow",
+        "tree": {
+          "sha": "e31af8145f2eeaaafe1d4323c8e5cec6b96e9df7",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/git/trees/e31af8145f2eeaaafe1d4323c8e5cec6b96e9df7"
+        },
+        "url": "https://api.github.com/repos/thekevinscott/willfire/git/commits/e200d441e88ab4ac2fc891d8e62e9be232051440",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCgAdFiEEnU3Dh/cnWdmpxUeIBqUoxO3sGUIFAmq6U2sACgkQBqUoxO3s\nGUI7nxAAg9dTQ+umm/euTDjo9AVYSKZ+7LZ3PLjSUhMgF79VLGCjs+pW0mzxIh/l\nS1ZMGYBwZK3h40IN46sCpw/OXjbPKL7udGt7Y4X+pPDtrRobb9FARvTHrGDdzPfa\naqq//PQNtd8wusxrajge3lSjzk6em7mD7mkMfQrDFHmZV/NrODSIZMic1R92qWS7\n4Nm6OgB4i211Gei+dfYTZkXh93Z9JO8EU1eOeSN9kf6CrVh9iTJaUlGkB35ftD8C\nXpM5+XfibBnzXzenso8ySO1YWaQwbWiO3YwSazuHOl4KaCH545e9uOPLgDacwy3/\n8iAHYCmYqxEPWlDXmET2wFxUpBHooASardae0n58QPzB57aYb9nTIqITQcT5G+8N\nCVeVECsZnsVjcQaOtyimNUIjnpFAEwI5ZmDBnWcS3Dmzt7OIINptc7LLw5jS+TFt\nfddCrowNOpUgFDjfDs5Y0AIm5aqBAa8rRBYaP03hPb+4niQpPYFq6f2HpueNQTZp\nfG5FybaHZge2Gy+QgNe411sWAr0bGhZ7K4TogYkkvLNbgapkfQxR9HZVSGYVh7qd\njQl3KQrOttWIyVJwi4PPJzc0Oh0s3K4OAa6qMI4wb0Ze7rrD/b+lXgmN/saVpt00\nar6q3HiV4TXb/1MNlIDX0YdkEZxEmpRYMaAJjWKQrGgFKEJwIzs=\n=N8x5\n-----END PGP SIGNATURE-----",
+          "payload": "tree e31af8145f2eeaaafe1d4323c8e5cec6b96e9df7\nparent e96b6abccf6cf24f7b0dfb47be8d491459baec5b\nauthor thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790595947 -0400\ncommitter thekevinbot <248217931+thekevinbot@users.noreply.github.com> 1790595947 -0400\n\nProbe workflow for case D14: push + pull_request on one workflow\n",
+          "verified_at": "2026-09-28T11:45:53Z"
+        }
+      },
+      "url": "https://api.github.com/repos/thekevinscott/willfire/commits/e200d441e88ab4ac2fc891d8e62e9be232051440",
+      "html_url": "https://github.com/thekevinscott/willfire/commit/e200d441e88ab4ac2fc891d8e62e9be232051440",
+      "comments_url": "https://api.github.com/repos/thekevinscott/willfire/commits/e200d441e88ab4ac2fc891d8e62e9be232051440/comments",
+      "author": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "thekevinbot",
+        "id": 248217931,
+        "node_id": "U_kgDODsuBSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/248217931?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/thekevinbot",
+        "html_url": "https://github.com/thekevinbot",
+        "followers_url": "https://api.github.com/users/thekevinbot/followers",
+        "following_url": "https://api.github.com/users/thekevinbot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/thekevinbot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/thekevinbot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/thekevinbot/subscriptions",
+        "organizations_url": "https://api.github.com/users/thekevinbot/orgs",
+        "repos_url": "https://api.github.com/users/thekevinbot/repos",
+        "events_url": "https://api.github.com/users/thekevinbot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/thekevinbot/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "e96b6abccf6cf24f7b0dfb47be8d491459baec5b",
+          "url": "https://api.github.com/repos/thekevinscott/willfire/commits/e96b6abccf6cf24f7b0dfb47be8d491459baec5b",
+          "html_url": "https://github.com/thekevinscott/willfire/commit/e96b6abccf6cf24f7b0dfb47be8d491459baec5b"
+        }
+      ],
+      "stats": {
+        "total": 16,
+        "additions": 16,
+        "deletions": 0
+      },
+      "files": [
+        {
+          "sha": "f02a8c033a5b8e5461a033774908d9cd059f7187",
+          "filename": ".github/workflows/d14-dual-trigger.yml",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/thekevinscott/willfire/blob/e200d441e88ab4ac2fc891d8e62e9be232051440/.github%2Fworkflows%2Fd14-dual-trigger.yml",
+          "raw_url": "https://github.com/thekevinscott/willfire/raw/e200d441e88ab4ac2fc891d8e62e9be232051440/.github%2Fworkflows%2Fd14-dual-trigger.yml",
+          "contents_url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github%2Fworkflows%2Fd14-dual-trigger.yml?ref=e200d441e88ab4ac2fc891d8e62e9be232051440",
+          "patch": "@@ -0,0 +1,16 @@\n+name: d14-dual-trigger\n+\n+on:\n+  push:\n+    branches: [probe/d14-dual-trigger]\n+  pull_request:\n+\n+permissions: {}\n+\n+jobs:\n+  d14-dual:\n+    name: d14-dual\n+    runs-on: ubuntu-latest\n+    timeout-minutes: 2\n+    steps:\n+      - run: 'true'"
+        }
+      ]
+    }
+  },
+  {
+    "method": "listWorkflows",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire"
+    },
+    "result": [
+      {
+        "id": 337832515,
+        "node_id": "W_kwDOT9j2e84UIupD",
+        "name": "putitoutthere check",
+        "path": ".github/workflows/check.yml",
+        "state": "active",
+        "created_at": "2026-08-19T09:40:02.000-04:00",
+        "updated_at": "2026-08-19T09:41:05.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/337832515",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/check.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/putitoutthere%20check/badge.svg"
+      },
+      {
+        "id": 347063166,
+        "node_id": "W_kwDOT9j2e84Ur8N-",
+        "name": "Testing Conventions (willfire)",
+        "path": ".github/workflows/conventions-src.yml",
+        "state": "active",
+        "created_at": "2026-08-31T20:13:30.000-04:00",
+        "updated_at": "2026-08-31T20:16:55.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/347063166",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/conventions-src.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/Testing%20Conventions%20(willfire)/badge.svg"
+      },
+      {
+        "id": 369059094,
+        "node_id": "W_kwDOT9j2e84V_2UW",
+        "name": "d14-dual-trigger",
+        "path": ".github/workflows/d14-dual-trigger.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:45:54.000-04:00",
+        "updated_at": "2026-09-28T07:45:54.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369059094",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/d14-dual-trigger.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/d14-dual-trigger/badge.svg"
+      },
+      {
+        "id": 369041839,
+        "node_id": "W_kwDOT9j2e84V_yGv",
+        "name": "integration",
+        "path": ".github/workflows/integration.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:24:39.000-04:00",
+        "updated_at": "2026-09-28T07:32:22.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369041839",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/integration.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/integration/badge.svg"
+      },
+      {
+        "id": 343919555,
+        "node_id": "W_kwDOT9j2e84Uf8vD",
+        "name": "lint",
+        "path": ".github/workflows/lint.yml",
+        "state": "active",
+        "created_at": "2026-08-27T12:01:09.000-04:00",
+        "updated_at": "2026-08-27T12:11:14.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/343919555",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/lint.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/lint/badge.svg"
+      },
+      {
+        "id": 338727184,
+        "node_id": "W_kwDOT9j2e84UMJEQ",
+        "name": "PR Monitor",
+        "path": ".github/workflows/pr-monitor.yml",
+        "state": "active",
+        "created_at": "2026-08-20T11:41:40.000-04:00",
+        "updated_at": "2026-08-20T12:16:44.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/338727184",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/pr-monitor.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/PR%20Monitor/badge.svg"
+      },
+      {
+        "id": 367845082,
+        "node_id": "W_kwDOT9j2e84V7N7a",
+        "name": "probe-cross-repo-gates",
+        "path": ".github/workflows/probe-cross-repo-gates.yml",
+        "state": "active",
+        "created_at": "2026-09-26T13:32:45.000-04:00",
+        "updated_at": "2026-09-26T13:32:45.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/367845082",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-cross-repo-gates.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/probe-cross-repo-gates/badge.svg"
+      },
+      {
+        "id": 367402113,
+        "node_id": "W_kwDOT9j2e84V5hyB",
+        "name": "probe-d6-any-base",
+        "path": ".github/workflows/probe-d6-any-base.yml",
+        "state": "active",
+        "created_at": "2026-09-25T20:42:01.000-04:00",
+        "updated_at": "2026-09-25T20:42:01.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/367402113",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-d6-any-base.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/probe-d6-any-base/badge.svg"
+      },
+      {
+        "id": 367401976,
+        "node_id": "W_kwDOT9j2e84V5hv4",
+        "name": "probe-d7",
+        "path": ".github/workflows/probe-d7.yml",
+        "state": "active",
+        "created_at": "2026-09-25T20:41:36.000-04:00",
+        "updated_at": "2026-09-25T20:41:36.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/367401976",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-d7.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/probe-d7/badge.svg"
+      },
+      {
+        "id": 367842380,
+        "node_id": "W_kwDOT9j2e84V7NRM",
+        "name": "probe-dispatch",
+        "path": ".github/workflows/probe-dispatch.yml",
+        "state": "active",
+        "created_at": "2026-09-26T13:27:46.000-04:00",
+        "updated_at": "2026-09-26T13:27:46.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/367842380",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-dispatch.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/probe-dispatch/badge.svg"
+      },
+      {
+        "id": 369031018,
+        "node_id": "W_kwDOT9j2e84V_vdq",
+        "name": "probe J11 matrix exclude include",
+        "path": ".github/workflows/probe-j11.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:10:41.000-04:00",
+        "updated_at": "2026-09-28T07:10:41.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369031018",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-j11.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/probe%20J11%20matrix%20exclude%20include/badge.svg"
+      },
+      {
+        "id": 369033399,
+        "node_id": "W_kwDOT9j2e84V_wC3",
+        "name": "probe J12 caller workflow name abcdefghijklmnopqrstuvwxyz",
+        "path": ".github/workflows/probe-j12.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:13:52.000-04:00",
+        "updated_at": "2026-09-28T07:13:52.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369033399",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-j12.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/probe%20J12%20caller%20workflow%20name%20abcdefghijklmnopqrstuvwxyz/badge.svg"
+      },
+      {
+        "id": 367401977,
+        "node_id": "W_kwDOT9j2e84V5hv5",
+        "name": "probe-jobs",
+        "path": ".github/workflows/probe-jobs.yml",
+        "state": "active",
+        "created_at": "2026-09-25T20:41:36.000-04:00",
+        "updated_at": "2026-09-25T20:41:36.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/367401977",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-jobs.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/probe-jobs/badge.svg"
+      },
+      {
+        "id": 369051877,
+        "node_id": "W_kwDOT9j2e84V_0jl",
+        "name": "probe-p6",
+        "path": ".github/workflows/probe-p6.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:36:42.000-04:00",
+        "updated_at": "2026-09-28T07:36:42.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369051877",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-p6.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/probe-p6/badge.svg"
+      },
+      {
+        "id": 369035132,
+        "node_id": "W_kwDOT9j2e84V_wd8",
+        "name": "probe R11 nine reusable levels",
+        "path": ".github/workflows/probe-r11.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:16:04.000-04:00",
+        "updated_at": "2026-09-28T07:16:04.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369035132",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-r11.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/probe%20R11%20nine%20reusable%20levels/badge.svg"
+      },
+      {
+        "id": 369051502,
+        "node_id": "W_kwDOT9j2e84V_0du",
+        "name": "probe-r12",
+        "path": ".github/workflows/probe-r12-caller.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:36:16.000-04:00",
+        "updated_at": "2026-09-28T07:36:16.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369051502",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-r12-caller.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/probe-r12/badge.svg"
+      },
+      {
+        "id": 369055434,
+        "node_id": "W_kwDOT9j2e84V_1bK",
+        "name": ".github/workflows/probe-r12b-caller.yml",
+        "path": ".github/workflows/probe-r12b-caller.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:41:27.000-04:00",
+        "updated_at": "2026-09-28T07:41:27.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369055434",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-r12b-caller.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/.github/workflows/probe-r12b-caller.yml/badge.svg"
+      },
+      {
+        "id": 369056751,
+        "node_id": "W_kwDOT9j2e84V_1vv",
+        "name": "probe-r12c-d10",
+        "path": ".github/workflows/probe-r12c-d10.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:43:07.000-04:00",
+        "updated_at": "2026-09-28T07:43:07.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369056751",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-r12c-d10.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/probe-r12c-d10/badge.svg"
+      },
+      {
+        "id": 369056744,
+        "node_id": "W_kwDOT9j2e84V_1vo",
+        "name": ".github/workflows/probe-r12c-d11.yml",
+        "path": ".github/workflows/probe-r12c-d11.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:43:06.000-04:00",
+        "updated_at": "2026-09-28T07:43:06.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369056744",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-r12c-d11.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/.github/workflows/probe-r12c-d11.yml/badge.svg"
+      },
+      {
+        "id": 369056742,
+        "node_id": "W_kwDOT9j2e84V_1vm",
+        "name": ".github/workflows/probe-r12c-d12.yml",
+        "path": ".github/workflows/probe-r12c-d12.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:43:06.000-04:00",
+        "updated_at": "2026-09-28T07:43:06.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369056742",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-r12c-d12.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/.github/workflows/probe-r12c-d12.yml/badge.svg"
+      },
+      {
+        "id": 369056736,
+        "node_id": "W_kwDOT9j2e84V_1vg",
+        "name": ".github/workflows/probe-r12c-d13.yml",
+        "path": ".github/workflows/probe-r12c-d13.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:43:06.000-04:00",
+        "updated_at": "2026-09-28T07:43:06.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369056736",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-r12c-d13.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/.github/workflows/probe-r12c-d13.yml/badge.svg"
+      },
+      {
+        "id": 369056734,
+        "node_id": "W_kwDOT9j2e84V_1ve",
+        "name": ".github/workflows/probe-r12c-d14.yml",
+        "path": ".github/workflows/probe-r12c-d14.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:43:06.000-04:00",
+        "updated_at": "2026-09-28T07:43:06.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369056734",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-r12c-d14.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/.github/workflows/probe-r12c-d14.yml/badge.svg"
+      },
+      {
+        "id": 369056729,
+        "node_id": "W_kwDOT9j2e84V_1vZ",
+        "name": ".github/workflows/probe-r12c-d15.yml",
+        "path": ".github/workflows/probe-r12c-d15.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:43:06.000-04:00",
+        "updated_at": "2026-09-28T07:43:06.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369056729",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-r12c-d15.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/.github/workflows/probe-r12c-d15.yml/badge.svg"
+      },
+      {
+        "id": 369056746,
+        "node_id": "W_kwDOT9j2e84V_1vq",
+        "name": ".github/workflows/probe-r12c-d16.yml",
+        "path": ".github/workflows/probe-r12c-d16.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:43:06.000-04:00",
+        "updated_at": "2026-09-28T07:43:06.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369056746",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-r12c-d16.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/.github/workflows/probe-r12c-d16.yml/badge.svg"
+      },
+      {
+        "id": 369056735,
+        "node_id": "W_kwDOT9j2e84V_1vf",
+        "name": ".github/workflows/probe-r12c-d17.yml",
+        "path": ".github/workflows/probe-r12c-d17.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:43:06.000-04:00",
+        "updated_at": "2026-09-28T07:43:06.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369056735",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-r12c-d17.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/.github/workflows/probe-r12c-d17.yml/badge.svg"
+      },
+      {
+        "id": 369056730,
+        "node_id": "W_kwDOT9j2e84V_1va",
+        "name": ".github/workflows/probe-r12c-d18.yml",
+        "path": ".github/workflows/probe-r12c-d18.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:43:06.000-04:00",
+        "updated_at": "2026-09-28T07:43:06.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369056730",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-r12c-d18.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/.github/workflows/probe-r12c-d18.yml/badge.svg"
+      },
+      {
+        "id": 369056732,
+        "node_id": "W_kwDOT9j2e84V_1vc",
+        "name": ".github/workflows/probe-r12c-d19.yml",
+        "path": ".github/workflows/probe-r12c-d19.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:43:06.000-04:00",
+        "updated_at": "2026-09-28T07:43:06.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369056732",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-r12c-d19.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/.github/workflows/probe-r12c-d19.yml/badge.svg"
+      },
+      {
+        "id": 369056737,
+        "node_id": "W_kwDOT9j2e84V_1vh",
+        "name": ".github/workflows/probe-r12c-d20.yml",
+        "path": ".github/workflows/probe-r12c-d20.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:43:06.000-04:00",
+        "updated_at": "2026-09-28T07:43:06.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369056737",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-r12c-d20.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/.github/workflows/probe-r12c-d20.yml/badge.svg"
+      },
+      {
+        "id": 369057846,
+        "node_id": "W_kwDOT9j2e84V_2A2",
+        "name": ".github/workflows/probe-r12d-mixed.yml",
+        "path": ".github/workflows/probe-r12d-mixed.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:44:32.000-04:00",
+        "updated_at": "2026-09-28T07:44:32.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369057846",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/probe-r12d-mixed.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/.github/workflows/probe-r12d-mixed.yml/badge.svg"
+      },
+      {
+        "id": 369051720,
+        "node_id": "W_kwDOT9j2e84V_0hI",
+        "name": "prt-noop",
+        "path": ".github/workflows/prt-noop.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:36:31.000-04:00",
+        "updated_at": "2026-09-28T07:36:31.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369051720",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/prt-noop.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/prt-noop/badge.svg"
+      },
+      {
+        "id": 337833212,
+        "node_id": "W_kwDOT9j2e84UIuz8",
+        "name": "Release",
+        "path": ".github/workflows/release.yml",
+        "state": "active",
+        "created_at": "2026-08-19T09:41:05.000-04:00",
+        "updated_at": "2026-08-19T09:41:05.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/337833212",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/release.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/Release/badge.svg"
+      },
+      {
+        "id": 369041840,
+        "node_id": "W_kwDOT9j2e84V_yGw",
+        "name": "typecheck",
+        "path": ".github/workflows/typecheck.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:24:39.000-04:00",
+        "updated_at": "2026-09-28T07:32:22.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369041840",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/typecheck.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/typecheck/badge.svg"
+      },
+      {
+        "id": 369041838,
+        "node_id": "W_kwDOT9j2e84V_yGu",
+        "name": "unit",
+        "path": ".github/workflows/unit.yml",
+        "state": "active",
+        "created_at": "2026-09-28T07:24:39.000-04:00",
+        "updated_at": "2026-09-28T07:32:22.000-04:00",
+        "url": "https://api.github.com/repos/thekevinscott/willfire/actions/workflows/369041838",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/main/.github/workflows/unit.yml",
+        "badge_url": "https://github.com/thekevinscott/willfire/workflows/unit/badge.svg"
+      }
+    ]
+  },
+  {
+    "method": "listWorkflowFiles",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": [
+      {
+        "name": "check.yml",
+        "path": ".github/workflows/check.yml",
+        "sha": "1123e982399b0c237670b255b32b39ee35ff2b1e",
+        "size": 320,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/check.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/check.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/1123e982399b0c237670b255b32b39ee35ff2b1e",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/check.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/check.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/1123e982399b0c237670b255b32b39ee35ff2b1e",
+          "html": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/check.yml"
+        }
+      },
+      {
+        "name": "conventions-src.yml",
+        "path": ".github/workflows/conventions-src.yml",
+        "sha": "6a252bff7fa64486289c664c1796f7fca32f893c",
+        "size": 1372,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/conventions-src.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/conventions-src.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/6a252bff7fa64486289c664c1796f7fca32f893c",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/conventions-src.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/conventions-src.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/6a252bff7fa64486289c664c1796f7fca32f893c",
+          "html": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/conventions-src.yml"
+        }
+      },
+      {
+        "name": "d14-dual-trigger.yml",
+        "path": ".github/workflows/d14-dual-trigger.yml",
+        "sha": "f02a8c033a5b8e5461a033774908d9cd059f7187",
+        "size": 227,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/d14-dual-trigger.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/d14-dual-trigger.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/f02a8c033a5b8e5461a033774908d9cd059f7187",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/d14-dual-trigger.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/d14-dual-trigger.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/f02a8c033a5b8e5461a033774908d9cd059f7187",
+          "html": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/d14-dual-trigger.yml"
+        }
+      },
+      {
+        "name": "integration.yml",
+        "path": ".github/workflows/integration.yml",
+        "sha": "96fb9220cbe0ab38339fc34cc30fd7df4ed2a976",
+        "size": 1117,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/integration.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/integration.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/96fb9220cbe0ab38339fc34cc30fd7df4ed2a976",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/integration.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/integration.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/96fb9220cbe0ab38339fc34cc30fd7df4ed2a976",
+          "html": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/integration.yml"
+        }
+      },
+      {
+        "name": "lint.yml",
+        "path": ".github/workflows/lint.yml",
+        "sha": "ee629f13af169e3e2d19558f5e2ca72b38585b8b",
+        "size": 725,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/lint.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/lint.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/ee629f13af169e3e2d19558f5e2ca72b38585b8b",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/lint.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/lint.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/ee629f13af169e3e2d19558f5e2ca72b38585b8b",
+          "html": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/lint.yml"
+        }
+      },
+      {
+        "name": "pr-monitor.yml",
+        "path": ".github/workflows/pr-monitor.yml",
+        "sha": "f90c7a95c4a7cf2ba8aa51737f14cfb2159663a7",
+        "size": 520,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/pr-monitor.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/pr-monitor.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/f90c7a95c4a7cf2ba8aa51737f14cfb2159663a7",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/pr-monitor.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/pr-monitor.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/f90c7a95c4a7cf2ba8aa51737f14cfb2159663a7",
+          "html": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/pr-monitor.yml"
+        }
+      },
+      {
+        "name": "prt-noop.yml",
+        "path": ".github/workflows/prt-noop.yml",
+        "sha": "b043948102324f2ef7445d49333562d361b5f069",
+        "size": 366,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/prt-noop.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/prt-noop.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/b043948102324f2ef7445d49333562d361b5f069",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/prt-noop.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/prt-noop.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/b043948102324f2ef7445d49333562d361b5f069",
+          "html": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/prt-noop.yml"
+        }
+      },
+      {
+        "name": "release.yml",
+        "path": ".github/workflows/release.yml",
+        "sha": "598acec69c3873f20f45bf661340fd3688de8685",
+        "size": 2281,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/release.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/release.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/598acec69c3873f20f45bf661340fd3688de8685",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/release.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/release.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/598acec69c3873f20f45bf661340fd3688de8685",
+          "html": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/release.yml"
+        }
+      },
+      {
+        "name": "typecheck.yml",
+        "path": ".github/workflows/typecheck.yml",
+        "sha": "4e36b5de6fb30313b01a23c6e3cb08382c9e26cb",
+        "size": 760,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/typecheck.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/typecheck.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/4e36b5de6fb30313b01a23c6e3cb08382c9e26cb",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/typecheck.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/typecheck.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/4e36b5de6fb30313b01a23c6e3cb08382c9e26cb",
+          "html": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/typecheck.yml"
+        }
+      },
+      {
+        "name": "unit.yml",
+        "path": ".github/workflows/unit.yml",
+        "sha": "8d7e6cf960213a347e89b62361acc4fc682d9750",
+        "size": 912,
+        "url": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/unit.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+        "html_url": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/unit.yml",
+        "git_url": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/8d7e6cf960213a347e89b62361acc4fc682d9750",
+        "download_url": "https://raw.githubusercontent.com/thekevinscott/willfire/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/unit.yml",
+        "type": "file",
+        "_links": {
+          "self": "https://api.github.com/repos/thekevinscott/willfire/contents/.github/workflows/unit.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2",
+          "git": "https://api.github.com/repos/thekevinscott/willfire/git/blobs/8d7e6cf960213a347e89b62361acc4fc682d9750",
+          "html": "https://github.com/thekevinscott/willfire/blob/d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2/.github/workflows/unit.yml"
+        }
+      }
+    ]
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/check.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": "name: putitoutthere check\n\non:\n  pull_request:\n    paths:\n      - 'putitoutthere.toml'\n      - 'package.json'\n      - 'scripts/*/package.json'\n      - '.github/workflows/release.yml'\n      - '.github/workflows/check.yml'\n\njobs:\n  putitoutthere-check:\n    uses: thekevinscott/putitoutthere/.github/workflows/check.yml@v0\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/conventions-src.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": "name: Testing Conventions (willfire)\n\n# Runs the upstream testing-conventions gates over the root `willfire` package,\n# pinned to the rolling `v0` tag (the same convention as check.yml).\n#\n# Every gate runs (`gates` left at its empty default): mutation's Stryker deps\n# are in devDependencies, and `e2e-attestations/` holds the receipt the\n# e2e-verify gate checks.\n#\n# One workflow file per workspace package (docs/monorepo.md), because `paths:`\n# is per-file and each package's lane has a different trigger set.\n\non:\n  pull_request:\n    paths:\n      - 'src/**'\n      - 'e2e-attestations/**'\n      - 'package.json'\n      - 'pnpm-lock.yaml'\n      - 'pnpm-workspace.yaml'\n      - 'tsconfig.json'\n      - 'tsconfig.build.json'\n      - 'vitest.config.mts'\n      - '.github/workflows/conventions-src.yml'\n  push:\n    branches: [main]\n    paths:\n      - 'src/**'\n      - 'e2e-attestations/**'\n      - 'package.json'\n      - 'pnpm-lock.yaml'\n      - 'pnpm-workspace.yaml'\n      - 'tsconfig.json'\n      - 'tsconfig.build.json'\n      - 'vitest.config.mts'\n      - '.github/workflows/conventions-src.yml'\n\npermissions:\n  contents: read\n\njobs:\n  # Job id kept as-is: it prefixes every check name this call produces.\n  conventions:\n    uses: thekevinscott/testing-conventions/.github/workflows/testing-conventions.yml@v0\n    with:\n      languages: '[\"typescript\"]'\n      source: src\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/d14-dual-trigger.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": "name: d14-dual-trigger\n\non:\n  push:\n    branches: [probe/d14-dual-trigger]\n  pull_request:\n\npermissions: {}\n\njobs:\n  d14-dual:\n    name: d14-dual\n    runs-on: ubuntu-latest\n    timeout-minutes: 2\n    steps:\n      - run: 'true'\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/integration.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": "name: integration\n\n# The suite builds `src` and replays `tests/integration`, importing\n# `tests/cases.ts` and `tests/getResponse.ts`; `attestations.test.ts` reads\n# `e2e-attestations/`. `tests/e2e` and `tests/fixtures` are read by no CI job.\non:\n  pull_request:\n    paths:\n      - 'src/**'\n      - 'tests/integration/**'\n      - 'tests/cases.ts'\n      - 'tests/getResponse.ts'\n      - 'e2e-attestations/**'\n      - 'tsconfig.json'\n      - 'tsconfig.build.json'\n      - 'vitest.config.mts'\n      - 'package.json'\n      - 'pnpm-lock.yaml'\n      - 'pnpm-workspace.yaml'\n      - '.github/workflows/integration.yml'\n  push:\n    branches: [main]\n\nconcurrency:\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  contents: read\n\njobs:\n  integration:\n    name: integration\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v7\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v7\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm test:integration\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/lint.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": "name: lint\n\non:\n  pull_request:\n    # eslint.config.js only matches src/**/*.ts and scripts/*/src/**/*.ts.\n    paths:\n      - 'src/**'\n      - 'scripts/*/src/**'\n      - 'eslint.config.js'\n      - 'package.json'\n      - 'pnpm-lock.yaml'\n      - '.github/workflows/lint.yml'\n\nconcurrency:\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  contents: read\n\njobs:\n  lint:\n    name: lint\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v7\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v7\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm lint\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/pr-monitor.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": "name: PR Monitor\n\non:\n  pull_request:\n\nconcurrency:\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  actions: read\n  contents: read\n  pull-requests: read\n\njobs:\n  monitor:\n    name: 'CI Gate'\n    runs-on: ubuntu-latest\n    # The action has no timeout of its own (see monitor.ts) — this is the\n    # backstop. If a predicted run never dispatches, the gate waits here\n    # until the job is killed.\n    timeout-minutes: 20\n    steps:\n      - uses: thekevinscott/pr-monitor@v1\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-cross-repo-gates.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-cross-repo-gates.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-d6-any-base.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-d6-any-base.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-d7.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-d7.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-dispatch.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-dispatch.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-j11.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-j11.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-j12.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-j12.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-jobs.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-jobs.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-p6.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-p6.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-r11.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-r11.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-r12-caller.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-r12-caller.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-r12b-caller.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-r12b-caller.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-r12c-d10.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-r12c-d10.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-r12c-d11.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-r12c-d11.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-r12c-d12.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-r12c-d12.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-r12c-d13.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-r12c-d13.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-r12c-d14.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-r12c-d14.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-r12c-d15.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-r12c-d15.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-r12c-d16.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-r12c-d16.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-r12c-d17.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-r12c-d17.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-r12c-d18.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-r12c-d18.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-r12c-d19.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-r12c-d19.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-r12c-d20.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-r12c-d20.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/probe-r12d-mixed.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": {
+      "$error": {
+        "status": 404,
+        "message": "GitHub API 404 for /repos/thekevinscott/willfire/contents/.github/workflows/probe-r12d-mixed.yml?ref=d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+      }
+    }
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/prt-noop.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": "name: prt-noop\n\n# Permanent probe for case D13 (#328): pull_request_target is read from the\n# default branch, so the only way a prediction of it can be exercised is a\n# workflow that lives here forever.\non:\n  pull_request_target:\n\npermissions: {}\n\njobs:\n  prt-noop:\n    name: prt-noop\n    runs-on: ubuntu-latest\n    timeout-minutes: 2\n    steps:\n      - run: 'true'\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/release.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": "name: Release\n\n# putitoutthere's reusable workflow; config lives in `putitoutthere.toml`\n# at the repo root.\n#\n# Auth: the `NPM_TOKEN` secret is the first-publish bootstrap only —\n# Trusted Publishing on npm binds to an already-published package, so\n# the very first publish has no OIDC path. `willfire` is published:\n# register the trusted publisher (repo thekevinscott/willfire,\n# workflow release.yml, environment release), then DELETE the NPM_TOKEN\n# secret; the OIDC exchange takes over.\n#\n# Filename matters: npm's trust policy matches the caller workflow\n# filename. Renaming this file requires re-registering the trusted\n# publisher.\n\non:\n  push:\n    branches: [main]\n  workflow_dispatch:\n    inputs:\n      release_packages:\n        description: >\n          Packages to release manually, bypassing change detection.\n          Comma-separated list of name[@<bump|version>] entries, e.g.\n          \"willfire@minor\" or \"willfire@1.2.0\". Leave empty to fall back\n          to automatic change detection (same as a push).\n        required: false\n        default: ''\n\njobs:\n  release:\n    uses: thekevinscott/putitoutthere/.github/workflows/release.yml@v0\n    with:\n      release_packages: ${{ inputs.release_packages || '' }}\n    secrets:\n      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}\n    permissions:\n      contents: write\n      # Required even for the token-auth bootstrap publish: the\n      # reusable workflow's publish job declares id-token: write, and\n      # a caller granting less is a startup error.\n      id-token: write\n\n  # PyPI upload runs in the caller's workflow context (see\n  # pypi/warehouse#11096). The `if:` gate skips this job for non-PyPI\n  # repos — pasted verbatim per putitoutthere's README regardless of\n  # what the repo publishes.\n  pypi-publish:\n    needs: release\n    if: needs.release.outputs.has_pypi == 'true'\n    runs-on: ubuntu-latest\n    environment: release\n    permissions:\n      id-token: write\n    steps:\n      - uses: actions/download-artifact@v8\n        with:\n          pattern: '*-sdist'\n          path: dist/\n          merge-multiple: true\n      - uses: actions/download-artifact@v8\n        with:\n          pattern: '*-wheel-*'\n          path: dist/\n          merge-multiple: true\n      - uses: pypa/gh-action-pypi-publish@release/v1\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/typecheck.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": "name: typecheck\n\n# `tsc -p tsconfig.json`, whose include is `src` alone.\non:\n  pull_request:\n    paths:\n      - 'src/**'\n      - 'tsconfig.json'\n      - 'package.json'\n      - 'pnpm-lock.yaml'\n      - 'pnpm-workspace.yaml'\n      - '.github/workflows/typecheck.yml'\n  push:\n    branches: [main]\n\nconcurrency:\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  contents: read\n\njobs:\n  typecheck:\n    name: typecheck\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v7\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v7\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm typecheck\n"
+  },
+  {
+    "method": "getContent",
+    "params": {
+      "owner": "thekevinscott",
+      "repo": "willfire",
+      "path": ".github/workflows/unit.yml",
+      "ref": "d0cf506572d215ee1bce6bb0fc7e8d95b9f100b2"
+    },
+    "result": "name: unit\n\n# Colocated tests over `src` alone. Only this job carries the coverage floor:\n# `src/` reaches 100% from its colocated tests, so the integration suite is\n# not propping the number up.\non:\n  pull_request:\n    paths:\n      - 'src/**'\n      - 'vitest.config.mts'\n      - 'tsconfig.json'\n      - 'package.json'\n      - 'pnpm-lock.yaml'\n      - 'pnpm-workspace.yaml'\n      - '.github/workflows/unit.yml'\n  push:\n    branches: [main]\n\nconcurrency:\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\npermissions:\n  contents: read\n\njobs:\n  unit:\n    name: unit (100% coverage)\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v7\n      - uses: pnpm/action-setup@v6\n      - uses: actions/setup-node@v7\n        with:\n          node-version: '24'\n          cache: pnpm\n      - run: pnpm install --frozen-lockfile\n      - run: pnpm test:unit\n"
+  }
+]
