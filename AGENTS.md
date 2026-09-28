@@ -50,6 +50,19 @@ tracked it. Re-run each excluded case and drop the term if it passes. If it
 still fails, name the open issue tracking it in the commit that adds the
 receipt — an exclusion with no open issue is how they accumulate (#181).
 
+## Merging
+
+- A PR that does not touch `tests/` is set to auto-merge as soon as it is
+  open: code that passes the integration and e2e suites is trusted to be safe
+  to merge. Arm it; don't ask.
+- A PR that touches `tests/` changes the thing we trust, so merging stays
+  Kevin's call.
+- Every PR touching `src/**` carries an e2e attestation (see above). No
+  attestation, no arming.
+- A downstream bug the suite did not catch is fatal to this policy: stop
+  arming, report it, and re-examine — potentially jettison — the testing
+  assumptions before anything else merges.
+
 ## Comments
 
 A comment earns its place by stating what the code cannot: a constraint, a
@@ -125,8 +138,8 @@ stale one.
 
 - Don't add unsolicited refactors or hypothetical-future abstractions.
 - Don't bypass a CI gate without an explicit reason in the PR body.
-- Don't merge PRs. Open the PR, get CI green, and stop — merging is Kevin's
-  call, and that includes arming auto-merge.
+- Don't merge PRs by hand. Auto-merge per the Merging section; a
+  `tests/`-touching PR waits for Kevin.
 - No attribution boilerplate. No "Generated with Claude Code" footers, no
   claude.ai links, no session trailers — not in commit messages, PR bodies,
   issues, or docs.
