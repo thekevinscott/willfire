@@ -1,0 +1,15 @@
+name: probe-j10-true
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  vars-eq-true:
+    name: vars-eq-true
+    if: vars.RUN_EXTRA == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
