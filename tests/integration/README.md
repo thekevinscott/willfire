@@ -102,6 +102,13 @@ gh api "repos/$OWNER/$REPO/actions/runs/$RUN_ID/jobs" \
 
 `fixture.json` is those job names, deduplicated and sorted.
 
+One head SHA can carry more than one dispatch: a draft PR marked ready fires
+`opened` and then `ready_for_review` on the same commit. A prediction answers
+one event, so the fixture is the runs that event produced, not the union.
+The runs API reports no activity type, so partition by workflow `.path` —
+each file's `types:` says which action could have dispatched it — and
+corroborate with `created_at`. Name the action in `action.json`.
+
 ### Re-record, never edit
 
 A hand-edited fixture asserts what someone believed GitHub would answer. Re-run
