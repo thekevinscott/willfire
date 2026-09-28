@@ -29,6 +29,11 @@ in `calls.json` as `{ "$binary": "tarball-0.bin" }` with the bytes in a
 sibling file; `getCalls` reads the reference back into an `ArrayBuffer` at
 replay, and a missing sibling fails loudly.
 
+A case recorded under a non-default event action (`ready_for_review`,
+`labeled`, …) declares it in a sibling `action.json` holding a bare JSON
+string, e.g. `"ready_for_review"`; replay passes it as the prediction's
+`action`. Absent, the prediction falls back to its own default.
+
 Discovery keys on `fixture.json`, so a directory holding only READMEs is
 inert until the capture lands.
 

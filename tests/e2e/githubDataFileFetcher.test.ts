@@ -9,10 +9,10 @@ const CASES = discoverCases(new URL("./responses/", import.meta.url));
 
 test.each(CASES)(
   "$owner/$repo#$pr still predicts the committed list",
-  async ({ owner, repo, pr, dir }) => {
+  async ({ owner, repo, pr, dir, action }) => {
     const expected = getResponse(dir);
 
-    const { checkNames } = await predict(github, `${owner}/${repo}`, pr);
+    const { checkNames } = await predict(github, `${owner}/${repo}`, pr, { action });
 
     expect(checkNames).toEqual(expected);
   },
