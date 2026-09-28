@@ -30,15 +30,22 @@ describe("finalizePrediction", () => {
     expect(entries.map((e) => e.checkName)).toEqual([null, null]);
   });
 
-  it("aggregates checkNames deduped and sorted, from resolved dispatched entries", () => {
+  it("aggregates checkNames sorted, from resolved dispatched entries", () => {
     const drafts: DraftEntry[] = [
       { workflow: WF, job: j("a"), checkName: "B", status: "run", reason: "" },
       { workflow: WF, job: j("b"), checkName: "A", status: "run", reason: "" },
-      { workflow: WF, job: j("c"), checkName: "A", status: "run", reason: "" },
       { workflow: WF, job: j("d"), checkName: "C", status: "skipped", reason: "if: false" },
       { workflow: WF, job: j("e"), status: "run", reason: "" },
     ];
     expect(finalizePrediction(drafts, null, new Map()).checkNames).toEqual(["A", "B", "C"]);
+  });
+
+  it("keeps one checkName per entry when two entries share a name", () => {
+    const drafts: DraftEntry[] = [
+      { workflow: WF, job: j("a"), checkName: "A", status: "run", reason: "" },
+      { workflow: WF, job: j("b"), checkName: "A", status: "run", reason: "" },
+    ];
+    expect(finalizePrediction(drafts, null, new Map()).checkNames).toEqual(["A", "A"]);
   });
 
   it("excludes an unknown entry's checkName from checkNames", () => {

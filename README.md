@@ -27,7 +27,7 @@ const { entries, checkNames, skip, sources } = await willfire(
   123,
   { action: context.payload.action }, // "opened" | "synchronize" | "reopened"
 );
-// checkNames: sorted, deduped checkName of every entry with status "run"
+// checkNames: sorted checkName of every entry with status "run", one per entry
 // sources: every repo read, and the commit each ref resolved to
 ```
 
@@ -74,9 +74,9 @@ A ref that will not resolve is not a source. Its callee is never read, the jobs
 behind it come back `unknown`, and nothing falls back to reading the mutable
 ref.
 
-Duplicate names in `checkNames` are not possible (it is a set), but duplicate
-check names *are* — GitHub happily creates two identically named checks when a
-matrix job's `name:` does not vary per combination. `entries` shows them.
+`checkNames` repeats a name that GitHub dispatches twice — it creates two
+identically named checks when a matrix job's `name:` does not vary per
+combination. Compare it as a list, not a set.
 
 Auth is any token with `contents: read`, `actions: read`, and
 `pull-requests: read` — inside an action, the workflow's `GITHUB_TOKEN`.

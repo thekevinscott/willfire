@@ -66,8 +66,10 @@ export type Entry = WorkflowEntry | JobEntry;
 export interface Prediction {
   entries: Entry[];
   /**
-   * Convenience aggregate: sorted, deduplicated names for dispatched entries
-   * whose check names resolved. Unresolved entries remain in `entries`.
+   * Convenience aggregate: sorted names for dispatched entries whose check
+   * names resolved, one per entry. Repeats are real — GitHub creates a check
+   * per matrix combination even where two share a name. Unresolved entries
+   * remain in `entries`.
    */
   checkNames: string[];
   skip: string | null; // set when a skip instruction suppresses everything
