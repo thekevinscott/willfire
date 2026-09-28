@@ -388,56 +388,42 @@ describe("reusable workflows", () => {
     ]);
   });
 
-  it("follows the nine reusable levels GitHub.com allows", async () => {
-    const entries = await expand(
-      { call: { uses: "./.github/workflows/n1.yml" } },
-      readerFor(chainOf(9)),
-    );
-    const name = `call / ${"j / ".repeat(8)}leaf`;
-    expect(entries).toEqual([{ job: name, checkName: name, status: "run", reason: "" }]);
-  });
-
-  it("gives up past the ninth reusable level", async () => {
-    // Not a self-imposed budget: a tenth level fails the run outright, so
-    // there is no check name to predict. That level is the first `uses:` we
-    // decline to follow, and the entry stops at the caller that made it.
+  it("follows the ten reusable levels GitHub.com allows", async () => {
+    // Ten, not the documented nine: willfire#342 run 36417316158 ran this chain.
     const entries = await expand(
       { call: { uses: "./.github/workflows/n1.yml" } },
       readerFor(chainOf(10)),
     );
-    expect(entries).toEqual([
-      {
-        job: `call${" / j".repeat(9)}`,
-        checkName: null,
-        status: "unknown",
-        reason: "reusable workflow nested deeper than 9 levels",
-      },
-    ]);
+    const name = `call / ${"j / ".repeat(9)}leaf`;
+    expect(entries).toEqual([{ job: name, checkName: name, status: "run", reason: "" }]);
   });
 
-  it("counts a cross-repo hop as one level, same as a local one", async () => {
+  it("throws past the tenth reusable level", async () => {
+    // An eleventh level fails the whole run at validation — zero jobs, zero
+    // checks (willfire#342 run 36417315398) — so there is no entry to emit and
+    // the caller turns the throw into a workflow-level verdict.
+    await expect(
+      expand({ call: { uses: "./.github/workflows/n1.yml" } }, readerFor(chainOf(11))),
+    ).rejects.toThrow("reusable workflow nested deeper than 10 levels");
+  });
+
+  it("counts a cross-repo hop as one level, and one deep branch fails the tree", async () => {
     // The chain alternates pinned owner/repo hops and `./` hops on its way to
-    // the bound, so the tenth being declined means both kinds were counted.
+    // the bound, so the eleventh throwing means both kinds were counted. The
+    // legal `leaf` sibling is lost with the rest: GitHub runs nothing from a
+    // tree that nests too deep anywhere (willfire#342 run 36417461106).
     const path = (i: number) => `.github/workflows/n${i}.yml`;
     const hop = (i: number) =>
       i % 2 === 1 ? `octo/repo/${path(i)}@${REMOTE_SHA}` : `./${path(i)}`;
     const files: Record<string, string> = {};
-    for (let i = 1; i <= 9; i++) {
+    for (let i = 1; i <= 10; i++) {
       const jobs =
-        i === 9 ? { leaf: {}, j: { uses: hop(10) } } : { j: { uses: hop(i + 1) } };
+        i === 10 ? { leaf: {}, j: { uses: hop(11) } } : { j: { uses: hop(i + 1) } };
       files[path(i)] = JSON.stringify({ on: { workflow_call: null }, jobs });
     }
-    const entries = await expand({ call: { uses: hop(1) } }, readerFor(files));
-    const p = `call${" / j".repeat(8)}`;
-    expect(entries).toEqual([
-      { job: `${p} / leaf`, checkName: `${p} / leaf`, status: "run", reason: "" },
-      {
-        job: `${p} / j`,
-        checkName: null,
-        status: "unknown",
-        reason: "reusable workflow nested deeper than 9 levels",
-      },
-    ]);
+    await expect(expand({ call: { uses: hop(1) } }, readerFor(files))).rejects.toThrow(
+      "reusable workflow nested deeper than 10 levels",
+    );
   });
 
   it("reports a dynamic matrix on the calling job as unknown", async () => {

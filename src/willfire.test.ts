@@ -390,6 +390,44 @@ describe("workflow-level verdicts", () => {
     ]);
   });
 
+  it("reports an over-deep reusable chain as a workflow-level run with no jobs", async () => {
+    // Eleven reusable levels fail the whole run at validation. The run exists
+    // but has zero jobs — the legal `ok` sibling included — so the verdict is
+    // the unparseable-file shape (willfire#342, runs 36417315398 / 36417461106).
+    const sub = (i: number) => `.github/workflows/n${i}.yml`;
+    const contents: Record<string, string> = {
+      [WF]: `on: pull_request\njobs:\n  ok: {}\n  call:\n    uses: ./${sub(1)}\n`,
+    };
+    for (let i = 1; i <= 10; i++) {
+      contents[sub(i)] = JSON.stringify({
+        on: { workflow_call: null },
+        jobs: { j: { uses: `./${sub(i + 1)}` } },
+      });
+    }
+    const { entries, checkNames } = await willfire(fakeGithub({ contents }), "o/r", 1);
+    expect(entries).toEqual([
+      {
+        workflow: WF,
+        job: "*",
+        checkName: null,
+        status: "run",
+        reason: `reusable workflow nested deeper than 10 levels at ./${sub(11)}`,
+      },
+    ]);
+    expect(checkNames).toEqual([]);
+  });
+
+  it("propagates a non-depth failure out of job expansion", async () => {
+    const sub = ".github/workflows/sub.yml";
+    const github = fakeGithub({
+      contents: { [WF]: `on: pull_request\njobs:\n  call:\n    uses: ./${sub}\n` },
+    });
+    const real = github.getContent;
+    github.getContent = async (args) =>
+      args.path === sub ? Promise.reject(apiError(503, sub)) : real(args);
+    await expect(willfire(github, "o/r", 1)).rejects.toThrow(`GitHub API 503 for ${sub}`);
+  });
+
   it("reports an unparseable workflow as a workflow-level run (#7)", async () => {
     // GitHub creates the run and concludes it `startup_failure`. The run exists
     // but has no jobs, so there is a workflow-level entry and nothing to expand.

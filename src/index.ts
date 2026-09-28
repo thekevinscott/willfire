@@ -6,6 +6,7 @@ export { matchFilters } from "./filters/matchFilters.js";
 export { expandMatrix } from "./matrix/index.js";
 export { evalIf } from "./jobs/evalIf.js";
 export { expandWorkflowJobs } from "./jobs/expandWorkflowJobs.js";
+export { ReusableDepthError } from "./jobs/expandJobs.js";
 export { parseUses } from "./uses/parseUses.js";
 export { makeGithubClient } from "./predict/makeGithubClient.js";
 export { willfire } from "./willfire.js";

@@ -44,6 +44,7 @@ describe("root barrel", () => {
     // pr-monitor imports Entry, JobEntry, WorkflowEntry and Prediction from
     // here; the runtime names below are the rest of the contract.
     expect(Object.keys(barrel).sort()).toEqual([
+      "ReusableDepthError",
       "evalIf",
       "expandMatrix",
       "expandWorkflowJobs",
