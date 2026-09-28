@@ -49,6 +49,7 @@ export async function runRun(
     tree: ctx.tree,
     actionRoot: ctx.actionRoot,
     stateKey: ctx.stateKey,
+    jobEnv: ctx.jobEnv,
     label,
   });
 }

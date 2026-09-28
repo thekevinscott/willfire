@@ -124,6 +124,9 @@ export interface WalkCtx {
   /** This job's `RunSpec.stateKey`: one machine's worth of state per job, as
    * on a real runner, where step 1's `npm install -g` is step 2's tool. */
   stateKey: string;
+  /** What steps wrote to `$GITHUB_ENV`, composite steps included: every later
+   * step of the job sees it, over the file's `env:` blocks but under its own. */
+  jobEnv: Record<string, string>;
   deps: ExecDeps;
   depth: number;
 }

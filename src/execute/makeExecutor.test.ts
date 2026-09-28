@@ -345,6 +345,54 @@ describe("executing run steps", () => {
     expect(out).toEqual({ v: "wji" });
   });
 
+  it("carries GITHUB_ENV writes into every later step", async () => {
+    const out = success(
+      await execute({
+        steps: [
+          { run: 'echo "K=written" >> "$GITHUB_ENV"' },
+          { id: "s", run: 'echo "v=$K" >> "$GITHUB_OUTPUT"' },
+        ],
+        outputs: { v: "${{ steps.s.outputs.v }}" },
+      }),
+    );
+    expect(out).toEqual({ v: "written" });
+  });
+
+  it("ranks GITHUB_ENV over the job's env: and under the step's own", async () => {
+    const out = success(
+      await execute(
+        {
+          env: { K: "job" },
+          steps: [
+            { run: 'echo "K=written" >> "$GITHUB_ENV"' },
+            { id: "a", run: 'echo "v=$K" >> "$GITHUB_OUTPUT"' },
+            { id: "b", env: { K: "step" }, run: 'echo "v=$K" >> "$GITHUB_OUTPUT"' },
+          ],
+          outputs: { a: "${{ steps.a.outputs.v }}", b: "${{ steps.b.outputs.v }}" },
+        },
+      ),
+    );
+    expect(out).toEqual({ a: "written", b: "step" });
+  });
+
+  it("starts each execution with an empty GITHUB_ENV slate", async () => {
+    const tree = await tempTree({});
+    const ex = executorOf({ [`o/r@${SHA}`]: tree });
+    const job = {
+      steps: [
+        { id: "s", run: 'echo "v=${K-unset}" >> "$GITHUB_OUTPUT"; echo "K=set" >> "$GITHUB_ENV"' },
+      ],
+      outputs: { v: "${{ steps.s.outputs.v }}" },
+    };
+    expect(success(await ex.executeJob("detect", job, {}, {}))).toEqual({ v: "unset" });
+    expect(success(await ex.executeJob("detect", job, {}, {}))).toEqual({ v: "unset" });
+  });
+
+  it("stops on malformed GITHUB_ENV", async () => {
+    const o = await execute({ steps: [{ id: "s", run: 'echo garbage >> "$GITHUB_ENV"' }] });
+    expect(failure(o)).toBe("step 's': malformed GITHUB_ENV");
+  });
+
   it("renders a null env value as the empty string", async () => {
     const out = success(
       await execute({
@@ -1106,6 +1154,31 @@ describe("composite actions", () => {
     expect(failure(o2)).toBe("step '#1': output 'x' of ./a2 has no value");
     const o3 = await ex.executeJob("detect", { steps: [{ uses: "./a3" }] }, {}, {});
     expect(failure(o3)).toBe("step '#1': output 'x' of ./a3 has no value");
+  });
+
+  it("carries a composite step's GITHUB_ENV write out to later job steps", async () => {
+    // As on a runner: env-file writes are job-scoped, not composite-scoped.
+    const tree = await tempTree({
+      "action/action.yml": compositeAction([
+        { shell: "bash", run: 'echo "K=from-composite" >> "$GITHUB_ENV"' },
+      ]),
+    });
+    const ex = executorOf({ [`o/r@${SHA}`]: tree });
+    const out = success(
+      await ex.executeJob(
+        "detect",
+        {
+          steps: [
+            { uses: "./action" },
+            { id: "s", run: 'echo "v=$K" >> "$GITHUB_OUTPUT"' },
+          ],
+          outputs: { v: "${{ steps.s.outputs.v }}" },
+        },
+        {},
+        {},
+      ),
+    );
+    expect(out).toEqual({ v: "from-composite" });
   });
 
   it("stops a self-including action at the nesting cap", async () => {

@@ -9,6 +9,7 @@ const ctxOf = (envLayers: WalkCtx["envLayers"] = []): WalkCtx => ({
   hasHistory: false,
   envLayers,
   stateKey: "sk",
+  jobEnv: {},
   deps: {
     provideTree: async () => null,
     runCommand: noop,
@@ -67,6 +68,20 @@ describe("stepEnv", () => {
   it("applies the outer layers in order", () => {
     const built = stepEnv({}, {}, ctxOf([{ K: "first" }, { K: "second" }]), "step 's'");
     expect(built.ok && built.v.K).toBe("second");
+  });
+
+  it("lets the job env from $GITHUB_ENV outrank the file's env: layers", () => {
+    const ctx = ctxOf([{ K: "workflow" }, { K: "job" }]);
+    ctx.jobEnv.K = "written";
+    const built = stepEnv({}, {}, ctx, "step 's'");
+    expect(built.ok && built.v.K).toBe("written");
+  });
+
+  it("lets a step's own env: outrank the job env", () => {
+    const ctx = ctxOf();
+    ctx.jobEnv.K = "written";
+    const built = stepEnv({ env: { K: "step" } }, {}, ctx, "step 's'");
+    expect(built.ok && built.v.K).toBe("step");
   });
 
   it("stops on a layer it cannot render, naming the step", () => {

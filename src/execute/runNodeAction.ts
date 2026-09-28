@@ -59,6 +59,7 @@ export async function runNodeAction(
     tree: ctx.tree,
     actionRoot,
     stateKey: ctx.stateKey,
+    jobEnv: ctx.jobEnv,
     label,
   });
 }

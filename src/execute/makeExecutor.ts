@@ -72,6 +72,7 @@ export function makeExecutor(opts: {
         // Fresh per execution, never per jobId: two runs of one job must not
         // see each other's installs any more than two runner VMs would.
         stateKey: randomUUID(),
+        jobEnv: {},
         deps,
         depth: 0,
       });
