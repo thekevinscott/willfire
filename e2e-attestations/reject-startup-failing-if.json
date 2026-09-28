@@ -1,0 +1,7 @@
+{
+  "command": "pnpm build && pnpm exec vitest run --config tests/e2e/vitest.config.mts --testTimeout=1800000",
+  "ran_at": 1790606758,
+  "exit_code": 0,
+  "commit": "c7740098e39e2031a5a283585ee9726aa3151dff",
+  "branch": "fix/reject-startup-failing-if"
+}
