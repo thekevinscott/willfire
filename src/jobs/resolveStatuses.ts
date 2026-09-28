@@ -25,7 +25,7 @@ export function resolveStatuses(
   scoped: Scope,
 ): Record<string, JobVerdict> {
   const verdicts: Record<string, JobVerdict> = {};
-  const resolving = new Set<string>();
+  const statuses: Record<string, JobVerdict["status"]> = {};
 
   const decide = (jobId: string): JobVerdict => {
     const job = jobs[jobId] ?? {};
@@ -43,8 +43,8 @@ export function resolveStatuses(
         needs,
       };
     }
-    const upstream = needs.map((n) => resolve(n).status);
-    const cond = String(job.if ?? "");
+    const upstream = needs.map((n) => statusOf(n));
+    const cond = String(job.if);
     // Every need settled and one was skipped: a status-function condition is
     // decidable against that state (probe PR #341, run 36416679059), where a
     // condition without one falls to the implicit success() gate below. The
@@ -70,26 +70,23 @@ export function resolveStatuses(
     return { status, reason, needs };
   };
 
-  const resolve = (jobId: string): JobVerdict => {
-    const settled = verdicts[jobId];
+  const statusOf = (jobId: string): JobVerdict["status"] => {
+    const settled = statuses[jobId];
     if (settled !== undefined) {
       return settled;
     }
     // A `needs:` cycle fails the workflow at startup the same way a dangling
-    // one does, so re-entry answers unknown rather than recursing forever.
-    // Left unmemoised: the outer frame still has to settle its own verdict.
-    if (resolving.has(jobId)) {
-      return { status: "unknown", reason: `needs '${jobId}' forms a cycle`, needs: [] };
-    }
-    resolving.add(jobId);
+    // one does, so seeding `unknown` before recursing lets re-entry read it
+    // instead of recursing forever.
+    statuses[jobId] = "unknown";
     const verdict = decide(jobId);
-    resolving.delete(jobId);
     verdicts[jobId] = verdict;
-    return verdict;
+    statuses[jobId] = verdict.status;
+    return verdict.status;
   };
 
   for (const jobId of Object.keys(jobs)) {
-    resolve(jobId);
+    statusOf(jobId);
   }
   return verdicts;
 }
