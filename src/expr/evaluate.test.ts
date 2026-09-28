@@ -274,6 +274,16 @@ describe("functions", () => {
     expect(evaluate("contains('abc', 'z')")).toBe(false);
   });
 
+  it("evaluates contains over an array produced by fromJSON", () => {
+    // Probe #383 ran the first two (run 36430453627) and the last three
+    // (run 36431899958). `'ab'` against `['abc']` skipped: element equality.
+    expect(evaluate("contains(fromJSON('[\"a\",\"b\"]'), 'a')")).toBe(true);
+    expect(evaluate("contains(fromJSON('[\"a\",\"b\"]'), 'c')")).toBe(false);
+    expect(evaluate("contains(fromJSON('[\"abc\"]'), 'ab')")).toBe(false);
+    expect(evaluate("contains(fromJSON('[1,2]'), 1)")).toBe(true);
+    expect(evaluate("contains(fromJSON('[1,2]'), '1')")).toBe(true);
+  });
+
   it("evaluates startsWith and endsWith", () => {
     expect(evaluate("startsWith('abc', 'ab')")).toBe(true);
     expect(evaluate("startsWith('abc', 'bc')")).toBe(false);

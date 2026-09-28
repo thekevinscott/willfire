@@ -1,4 +1,5 @@
 import { asBool } from "./asBool.js";
+import { containsCall } from "./containsCall.js";
 import { formatCall } from "./formatCall.js";
 import { fromJson } from "./fromJson.js";
 import { UNKNOWN, type Scope, type Val } from "./val.js";
@@ -28,14 +29,7 @@ export function applyFunction(name: string, args: Val[], scope: Scope): Val {
     return formatCall(args);
   }
   if (name === "contains" && args.length === 2) {
-    const [hay, needle] = args;
-    if (hay.kind !== "value" || needle.kind !== "value") {
-      return UNKNOWN;
-    }
-    if (typeof hay.v !== "string" || typeof needle.v !== "string") {
-      return UNKNOWN;
-    }
-    return asBool(hay.v.includes(needle.v));
+    return containsCall(args[0], args[1]);
   }
   if ((name === "startswith" || name === "endswith") && args.length === 2) {
     const [s, part] = args;
