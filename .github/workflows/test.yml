@@ -10,7 +10,21 @@ name: test
 # `tests/fixtures/willrun-probe/README.md`.
 
 on:
-  pull_request: {}
+  pull_request:
+    # tests/e2e is excluded because no CI job reads it: the e2e suite runs
+    # locally, and CI checks only its receipts under e2e-attestations/.
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '!tests/e2e/**'
+      - 'e2e-attestations/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'tsconfig.json'
+      - 'tsconfig.build.json'
+      - 'vitest.config.mts'
+      - '.github/workflows/test.yml'
   push:
     branches: [main]
 
