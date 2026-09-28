@@ -1,0 +1,16 @@
+name: d14-dual-trigger
+
+on:
+  push:
+    branches: [probe/d14-dual-trigger]
+  pull_request:
+
+permissions: {}
+
+jobs:
+  d14-dual:
+    name: d14-dual
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: 'true'
