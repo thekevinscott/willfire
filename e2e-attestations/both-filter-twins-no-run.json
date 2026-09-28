@@ -1,0 +1,7 @@
+{
+  "command": "pnpm build && pnpm vitest run --config tests/e2e/vitest.config.mts --testTimeout=1800000",
+  "ran_at": 1790606970,
+  "exit_code": 0,
+  "commit": "7599a582992730c912eb6a99b53545d02127be9d",
+  "branch": "fix/both-filter-twins-no-run"
+}
