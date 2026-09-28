@@ -3,9 +3,9 @@ import { parseCallbackCommand } from "../callback/parseCallbackCommand.js";
 import type { PrEventAction } from "../types.js";
 import { isPrEventAction } from "./isPrEventAction.js";
 
-const USAGE =
-  "usage: predict --repo owner/name --pr N [--action <pull_request activity type>]" +
-  ' [--callback "<command>"]... [--json]';
+// A declaration, not a module const: a static's mutants can never be run
+// against a test, so the literal lives where call-time coverage reaches it.
+function usage(): string { return `usage: predict --repo owner/name --pr N [--action <pull_request activity type>] [--callback "<command>"]... [--json]`; }
 
 const SPEC = {
   "--repo": String,
@@ -24,7 +24,7 @@ export function parseArgs(argv: string[]): {
 } {
   const reject: (reason: string) => never = (reason) => {
     console.error(reason);
-    console.error(USAGE);
+    console.error(usage());
     process.exit(2);
   };
   const read = () => {
@@ -39,7 +39,7 @@ export function parseArgs(argv: string[]): {
   const repo = parsed["--repo"];
   const pr = parsed["--pr"];
   if (!repo || !pr) {
-    console.error(USAGE);
+    console.error(usage());
     process.exit(2);
   }
   // Refused, not ignored: falling back to the guess would turn a typo into a
