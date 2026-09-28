@@ -1,0 +1,7 @@
+name: probe-skip-h
+on: pull_request
+jobs:
+  probeh:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
