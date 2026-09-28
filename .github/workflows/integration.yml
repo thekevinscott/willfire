@@ -1,0 +1,44 @@
+name: integration
+
+# The suite builds `src` and replays `tests/integration`, importing
+# `tests/cases.ts` and `tests/getResponse.ts`; `attestations.test.ts` reads
+# `e2e-attestations/`. `tests/e2e` and `tests/fixtures` are read by no CI job.
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/integration/**'
+      - 'tests/cases.ts'
+      - 'tests/getResponse.ts'
+      - 'e2e-attestations/**'
+      - 'tsconfig.json'
+      - 'tsconfig.build.json'
+      - 'vitest.config.mts'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/integration.yml'
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    name: integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:integration
