@@ -371,6 +371,58 @@ describe("workflow-level verdicts", () => {
     expect(await only(wf, { baseRef: "main" })).toMatchObject({ status: "run" });
   });
 
+  // Measured on willfire#409 (head `f3c21dc`): each of these forms produced one
+  // zero-job `push` failure run and no `pull_request` run at all, while a valid
+  // control workflow in the same PR ran normally. The refusal is whole-file, so
+  // an unguarded sibling in the file names no check either — which is why the
+  // single entry these assert is the point, not just its status.
+
+  it("names no check for a job `if:` reading secrets (#378)", async () => {
+    const wf =
+      "on: pull_request\njobs:\n  guarded:\n    if: ${{ secrets.X != '' }}\n    runs-on: ubuntu-latest\n  sibling:\n    runs-on: ubuntu-latest\n";
+    expect(await only(wf)).toMatchObject({
+      job: "*",
+      status: "no-dispatch",
+      reason: "job 'guarded' if: reads secrets, unavailable there: startup failure",
+    });
+  });
+
+  it("refuses the same `if:` unwrapped (#378)", async () => {
+    const wf = "on: pull_request\njobs:\n  guarded:\n    if: secrets.X != ''\n  sibling: {}\n";
+    expect(await only(wf)).toMatchObject({ job: "*", status: "no-dispatch" });
+  });
+
+  it("names no check for a step `if:` reading secrets (#378)", async () => {
+    const wf =
+      "on: pull_request\njobs:\n  a:\n    steps:\n      - run: 'true'\n      - if: ${{ secrets.X != '' }}\n        run: 'true'\n";
+    expect(await only(wf)).toMatchObject({
+      status: "no-dispatch",
+      reason: "a step of job 'a' if: reads secrets, unavailable there: startup failure",
+    });
+  });
+
+  it("names no check for a job `if:` reading env (#378)", async () => {
+    const wf = "on: pull_request\njobs:\n  a:\n    if: ${{ env.FOO != '' }}\n";
+    expect(await only(wf)).toMatchObject({
+      status: "no-dispatch",
+      reason: "job 'a' if: reads env, unavailable there: startup failure",
+    });
+  });
+
+  it("leaves a step `if:` reading env alone (#378)", async () => {
+    // Steps read `env`; only jobs cannot. The allowlist differs by position, so
+    // a single list of refused names would decline a file GitHub accepts.
+    const wf =
+      "on: pull_request\njobs:\n  a:\n    steps:\n      - if: ${{ env.FOO != '' }}\n        run: 'true'\n";
+    expect(await only(wf)).toMatchObject({ job: "a", status: "run" });
+  });
+
+  it("does not refuse a condition that merely mentions secrets (#378)", async () => {
+    const wf =
+      "on: pull_request\njobs:\n  a:\n    if: ${{ contains(github.ref, 'secrets.X') }}\n    runs-on: ubuntu-latest\n";
+    expect(await only(wf)).toMatchObject({ job: "a" });
+  });
+
   it("reports a workflow with no file at head as no-dispatch (#7)", async () => {
     // The Actions API keeps listing a workflow as `active` after its file is
     // deleted on the branch. Nothing can dispatch from a file that is not there.

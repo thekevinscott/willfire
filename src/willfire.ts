@@ -12,6 +12,7 @@ import { jobName } from "./entries/jobName.js";
 import { errorStatus } from "./predict/errorStatus.js";
 import type { Scope } from "./expr/val.js";
 import { expandJobs } from "./jobs/expandJobs.js";
+import { rejectedIfContext } from "./jobs/rejectedIfContext.js";
 import { workflowDispatches } from "./triggers/workflowDispatches.js";
 import { finalizePrediction } from "./predict/finalizePrediction.js";
 import type { GithubClient } from "./predict/makeGithubClient.js";
@@ -273,6 +274,13 @@ export async function willfire(
     const [dispatches, reason] = workflowDispatches(wf, ctx);
     if (!dispatches) {
       return [{ workflow: path, job: "*", status: "no-dispatch", reason }];
+    }
+    // A file GitHub refuses at startup is refused whole: the failure hangs off
+    // the push that introduced it, never the pull request, so no job in it is
+    // named. It is a property of the file, so it settles before expansion.
+    const rejected = rejectedIfContext(wf);
+    if (rejected !== null) {
+      return [{ workflow: path, job: "*", status: "no-dispatch", reason: rejected }];
     }
     // `github.workflow` is the top-level workflow's `name:` — the path when
     // unnamed — all the way down its reusable call tree, so it seeds per
