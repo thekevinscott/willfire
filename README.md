@@ -333,12 +333,11 @@ the docs do not state:
   of the callee's file was present at head, under a different job name, and
   GitHub did not use it.
 
-Scope notes: validated on `opened` pull_request events; `synchronize`/`labeled`
-live events, `branches-ignore`, and diffs far beyond 301 files are not yet
-probe-verified — passing `action` explicitly is what makes probing the other
-two possible. `action` accepts the three default `types:` only; `pull_request`
-fires on around twenty actions, and a workflow narrowing to `ready_for_review`
-or `edited` is out of scope either way. Reusable-workflow name prefixing is probe-verified to three
+Scope notes: `synchronize` live events and diffs far beyond 301 files are not
+yet probe-verified. `labeled` is, on both sides — a `types: [labeled]` workflow
+fires on the label and nothing under default `types:` does (case P9). So is
+`branches-ignore`, along with the decline side of `branches:`, on a non-`main`
+base (case D16). Reusable-workflow name prefixing is probe-verified to three
 levels; deeper nesting is inferred. The cross-repo probe calls back into the
 probe repo itself by full `owner/repo@ref` reference, so it pins ref
 resolution but not the owner/repo half of the address.
