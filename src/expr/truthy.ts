@@ -12,10 +12,11 @@ export function truthy(val: Val): boolean | null {
       return false;
     case "unknown":
       return null;
-    // GitHub does cast these, but no workflow asks it to, so guessing buys
-    // nothing.
+    // An array or an object is always true, the empty array included — probe
+    // #383 run 36430453652 ran all three of `fromJSON('[1]')`,
+    // `fromJSON('[]')` and `fromJSON('{"a":1}')`.
     case "json":
-      return null;
+      return true;
     case "value": {
       const v = val.v;
       if (typeof v === "boolean") {

@@ -330,12 +330,11 @@ describe("fromJSON", () => {
     expect(evaluate("fromJSON('null')")).toBe(false);
   });
 
-  it("does not model the truthiness of an array or an object", () => {
-    // GitHub casts them, but no workflow asks it to, and the answer is not
-    // worth guessing at to find out.
-    expect(evaluate("fromJSON('[]')")).toBe(null);
-    expect(evaluate("fromJSON('[1]')")).toBe(null);
-    expect(evaluate("fromJSON('{}')")).toBe(null);
+  it("reads an array or an object as true, the empty array included", () => {
+    // Probe #383 run 36430453652 dispatched all three; all three ran.
+    expect(evaluate("fromJSON('[]')")).toBe(true);
+    expect(evaluate("fromJSON('[1]')")).toBe(true);
+    expect(evaluate('fromJSON(\'{"a":1}\')')).toBe(true);
   });
 
   it("compares a structure by instance, so it equals nothing written beside it", () => {

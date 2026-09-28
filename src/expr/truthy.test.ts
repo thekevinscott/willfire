@@ -7,7 +7,11 @@ describe("truthy", () => {
     [{ kind: "truthy" }, true],
     [{ kind: "falsy" }, false],
     [{ kind: "unknown" }, null],
-    [{ kind: "json", v: [] }, null],
+    // Probe #383 run 36430453652: an array or object is true, empty or not.
+    [{ kind: "json", v: [] }, true],
+    [{ kind: "json", v: [1] }, true],
+    [{ kind: "json", v: { a: 1 } }, true],
+
     [{ kind: "value", v: true }, true],
     [{ kind: "value", v: false }, false],
     [{ kind: "value", v: 0 }, false],
