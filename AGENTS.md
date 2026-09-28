@@ -22,8 +22,9 @@ ratio, no number at any level.
 
 A unit test asserts what its author believed, so it is never evidence about
 GitHub. Only the integration and e2e fixtures — recordings of live CI — verify
-willfire's contract, the exact list of check-name strings. Any claim about
-GitHub's behavior needs a captured fixture or a cited live run.
+willfire's contract, the exact list of check-name strings. Evidence is a
+captured fixture under `tests/integration/fixtures/` or a cited live run; a
+test comment claiming measurement names the run id or the fixture path.
 `src/jobs/expandJobs.test.ts` asserted a ten-level reusable chain never runs,
 with a comment claiming it was measured; probe PR #340 (run 36416635296) showed
 GitHub runs it, and the suite was green throughout.
@@ -34,6 +35,9 @@ ought to behave. Every workflow-level verdict was read off a live dispatch on
 under `tests/fixtures/willrun-probe/` are the record. Changing one of those
 assertions is a claim that GitHub's behavior
 changed — verify it against a real PR before you do.
+
+Integration coverage is the priority. Never remove an integration test; add
+them freely wherever the prediction rests on a belief no fixture verifies.
 
 willfire MUST return the exact list of check-name strings, with zero
 `unknown`s. Anything it cannot decide — a runtime-computed matrix, an
@@ -60,11 +64,10 @@ receipt — an exclusion with no open issue is how they accumulate (#181).
 
 ## Merging
 
-- A PR that does not touch `tests/` is set to auto-merge as soon as it is
-  open: code that passes the integration and e2e suites is trusted to be safe
-  to merge. Arm it; don't ask.
-- A PR that touches `tests/` changes the thing we trust, so merging stays
-  Kevin's call.
+- Every PR is armed for auto-merge as soon as it is open, fixture and test PRs
+  included: `gh pr merge <n> --auto --squash`. Arm it; don't ask.
+- A scratch probe PR is the exception: never merged, never armed. It is closed
+  unmerged, and the closed PR is the permanent record.
 - Every PR touching `src/**` carries an e2e attestation (see above). No
   attestation, no arming.
 - A downstream bug the suite did not catch is fatal to this policy: stop
@@ -146,8 +149,7 @@ stale one.
 
 - Don't add unsolicited refactors or hypothetical-future abstractions.
 - Don't bypass a CI gate without an explicit reason in the PR body.
-- Don't merge PRs by hand. Auto-merge per the Merging section; a
-  `tests/`-touching PR waits for Kevin.
+- Don't merge PRs by hand. Auto-merge per the Merging section.
 - No attribution boilerplate. No "Generated with Claude Code" footers, no
   claude.ai links, no session trailers — not in commit messages, PR bodies,
   issues, or docs.
