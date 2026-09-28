@@ -1,0 +1,7 @@
+{
+  "command": "pnpm vitest run --config tests/e2e/vitest.config.mts -t \"^(?!.*putitoutthere)\"",
+  "ran_at": 1790606366,
+  "exit_code": 0,
+  "commit": "67b93cd621e53ba1c56eac37c2462652b9e9bef8",
+  "branch": "fix/duplicate-check-names"
+}
