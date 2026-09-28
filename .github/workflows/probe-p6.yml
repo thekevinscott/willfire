@@ -1,0 +1,26 @@
+name: probe-p6
+on: pull_request
+jobs:
+  a:
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
+  b:
+    needs: a
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
+  c:
+    needs: a
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
+  d:
+    needs: a
+    if: ${{ success() || failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'true'
