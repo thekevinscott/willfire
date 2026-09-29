@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1790711657,
+  "exit_code": 0,
+  "commit": "07161880c25d65a4d677e1f4dbcd2b97e6a65f6c",
+  "branch": "fix/absent-matrix-key-name"
+}
