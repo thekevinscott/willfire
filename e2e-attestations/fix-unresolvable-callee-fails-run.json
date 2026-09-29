@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1790712194,
+  "exit_code": 0,
+  "commit": "af0945487b7202f52ba2347a515bb8a5d9b68d1d",
+  "branch": "fix/unresolvable-callee-fails-run"
+}
