@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1790711479,
+  "exit_code": 0,
+  "commit": "2cb49290da7a2ef650741645ce4db46010efd586",
+  "branch": "fix/contains-array"
+}
