@@ -1,0 +1,7 @@
+{
+  "command": "pnpm test:e2e",
+  "ran_at": 1790712584,
+  "exit_code": 0,
+  "commit": "bfbcb76b96262e4d155e2b0d320fbe0c961699d7",
+  "branch": "fix/matrix-exclude-wipe"
+}
